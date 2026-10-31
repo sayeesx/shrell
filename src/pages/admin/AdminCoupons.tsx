@@ -3,6 +3,7 @@ import { Tag, Plus } from 'lucide-react';
 import { Coupon } from '../../domain/types';
 import { couponRepository } from '../../infrastructure/repositories';
 import { formatINR, rupeesToPaisa } from '../../domain/services/CurrencyService';
+import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 
 export const AdminCoupons: React.FC = () => {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
@@ -13,6 +14,8 @@ export const AdminCoupons: React.FC = () => {
   const [maxDiscountRupees] = useState('1500');
   const [maxUses] = useState('500');
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useBodyScrollLock(isModalOpen);
 
   const loadCoupons = async () => {
     try {

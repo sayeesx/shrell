@@ -5,6 +5,7 @@ import { formatINR } from '../../domain/services/CurrencyService';
 import { productRepository } from '../../infrastructure/repositories';
 import { useCart } from '../../application/CartContext';
 import { ProductCard } from '../../components/ui/ProductCard';
+import { HalfArrowIcon } from '../../components/common/HalfArrowIcon';
 
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -142,9 +143,11 @@ export const ProductDetailPage: React.FC = () => {
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 text-xs font-bold text-gray-700 hover:text-gray-950 transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-bold text-gray-700 hover:text-gray-950 transition-colors group"
+            aria-label="Go back"
           >
-            <i className="bi bi-arrow-left text-base" /> Back
+            <HalfArrowIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.4} />
+            <span>Back</span>
           </button>
           <Link
             to="/cart"

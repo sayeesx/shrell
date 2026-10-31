@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../application/AuthContext';
 import { useCart } from '../../application/CartContext';
 import { useVehicle } from '../../application/VehicleContext';
+import { HalfArrowIcon } from '../../components/common/HalfArrowIcon';
 
 export const ProfilePage: React.FC = () => {
   const { user, logout, openAuthModal } = useAuth();
@@ -57,9 +58,11 @@ export const ProfilePage: React.FC = () => {
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors group cursor-pointer"
+            aria-label="Go back"
           >
-            <i className="bi bi-arrow-left text-sm" /> Back
+            <HalfArrowIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.4} />
+            <span>Back</span>
           </button>
           <span className="text-[11px] font-bold text-gray-400 tracking-wider uppercase">
             Account Management

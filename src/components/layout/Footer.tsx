@@ -50,11 +50,13 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Info */}
           <div className="space-y-4 md:col-span-1">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-black text-white lowercase tracking-tight">
-                shrell<span className="w-2 h-2 rounded-full bg-brand-500 inline-block ml-0.5"></span>
-              </span>
-            </div>
+            <Link to="/" className="inline-block group" aria-label="SHRELL Automotive Home">
+              <img
+                src="/logos/shrell-logo-white.png"
+                alt="SHRELL Automotive"
+                className="h-7 w-auto object-contain transition-opacity group-hover:opacity-90"
+              />
+            </Link>
             <p className="text-xs text-slate-400 leading-relaxed">
               Specialized car accessories, overland gear, and precision components designed for Indian road conditions.
             </p>

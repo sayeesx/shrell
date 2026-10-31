@@ -43,9 +43,13 @@ export const AdminLayout: React.FC = () => {
       <aside className="w-full md:w-64 bg-surface-900 border-r border-surface-800 flex flex-col flex-shrink-0">
         {/* Brand Header */}
         <div className="p-5 border-b border-surface-800 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded bg-surface-950 border border-surface-700 flex items-center justify-center font-bold text-brand-500 font-mono text-sm">
-              S
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-surface-950 border border-surface-700/80 p-1 flex items-center justify-center flex-shrink-0 shadow-xs">
+              <img
+                src="/logos/shrell-brandicon_no-bg.png"
+                alt="SHRELL"
+                className="w-full h-full object-contain"
+              />
             </div>
             <div>
               <span className="text-sm font-bold text-slate-100 font-mono tracking-wider">

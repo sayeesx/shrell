@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../application/AuthContext';
+import { useBodyScrollLock } from '../common/useBodyScrollLock';
 
 export const AuthModal: React.FC = () => {
   const { isAuthModalOpen, closeAuthModal, loginWithPhone } = useAuth();
   const navigate = useNavigate();
+
+  useBodyScrollLock(isAuthModalOpen);
 
   const [step, setStep] = useState<'phone' | 'otp' | 'success'>('phone');
   const [phoneNumber, setPhoneNumber] = useState('');

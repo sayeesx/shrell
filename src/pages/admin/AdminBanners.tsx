@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { HeroBanner } from '../../domain/types';
 import { bannerRepository } from '../../infrastructure/repositories';
 import { cloudinaryService } from '../../infrastructure/cloudinary/cloudinaryService';
+import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 
 interface CropModalState {
   isOpen: boolean;
@@ -35,6 +36,8 @@ export const AdminBanners: React.FC = () => {
     imageUrl: '',
     originalFile: null,
   });
+
+  useBodyScrollLock(cropModal.isOpen);
   const [aspectRatio, setAspectRatio] = useState<number>(16 / 5); // default desktop ~3.2:1
   const [zoom, setZoom] = useState<number>(1);
   const [panX, setPanX] = useState<number>(0);

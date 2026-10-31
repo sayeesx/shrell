@@ -4,6 +4,7 @@ import { Order, OrderStatus } from '../../domain/types';
 import { formatINR } from '../../domain/services/CurrencyService';
 import { orderRepository } from '../../infrastructure/repositories';
 import { ManualShippingAdapter } from '../../infrastructure/shipping/ManualShippingAdapter';
+import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 
 export const AdminOrders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -13,6 +14,8 @@ export const AdminOrders: React.FC = () => {
 
   // Order Details Modal
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
+  useBodyScrollLock(!!selectedOrder);
 
   // Dispatch fields
   const [courierName, setCourierName] = useState('BlueDart Express');

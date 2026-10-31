@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useVehicle } from '../../application/VehicleContext';
+import { useBodyScrollLock } from '../common/useBodyScrollLock';
 
 interface VehicleSelectorModalProps {
   isOpen: boolean;
@@ -7,6 +8,7 @@ interface VehicleSelectorModalProps {
 }
 
 export const VehicleSelectorModal: React.FC<VehicleSelectorModalProps> = ({ isOpen, onClose }) => {
+  useBodyScrollLock(isOpen);
   const {
     makes,
     models,

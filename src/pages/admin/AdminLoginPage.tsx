@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Lock, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../application/AuthContext';
+import { HalfArrowIcon } from '../../components/common/HalfArrowIcon';
 
 export const AdminLoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -28,9 +29,13 @@ export const AdminLoginPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-surface-950 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md bg-surface-900 border border-surface-700 rounded-lg p-8 shadow-elevation space-y-6">
-        <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded bg-surface-800 border border-surface-700 flex items-center justify-center mx-auto text-brand-500">
-            <Shield className="w-6 h-6" />
+        <div className="text-center space-y-3">
+          <div className="w-14 h-14 rounded-2xl bg-surface-950 border border-surface-700 flex items-center justify-center mx-auto p-2.5 shadow-inner">
+            <img
+              src="/logos/shrell-brandicon_no-bg.png"
+              alt="SHRELL"
+              className="w-full h-full object-contain"
+            />
           </div>
           <h1 className="text-xl font-bold text-slate-100 font-mono tracking-wider">
             SHRELL OPERATIONS CONSOLE
@@ -82,9 +87,10 @@ export const AdminLoginPage: React.FC = () => {
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="text-xs font-mono text-slate-400 hover:text-slate-200 transition-colors inline-flex items-center gap-1.5"
+            className="text-xs font-mono text-slate-400 hover:text-slate-200 transition-colors inline-flex items-center gap-2 group cursor-pointer"
+            aria-label="Return to Customer Storefront"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
+            <HalfArrowIcon className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.4} />
             <span>Return to Customer Storefront</span>
           </button>
         </div>

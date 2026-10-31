@@ -5,6 +5,7 @@ import { Order, PaymentMethod } from '../../domain/types';
 import { formatINR, paisaToRupees } from '../../domain/services/CurrencyService';
 import { orderRepository } from '../../infrastructure/repositories';
 import { whatsAppService } from '../../features/whatsapp/WhatsAppService';
+import { HalfArrowIcon } from '../../components/common/HalfArrowIcon';
 
 const INDIAN_STATES = [
   'Andhra Pradesh',
@@ -259,9 +260,10 @@ export const CheckoutPage: React.FC = () => {
           </div>
           <Link
             to="/cart"
-            className="text-xs font-semibold text-gray-600 hover:text-gray-950 flex items-center gap-1.5 transition-colors"
+            className="text-xs font-semibold text-gray-600 hover:text-gray-950 flex items-center gap-1.5 transition-colors group"
+            aria-label="Return to Cart"
           >
-            <i className="bi bi-arrow-left text-sm" aria-hidden="true"></i>
+            <HalfArrowIcon className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.4} />
             <span>Return to Cart</span>
           </Link>
         </div>

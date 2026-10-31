@@ -7,6 +7,7 @@ import {
   categoryRepository,
   productRepository,
 } from '../../infrastructure/repositories';
+import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 
 export const AdminProducts: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -17,6 +18,8 @@ export const AdminProducts: React.FC = () => {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  useBodyScrollLock(isModalOpen);
 
   // Form Fields
   const [name, setName] = useState('');

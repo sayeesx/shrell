@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Layers, Search, History, ArrowUpDown } from 'lucide-react';
 import { InventoryMovement, Product } from '../../domain/types';
 import { inventoryRepository, productRepository } from '../../infrastructure/repositories';
+import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 
 export const AdminInventory: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -10,6 +11,8 @@ export const AdminInventory: React.FC = () => {
 
   // Adjustment Modal
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  useBodyScrollLock(!!selectedProduct);
   const [adjustmentQuantity, setAdjustmentQuantity] = useState('5');
   const [adjustmentType, setAdjustmentType] = useState<'RESTOCK' | 'DAMAGE_ADJUSTMENT'>('RESTOCK');
   const [adjustmentNotes, setAdjustmentNotes] = useState('Warehouse stock intake');

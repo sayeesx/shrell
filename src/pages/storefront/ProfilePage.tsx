@@ -3,14 +3,10 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../application/AuthContext';
 import { useCart } from '../../application/CartContext';
 import { useVehicle } from '../../application/VehicleContext';
-import { HalfArrowIcon } from '../../components/common/HalfArrowIcon';
-import { useSafeBack } from '../../components/common/useSafeBack';
-
 export const ProfilePage: React.FC = () => {
   const { user, logout, openAuthModal } = useAuth();
   const { itemCount } = useCart();
   const { selectedVehicle } = useVehicle();
-  const handleGoBack = useSafeBack('/catalogue');
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -54,25 +50,15 @@ export const ProfilePage: React.FC = () => {
     <div className="min-h-screen bg-[#0D0F14] py-6 sm:py-10 px-4 sm:px-6">
       <div className="max-w-3xl mx-auto space-y-6">
         
-        {/* Navigation Breadcrumb / Back Link */}
+        {/* Navigation Breadcrumb / Home Link */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleGoBack}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-surface-900 hover:bg-surface-800 border border-surface-800 text-xs font-semibold text-slate-300 hover:text-white transition-colors group cursor-pointer"
-              aria-label="Go back"
-            >
-              <HalfArrowIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.4} />
-              <span>Back</span>
-            </button>
-
-            {/* SHRELL logo near Go Back as main home page button */}
+          <div className="flex items-center">
+            {/* SHRELL Home Button */}
             <Link to="/" className="flex items-center group cursor-pointer" aria-label="SHRELL Home">
               <img
                 src="/logos/shrell-logo-white.png"
                 alt="SHRELL Automotive"
-                className="h-6 w-auto object-contain transition-transform group-hover:scale-105"
+                className="h-[22px] w-auto object-contain transition-transform group-hover:scale-105"
               />
             </Link>
           </div>

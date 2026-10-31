@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../application/CartContext';
 import { useAuth } from '../../application/AuthContext';
-import { HalfArrowIcon } from '../common/HalfArrowIcon';
-import { useSafeBack } from '../common/useSafeBack';
-
 const ANNOUNCEMENT_MESSAGES = [
   { text: 'Fast Surface Dispatch via BlueDart & Delhivery Express Logistics', icon: 'bi-box-seam-fill' },
   { text: 'Verified OEM Equipment Guaranteed', icon: 'bi-patch-check-fill' },
@@ -18,10 +15,6 @@ export const Navbar: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  const handleGoBack = useSafeBack('/catalogue');
-
-  const isHomePage = location.pathname === '/';
 
   // Smooth scroll listener with hysteresis to avoid boundary jitter/stutter
   useEffect(() => {
@@ -101,24 +94,13 @@ export const Navbar: React.FC = () => {
             isScrolled ? 'h-16' : 'h-20'
           }`}
         >
-          {/* Logo & Half-Arrow Go Back Button */}
-          <div className="flex items-center gap-3">
-            {!isHomePage && (
-              <button
-                type="button"
-                onClick={handleGoBack}
-                className="group flex items-center justify-center w-8 h-8 rounded-full bg-[#130E10] hover:bg-[#1D1214] border border-[#221215] text-white transition-all cursor-pointer shadow-xs active:scale-95"
-                aria-label="Go back to previous page"
-                title="Go back"
-              >
-                <HalfArrowIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.4} />
-              </button>
-            )}
+          {/* SHRELL Home Logo Button (subtly reduced size) */}
+          <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2 flex-shrink-0 group cursor-pointer" aria-label="SHRELL Home">
               <img
                 src="/logos/shrell-logo-white.png"
                 alt="SHRELL Automotive"
-                className="h-7 lg:h-8 w-auto object-contain transition-transform group-hover:scale-[1.02]"
+                className="h-[25px] lg:h-[27px] w-auto object-contain transition-transform group-hover:scale-[1.02]"
               />
             </Link>
           </div>
@@ -189,26 +171,14 @@ export const Navbar: React.FC = () => {
         {/* MOBILE NAVBAR (md:hidden) — Fixed Search Bar & Curved Nav */}
         {/* ========================================================= */}
         <div className="md:hidden py-2.5 transition-all duration-300 ease-in-out">
-          {/* Top Row: Back / Logo + Menu & Cart */}
+          {/* Top Row: SHRELL Logo Home Button (subtly reduced size) + Menu & Cart */}
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5 min-w-0">
-              {!isHomePage && (
-                <button
-                  type="button"
-                  onClick={handleGoBack}
-                  className="group flex items-center justify-center w-8 h-8 rounded-full bg-[#130E10] hover:bg-[#1D1214] border border-[#221215] text-white transition-all cursor-pointer flex-shrink-0 active:scale-95"
-                  aria-label="Go back to previous page"
-                  title="Go back"
-                >
-                  <HalfArrowIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.4} />
-                </button>
-              )}
-              {/* SHRELL logo near Go Back as main home page button */}
+            <div className="flex items-center min-w-0">
               <Link to="/" className="flex items-center flex-shrink-0 group cursor-pointer" aria-label="SHRELL Home">
                 <img
                   src="/logos/shrell-logo-white.png"
                   alt="SHRELL Automotive"
-                  className="h-6 w-auto object-contain"
+                  className="h-[21px] w-auto object-contain"
                 />
               </Link>
             </div>

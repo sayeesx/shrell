@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../application/AuthContext';
-import { HalfArrowIcon } from '../../components/common/HalfArrowIcon';
 
 export const AdminLoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -84,15 +83,14 @@ export const AdminLoginPage: React.FC = () => {
         </form>
 
         <div className="text-center pt-2 border-t border-surface-800">
-          <button
-            type="button"
-            onClick={() => navigate('/')}
+          <Link
+            to="/"
             className="text-xs font-mono text-slate-400 hover:text-slate-200 transition-colors inline-flex items-center gap-2 group cursor-pointer"
-            aria-label="Return to Customer Storefront"
+            aria-label="SHRELL Storefront"
           >
-            <HalfArrowIcon className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.4} />
-            <span>Return to Customer Storefront</span>
-          </button>
+            <img src="/logos/shrell-logo-white.png" alt="SHRELL" className="h-4 w-auto object-contain" />
+            <span>Customer Storefront</span>
+          </Link>
         </div>
       </div>
     </div>

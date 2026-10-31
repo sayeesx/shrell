@@ -40,8 +40,8 @@
     -webkit-box-shadow: none !important;
   }
 
-  body {
-    font-family: 'Inter Tight', sans-serif !important;
+  body, html {
+    font-family: 'DM Sans', sans-serif !important;
   }
 
   a[href], button, summary, select,
@@ -149,14 +149,14 @@
     -webkit-backface-visibility: hidden;
   }
 
-  /* Slide in drawer from left margin */
-  @keyframes slideFromLeft {
-    from { transform: translate3d(-100%, 0, 0); }
+  /* Slide in drawer from right margin */
+  @keyframes slideFromRight {
+    from { transform: translate3d(100%, 0, 0); }
     to { transform: translate3d(0, 0, 0); }
   }
 
-  .animate-slide-left-drawer {
-    animation: slideFromLeft 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  .animate-slide-right-drawer {
+    animation: slideFromRight 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   /* Timeline-based SVG Feedback Animations */

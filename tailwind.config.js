@@ -47,8 +47,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['"Inter Tight"', 'sans-serif'],
-        mono: ['"Inter Tight"', 'sans-serif'],
+        sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
+        mono: ['"DM Sans"', 'monospace'],
       },
       boxShadow: {
         none: 'none',

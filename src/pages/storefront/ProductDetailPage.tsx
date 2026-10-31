@@ -5,20 +5,23 @@ import { formatINR } from '../../domain/services/CurrencyService';
 import { productRepository } from '../../infrastructure/repositories';
 import { useCart } from '../../application/CartContext';
 import { ProductCard } from '../../components/ui/ProductCard';
-import { HalfArrowIcon } from '../../components/common/HalfArrowIcon';
-import { useSafeBack } from '../../components/common/useSafeBack';
-import { ProductImagePlaceholder } from '../../components/common/ProductImagePlaceholder';
-
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { addItem, openCheckout } = useCart();
-  const handleGoBack = useSafeBack('/catalogue');
 
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
   const [addedMessage, setAddedMessage] = useState<string>('');
+
+  const productViews = [
+    { id: 1, label: 'Front Fitment', tag: 'Primary' },
+    { id: 2, label: 'Side Geometry', tag: '3/4 Angle' },
+    { id: 3, label: 'Mounting Points', tag: 'OEM Spec' },
+    { id: 4, label: 'Package Kit', tag: 'Complete' },
+  ];
 
   // Accordion open states
   const [openAccordions, setOpenAccordions] = useState<{ [key: string]: boolean }>({
@@ -129,25 +132,15 @@ export const ProductDetailPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#0A0808] bg-atmospheric-red text-[#F1EEEE]">
       <div className="max-w-2xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-8 space-y-10">
-        {/* Top Product Navigation (Matches dark editorial aesthetic) */}
+        {/* Top Product Navigation (SHRELL Home logo button only) */}
         <div className="flex items-center justify-between pb-3 border-b border-[#261619]">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleGoBack}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#130E10] hover:bg-[#1A1214] border border-[#261619] text-xs font-medium text-[#D8D1D1] hover:text-[#F1EEEE] transition-colors group cursor-pointer"
-              aria-label="Go back"
-            >
-              <HalfArrowIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.2} />
-              <span>Back</span>
-            </button>
-
-            {/* SHRELL logo near Go Back as main home page button */}
+          <div className="flex items-center">
+            {/* SHRELL Home Logo Button */}
             <Link to="/" className="flex items-center group cursor-pointer" aria-label="SHRELL Home">
               <img
                 src="/logos/shrell-logo-white.png"
                 alt="SHRELL Automotive"
-                className="h-6 w-auto object-contain transition-transform group-hover:scale-105"
+                className="h-[22px] w-auto object-contain transition-transform group-hover:scale-105"
               />
             </Link>
           </div>
@@ -165,11 +158,48 @@ export const ProductDetailPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           
           {/* ========================================================= */}
-          {/* LEFT: Product Image Card (Clean SHRELL placeholder)        */}
+          {/* LEFT: Product Image Showcase (No box/border + 4 Cubes)   */}
           {/* ========================================================= */}
           <div className="space-y-4">
-            <div className="relative aspect-square sm:aspect-[4/3] rounded-2xl bg-[#080000] border border-[#261619] flex items-center justify-center p-4 sm:p-8 overflow-hidden shadow-2xl">
-              <ProductImagePlaceholder alt={product.name} />
+            {/* Main Product Image - Free-floating without box or border */}
+            <div className="relative aspect-square sm:aspect-[4/3] flex items-center justify-center p-4 sm:p-8 select-none">
+              <img
+                src="/logos/shrell-full_white-text_black-logo.png"
+                alt={`${product.name} - ${productViews[selectedImageIndex].label}`}
+                className="w-56 sm:w-72 max-h-60 object-contain opacity-35 filter brightness-125 grayscale transition-all duration-300"
+              />
+              <div className="absolute bottom-2 left-2 pointer-events-none">
+                <span className="text-[10px] font-mono tracking-wider uppercase text-slate-400 bg-[#0A0808]/80 px-2 py-0.5 rounded-full border border-[#261619]">
+                  {productViews[selectedImageIndex].label}
+                </span>
+              </div>
+            </div>
+
+            {/* 4 Small Selectable Image Cubes */}
+            <div className="flex items-center gap-3 pt-1">
+              {productViews.map((view, idx) => {
+                const isSelected = selectedImageIndex === idx;
+                return (
+                  <button
+                    key={view.id}
+                    type="button"
+                    onClick={() => setSelectedImageIndex(idx)}
+                    className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg transition-all flex items-center justify-center p-1.5 cursor-pointer select-none ${
+                      isSelected
+                        ? 'ring-2 ring-[#FF000E] bg-[#160D0F]'
+                        : 'bg-[#100B0D] hover:bg-[#180E11] opacity-60 hover:opacity-100 border border-[#221215]'
+                    }`}
+                    aria-label={`View ${view.label}`}
+                    title={view.label}
+                  >
+                    <img
+                      src="/logos/shrell-full_white-text_black-logo.png"
+                      alt={view.label}
+                      className="w-full h-full object-contain opacity-40 brightness-125 grayscale"
+                    />
+                  </button>
+                );
+              })}
             </div>
           </div>
 

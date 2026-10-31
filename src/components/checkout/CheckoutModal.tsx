@@ -5,7 +5,6 @@ import { Order, PaymentMethod } from '../../domain/types';
 import { formatINR } from '../../domain/services/CurrencyService';
 import { orderRepository } from '../../infrastructure/repositories';
 import { whatsAppService } from '../../features/whatsapp/WhatsAppService';
-import { HalfArrowIcon } from '../common/HalfArrowIcon';
 import { useBodyScrollLock } from '../common/useBodyScrollLock';
 import { ThemeSuccessAnimation } from '../common/ThemeFeedbackAnimation';
 
@@ -173,7 +172,7 @@ export const CheckoutModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-stretch md:items-center justify-start md:justify-center md:p-6 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-stretch md:items-center justify-end md:justify-center md:p-6 overflow-hidden">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/75 backdrop-blur-xs transition-opacity duration-300"
@@ -181,26 +180,16 @@ export const CheckoutModal: React.FC = () => {
         aria-hidden="true"
       />
 
-      {/* Modal / Mobile Left Drawer */}
+      {/* Modal / Drawer (Opens from Right) */}
       <div
-        className="relative z-10 w-[92%] sm:w-[85%] md:w-full max-w-md md:max-w-2xl h-[100dvh] md:h-auto md:max-h-[90vh] bg-[#0E0A0B] text-[#F1EEEE] border-r md:border border-[#261619] shadow-[0_25px_60px_rgba(0,0,0,0.9)] flex flex-col md:rounded-2xl animate-slide-left-drawer md:animate-none overflow-hidden"
+        className="relative z-10 w-[92%] sm:w-[85%] md:w-full max-w-md md:max-w-2xl h-[100dvh] md:h-auto md:max-h-[90vh] bg-[#0E0A0B] text-[#F1EEEE] border-l md:border border-[#261619] shadow-[0_25px_60px_rgba(0,0,0,0.9)] flex flex-col md:rounded-2xl animate-slide-right-drawer md:animate-none overflow-hidden"
         role="dialog"
         aria-modal="true"
       >
-        {/* Header with Go Back + SHRELL Logo as Home button + Close X */}
+        {/* Header with SHRELL Logo as Home button + Close X */}
         <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-[#261619] bg-[#0A0808] flex-shrink-0">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={closeCheckout}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#130E10] hover:bg-[#1A1214] border border-[#261619] text-[#D8D1D1] hover:text-[#F1EEEE] text-xs font-medium transition-colors cursor-pointer"
-              aria-label="Back to store"
-            >
-              <HalfArrowIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.2} />
-              <span>Back</span>
-            </button>
-
-            {/* SHRELL logo near Go Back as main home page button */}
+          <div className="flex items-center">
+            {/* SHRELL Home Button */}
             <Link
               to="/"
               onClick={closeCheckout}
@@ -210,7 +199,7 @@ export const CheckoutModal: React.FC = () => {
               <img
                 src="/logos/shrell-logo-white.png"
                 alt="SHRELL Automotive"
-                className="h-6 w-auto object-contain transition-transform group-hover:scale-105"
+                className="h-[22px] w-auto object-contain transition-transform group-hover:scale-105"
               />
             </Link>
           </div>

@@ -154,7 +154,7 @@ export const HomePage: React.FC = () => {
           */}
           {banners.length > 0 && (
             <div
-              className="relative rounded-lg overflow-hidden bg-transparent group flex items-center justify-center w-full max-h-[180px] sm:max-h-[260px] md:max-h-[320px] select-none touch-pan-y"
+              className="relative rounded-lg overflow-hidden bg-transparent group flex items-center justify-center w-full max-h-[180px] sm:max-h-[260px] md:max-h-[480px] lg:max-h-[560px] xl:max-h-[620px] select-none touch-pan-y"
               onMouseEnter={() => setIsPaused(true)}
               onMouseLeave={() => setIsPaused(false)}
               onTouchStart={onTouchStart}
@@ -168,14 +168,14 @@ export const HomePage: React.FC = () => {
                   className="block w-full focus:outline-none flex items-center justify-center"
                   aria-label={banners[currentSlide]?.altText || 'Featured Automotive Banner'}
                 >
-                  {/* Desktop Image Banner */}
+                  {/* Desktop Image Banner (Bigger on desktop browser) */}
                   <img
                     src={banners[currentSlide]?.desktopImageUrl}
                     alt={banners[currentSlide]?.altText || 'Hero Banner'}
-                    className="hidden md:block w-full max-h-[320px] object-cover sm:object-contain rounded-lg mx-auto"
+                    className="hidden md:block w-full max-h-[480px] lg:max-h-[560px] xl:max-h-[620px] object-cover sm:object-contain rounded-lg mx-auto"
                   />
 
-                  {/* Mobile Image Banner */}
+                  {/* Mobile Image Banner (Strictly unchanged) */}
                   <img
                     src={banners[currentSlide]?.mobileImageUrl || banners[currentSlide]?.desktopImageUrl}
                     alt={banners[currentSlide]?.altText || 'Hero Banner'}

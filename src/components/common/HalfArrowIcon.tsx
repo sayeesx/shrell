@@ -6,12 +6,12 @@ interface HalfArrowIconProps {
 }
 
 /**
- * Minimalist Half-Arrow icon (stem with single top barb)
- * for a sleek, modern back navigation affordance.
+ * Sleek Half-Arrow (Left Chevron) icon
+ * Elegant, standard modern back navigation affordance.
  */
 export const HalfArrowIcon: React.FC<HalfArrowIconProps> = ({
   className = 'w-4 h-4',
-  strokeWidth = 2.2,
+  strokeWidth = 2.4,
 }) => {
   return (
     <svg
@@ -24,8 +24,7 @@ export const HalfArrowIcon: React.FC<HalfArrowIconProps> = ({
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path d="M19 12H5" />
-      <path d="M12 5L5 12" />
+      <polyline points="15 18 9 12 15 6" />
     </svg>
   );
 };

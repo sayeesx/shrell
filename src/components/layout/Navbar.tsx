@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../../application/CartContext';
 import { useAuth } from '../../application/AuthContext';
 import { HalfArrowIcon } from '../common/HalfArrowIcon';
+import { useSafeBack } from '../common/useSafeBack';
 
 const ANNOUNCEMENT_MESSAGES = [
   { text: 'Fast Surface Dispatch via BlueDart & Delhivery Express Logistics', icon: 'bi-box-seam-fill' },
@@ -18,6 +19,7 @@ export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const handleGoBack = useSafeBack('/catalogue');
 
   const isHomePage = location.pathname === '/';
 
@@ -63,13 +65,13 @@ export const Navbar: React.FC = () => {
 
   return (
     <header
-      className={`sticky top-0 z-40 text-white transition-colors duration-500 ease-in-out ${
+      className={`sticky top-0 z-40 text-white transition-all duration-500 ease-in-out ${
         isScrolled
-          ? 'bg-[#0D0F14]/95 backdrop-blur-md border-b border-surface-800 shadow-xl'
+          ? 'bg-[#0D0F14]/95 backdrop-blur-md border-b border-surface-800 shadow-xl rounded-b-2xl sm:rounded-b-3xl'
           : 'bg-[#0D0F14] border-b border-surface-800/40'
       }`}
     >
-      {/* 1. Fluid Continuous Marquee (Smoothly and gracefully glides up on scroll without layout snap) */}
+      {/* 1. Fluid Continuous Marquee (Smoothly glides up on scroll) */}
       <div
         className={`grid transition-[grid-template-rows,opacity,transform] duration-500 ease-in-out select-none ${
           isScrolled
@@ -104,7 +106,7 @@ export const Navbar: React.FC = () => {
             {!isHomePage && (
               <button
                 type="button"
-                onClick={() => navigate(-1)}
+                onClick={handleGoBack}
                 className="group flex items-center justify-center w-8 h-8 rounded-full bg-surface-800 hover:bg-surface-700 border border-surface-700 text-white transition-all cursor-pointer shadow-xs active:scale-95"
                 aria-label="Go back to previous page"
                 title="Go back"
@@ -112,7 +114,7 @@ export const Navbar: React.FC = () => {
                 <HalfArrowIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.4} />
               </button>
             )}
-            <Link to="/" className="flex items-center gap-2 flex-shrink-0 group" aria-label="SHRELL Home">
+            <Link to="/" className="flex items-center gap-2 flex-shrink-0 group cursor-pointer" aria-label="SHRELL Home">
               <img
                 src="/logos/shrell-logo-white.png"
                 alt="SHRELL Automotive"
@@ -138,7 +140,7 @@ export const Navbar: React.FC = () => {
               <button
                 type="submit"
                 aria-label="Filter or search"
-                className="absolute right-3.5 text-gray-500 hover:text-brand-600 transition-colors"
+                className="absolute right-3.5 text-gray-500 hover:text-brand-600 transition-colors cursor-pointer"
               >
                 <i className="bi bi-sliders text-base" aria-hidden="true" />
               </button>
@@ -170,7 +172,7 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center gap-2.5 sm:gap-3 flex-shrink-0">
             <Link
               to="/cart"
-              className="relative p-2.5 rounded-full bg-surface-800 hover:bg-surface-700 border border-surface-700 text-white transition-colors flex items-center justify-center active:scale-95"
+              className="relative p-2.5 rounded-full bg-surface-800 hover:bg-surface-700 border border-surface-700 text-white transition-colors flex items-center justify-center active:scale-95 cursor-pointer"
               aria-label={`Cart with ${itemCount} items`}
             >
               <i className="bi bi-bag text-lg leading-none" aria-hidden="true" />
@@ -184,17 +186,16 @@ export const Navbar: React.FC = () => {
         </div>
 
         {/* ========================================================= */}
-        {/* MOBILE NAVBAR (md:hidden) — Smooth Unified Responsive Bar  */}
-        {/* No DOM unmounting to prevent hero section stuttering       */}
+        {/* MOBILE NAVBAR (md:hidden) — Fixed Search Bar & Curved Nav */}
         {/* ========================================================= */}
-        <div className="md:hidden py-2.5 transition-all duration-500 ease-in-out">
+        <div className="md:hidden py-2.5 transition-all duration-300 ease-in-out">
           {/* Top Row: Back / Logo + Menu & Cart */}
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-0">
               {!isHomePage && (
                 <button
                   type="button"
-                  onClick={() => navigate(-1)}
+                  onClick={handleGoBack}
                   className="group flex items-center justify-center w-8 h-8 rounded-full bg-surface-800 hover:bg-surface-700 border border-surface-700 text-white transition-all cursor-pointer flex-shrink-0 active:scale-95"
                   aria-label="Go back to previous page"
                   title="Go back"
@@ -202,7 +203,8 @@ export const Navbar: React.FC = () => {
                   <HalfArrowIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.4} />
                 </button>
               )}
-              <Link to="/" className="flex items-center flex-shrink-0 group" aria-label="SHRELL Home">
+              {/* SHRELL logo near Go Back as main home page button */}
+              <Link to="/" className="flex items-center flex-shrink-0 group cursor-pointer" aria-label="SHRELL Home">
                 <img
                   src="/logos/shrell-logo-white.png"
                   alt="SHRELL Automotive"
@@ -214,7 +216,7 @@ export const Navbar: React.FC = () => {
             <div className="flex items-center gap-2 flex-shrink-0">
               <Link
                 to="/catalogue"
-                className="p-2 rounded-full bg-surface-800 hover:bg-surface-700 border border-surface-700 text-white transition-colors flex items-center justify-center active:scale-95"
+                className="p-2 rounded-full bg-surface-800 hover:bg-surface-700 border border-surface-700 text-white transition-colors flex items-center justify-center active:scale-95 cursor-pointer"
                 title="Categories Menu"
                 aria-label="Categories Menu"
               >
@@ -222,7 +224,7 @@ export const Navbar: React.FC = () => {
               </Link>
               <Link
                 to="/cart"
-                className="relative p-2 rounded-full bg-surface-800 hover:bg-surface-700 border border-surface-700 text-white transition-colors flex items-center justify-center active:scale-95"
+                className="relative p-2 rounded-full bg-surface-800 hover:bg-surface-700 border border-surface-700 text-white transition-colors flex items-center justify-center active:scale-95 cursor-pointer"
                 aria-label={`Cart with ${itemCount} items`}
               >
                 <i className="bi bi-bag text-sm leading-none" />
@@ -235,43 +237,35 @@ export const Navbar: React.FC = () => {
             </div>
           </div>
 
-          {/* Smooth Collapsing Search Bar (Collapses gracefully without DOM replacement or layout jumps) */}
-          <div
-            className={`grid transition-[grid-template-rows,opacity,margin] duration-500 ease-in-out ${
-              isScrolled
-                ? 'grid-rows-[0fr] opacity-0 pointer-events-none mt-0'
-                : 'grid-rows-[1fr] opacity-100 mt-2.5'
-            }`}
-          >
-            <div className="overflow-hidden">
-              <form onSubmit={handleSearchSubmit} className="relative">
-                <i
-                  className="bi bi-search text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 text-sm pointer-events-none"
-                  aria-hidden="true"
-                />
-                <input
-                  type="text"
-                  placeholder="What's on your mind? Search parts..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white text-gray-900 placeholder:text-gray-500 rounded-full pl-10 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 font-sans shadow-xs"
-                />
-                {searchQuery ? (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    aria-label="Clear search"
-                  >
-                    <i className="bi bi-x text-base" />
-                  </button>
-                ) : (
-                  <button type="submit" className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500" aria-label="Search filter">
-                    <i className="bi bi-sliders text-sm" aria-hidden="true" />
-                  </button>
-                )}
-              </form>
-            </div>
+          {/* Search Bar: Persistently fixed and visible on mobile even when scrolling */}
+          <div className="mt-2.5">
+            <form onSubmit={handleSearchSubmit} className="relative">
+              <i
+                className="bi bi-search text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 text-sm pointer-events-none"
+                aria-hidden="true"
+              />
+              <input
+                type="text"
+                placeholder="What's on your mind? Search parts..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-white text-gray-900 placeholder:text-gray-500 rounded-full pl-10 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 font-sans shadow-xs"
+              />
+              {searchQuery ? (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                  aria-label="Clear search"
+                >
+                  <i className="bi bi-x text-base" />
+                </button>
+              ) : (
+                <button type="submit" className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer" aria-label="Search filter">
+                  <i className="bi bi-sliders text-sm" aria-hidden="true" />
+                </button>
+              )}
+            </form>
           </div>
         </div>
       </div>

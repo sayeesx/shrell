@@ -1,15 +1,16 @@
 import React, { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../application/AuthContext';
 import { useCart } from '../../application/CartContext';
 import { useVehicle } from '../../application/VehicleContext';
 import { HalfArrowIcon } from '../../components/common/HalfArrowIcon';
+import { useSafeBack } from '../../components/common/useSafeBack';
 
 export const ProfilePage: React.FC = () => {
   const { user, logout, openAuthModal } = useAuth();
   const { itemCount } = useCart();
   const { selectedVehicle } = useVehicle();
-  const navigate = useNavigate();
+  const handleGoBack = useSafeBack('/catalogue');
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -55,16 +56,28 @@ export const ProfilePage: React.FC = () => {
         
         {/* Navigation Breadcrumb / Back Link */}
         <div className="flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors group cursor-pointer"
-            aria-label="Go back"
-          >
-            <HalfArrowIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.4} />
-            <span>Back</span>
-          </button>
-          <span className="text-[11px] font-bold text-slate-500 tracking-wider uppercase">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleGoBack}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-surface-900 hover:bg-surface-800 border border-surface-800 text-xs font-semibold text-slate-300 hover:text-white transition-colors group cursor-pointer"
+              aria-label="Go back"
+            >
+              <HalfArrowIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.4} />
+              <span>Back</span>
+            </button>
+
+            {/* SHRELL logo near Go Back as main home page button */}
+            <Link to="/" className="flex items-center group cursor-pointer" aria-label="SHRELL Home">
+              <img
+                src="/logos/shrell-logo-white.png"
+                alt="SHRELL Automotive"
+                className="h-6 w-auto object-contain transition-transform group-hover:scale-105"
+              />
+            </Link>
+          </div>
+
+          <span className="text-[11px] font-bold text-slate-500 tracking-wider uppercase font-mono">
             Account Management
           </span>
         </div>

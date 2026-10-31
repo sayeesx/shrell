@@ -13,6 +13,9 @@ interface CartContextType {
   applyCoupon: (code: string) => Promise<{ success: boolean; message: string }>;
   removeCoupon: () => void;
   itemCount: number;
+  isCheckoutOpen: boolean;
+  openCheckout: () => void;
+  closeCheckout: () => void;
 }
 
 const CART_STORAGE_KEY = 'vahn_cart_items_v1';
@@ -40,6 +43,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const [settings, setSettings] = useState<StoreSettings>(INITIAL_SETTINGS);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+
+  const openCheckout = () => setIsCheckoutOpen(true);
+  const closeCheckout = () => setIsCheckoutOpen(false);
 
   useEffect(() => {
     settingsRepository.getSettings().then(setSettings).catch(console.error);
@@ -188,6 +195,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         applyCoupon,
         removeCoupon,
         itemCount,
+        isCheckoutOpen,
+        openCheckout,
+        closeCheckout,
       }}
     >
       {children}

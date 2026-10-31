@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Product } from '../../domain/types';
 import { formatINR } from '../../domain/services/CurrencyService';
 import { productRepository } from '../../infrastructure/repositories';
 import { useCart } from '../../application/CartContext';
 import { ProductCard } from '../../components/ui/ProductCard';
 import { HalfArrowIcon } from '../../components/common/HalfArrowIcon';
+import { useSafeBack } from '../../components/common/useSafeBack';
 import { ProductImagePlaceholder } from '../../components/common/ProductImagePlaceholder';
 
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const navigate = useNavigate();
-  const { addItem } = useCart();
+  const { addItem, openCheckout } = useCart();
+  const handleGoBack = useSafeBack('/catalogue');
 
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
@@ -124,7 +125,7 @@ export const ProductDetailPage: React.FC = () => {
   const handleBuyNow = () => {
     const res = addItem(product, quantity);
     if (res.success) {
-      navigate('/checkout');
+      openCheckout();
     }
   };
 
@@ -141,18 +142,30 @@ export const ProductDetailPage: React.FC = () => {
       <div className="max-w-2xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-8 space-y-10">
         {/* Top Product Navigation (Matches hero/header dark aesthetics) */}
         <div className="flex items-center justify-between pb-3 border-b border-surface-800">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 text-xs font-bold text-slate-300 hover:text-white transition-colors group cursor-pointer"
-            aria-label="Go back"
-          >
-            <HalfArrowIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.4} />
-            <span>Back</span>
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleGoBack}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-surface-900 hover:bg-surface-800 border border-surface-800 text-xs font-bold text-slate-300 hover:text-white transition-colors group cursor-pointer"
+              aria-label="Go back"
+            >
+              <HalfArrowIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.4} />
+              <span>Back</span>
+            </button>
+
+            {/* SHRELL logo near Go Back as main home page button */}
+            <Link to="/" className="flex items-center group cursor-pointer" aria-label="SHRELL Home">
+              <img
+                src="/logos/shrell-logo-white.png"
+                alt="SHRELL Automotive"
+                className="h-6 w-auto object-contain transition-transform group-hover:scale-105"
+              />
+            </Link>
+          </div>
+
           <Link
             to="/cart"
-            className="relative p-2 rounded-full bg-surface-800 hover:bg-surface-700 text-slate-200 border border-surface-700 transition-colors flex items-center justify-center"
+            className="relative p-2 rounded-full bg-surface-800 hover:bg-surface-700 text-slate-200 border border-surface-700 transition-colors flex items-center justify-center cursor-pointer"
             aria-label="View cart"
           >
             <i className="bi bi-bag text-sm" />

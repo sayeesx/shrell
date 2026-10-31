@@ -72,18 +72,14 @@ export const MobileNavDock: React.FC = () => {
           <Link
             key={item.id}
             to={item.to}
-            className="group relative flex flex-col items-center justify-center py-1 transition-transform active:scale-90 duration-200 cursor-pointer"
+            className="group relative flex flex-col items-center justify-center py-1 transition-transform active:scale-95 duration-200 cursor-pointer"
           >
-            {/* Animated Active Icon Capsule */}
-            <div
-              className={`w-12 h-8 rounded-2xl flex items-center justify-center transition-all duration-300 ${
-                item.isActive
-                  ? 'bg-brand-500/15 text-brand-500 shadow-[0_0_14px_rgba(255,0,14,0.35)] -translate-y-1 scale-110'
-                  : 'text-gray-400 group-hover:text-white group-hover:scale-105'
-              }`}
-            >
+            {/* Pure Red Active Icon without Background */}
+            <div className="w-12 h-8 flex items-center justify-center transition-all duration-200">
               <i
-                className={`bi ${item.isActive ? item.iconActive : item.iconInactive} text-[23px] leading-none transition-transform`}
+                className={`bi ${item.isActive ? item.iconActive : item.iconInactive} text-[23px] leading-none transition-colors ${
+                  item.isActive ? 'text-brand-500' : 'text-gray-400 group-hover:text-white'
+                }`}
                 aria-hidden="true"
               />
             </div>
@@ -92,17 +88,12 @@ export const MobileNavDock: React.FC = () => {
             <span
               className={`text-[10px] tracking-tight transition-all duration-200 ${
                 item.isActive
-                  ? 'text-white font-bold -translate-y-0.5'
+                  ? 'text-brand-500 font-bold'
                   : 'text-gray-400 font-medium group-hover:text-gray-200'
               }`}
             >
               {item.label}
             </span>
-
-            {/* Glowing Active Dot */}
-            {item.isActive && (
-              <span className="absolute bottom-0 w-1.5 h-1.5 rounded-full bg-brand-500 shadow-[0_0_8px_#FF000E] animate-pulse" />
-            )}
           </Link>
         ))}
 
@@ -110,19 +101,15 @@ export const MobileNavDock: React.FC = () => {
         <button
           type="button"
           onClick={handleProfileClick}
-          className="group relative flex flex-col items-center justify-center py-1 transition-transform active:scale-90 duration-200 cursor-pointer"
+          className="group relative flex flex-col items-center justify-center py-1 transition-transform active:scale-95 duration-200 cursor-pointer"
           aria-label="Account profile"
         >
-          {/* Animated Active Icon Capsule */}
-          <div
-            className={`w-12 h-8 rounded-2xl flex items-center justify-center transition-all duration-300 ${
-              isProfileActive
-                ? 'bg-brand-500/15 text-brand-500 shadow-[0_0_14px_rgba(255,0,14,0.35)] -translate-y-1 scale-110'
-                : 'text-gray-400 group-hover:text-white group-hover:scale-105'
-            }`}
-          >
+          {/* Pure Red Active Icon without Background */}
+          <div className="w-12 h-8 flex items-center justify-center transition-all duration-200">
             <i
-              className={`bi ${isProfileActive ? 'bi-person-fill' : 'bi-person'} text-[23px] leading-none transition-transform`}
+              className={`bi ${isProfileActive ? 'bi-person-fill' : 'bi-person'} text-[23px] leading-none transition-colors ${
+                isProfileActive ? 'text-brand-500' : 'text-gray-400 group-hover:text-white'
+              }`}
               aria-hidden="true"
             />
           </div>
@@ -131,17 +118,12 @@ export const MobileNavDock: React.FC = () => {
           <span
             className={`text-[10px] tracking-tight transition-all duration-200 ${
               isProfileActive
-                ? 'text-white font-bold -translate-y-0.5'
+                ? 'text-brand-500 font-bold'
                 : 'text-gray-400 font-medium group-hover:text-gray-200'
             }`}
           >
             {user ? 'Account' : 'Login'}
           </span>
-
-          {/* Glowing Active Dot */}
-          {isProfileActive && (
-            <span className="absolute bottom-0 w-1.5 h-1.5 rounded-full bg-brand-500 shadow-[0_0_8px_#FF000E] animate-pulse" />
-          )}
         </button>
       </div>
     </nav>

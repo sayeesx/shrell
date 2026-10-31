@@ -6,7 +6,7 @@ import { whatsAppService } from '../../features/whatsapp/WhatsAppService';
 import { ProductImagePlaceholder } from '../../components/common/ProductImagePlaceholder';
 
 export const CartPage: React.FC = () => {
-  const { cart, updateQuantity, removeItem, clearCart, applyCoupon, removeCoupon } = useCart();
+  const { cart, updateQuantity, removeItem, clearCart, applyCoupon, removeCoupon, openCheckout } = useCart();
   const [couponCode, setCouponCode] = useState('');
   const [couponMessage, setCouponMessage] = useState<{ text: string; isError: boolean } | null>(
     null
@@ -287,13 +287,14 @@ export const CartPage: React.FC = () => {
 
             {/* Checkout Action */}
             <div className="pt-2">
-              <Link
-                to="/checkout"
-                className="w-full min-h-[46px] px-6 py-3.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
+              <button
+                type="button"
+                onClick={openCheckout}
+                className="w-full min-h-[46px] px-6 py-3.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm cursor-pointer"
               >
                 <span>Proceed to Checkout</span>
                 <i className="bi bi-arrow-right text-xs" aria-hidden="true"></i>
-              </Link>
+              </button>
             </div>
 
             {/* Cart to WhatsApp alternative */}

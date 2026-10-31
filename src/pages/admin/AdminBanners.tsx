@@ -3,6 +3,7 @@ import { HeroBanner } from '../../domain/types';
 import { bannerRepository } from '../../infrastructure/repositories';
 import { cloudinaryService } from '../../infrastructure/cloudinary/cloudinaryService';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
+import { ShrellLoader } from '../../components/common/ShrellLoader';
 
 interface CropModalState {
   isOpen: boolean;
@@ -651,7 +652,9 @@ export const AdminBanners: React.FC = () => {
         </h2>
 
         {loading ? (
-          <div className="p-8 text-center text-xs text-slate-500">Loading banners...</div>
+          <div className="py-12 flex items-center justify-center">
+            <ShrellLoader size={48} />
+          </div>
         ) : banners.length === 0 ? (
           <div className="p-8 rounded-lg bg-surface-900 border border-surface-700 text-center text-xs text-slate-400">
             No banners created yet. Click &quot;Add New Banner&quot; above to create one.

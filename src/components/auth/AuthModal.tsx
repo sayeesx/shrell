@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../application/AuthContext';
 import { useBodyScrollLock } from '../common/useBodyScrollLock';
 import { ThemeSuccessAnimation, ThemeErrorAnimation } from '../common/ThemeFeedbackAnimation';
+import { ShrellLoader } from '../common/ShrellLoader';
 
 export const AuthModal: React.FC = () => {
   const { isAuthModalOpen, closeAuthModal, loginWithPhone } = useAuth();
@@ -304,9 +305,8 @@ export const AuthModal: React.FC = () => {
             )}
 
             {isVerifying ? (
-              <div className="flex items-center justify-center gap-2 py-3 text-sm text-[#D8D1D1]">
-                <i className="bi bi-arrow-repeat animate-spin text-base text-[#FF000E]" />
-                <span>Verifying credentials...</span>
+              <div className="flex flex-col items-center justify-center py-3">
+                <ShrellLoader size={40} />
               </div>
             ) : (
               <div className="text-center pt-1">

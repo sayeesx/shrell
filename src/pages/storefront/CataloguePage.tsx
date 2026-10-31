@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Product } from '../../domain/types';
 import { productRepository } from '../../infrastructure/repositories';
 import { ProductCard } from '../../components/ui/ProductCard';
+import { ShrellLoader } from '../../components/common/ShrellLoader';
 
 export const CataloguePage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -74,10 +75,8 @@ export const CataloguePage: React.FC = () => {
       {/* Full-width Product Grid */}
       <main className="space-y-6">
         {loading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="h-64 sm:h-80 rounded-lg bg-[#0E0A0B] animate-pulse border border-[#221215]" />
-            ))}
+          <div className="min-h-[50vh] flex items-center justify-center py-20">
+            <ShrellLoader size={76} />
           </div>
         ) : products.length === 0 ? (
           <div className="p-12 text-center rounded-xl bg-[#0E0A0B] border border-[#221215] space-y-4 max-w-lg mx-auto">

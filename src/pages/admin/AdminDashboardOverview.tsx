@@ -11,6 +11,7 @@ import {
 import { Order, Product } from '../../domain/types';
 import { formatINR } from '../../domain/services/CurrencyService';
 import { orderRepository, productRepository } from '../../infrastructure/repositories';
+import { ShrellLoader } from '../../components/common/ShrellLoader';
 
 export const AdminDashboardOverview: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -47,13 +48,8 @@ export const AdminDashboardOverview: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="h-8 w-48 bg-surface-900 rounded animate-pulse" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((n) => (
-            <div key={n} className="h-28 bg-surface-900 rounded-lg animate-pulse" />
-          ))}
-        </div>
+      <div className="py-24 flex items-center justify-center">
+        <ShrellLoader size={64} />
       </div>
     );
   }

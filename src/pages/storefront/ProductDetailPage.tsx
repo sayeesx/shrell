@@ -5,6 +5,7 @@ import { formatINR } from '../../domain/services/CurrencyService';
 import { productRepository } from '../../infrastructure/repositories';
 import { useCart } from '../../application/CartContext';
 import { ProductCard } from '../../components/ui/ProductCard';
+import { ShrellLoader } from '../../components/common/ShrellLoader';
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { addItem, openCheckout } = useCart();
@@ -73,19 +74,8 @@ export const ProductDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0A0808] bg-atmospheric-red text-[#F1EEEE] py-12">
-        <div className="max-w-2xl lg:max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            <div className="aspect-square bg-[#130E10] border border-[#261619] rounded-xl animate-pulse" />
-            <div className="space-y-4 pt-4">
-              <div className="h-4 w-1/4 bg-[#1A1214] rounded animate-pulse" />
-              <div className="h-8 w-3/4 bg-[#1A1214] rounded animate-pulse" />
-              <div className="h-6 w-1/3 bg-[#1A1214] rounded animate-pulse" />
-              <div className="h-12 w-full bg-[#1A1214] rounded-lg animate-pulse" />
-              <div className="h-12 w-full bg-[#1A1214] rounded-lg animate-pulse" />
-            </div>
-          </div>
-        </div>
+      <div className="min-h-[70vh] bg-[#0A0808] bg-atmospheric-red text-[#F1EEEE] flex items-center justify-center p-6">
+        <ShrellLoader size={84} />
       </div>
     );
   }

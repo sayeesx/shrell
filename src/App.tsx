@@ -14,6 +14,7 @@ import { CartPage } from './pages/storefront/CartPage';
 import { OrderTrackingPage } from './pages/storefront/OrderTrackingPage';
 import { PoliciesPage } from './pages/storefront/PoliciesPage';
 import { ProfilePage } from './pages/storefront/ProfilePage';
+import { OfflinePage } from './pages/storefront/OfflinePage';
 
 // Admin Pages
 import { AdminLoginPage } from './pages/admin/AdminLoginPage';
@@ -34,6 +35,29 @@ export const App: React.FC = () => {
   const isHomePage = location.pathname === '/';
   const isCataloguePage = location.pathname.startsWith('/catalogue');
 
+  // Network offline state listener
+  const [isOnline, setIsOnline] = React.useState<boolean>(
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  );
+
+  React.useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Display offline page when connection is lost (unless user is explicitly testing /offline route)
+  if (!isOnline && location.pathname !== '/offline') {
+    return <OfflinePage onRetry={() => setIsOnline(navigator.onLine)} />;
+  }
+
   // Header is displayed ONLY in Home page and Category / Catalogue pages
   const shouldShowHeader = !isAdminRoute && (isHomePage || isCataloguePage);
 
@@ -44,7 +68,7 @@ export const App: React.FC = () => {
       {/* Global Phone & 4-Digit Verification Modal */}
       <AuthModal />
 
-      {/* Global Checkout Modal (Slides from left on mobile, centered on desktop) */}
+      {/* Global Checkout Modal */}
       <CheckoutModal />
 
       {/* Storefront Navigation: Only on Home and Category pages */}
@@ -61,6 +85,7 @@ export const App: React.FC = () => {
           <Route path="/checkout" element={<Navigate to="/cart" replace />} />
           <Route path="/track" element={<OrderTrackingPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/offline" element={<OfflinePage onRetry={() => setIsOnline(true)} />} />
           <Route path="/shipping-policy" element={<PoliciesPage />} />
           <Route path="/returns-policy" element={<PoliciesPage />} />
           <Route path="/privacy-policy" element={<PoliciesPage />} />

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Category, Product, HeroBanner } from '../../domain/types';
 import { categoryRepository, productRepository, bannerRepository } from '../../infrastructure/repositories';
 import { ProductCard } from '../../components/ui/ProductCard';
+import { ShrellLoader } from '../../components/common/ShrellLoader';
 
 export const HomePage: React.FC = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -254,10 +255,8 @@ export const HomePage: React.FC = () => {
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-              {[1, 2, 3, 4].map((n) => (
-                <div key={n} className="h-60 sm:h-72 rounded-lg bg-[#0E0A0B] border border-[#221215] animate-pulse" />
-              ))}
+            <div className="h-56 flex items-center justify-center">
+              <ShrellLoader size={64} />
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
@@ -289,10 +288,8 @@ export const HomePage: React.FC = () => {
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-              {[1, 2, 3, 4].map((n) => (
-                <div key={n} className="h-60 sm:h-72 rounded-lg bg-[#0E0A0B] border border-[#221215] animate-pulse" />
-              ))}
+            <div className="h-56 flex items-center justify-center">
+              <ShrellLoader size={64} />
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Save, Check } from 'lucide-react';
+import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { settingsRepository } from '../../infrastructure/repositories';
 import { paisaToRupees, rupeesToPaisa } from '../../domain/services/CurrencyService';
 
@@ -61,7 +62,11 @@ export const AdminSettings: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="p-8 text-xs font-mono text-slate-400">Loading settings...</div>;
+    return (
+      <div className="py-24 flex items-center justify-center">
+        <ShrellLoader size={56} />
+      </div>
+    );
   }
 
   return (

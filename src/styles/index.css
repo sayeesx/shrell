@@ -42,6 +42,7 @@
 
   body, html {
     font-family: 'DM Sans', sans-serif !important;
+    scroll-behavior: smooth;
   }
 
   a[href], button, summary, select,

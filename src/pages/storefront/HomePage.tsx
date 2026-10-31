@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Category, Product, HeroBanner } from '../../domain/types';
-import { categoryRepository, productRepository, bannerRepository } from '../../infrastructure/repositories';
+import { Product, HeroBanner } from '../../domain/types';
+import { productRepository, bannerRepository } from '../../infrastructure/repositories';
 import { ProductCard } from '../../components/ui/ProductCard';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 
 export const HomePage: React.FC = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [banners, setBanners] = useState<HeroBanner[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [activeCategoryTab, setActiveCategoryTab] = useState<string>('all');
@@ -43,13 +42,11 @@ export const HomePage: React.FC = () => {
   useEffect(() => {
     async function loadData() {
       try {
-        const [prodResult, catResult, bannerResult] = await Promise.all([
+        const [prodResult, bannerResult] = await Promise.all([
           productRepository.getAll({ limit: 8 }),
-          categoryRepository.getAll(),
           bannerRepository.getAll(),
         ]);
         setFeaturedProducts(prodResult.products);
-        setCategories(catResult);
         setBanners(bannerResult);
       } catch (err) {
         console.error('Failed to load home page catalogue data:', err);
@@ -83,11 +80,11 @@ export const HomePage: React.FC = () => {
 
   const categoryIcons = [
     { id: 'all', icon: 'bi-grid-fill', label: 'All', to: '/catalogue' },
-    { id: 'roof', icon: 'bi-layers-fill', label: 'Roof Racks', to: '/catalogue?category=roof-racks-cargo' },
+    { id: 'freshner', icon: 'bi-tree-fill', label: 'Air Freshener', to: '/catalogue?category=air-fresheners' },
     { id: 'lighting', icon: 'bi-lightbulb-fill', label: 'Lighting', to: '/catalogue?category=auxiliary-lighting' },
-    { id: 'mats', icon: 'bi-shield-fill-check', label: 'Floor Mats', to: '/catalogue?category=all-weather-floor-protection' },
+    { id: 'mats', icon: 'floor-mat', label: 'Floor Mats', to: '/catalogue?category=all-weather-floor-protection' },
     { id: 'cams', icon: 'bi-camera-video-fill', label: 'Dash Cams', to: '/catalogue?category=dash-cameras' },
-    { id: 'tyre', icon: 'bi-speedometer2', label: 'Tyre Care', to: '/catalogue?category=tyre-care-air-systems' },
+    { id: 'tyre', icon: 'tyre-care', label: 'Tyre Care', to: '/catalogue?category=tyre-care-air-systems' },
     { id: 'recovery', icon: 'bi-tools', label: 'Recovery', to: '/catalogue?category=touring-recovery-gear' },
     { id: 'audio', icon: 'bi-speaker-fill', label: 'Audio & Tech', to: '/catalogue?category=audio' },
     { id: 'wash', icon: 'bi-droplet-half', label: 'Car Care', to: '/catalogue?category=car-care' },
@@ -129,7 +126,19 @@ export const HomePage: React.FC = () => {
                           : 'text-gray-400 group-hover:text-white'
                       }`}
                     >
-                      <i className={`bi ${cat.icon} text-lg sm:text-xl leading-none`} aria-hidden="true"></i>
+                      {cat.id === 'freshner' ? (
+                        <i className="bi bi-tree-fill text-lg sm:text-xl leading-none" aria-hidden="true"></i>
+                      ) : cat.id === 'mats' ? (
+                        <svg viewBox="0 0 24 24" className="w-[18px] h-[18px] fill-current" aria-hidden="true">
+                          <path fillRule="evenodd" clipRule="evenodd" d="M4.5 3A1.5 1.5 0 0 0 3 4.5v15A1.5 1.5 0 0 0 4.5 21h15a1.5 1.5 0 0 0 1.5-1.5v-15A1.5 1.5 0 0 0 19.5 3h-15ZM5 5h14v14H5V5Zm3 3a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1Zm0 4a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1Zm0 4a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1Z"/>
+                        </svg>
+                      ) : cat.id === 'tyre' ? (
+                        <svg viewBox="0 0 24 24" className="w-[18px] h-[18px] fill-current" aria-hidden="true">
+                          <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2Zm-8 10a8 8 0 1 1 16 0 8 8 0 0 1-16 0Zm8-5.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11Zm0 3.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-1-4.25a.75.75 0 0 1 1.5 0v1.5a.75.75 0 0 1-1.5 0v-1.5Zm0 7a.75.75 0 0 1 1.5 0v1.5a.75.75 0 0 1-1.5 0v-1.5Zm-4.25-2.25a.75.75 0 0 1 0-1.5h1.5a.75.75 0 0 1 0 1.5h-1.5Zm7 0a.75.75 0 0 1 0-1.5h1.5a.75.75 0 0 1 0 1.5h-1.5Z"/>
+                        </svg>
+                      ) : (
+                        <i className={`bi ${cat.icon} text-lg sm:text-xl leading-none`} aria-hidden="true"></i>
+                      )}
                     </div>
                     <span
                       className={`text-[11px] sm:text-[12px] font-medium tracking-tight text-center whitespace-nowrap transition-colors ${
@@ -174,6 +183,12 @@ export const HomePage: React.FC = () => {
                     src={banners[currentSlide]?.desktopImageUrl}
                     alt={banners[currentSlide]?.altText || 'Hero Banner'}
                     className="hidden md:block w-full max-h-[480px] lg:max-h-[560px] xl:max-h-[620px] object-cover sm:object-contain rounded-lg mx-auto"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (!target.src.endsWith('/shrell-opengraph.png')) {
+                        target.src = '/shrell-opengraph.png';
+                      }
+                    }}
                   />
 
                   {/* Mobile Image Banner (Strictly unchanged) */}
@@ -181,6 +196,12 @@ export const HomePage: React.FC = () => {
                     src={banners[currentSlide]?.mobileImageUrl || banners[currentSlide]?.desktopImageUrl}
                     alt={banners[currentSlide]?.altText || 'Hero Banner'}
                     className="block md:hidden w-full max-h-[180px] object-cover rounded-lg"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (!target.src.endsWith('/shrell-opengraph.png')) {
+                        target.src = '/shrell-opengraph.png';
+                      }
+                    }}
                   />
                 </Link>
               </div>
@@ -306,63 +327,177 @@ export const HomePage: React.FC = () => {
           )}
         </section>
 
-        {/* SECTION 3: Curated Equipment Systems */}
-        <section className="space-y-5 sm:space-y-6">
-          <div className="flex items-center justify-between border-b border-[#221215] pb-2.5 sm:pb-3 gap-3">
-            <div className="min-w-0">
-              <h2 className="text-xl sm:text-2xl font-bold text-[#F1EEEE] tracking-tight">
-                Curated Equipment Systems
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-400 mt-0.5 font-normal">
-                Field-tested car accessories for touring, protection, and lighting
-              </p>
-            </div>
-            <Link
-              to="/catalogue"
-              className="text-xs sm:text-sm font-semibold text-[#FF000E] hover:text-[#E0000C] flex items-center gap-1 transition-colors flex-shrink-0"
-            >
-              <span>View All</span>
-              <i className="bi bi-chevron-right text-[10px] sm:text-xs" aria-hidden="true"></i>
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {categories.map((cat) => (
-              <Link
-                key={cat.id}
-                to={`/catalogue?category=${cat.slug}`}
-                className="group relative rounded-lg border border-[#221215] hover:border-[#4F242C] bg-[#0E0A0B] overflow-hidden flex flex-col transition-all duration-200"
-              >
-                <div className="aspect-[16/10] bg-[#0E0A0B] overflow-hidden relative flex items-center justify-center border-b border-[#221215]">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#160D0F] via-[#0A0808] to-[#0A0808]" />
-                  <img
-                    src="/logos/shrell-full_white-text_black-logo.png"
-                    alt={cat.name}
-                    className="w-36 sm:w-44 max-h-16 object-contain opacity-35 filter brightness-125 grayscale select-none transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-                  <div className="absolute bottom-2.5 left-2.5 text-white">
-                    <span className="text-[10px] font-mono uppercase tracking-wider bg-black/80 border border-[#2A1519] px-2 py-0.5 rounded-full text-slate-300">
-                      {cat.productCount || 'OEM Grade'}
+        {/* SECTION 3: Titleless Editorial Bento Grid (Exact match to reference design) */}
+        <section className="space-y-4 pt-2">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-5">
+            {/* LEFT COLUMN: 2 Cards (4 cols on desktop) */}
+            <div className="md:col-span-4 flex flex-col gap-4">
+              {/* Card 1: Light Off-White Panel */}
+              <div className="rounded-2xl bg-[#F7F5F5] text-[#140E10] p-6 sm:p-7 relative overflow-hidden flex flex-col justify-between min-h-[220px] sm:min-h-[240px] group border border-white/40 shadow-sm">
+                <div className="flex items-start justify-between z-10">
+                  <div className="w-28 sm:w-32 h-28 sm:h-32 -ml-2 -mt-2 relative">
+                    <img
+                      src="/images/bento/bento_car_laser_tip.jpg"
+                      alt="Precision Laser Crafting"
+                      className="w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="text-right">
+                    <span className="block text-3xl sm:text-4xl font-extrabold text-[#FF000E] tracking-tight leading-none">
+                      95%
+                    </span>
+                    <span className="block text-xs sm:text-sm font-bold text-[#140E10] mt-1.5 leading-snug">
+                      Less Material<br />Waste
                     </span>
                   </div>
                 </div>
-                <div className="p-3.5 sm:p-4 flex-1 flex flex-col justify-between bg-[#0E0A0B]">
+
+                <div className="mt-4 pt-3 border-t border-black/10 flex items-center justify-between text-[11px] font-mono text-[#5C5456] uppercase tracking-wider">
+                  <span>CNC Laser Sculpted</span>
+                  <span className="text-[#FF000E] font-semibold">T6 Alloy</span>
+                </div>
+              </div>
+
+              {/* Card 2: Dark Graphite Panel */}
+              <div className="rounded-2xl bg-[#0E0A0B] border border-[#221215] p-6 sm:p-7 flex flex-col justify-between flex-1 min-h-[200px] group hover:border-[#4F242C] transition-all">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 flex items-center justify-center">
+                      <img src="/logos/shrell-brandicon_no-bg.png" alt="Shrell" className="w-full h-full object-contain" />
+                    </div>
+                    <span className="text-[11px] font-bold tracking-widest uppercase text-[#8E8587]">
+                      SHRELL
+                    </span>
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-extrabold text-[#F1EEEE] tracking-tight leading-tight">
+                    Laser Cutting<br />Parts
+                  </h3>
+                </div>
+
+                <div className="pt-4 flex items-end justify-between border-t border-[#221215] mt-4">
                   <div>
-                    <h3 className="text-sm sm:text-base font-semibold text-[#F1EEEE] group-hover:text-[#FF000E] transition-colors">
-                      {cat.name}
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
-                      {cat.description}
+                    <p className="text-[11px] sm:text-xs text-[#8E8587] leading-tight">
+                      Satisfied users<br />around the world
                     </p>
                   </div>
-                  <div className="mt-3 flex items-center gap-1 text-xs font-semibold text-[#FF000E]">
-                    <span>Explore category</span>
-                    <i className="bi bi-arrow-right text-xs group-hover:translate-x-1 transition-transform" aria-hidden="true"></i>
+                  <div className="text-2xl sm:text-3xl font-extrabold text-[#FF000E] tracking-tight">
+                    4.5K<sup className="text-sm sm:text-base font-bold">+</sup>
                   </div>
                 </div>
-              </Link>
-            ))}
+              </div>
+            </div>
+
+            {/* MIDDLE COLUMN: Tall Hero Card with Angled Chamfer Cut (4 cols on desktop) */}
+            <div className="md:col-span-4 relative group">
+              <div
+                className="h-full min-h-[380px] sm:min-h-[460px] rounded-2xl bg-[#0A0808] border border-[#221215] hover:border-[#FF000E]/40 overflow-hidden relative flex flex-col justify-between p-6 transition-all duration-300 shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+                style={{
+                  clipPath: 'polygon(36px 0, 100% 0, 100% 100%, 0 100%, 0 36px)',
+                }}
+              >
+                {/* Background 3D Hero Gear Image */}
+                <div className="absolute inset-0 z-0 overflow-hidden">
+                  <img
+                    src="/images/bento/bento_car_gear_hero.jpg"
+                    alt="Precision Engineered 3D Gear"
+                    className="w-full h-full object-cover object-center filter brightness-95 group-hover:scale-105 transition-transform duration-700 ease-out"
+                  />
+                  {/* Subtle red ambient light blending */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0808] via-transparent to-black/70 pointer-events-none" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(255,0,14,0.18),transparent_70%)] pointer-events-none" />
+                </div>
+
+                {/* Top Corner Angled Notch Tag */}
+                <div className="relative z-10 flex items-center justify-between">
+                  <div className="bg-[#0A0808]/85 backdrop-blur-md border border-[#3A141A] rounded-full px-3.5 py-1 text-[10px] sm:text-[11px] text-[#D8D1D1] font-mono tracking-wide">
+                    Access laser cutting easily online
+                  </div>
+                </div>
+
+                {/* Bottom Tagline & Link */}
+                <div className="relative z-10 pt-6">
+                  <Link
+                    to="/catalogue"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/80 hover:bg-[#FF000E] text-white border border-[#3A141A] hover:border-[#FF000E] text-xs font-semibold backdrop-blur-md transition-all group/btn"
+                  >
+                    <span>Explore Hardware</span>
+                    <i className="bi bi-arrow-right text-xs group-hover/btn:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN: Red Hero Card + Square Badge Tile (4 cols on desktop) */}
+            <div className="md:col-span-4 flex flex-col gap-4">
+              {/* Card 4: Signature Crimson Red Card with Chamfer Cut */}
+              <div
+                className="rounded-2xl bg-gradient-to-br from-[#FF000E] via-[#E0000C] to-[#B0000A] text-white p-6 sm:p-7 relative overflow-hidden flex flex-col justify-between flex-1 min-h-[260px] sm:min-h-[290px] shadow-[0_12px_36px_rgba(255,0,14,0.3)] transition-all group"
+                style={{
+                  clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 36px), calc(100% - 36px) 100%, 0 100%)',
+                }}
+              >
+                <div className="space-y-4 relative z-10">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 flex items-center justify-center">
+                      <img src="/logos/shrell-brandicon_no-bg.png" alt="Shrell" className="w-full h-full object-contain filter brightness-200" />
+                    </div>
+                    <span className="text-[11px] font-mono font-bold tracking-widest uppercase text-white/90">
+                      SHRELL
+                    </span>
+                  </div>
+
+                  <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
+                    Efficient<br />Online Laser<br />Crafting
+                  </h3>
+
+                  <p className="text-xs sm:text-sm text-white/85 leading-relaxed font-sans max-w-xs">
+                    Discover the simplicity of laser cutting with easy online access and fast delivery of custom parts.
+                  </p>
+                </div>
+
+                <div className="relative z-10 pt-4 flex items-center justify-between border-t border-white/20">
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-white/80">
+                    OEM Grade Fitment
+                  </span>
+                  <Link
+                    to="/catalogue"
+                    className="w-7 h-7 rounded-full bg-white/20 hover:bg-white text-white hover:text-[#FF000E] flex items-center justify-center transition-all"
+                    aria-label="Catalogue"
+                  >
+                    <i className="bi bi-chevron-right text-xs" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* Card 5: Square Brand Accent Tile */}
+              <div className="rounded-2xl bg-[#FF000E] p-6 flex items-center justify-center relative overflow-hidden h-[130px] sm:h-[140px] group shadow-[0_8px_24px_rgba(255,0,14,0.25)]">
+                <div className="w-20 h-20 relative flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                  {/* Clean White Cutout Logo Emblem */}
+                  <img
+                    src="/logos/shrell-brandicon_no-bg.png"
+                    alt="Shrell Emblem"
+                    className="w-full h-full object-contain filter brightness-0 invert drop-shadow-md"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Reference Design Metadata Strip */}
+          <div className="pt-2 px-2 flex flex-wrap items-center justify-between text-xs text-[#8E8587] gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-mono text-[#5C5456] uppercase tracking-wider">Typography</span>
+              <span className="text-[#F1EEEE] font-medium font-sans">DM Sans</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-mono text-[#5C5456] uppercase tracking-wider">Colors</span>
+              <div className="flex items-center gap-1.5">
+                <span className="w-3.5 h-3.5 rounded-full bg-[#FFFFFF] border border-white/20" title="White" />
+                <span className="w-3.5 h-3.5 rounded-full bg-[#0E0A0B] border border-[#261619]" title="Charcoal" />
+                <span className="w-3.5 h-3.5 rounded-full bg-[#B0000A]" title="Crimson" />
+                <span className="w-3.5 h-3.5 rounded-full bg-[#FF000E]" title="Signature Red" />
+              </div>
+            </div>
           </div>
         </section>
 

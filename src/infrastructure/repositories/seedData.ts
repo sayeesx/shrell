@@ -56,10 +56,10 @@ export const INITIAL_BRANDS: Brand[] = [
 
 export const INITIAL_CATEGORIES: Category[] = [
   {
-    id: 'cat-roof-racks',
-    name: 'Roof Racks & Cargo Systems',
-    slug: 'roof-racks-cargo',
-    description: 'Aerodynamic aluminium crossbars, modular cargo platforms, and expedition luggage baskets.',
+    id: 'cat-air-fresheners',
+    name: 'Air Fresheners',
+    slug: 'air-fresheners',
+    description: 'Organic cedar fiber blocks, solar kinetic turbine diffusers, and luxury car cabin fragrances.',
     imageUrl: '/logos/shrell-full_white-text_black-logo.png',
     isActive: true,
     displayOrder: 1,
@@ -149,8 +149,8 @@ Engineered specifically for Indian touring speeds and monsoons. The Stealth Wing
 - Heavy-duty cast zinc core locking mechanism with 2 coded master keys.
 - Universal standard 20mm T-slot channel compatible with cycle carriers, roof boxes, and kayak mounts.
 - Dynamic load capacity tested to 85 kg (Static capacity: 180 kg for rooftop tents).`,
-    categoryId: 'cat-roof-racks',
-    categoryName: 'Roof Racks & Cargo Systems',
+    categoryId: 'cat-air-fresheners',
+    categoryName: 'Air Fresheners',
     brandId: 'brand-vahn',
     brandName: '',
     pricePaisa: 1499900, // ₹14,999.00

@@ -46,14 +46,9 @@ export const OfflinePage: React.FC<OfflinePageProps> = ({ onRetry }) => {
       aria-live="polite"
     >
       <div className="max-w-md w-full flex flex-col items-center gap-7 animate-fadeIn">
-        {/* Offline Red Icon (Exact match to reference brandicon emblem) */}
+        {/* Shrell Animated Loading Logo */}
         <div className="relative w-36 h-36 sm:w-44 sm:h-44 flex items-center justify-center">
-          <img
-            src="/logos/shrell-brandicon_no-bg.png"
-            alt="Shrell Offline"
-            className="w-full h-full object-contain drop-shadow-[0_12px_28px_rgba(255,0,14,0.22)]"
-            draggable={false}
-          />
+          <ShrellLoader size={120} />
         </div>
 
         {/* Text Content */}
@@ -66,7 +61,7 @@ export const OfflinePage: React.FC<OfflinePageProps> = ({ onRetry }) => {
           </p>
         </div>
 
-        {/* Retry Button */}
+        {/* Retry Button without bottom loader */}
         <div className="pt-2 flex flex-col items-center">
           <button
             type="button"
@@ -74,11 +69,7 @@ export const OfflinePage: React.FC<OfflinePageProps> = ({ onRetry }) => {
             disabled={checking}
             className="inline-flex items-center justify-center min-w-[136px] h-10 px-8 rounded-full border border-[#2F2729] bg-[#140E10] hover:bg-[#1C1417] text-xs sm:text-sm font-medium text-[#F1EEEE] hover:text-white transition-all shadow-xs active:scale-95 cursor-pointer disabled:opacity-75"
           >
-            {checking ? (
-              <ShrellLoader size={22} />
-            ) : (
-              'Try again'
-            )}
+            {checking ? 'Checking...' : 'Try again'}
           </button>
 
           {notice && (

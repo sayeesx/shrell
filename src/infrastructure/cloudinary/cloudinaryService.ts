@@ -17,8 +17,8 @@ class CloudinaryService {
   private uploadPreset: string;
 
   constructor() {
-    this.cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '';
-    this.uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || '';
+    this.cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dy1i55fut';
+    this.uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'ECOMMERCE';
   }
 
   public isConfigured(): boolean {

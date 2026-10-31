@@ -107,8 +107,8 @@ export const App: React.FC = () => {
         </Routes>
       </div>
 
-      {/* Storefront Footer */}
-      {!isAdminRoute && <Footer />}
+      {/* Storefront Footer (Rendered strictly on home page) */}
+      {location.pathname === '/' && <Footer />}
 
       {/* Mobile Floating Bottom Navigation Dock */}
       {!isAdminRoute && <MobileNavDock />}

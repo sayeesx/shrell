@@ -16,10 +16,10 @@ const DEFAULT_BANNERS: HeroBanner[] = [
   },
   {
     id: 'banner-02',
-    desktopImageUrl: '/logos/shrell-full_white-text_black-logo.png',
-    mobileImageUrl: '/logos/shrell-full_white-text_black-logo.png',
-    targetUrl: '/catalogue?category=roof-racks-cargo',
-    altText: 'Aerodynamic Roof Cargo Systems',
+    desktopImageUrl: '/logos/shrell-brandicon_black-bg.png',
+    mobileImageUrl: '/logos/shrell-brandicon_black-bg.png',
+    targetUrl: '/catalogue',
+    altText: 'SHRELL Precision Engineered Automotive Systems',
     isActive: true,
     order: 2,
     createdAt: new Date().toISOString(),
@@ -39,12 +39,15 @@ class BannerRepository implements IBannerRepository {
     try {
       const data = localStorage.getItem(PRIMARY_KEY) || localStorage.getItem(FALLBACK_KEY);
       if (data !== null) {
-        return JSON.parse(data);
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
       }
     } catch (e) {
       console.warn('Failed to parse stored banners:', e);
     }
-    // Initialize defaults if not configured yet
+    // Initialize defaults if not configured yet or empty
     try {
       localStorage.setItem(PRIMARY_KEY, JSON.stringify(DEFAULT_BANNERS));
     } catch (e) {
@@ -66,9 +69,13 @@ class BannerRepository implements IBannerRepository {
 
   async getAll(): Promise<HeroBanner[]> {
     const banners = this.getStoredBanners();
-    return banners
+    const active = banners
       .filter((b) => b.isActive)
       .sort((a, b) => a.order - b.order);
+    if (active.length === 0) {
+      return DEFAULT_BANNERS;
+    }
+    return active;
   }
 
   async getAllForAdmin(): Promise<HeroBanner[]> {

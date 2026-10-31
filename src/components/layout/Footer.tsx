@@ -72,9 +72,9 @@ export const Footer: React.FC = () => {
             </h5>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link to="/catalogue?category=roof-racks-cargo" className="hover:text-white transition-colors flex items-center gap-2">
-                  <i className="bi bi-layers text-brand-500 text-sm" aria-hidden="true"></i>
-                  Roof Racks &amp; Crossbars
+                <Link to="/catalogue?category=air-fresheners" className="hover:text-white transition-colors flex items-center gap-2">
+                  <i className="bi bi-tree-fill text-brand-500 text-sm" aria-hidden="true"></i>
+                  Air Fresheners &amp; Fragrance
                 </Link>
               </li>
               <li>

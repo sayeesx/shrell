@@ -2,6 +2,8 @@ import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
+import { MobileNavDock } from './components/layout/MobileNavDock';
+import { AuthModal } from './components/auth/AuthModal';
 
 // Storefront Pages
 import { HomePage } from './pages/storefront/HomePage';
@@ -11,6 +13,7 @@ import { CartPage } from './pages/storefront/CartPage';
 import { CheckoutPage } from './pages/storefront/CheckoutPage';
 import { OrderTrackingPage } from './pages/storefront/OrderTrackingPage';
 import { PoliciesPage } from './pages/storefront/PoliciesPage';
+import { ProfilePage } from './pages/storefront/ProfilePage';
 
 // Admin Pages
 import { AdminLoginPage } from './pages/admin/AdminLoginPage';
@@ -30,12 +33,20 @@ export const App: React.FC = () => {
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isCheckoutRoute = location.pathname === '/checkout';
   const isHomePage = location.pathname === '/';
+  const isCataloguePage = location.pathname.startsWith('/catalogue');
+
+  // Header is displayed ONLY in Home page and Category / Catalogue pages
+  const shouldShowHeader = !isAdminRoute && !isCheckoutRoute && (isHomePage || isCataloguePage);
 
   return (
-    <div className="min-h-screen flex flex-col bg-canvas-50 text-gray-900 font-sans antialiased">
+    <div className="min-h-screen flex flex-col bg-canvas-50 text-gray-900 font-sans antialiased pb-16 md:pb-0">
       <ScrollToTop />
-      {/* Storefront Navigation (Hidden on Admin and Checkout) */}
-      {!isAdminRoute && !isCheckoutRoute && <Navbar />}
+
+      {/* Global Phone & 4-Digit Verification Modal */}
+      <AuthModal />
+
+      {/* Storefront Navigation: Only on Home and Category pages */}
+      {shouldShowHeader && <Navbar />}
 
       {/* Main Content View */}
       <div className="flex-1">
@@ -47,6 +58,7 @@ export const App: React.FC = () => {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/track" element={<OrderTrackingPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/shipping-policy" element={<PoliciesPage />} />
           <Route path="/returns-policy" element={<PoliciesPage />} />
           <Route path="/privacy-policy" element={<PoliciesPage />} />
@@ -64,6 +76,9 @@ export const App: React.FC = () => {
           </Route>
         </Routes>
       </div>
+
+      {/* Mobile Navigation Dock: Categories, Featured, Deals, Profile */}
+      <MobileNavDock />
 
       {/* Storefront Footer: Displayed exclusively on main home page */}
       {isHomePage && <Footer />}

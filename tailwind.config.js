@@ -46,8 +46,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['"Inter Tight"', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        mono: ['JetBrains Mono', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+        sans: ['"Inter Tight"', 'sans-serif'],
+        mono: ['"Inter Tight"', 'sans-serif'],
       },
       boxShadow: {
         none: 'none',

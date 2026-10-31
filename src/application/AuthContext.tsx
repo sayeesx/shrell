@@ -5,6 +5,7 @@ export interface UserSession {
   id: string;
   name: string;
   email: string;
+  phone?: string;
   role: 'customer' | 'admin';
 }
 
@@ -12,9 +13,13 @@ interface AuthContextType {
   user: UserSession | null;
   isAdmin: boolean;
   loginAsCustomer: (name: string, email: string, phone: string) => Promise<void>;
+  loginWithPhone: (phone: string, name?: string) => Promise<void>;
   loginAsAdmin: (password: string) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
+  isAuthModalOpen: boolean;
+  openAuthModal: () => void;
+  closeAuthModal: () => void;
 }
 
 const AUTH_STORAGE_KEY = 'shrell_user_session_v1';
@@ -53,11 +58,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkSession();
   }, []);
 
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+
+  const openAuthModal = () => setIsAuthModalOpen(true);
+  const closeAuthModal = () => setIsAuthModalOpen(false);
+
+  const loginWithPhone = async (phone: string, name = 'Valued Customer') => {
+    const session: UserSession = {
+      id: `cust-${Date.now()}`,
+      name,
+      email: `${phone}@customer.shrell.com`,
+      phone,
+      role: 'customer',
+    };
+    setUser(session);
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
+  };
+
   const loginAsCustomer = async (name: string, email: string, phone: string) => {
     const session: UserSession = {
       id: `cust-${Date.now()}`,
       name,
       email: email || `${phone}@guest.shrell.com`,
+      phone,
       role: 'customer',
     };
     setUser(session);
@@ -93,9 +116,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         isAdmin: user?.role === 'admin',
         loginAsCustomer,
+        loginWithPhone,
         loginAsAdmin,
         logout,
         isLoading,
+        isAuthModalOpen,
+        openAuthModal,
+        closeAuthModal,
       }}
     >
       {children}

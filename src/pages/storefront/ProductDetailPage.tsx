@@ -137,7 +137,24 @@ export const ProductDetailPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-2xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-8 space-y-10">
-        
+        {/* Top Product Navigation (Since global header is hidden on product pages) */}
+        <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center gap-2 text-xs font-bold text-gray-700 hover:text-gray-950 transition-colors"
+          >
+            <i className="bi bi-arrow-left text-base" /> Back
+          </button>
+          <Link
+            to="/cart"
+            className="relative p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-900 transition-colors flex items-center justify-center"
+            aria-label="View cart"
+          >
+            <i className="bi bi-bag text-sm" />
+          </Link>
+        </div>
+
         {/* Main Product Showcase (Matches KOVA Reference DTC Layout) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           

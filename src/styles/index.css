@@ -33,7 +33,7 @@
   }
 
   body {
-    font-family: 'Inter Tight', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter Tight', sans-serif !important;
   }
 
   a[href], button, summary, select,

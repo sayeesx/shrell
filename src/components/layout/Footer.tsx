@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-[#0D0F14] border-t border-surface-800 text-slate-400 text-sm">
+    <footer className="bg-[#080000] border-t border-[#221215] text-slate-400 text-sm">
       {/* Trust Pillars */}
-      <div className="border-b border-surface-800/80 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="border-b border-[#221215]/80 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           <div className="flex items-start gap-3.5">
-            <div className="p-2.5 rounded-xl bg-surface-900 border border-surface-700 text-brand-500 flex-shrink-0">
+            <div className="p-2.5 rounded-xl bg-[#0E0A0B] border border-[#221215] text-[#FF000E] flex-shrink-0">
               <i className="bi bi-patch-check-fill text-lg leading-none" aria-hidden="true"></i>
             </div>
             <div>
@@ -20,7 +20,7 @@ export const Footer: React.FC = () => {
           </div>
 
           <div className="flex items-start gap-3.5">
-            <div className="p-2.5 rounded-xl bg-surface-900 border border-surface-700 text-brand-500 flex-shrink-0">
+            <div className="p-2.5 rounded-xl bg-[#0E0A0B] border border-[#221215] text-[#FF000E] flex-shrink-0">
               <i className="bi bi-truck text-lg leading-none" aria-hidden="true"></i>
             </div>
             <div>
@@ -32,7 +32,7 @@ export const Footer: React.FC = () => {
           </div>
 
           <div className="flex items-start gap-3.5">
-            <div className="p-2.5 rounded-xl bg-surface-900 border border-surface-700 text-brand-500 flex-shrink-0">
+            <div className="p-2.5 rounded-xl bg-[#0E0A0B] border border-[#221215] text-[#FF000E] flex-shrink-0">
               <i className="bi bi-arrow-repeat text-lg leading-none" aria-hidden="true"></i>
             </div>
             <div>
@@ -160,7 +160,7 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Legal & GST Bar */}
-        <div className="mt-10 pt-6 border-t border-surface-800/80 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 font-mono gap-4">
+        <div className="mt-10 pt-6 border-t border-[#221215]/80 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 font-mono gap-4">
           <p>© {new Date().getFullYear()} SHRELL Automotive India Private Limited. All rights reserved.</p>
           <div className="flex items-center gap-3">
             <span>GSTIN: 27AABCV1234F1Z8</span>

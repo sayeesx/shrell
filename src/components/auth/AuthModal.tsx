@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../application/AuthContext';
 import { useBodyScrollLock } from '../common/useBodyScrollLock';
+import { ThemeSuccessAnimation, ThemeErrorAnimation } from '../common/ThemeFeedbackAnimation';
 
 export const AuthModal: React.FC = () => {
   const { isAuthModalOpen, closeAuthModal, loginWithPhone } = useAuth();
@@ -9,7 +10,7 @@ export const AuthModal: React.FC = () => {
 
   useBodyScrollLock(isAuthModalOpen);
 
-  const [step, setStep] = useState<'phone' | 'otp' | 'success'>('phone');
+  const [step, setStep] = useState<'phone' | 'otp' | 'success' | 'error'>('phone');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState(['', '', '', '']);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -122,9 +123,19 @@ export const AuthModal: React.FC = () => {
     }
   };
 
-  const verifyCode = async (_code: string) => {
+  const verifyCode = async (code: string) => {
     setIsVerifying(true);
     setErrorMessage('');
+
+    // If '0000' is entered, trigger error state to demonstrate ThemeErrorAnimation
+    if (code === '0000') {
+      setTimeout(() => {
+        setIsVerifying(false);
+        setErrorMessage('Invalid verification code entered.');
+        setStep('error');
+      }, 500);
+      return;
+    }
 
     // Instant verification for customer convenience
     setTimeout(async () => {
@@ -150,14 +161,14 @@ export const AuthModal: React.FC = () => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto overscroll-contain">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-300"
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300"
         onClick={closeAuthModal}
         aria-hidden="true"
       />
 
       {/* Modal Container: Elevated above virtual keyboard on mobile */}
       <div
-        className="relative w-full max-w-sm sm:max-w-md bg-white text-gray-900 rounded-3xl p-6 sm:p-8 z-10 shadow-2xl transition-all duration-300 ease-out my-auto max-h-[calc(100dvh-2rem)] overflow-y-auto"
+        className="relative w-full max-w-sm sm:max-w-md bg-[#0E0A0B] text-[#F1EEEE] border border-[#261619] rounded-3xl p-6 sm:p-8 z-10 shadow-[0_25px_60px_rgba(0,0,0,0.9)] transition-all duration-300 ease-out my-auto max-h-[calc(100dvh-2rem)] overflow-y-auto"
         style={{
           transform: keyboardOffset > 0 ? `translateY(-${Math.min(keyboardOffset * 0.45, 140)}px)` : undefined,
         }}
@@ -165,16 +176,16 @@ export const AuthModal: React.FC = () => {
         aria-modal="true"
       >
         {/* Mobile Indicator Bar */}
-        <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4 sm:hidden" />
+        <div className="w-10 h-1 bg-[#261619] rounded-full mx-auto mb-4 sm:hidden" />
 
         {/* Close Button */}
         <button
           type="button"
           onClick={closeAuthModal}
-          className="absolute top-5 right-5 text-gray-400 hover:text-gray-700 w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer"
+          className="absolute top-5 right-5 text-[#8E8587] hover:text-[#F1EEEE] w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer"
           aria-label="Close modal"
         >
-          <i className="bi bi-x-lg text-base" aria-hidden="true" />
+          <i className="bi bi-x-lg text-sm" aria-hidden="true" />
         </button>
 
         {/* ======================================================== */}
@@ -183,21 +194,21 @@ export const AuthModal: React.FC = () => {
         {step === 'phone' && (
           <div className="space-y-6 pt-2">
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-950 tracking-tight font-sans">
+              <h2 className="text-xl sm:text-2xl font-semibold text-[#F1EEEE] tracking-tight font-sans">
                 Enter your phone number
               </h2>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1 font-sans">
+              <p className="text-xs sm:text-sm text-[#8E8587] mt-1 font-sans">
                 We'll text you a 4-digit code to verify your phone.
               </p>
             </div>
 
             <form onSubmit={handlePhoneSubmit} className="space-y-4">
               <div>
-                <label htmlFor="auth-phone-input" className="block text-xs font-semibold text-gray-700 mb-1.5 font-sans">
+                <label htmlFor="auth-phone-input" className="block text-xs font-medium text-[#D8D1D1] mb-1.5 font-sans">
                   Phone Number
                 </label>
-                <div className="flex rounded-full border border-gray-300 bg-white overflow-hidden shadow-2xs focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-brand-500 transition-all">
-                  <div className="flex items-center px-4 bg-gray-50 text-gray-600 text-xs font-semibold border-r border-gray-200 select-none">
+                <div className="flex rounded-full border border-[#261619] bg-[#130E10] overflow-hidden focus-within:ring-2 focus-within:ring-[#FF000E] focus-within:border-[#FF000E] transition-all">
+                  <div className="flex items-center px-4 bg-[#1A1214] text-[#D8D1D1] text-xs font-medium border-r border-[#261619] select-none">
                     +91
                   </div>
                   <input
@@ -208,30 +219,30 @@ export const AuthModal: React.FC = () => {
                     placeholder="98765 43210"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="w-full px-4 py-3 text-sm text-gray-900 bg-transparent focus:outline-none tracking-wider font-sans font-medium"
+                    className="w-full px-4 py-3 text-sm text-[#F1EEEE] placeholder-[#5C5456] bg-transparent focus:outline-none tracking-wider font-sans font-medium"
                     maxLength={14}
                   />
                 </div>
                 {errorMessage && (
-                  <p className="text-xs text-rose-600 mt-1.5 font-medium">{errorMessage}</p>
+                  <p className="text-xs text-[#FF2E3A] mt-1.5 font-medium">{errorMessage}</p>
                 )}
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3.5 px-6 rounded-full bg-[#1F242F] hover:bg-black text-white font-semibold text-sm transition-all shadow-sm active:scale-98 cursor-pointer font-sans"
+                className="w-full py-3.5 px-6 rounded-full bg-[#FF000E] hover:bg-[#E0000C] text-white font-medium text-sm transition-all active:scale-98 cursor-pointer font-sans"
               >
                 Send Verification Code
               </button>
             </form>
 
-            <p className="text-[11px] text-gray-500 text-center leading-relaxed font-sans">
+            <p className="text-[11px] text-[#8E8587] text-center leading-relaxed font-sans">
               By continuing, you agree to SHRELL Automotive's{' '}
-              <a href="/privacy-policy" className="underline hover:text-gray-900">
+              <a href="/privacy-policy" className="underline hover:text-[#F1EEEE]">
                 Privacy Policy
               </a>{' '}
               and{' '}
-              <a href="/shipping-policy" className="underline hover:text-gray-900">
+              <a href="/shipping-policy" className="underline hover:text-[#F1EEEE]">
                 Terms of Service
               </a>
               .
@@ -240,24 +251,24 @@ export const AuthModal: React.FC = () => {
         )}
 
         {/* ======================================================== */}
-        {/* STEP 2: 4-DIGIT CODE INPUT (Matching Image 2 Reference)  */}
+        {/* STEP 2: 4-DIGIT CODE INPUT                               */}
         {/* ======================================================== */}
         {step === 'otp' && (
           <div className="space-y-6 pt-2">
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-950 tracking-tight font-sans">
+              <h2 className="text-xl sm:text-2xl font-semibold text-[#F1EEEE] tracking-tight font-sans">
                 Verify phone number
               </h2>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1 font-sans">
+              <p className="text-xs sm:text-sm text-[#8E8587] mt-1 font-sans">
                 Enter the 4-digit code sent to{' '}
-                <span className="font-semibold text-gray-800">
+                <span className="font-medium text-[#F1EEEE]">
                   +91 {phoneNumber.replace(/\D/g, '')}
                 </span>
                 .{' '}
                 <button
                   type="button"
                   onClick={() => setStep('phone')}
-                  className="text-brand-600 font-semibold hover:underline cursor-pointer"
+                  className="text-[#FF000E] font-medium hover:underline cursor-pointer"
                 >
                   Edit
                 </button>
@@ -280,31 +291,31 @@ export const AuthModal: React.FC = () => {
                   disabled={isVerifying}
                   className={`w-14 h-14 sm:w-16 sm:h-16 text-center text-2xl font-bold rounded-2xl border transition-all duration-150 focus:outline-none ${
                     otp[index]
-                      ? 'border-gray-950 bg-white text-gray-950 shadow-xs'
-                      : 'border-gray-300 bg-gray-50 text-gray-900 hover:border-gray-400'
-                  } focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/10`}
+                      ? 'border-[#B0000A] bg-[#1A1214] text-[#F1EEEE]'
+                      : 'border-[#261619] bg-[#130E10] text-[#F1EEEE] hover:border-[#4F242C]'
+                  } focus:border-[#FF000E] focus:bg-[#1A1214] focus:ring-2 focus:ring-[#FF000E]/20`}
                   aria-label={`Digit ${index + 1}`}
                 />
               ))}
             </div>
 
             {errorMessage && (
-              <p className="text-xs text-center text-rose-600 font-medium">{errorMessage}</p>
+              <p className="text-xs text-center text-[#FF2E3A] font-medium">{errorMessage}</p>
             )}
 
             {isVerifying ? (
-              <div className="flex items-center justify-center gap-2 py-3 text-sm text-gray-600">
-                <i className="bi bi-arrow-repeat animate-spin text-base text-brand-600" />
+              <div className="flex items-center justify-center gap-2 py-3 text-sm text-[#D8D1D1]">
+                <i className="bi bi-arrow-repeat animate-spin text-base text-[#FF000E]" />
                 <span>Verifying credentials...</span>
               </div>
             ) : (
               <div className="text-center pt-1">
-                <p className="text-xs text-gray-500 font-sans">
+                <p className="text-xs text-[#8E8587] font-sans">
                   Didn't receive the code?{' '}
                   <button
                     type="button"
                     onClick={handleResend}
-                    className="text-brand-600 font-semibold hover:underline cursor-pointer"
+                    className="text-[#FF000E] font-medium hover:underline cursor-pointer"
                   >
                     Resend Code
                   </button>
@@ -313,7 +324,7 @@ export const AuthModal: React.FC = () => {
             )}
 
             <div className="pt-2">
-              <p className="text-[11px] text-gray-500 text-center font-sans">
+              <p className="text-[11px] text-[#8E8587] text-center font-sans">
                 Tip: Enter any 4 numbers for instant access.
               </p>
             </div>
@@ -321,41 +332,20 @@ export const AuthModal: React.FC = () => {
         )}
 
         {/* ======================================================== */}
-        {/* STEP 3: SUCCESSFUL (Safe uncropped scalloped badge)       */}
+        {/* STEP 3: SUCCESSFUL (Editorial Theme Animated Badge)       */}
         {/* ======================================================== */}
         {step === 'success' && (
           <div className="space-y-6 pt-4 pb-2 text-center">
-            {/* Scalloped Green Badge with Checkmark - with safe viewBox margin so petals are NEVER cropped */}
+            {/* Editorial Crimson-to-Black Success Animation */}
             <div className="flex justify-center">
-              <div className="relative w-24 h-24 flex items-center justify-center">
-                <svg
-                  viewBox="-14 -14 128 128"
-                  className="w-24 h-24 text-[#B4F094] fill-current overflow-visible"
-                  aria-hidden="true"
-                >
-                  <path d="M50 0 C54 7 60 7 66 3 C72 10 77 12 83 9 C87 17 92 21 97 20 C98 28 101 34 100 42 C103 48 103 54 100 60 C101 68 98 74 97 82 C92 81 87 85 83 93 C77 90 72 92 66 99 C60 95 54 95 50 100 C46 95 40 95 34 99 C28 92 23 90 17 93 C13 85 8 81 3 82 C2 74 -1 68 0 60 C-3 54 -3 48 0 42 C-1 34 2 28 3 20 C8 21 13 17 17 9 C23 12 28 10 34 3 C40 7 46 7 50 0 Z" />
-                </svg>
-                {/* Bold Checkmark */}
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#1E4620"
-                  strokeWidth="3.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="absolute w-10 h-10"
-                  aria-hidden="true"
-                >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </div>
+              <ThemeSuccessAnimation size={105} />
             </div>
 
             <div className="space-y-1">
-              <h2 className="text-2xl font-bold text-gray-950 tracking-tight font-sans">
+              <h2 className="text-2xl font-semibold text-[#F1EEEE] tracking-tight font-sans">
                 Successful
               </h2>
-              <p className="text-xs sm:text-sm text-gray-500 max-w-[260px] mx-auto leading-relaxed font-sans">
+              <p className="text-xs sm:text-sm text-[#8E8587] max-w-[260px] mx-auto leading-relaxed font-sans">
                 Your New Experience is successfully added.
               </p>
             </div>
@@ -363,9 +353,40 @@ export const AuthModal: React.FC = () => {
             <button
               type="button"
               onClick={handleDone}
-              className="w-full py-3.5 px-6 rounded-full bg-[#1F242F] hover:bg-black text-white font-semibold text-sm transition-all cursor-pointer font-sans"
+              className="w-full py-3.5 px-6 rounded-full bg-[#FF000E] hover:bg-[#E0000C] text-white font-medium text-sm transition-all cursor-pointer font-sans"
             >
               Done
+            </button>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* STEP 4: ERROR STATE (Theme Error Cross Animation)         */}
+        {/* ======================================================== */}
+        {step === 'error' && (
+          <div className="space-y-6 pt-4 pb-2 text-center">
+            <div className="flex justify-center">
+              <ThemeErrorAnimation size={105} />
+            </div>
+
+            <div className="space-y-1">
+              <h2 className="text-2xl font-semibold text-[#F1EEEE] tracking-tight font-sans">
+                Verification Failed
+              </h2>
+              <p className="text-xs sm:text-sm text-[#8E8587] max-w-[260px] mx-auto leading-relaxed font-sans">
+                {errorMessage || 'The code entered could not be verified. Please try again.'}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setOtp(['', '', '', '']);
+                setStep('otp');
+              }}
+              className="w-full py-3.5 px-6 rounded-full bg-[#FF000E] hover:bg-[#E0000C] text-white font-medium text-sm transition-all cursor-pointer font-sans"
+            >
+              Try Again
             </button>
           </div>
         )}

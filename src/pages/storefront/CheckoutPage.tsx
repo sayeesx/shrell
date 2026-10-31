@@ -580,11 +580,11 @@ export const CheckoutPage: React.FC = () => {
                 <div className="space-y-3 max-h-72 overflow-y-auto pr-1 divide-y divide-gray-100">
                   {cart.items.map((item) => (
                     <div key={item.productId} className="pt-3 first:pt-0 flex items-center gap-3">
-                      <div className="w-14 h-14 rounded-lg bg-[#F6F6F6] border border-gray-200 p-1 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                      <div className="w-14 h-14 rounded-lg bg-[#0E0A0B] border border-[#261619] p-1 flex-shrink-0 flex items-center justify-center overflow-hidden">
                         <img
-                          src={item.product.images[0]?.url || 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=400&q=80'}
+                          src={item.product.images[0]?.url || '/logos/shrell-full_white-text_black-logo.png'}
                           alt={item.product.name}
-                          className="w-full h-full object-contain"
+                          className="w-full h-full object-contain opacity-40 brightness-125 grayscale"
                         />
                       </div>
                       <div className="flex-1 min-w-0">

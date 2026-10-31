@@ -66,7 +66,7 @@ export const AdminProducts: React.FC = () => {
     setBrandId(brands[0]?.id || '');
     setShortDesc('');
     setDesc('');
-    setImageUrl('https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80');
+    setImageUrl('/logos/shrell-full_white-text_black-logo.png');
     setIsUniversal(true);
     setWeightGrams('3000');
     setDimensions('80x25x15');
@@ -105,7 +105,7 @@ export const AdminProducts: React.FC = () => {
       {
         id: `img-${Date.now()}`,
         productId: '',
-        url: imageUrl.trim() || 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80',
+        url: imageUrl.trim() || '/logos/shrell-full_white-text_black-logo.png',
         altText: name,
         sortOrder: 1,
         isPrimary: true,
@@ -398,7 +398,7 @@ export const AdminProducts: React.FC = () => {
                   type="url"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
+                  placeholder="/logos/shrell-full_white-text_black-logo.png"
                   className="w-full bg-surface-950 border border-surface-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-brand-500"
                 />
               </div>

@@ -67,8 +67,8 @@ export const Navbar: React.FC = () => {
     <header
       className={`sticky top-0 z-40 text-white transition-all duration-500 ease-in-out ${
         isScrolled
-          ? 'bg-[#0D0F14]/95 backdrop-blur-md border-b border-surface-800 shadow-xl rounded-b-2xl sm:rounded-b-3xl'
-          : 'bg-[#0D0F14] border-b border-surface-800/40'
+          ? 'bg-[#0A0808]/95 backdrop-blur-md border-b border-[#221215] shadow-xl rounded-b-2xl sm:rounded-b-3xl'
+          : 'bg-[#0A0808] border-b border-[#221215]/60'
       }`}
     >
       {/* 1. Fluid Continuous Marquee (Smoothly glides up on scroll) */}
@@ -79,13 +79,13 @@ export const Navbar: React.FC = () => {
             : 'grid-rows-[1fr] opacity-100 translate-y-0'
         }`}
       >
-        <div className="overflow-hidden bg-[#090B0E] border-b border-surface-800/60 py-1.5 text-xs">
+        <div className="overflow-hidden bg-[#080000] border-b border-[#221215]/60 py-1.5 text-xs">
           <div className="animate-marquee-scroll flex items-center gap-12 whitespace-nowrap">
             {[...ANNOUNCEMENT_MESSAGES, ...ANNOUNCEMENT_MESSAGES].map((msg, i) => (
               <div key={i} className="flex items-center gap-2.5 text-gray-300 font-medium font-sans">
-                <i className={`bi ${msg.icon} text-brand-400 text-xs`} aria-hidden="true" />
+                <i className={`bi ${msg.icon} text-[#FF000E] text-xs`} aria-hidden="true" />
                 <span className="tracking-tight">{msg.text}</span>
-                <span className="text-surface-700 ml-6 text-sm">•</span>
+                <span className="text-[#3B1A1E] ml-6 text-sm">•</span>
               </div>
             ))}
           </div>
@@ -107,7 +107,7 @@ export const Navbar: React.FC = () => {
               <button
                 type="button"
                 onClick={handleGoBack}
-                className="group flex items-center justify-center w-8 h-8 rounded-full bg-surface-800 hover:bg-surface-700 border border-surface-700 text-white transition-all cursor-pointer shadow-xs active:scale-95"
+                className="group flex items-center justify-center w-8 h-8 rounded-full bg-[#130E10] hover:bg-[#1D1214] border border-[#221215] text-white transition-all cursor-pointer shadow-xs active:scale-95"
                 aria-label="Go back to previous page"
                 title="Go back"
               >
@@ -172,12 +172,12 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center gap-2.5 sm:gap-3 flex-shrink-0">
             <Link
               to="/cart"
-              className="relative p-2.5 rounded-full bg-surface-800 hover:bg-surface-700 border border-surface-700 text-white transition-colors flex items-center justify-center active:scale-95 cursor-pointer"
+              className="relative p-2.5 rounded-full bg-[#130E10] hover:bg-[#1D1214] border border-[#221215] text-white transition-colors flex items-center justify-center active:scale-95 cursor-pointer"
               aria-label={`Cart with ${itemCount} items`}
             >
               <i className="bi bi-bag text-lg leading-none" aria-hidden="true" />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-brand-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center leading-none px-1 shadow-sm">
+                <span className="absolute -top-1 -right-1 bg-[#FF000E] text-white text-[10px] font-semibold min-w-[18px] h-[18px] rounded-full flex items-center justify-center leading-none px-1 shadow-sm">
                   {itemCount}
                 </span>
               )}
@@ -196,7 +196,7 @@ export const Navbar: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleGoBack}
-                  className="group flex items-center justify-center w-8 h-8 rounded-full bg-surface-800 hover:bg-surface-700 border border-surface-700 text-white transition-all cursor-pointer flex-shrink-0 active:scale-95"
+                  className="group flex items-center justify-center w-8 h-8 rounded-full bg-[#130E10] hover:bg-[#1D1214] border border-[#221215] text-white transition-all cursor-pointer flex-shrink-0 active:scale-95"
                   aria-label="Go back to previous page"
                   title="Go back"
                 >
@@ -216,7 +216,7 @@ export const Navbar: React.FC = () => {
             <div className="flex items-center gap-2 flex-shrink-0">
               <Link
                 to="/catalogue"
-                className="p-2 rounded-full bg-surface-800 hover:bg-surface-700 border border-surface-700 text-white transition-colors flex items-center justify-center active:scale-95 cursor-pointer"
+                className="p-2 rounded-full bg-[#130E10] hover:bg-[#1D1214] border border-[#221215] text-white transition-colors flex items-center justify-center active:scale-95 cursor-pointer"
                 title="Categories Menu"
                 aria-label="Categories Menu"
               >
@@ -224,12 +224,12 @@ export const Navbar: React.FC = () => {
               </Link>
               <Link
                 to="/cart"
-                className="relative p-2 rounded-full bg-surface-800 hover:bg-surface-700 border border-surface-700 text-white transition-colors flex items-center justify-center active:scale-95 cursor-pointer"
+                className="relative p-2 rounded-full bg-[#130E10] hover:bg-[#1D1214] border border-[#221215] text-white transition-colors flex items-center justify-center active:scale-95 cursor-pointer"
                 aria-label={`Cart with ${itemCount} items`}
               >
                 <i className="bi bi-bag text-sm leading-none" />
                 {itemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-brand-500 text-white text-[9px] font-bold min-w-[16px] h-[16px] rounded-full flex items-center justify-center leading-none px-0.5 shadow-sm">
+                  <span className="absolute -top-1 -right-1 bg-[#FF000E] text-white text-[9px] font-semibold min-w-[16px] h-[16px] rounded-full flex items-center justify-center leading-none px-0.5 shadow-sm">
                     {itemCount}
                   </span>
                 )}

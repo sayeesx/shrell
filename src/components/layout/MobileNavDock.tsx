@@ -63,7 +63,7 @@ export const MobileNavDock: React.FC = () => {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[#0A0C10]/95 backdrop-blur-xl border-t border-white/[0.08] px-3 pt-2 pb-[max(0.65rem,env(safe-area-inset-bottom))] shadow-[0_-10px_35px_rgba(0,0,0,0.7)] select-none transition-all duration-300"
+      className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[#0A0808]/95 backdrop-blur-xl border-t border-[#221215] px-3 pt-2 pb-[max(0.65rem,env(safe-area-inset-bottom))] shadow-[0_-10px_35px_rgba(0,0,0,0.85)] select-none transition-all duration-300"
       aria-label="Mobile Navigation Dock"
     >
       <div className="grid grid-cols-4 items-center gap-1 max-w-md mx-auto">
@@ -78,7 +78,7 @@ export const MobileNavDock: React.FC = () => {
             <div className="w-12 h-8 flex items-center justify-center transition-all duration-200">
               <i
                 className={`bi ${item.isActive ? item.iconActive : item.iconInactive} text-[23px] leading-none transition-colors ${
-                  item.isActive ? 'text-brand-500' : 'text-gray-400 group-hover:text-white'
+                  item.isActive ? 'text-[#FF000E]' : 'text-gray-400 group-hover:text-white'
                 }`}
                 aria-hidden="true"
               />
@@ -88,8 +88,8 @@ export const MobileNavDock: React.FC = () => {
             <span
               className={`text-[10px] tracking-tight transition-all duration-200 ${
                 item.isActive
-                  ? 'text-brand-500 font-bold'
-                  : 'text-gray-400 font-medium group-hover:text-gray-200'
+                  ? 'text-[#FF000E] font-semibold'
+                  : 'text-gray-400 font-normal group-hover:text-gray-200'
               }`}
             >
               {item.label}
@@ -108,7 +108,7 @@ export const MobileNavDock: React.FC = () => {
           <div className="w-12 h-8 flex items-center justify-center transition-all duration-200">
             <i
               className={`bi ${isProfileActive ? 'bi-person-fill' : 'bi-person'} text-[23px] leading-none transition-colors ${
-                isProfileActive ? 'text-brand-500' : 'text-gray-400 group-hover:text-white'
+                isProfileActive ? 'text-[#FF000E]' : 'text-gray-400 group-hover:text-white'
               }`}
               aria-hidden="true"
             />
@@ -118,8 +118,8 @@ export const MobileNavDock: React.FC = () => {
           <span
             className={`text-[10px] tracking-tight transition-all duration-200 ${
               isProfileActive
-                ? 'text-brand-500 font-bold'
-                : 'text-gray-400 font-medium group-hover:text-gray-200'
+                ? 'text-[#FF000E] font-semibold'
+                : 'text-gray-400 font-normal group-hover:text-gray-200'
             }`}
           >
             {user ? 'Account' : 'Login'}

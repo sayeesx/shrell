@@ -6,18 +6,18 @@ const FALLBACK_KEY = 'vahn_hero_banners';
 const DEFAULT_BANNERS: HeroBanner[] = [
   {
     id: 'banner-01',
-    desktopImageUrl: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1600&h=500&q=85',
-    mobileImageUrl: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&h=450&q=85',
+    desktopImageUrl: '/shrell-opengraph.png',
+    mobileImageUrl: '/shrell-opengraph.png',
     targetUrl: '/catalogue',
-    altText: 'Festive Season Overland Accessories',
+    altText: 'SHRELL Premium Automotive Overland Equipment',
     isActive: true,
     order: 1,
     createdAt: new Date().toISOString(),
   },
   {
     id: 'banner-02',
-    desktopImageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1600&h=500&q=85',
-    mobileImageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&h=450&q=85',
+    desktopImageUrl: '/logos/shrell-full_white-text_black-logo.png',
+    mobileImageUrl: '/logos/shrell-full_white-text_black-logo.png',
     targetUrl: '/catalogue?category=roof-racks-cargo',
     altText: 'Aerodynamic Roof Cargo Systems',
     isActive: true,

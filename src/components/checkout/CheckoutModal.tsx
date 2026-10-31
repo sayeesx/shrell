@@ -7,6 +7,7 @@ import { orderRepository } from '../../infrastructure/repositories';
 import { whatsAppService } from '../../features/whatsapp/WhatsAppService';
 import { HalfArrowIcon } from '../common/HalfArrowIcon';
 import { useBodyScrollLock } from '../common/useBodyScrollLock';
+import { ThemeSuccessAnimation } from '../common/ThemeFeedbackAnimation';
 
 const INDIAN_STATES = [
   'Andhra Pradesh',
@@ -182,20 +183,20 @@ export const CheckoutModal: React.FC = () => {
 
       {/* Modal / Mobile Left Drawer */}
       <div
-        className="relative z-10 w-[92%] sm:w-[85%] md:w-full max-w-md md:max-w-2xl h-[100dvh] md:h-auto md:max-h-[90vh] bg-surface-900 text-slate-100 border-r md:border border-surface-800 shadow-2xl flex flex-col md:rounded-2xl animate-slide-left-drawer md:animate-none overflow-hidden"
+        className="relative z-10 w-[92%] sm:w-[85%] md:w-full max-w-md md:max-w-2xl h-[100dvh] md:h-auto md:max-h-[90vh] bg-[#0E0A0B] text-[#F1EEEE] border-r md:border border-[#261619] shadow-[0_25px_60px_rgba(0,0,0,0.9)] flex flex-col md:rounded-2xl animate-slide-left-drawer md:animate-none overflow-hidden"
         role="dialog"
         aria-modal="true"
       >
         {/* Header with Go Back + SHRELL Logo as Home button + Close X */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-surface-800 bg-[#090B0E] flex-shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-[#261619] bg-[#0A0808] flex-shrink-0">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={closeCheckout}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-surface-800 hover:bg-surface-700 text-slate-300 hover:text-white text-xs font-semibold transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#130E10] hover:bg-[#1A1214] border border-[#261619] text-[#D8D1D1] hover:text-[#F1EEEE] text-xs font-medium transition-colors cursor-pointer"
               aria-label="Back to store"
             >
-              <HalfArrowIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.4} />
+              <HalfArrowIcon className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" strokeWidth={2.2} />
               <span>Back</span>
             </button>
 
@@ -217,10 +218,10 @@ export const CheckoutModal: React.FC = () => {
           <button
             type="button"
             onClick={closeCheckout}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-white bg-surface-800 hover:bg-surface-750 transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[#8E8587] hover:text-[#F1EEEE] bg-[#130E10] hover:bg-[#1A1214] border border-[#261619] transition-colors cursor-pointer"
             aria-label="Close checkout"
           >
-            <i className="bi bi-x-lg text-sm" />
+            <i className="bi bi-x-lg text-xs" />
           </button>
         </div>
 
@@ -229,40 +230,40 @@ export const CheckoutModal: React.FC = () => {
           {/* STATE 1: ORDER CONFIRMED */}
           {createdOrder ? (
             <div className="text-center py-6 sm:py-8 space-y-5">
-              <div className="w-16 h-16 rounded-full bg-emerald-950/80 border border-emerald-800 text-emerald-400 flex items-center justify-center mx-auto text-3xl">
-                <i className="bi bi-check2-circle" aria-hidden="true"></i>
+              <div className="flex justify-center">
+                <ThemeSuccessAnimation size={96} />
               </div>
 
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 font-mono">
+                <span className="text-[11px] font-medium uppercase tracking-wider text-[#FF000E] font-sans">
                   Order Confirmed
                 </span>
-                <h1 className="text-2xl font-bold text-white tracking-tight mt-1">
+                <h1 className="text-2xl font-semibold text-[#F1EEEE] tracking-tight mt-1">
                   Thank you, {createdOrder.customerName}
                 </h1>
-                <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">
-                  Your order <span className="font-mono font-bold text-white">{createdOrder.id}</span> has been received and queued for dispatch.
+                <p className="text-xs text-[#8E8587] max-w-sm mx-auto mt-1">
+                  Your order <span className="font-mono font-medium text-[#F1EEEE]">{createdOrder.id}</span> has been received and queued for dispatch.
                 </p>
               </div>
 
-              <div className="p-4 bg-[#090B0E] border border-surface-800 rounded-xl text-left text-xs space-y-2.5 font-sans">
-                <div className="flex justify-between text-slate-400">
+              <div className="p-4 bg-[#130E10] border border-[#261619] rounded-xl text-left text-xs space-y-2.5 font-sans">
+                <div className="flex justify-between text-[#8E8587]">
                   <span>Order Reference</span>
-                  <strong className="text-white font-mono font-bold">{createdOrder.id}</strong>
+                  <strong className="text-[#F1EEEE] font-mono font-medium">{createdOrder.id}</strong>
                 </div>
-                <div className="flex justify-between text-slate-400">
+                <div className="flex justify-between text-[#8E8587]">
                   <span>Payment Mode</span>
-                  <strong className="text-white font-bold">
+                  <strong className="text-[#F1EEEE] font-medium">
                     {createdOrder.paymentMethod === 'MANUAL_UPI' ? 'Direct Bank UPI (UTR)' : 'Cash on Delivery (COD)'}
                   </strong>
                 </div>
-                <div className="flex justify-between text-slate-400">
+                <div className="flex justify-between text-[#8E8587]">
                   <span>Amount</span>
-                  <strong className="text-brand-400 font-bold">{formatINR(createdOrder.totalPaisa)}</strong>
+                  <strong className="text-[#FF000E] font-semibold">{formatINR(createdOrder.totalPaisa)}</strong>
                 </div>
-                <div className="flex justify-between text-slate-400 pt-2 border-t border-surface-800">
+                <div className="flex justify-between text-[#8E8587] pt-2 border-t border-[#261619]">
                   <span>Delivery Address</span>
-                  <span className="text-slate-200 font-medium text-right max-w-[220px]">
+                  <span className="text-[#D8D1D1] font-normal text-right max-w-[220px]">
                     {createdOrder.shippingAddress.addressLine1}, {createdOrder.shippingAddress.city},{' '}
                     {createdOrder.shippingAddress.state} - {createdOrder.shippingAddress.postalCode}
                   </span>
@@ -273,7 +274,7 @@ export const CheckoutModal: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleDone}
-                  className="w-full sm:w-auto px-6 py-3 rounded-lg bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold transition-colors cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-3 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-medium transition-colors cursor-pointer"
                 >
                   Continue Shopping
                 </button>
@@ -282,9 +283,9 @@ export const CheckoutModal: React.FC = () => {
                   href={whatsAppService.getOrderSupportLink(createdOrder)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full sm:w-auto px-6 py-3 rounded-lg bg-emerald-950/70 hover:bg-emerald-900/70 border border-emerald-800 text-emerald-300 text-xs font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-3 rounded-lg bg-[#130E10] hover:bg-[#1A1214] border border-[#261619] text-[#D8D1D1] hover:text-[#F1EEEE] text-xs font-medium transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <i className="bi bi-whatsapp text-sm" aria-hidden="true"></i>
+                  <i className="bi bi-whatsapp text-sm text-emerald-400" aria-hidden="true"></i>
                   <span>Track with WhatsApp Support</span>
                 </a>
               </div>
@@ -292,17 +293,17 @@ export const CheckoutModal: React.FC = () => {
           ) : cart.items.length === 0 ? (
             /* STATE 2: EMPTY CART */
             <div className="text-center py-12 space-y-4">
-              <div className="w-16 h-16 rounded-full bg-surface-800 flex items-center justify-center mx-auto text-slate-400">
+              <div className="w-16 h-16 rounded-full bg-[#130E10] border border-[#261619] flex items-center justify-center mx-auto text-[#8E8587]">
                 <i className="bi bi-bag-x text-3xl" />
               </div>
-              <h2 className="text-xl font-bold text-white">Your Shopping Cart is Empty</h2>
-              <p className="text-xs text-slate-400 max-w-xs mx-auto">
+              <h2 className="text-xl font-semibold text-[#F1EEEE]">Your Shopping Cart is Empty</h2>
+              <p className="text-xs text-[#8E8587] max-w-xs mx-auto">
                 Add automotive equipment or accessories to your cart before proceeding to checkout.
               </p>
               <button
                 type="button"
                 onClick={closeCheckout}
-                className="px-6 py-2.5 rounded-full bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+                className="px-6 py-2.5 rounded-full bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-medium uppercase tracking-wider transition-colors cursor-pointer"
               >
                 Browse Catalogue
               </button>
@@ -311,18 +312,18 @@ export const CheckoutModal: React.FC = () => {
             /* STATE 3: CHECKOUT FORM */
             <form onSubmit={handleSubmitOrder} className="space-y-6">
               {/* Order Items Preview */}
-              <div className="p-3.5 rounded-xl bg-[#090B0E] border border-surface-800 space-y-2">
-                <div className="flex items-center justify-between text-xs font-semibold text-slate-300 border-b border-surface-800 pb-2">
+              <div className="p-3.5 rounded-xl bg-[#130E10] border border-[#261619] space-y-2">
+                <div className="flex items-center justify-between text-xs font-medium text-[#D8D1D1] border-b border-[#261619] pb-2">
                   <span>Order Items ({cart.items.length})</span>
-                  <span className="text-white font-bold">{formatINR(cart.totalPaisa)}</span>
+                  <span className="text-[#F1EEEE] font-semibold">{formatINR(cart.totalPaisa)}</span>
                 </div>
                 <div className="max-h-28 overflow-y-auto space-y-1.5 pr-1">
                   {cart.items.map((item) => (
-                    <div key={item.productId} className="flex items-center justify-between text-[11px] text-slate-300">
+                    <div key={item.productId} className="flex items-center justify-between text-[11px] text-[#D8D1D1]">
                       <span className="truncate max-w-[220px]">
                         {item.quantity}x {item.product.name}
                       </span>
-                      <span className="font-mono text-white flex-shrink-0">
+                      <span className="font-mono text-[#F1EEEE] flex-shrink-0">
                         {formatINR(item.subtotalPaisa)}
                       </span>
                     </div>
@@ -332,91 +333,91 @@ export const CheckoutModal: React.FC = () => {
 
               {/* Delivery Address */}
               <div className="space-y-3">
-                <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono flex items-center gap-2">
-                  <i className="bi bi-geo-alt-fill text-brand-500"></i>
+                <h3 className="text-xs font-medium text-[#F1EEEE] uppercase tracking-wider font-mono flex items-center gap-2">
+                  <i className="bi bi-geo-alt-fill text-[#FF000E]"></i>
                   <span>Delivery Address</span>
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div>
-                    <label className="block text-slate-400 mb-1">Full Name *</label>
+                    <label className="block text-[#8E8587] mb-1">Full Name *</label>
                     <input
                       type="text"
                       required
                       placeholder="e.g. Rahul Sharma"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="w-full bg-[#090B0E] border border-surface-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-brand-500"
+                      className="w-full bg-[#0A0808] border border-[#261619] rounded-lg px-3 py-2 text-[#F1EEEE] placeholder-[#5C5456] focus:outline-none focus:border-[#FF000E]"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 mb-1">Mobile Number (10 digits) *</label>
+                    <label className="block text-[#8E8587] mb-1">Mobile Number (10 digits) *</label>
                     <input
                       type="tel"
                       required
                       placeholder="e.g. 9876543210"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full bg-[#090B0E] border border-surface-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-brand-500"
+                      className="w-full bg-[#0A0808] border border-[#261619] rounded-lg px-3 py-2 text-[#F1EEEE] placeholder-[#5C5456] focus:outline-none focus:border-[#FF000E]"
                       maxLength={10}
                     />
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-slate-400 mb-1">Email Address (Optional for Invoice)</label>
+                    <label className="block text-[#8E8587] mb-1">Email Address (Optional for Invoice)</label>
                     <input
                       type="email"
                       placeholder="e.g. rahul@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-[#090B0E] border border-surface-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-brand-500"
+                      className="w-full bg-[#0A0808] border border-[#261619] rounded-lg px-3 py-2 text-[#F1EEEE] placeholder-[#5C5456] focus:outline-none focus:border-[#FF000E]"
                     />
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-slate-400 mb-1">Address Line 1 *</label>
+                    <label className="block text-[#8E8587] mb-1">Address Line 1 *</label>
                     <input
                       type="text"
                       required
                       placeholder="House / Flat / Street Name"
                       value={addressLine1}
                       onChange={(e) => setAddressLine1(e.target.value)}
-                      className="w-full bg-[#090B0E] border border-surface-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-brand-500"
+                      className="w-full bg-[#0A0808] border border-[#261619] rounded-lg px-3 py-2 text-[#F1EEEE] placeholder-[#5C5456] focus:outline-none focus:border-[#FF000E]"
                     />
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-slate-400 mb-1">Address Line 2 (Apartment / Landmark)</label>
+                    <label className="block text-[#8E8587] mb-1">Address Line 2 (Apartment / Landmark)</label>
                     <input
                       type="text"
                       placeholder="Near City Center / Building 4B"
                       value={addressLine2}
                       onChange={(e) => setAddressLine2(e.target.value)}
-                      className="w-full bg-[#090B0E] border border-surface-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-brand-500"
+                      className="w-full bg-[#0A0808] border border-[#261619] rounded-lg px-3 py-2 text-[#F1EEEE] placeholder-[#5C5456] focus:outline-none focus:border-[#FF000E]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-400 mb-1">City / District *</label>
+                    <label className="block text-[#8E8587] mb-1">City / District *</label>
                     <input
                       type="text"
                       required
                       placeholder="e.g. Pune"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      className="w-full bg-[#090B0E] border border-surface-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-brand-500"
+                      className="w-full bg-[#0A0808] border border-[#261619] rounded-lg px-3 py-2 text-[#F1EEEE] placeholder-[#5C5456] focus:outline-none focus:border-[#FF000E]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-400 mb-1">State *</label>
+                    <label className="block text-[#8E8587] mb-1">State *</label>
                     <select
                       value={state}
                       onChange={(e) => setState(e.target.value)}
-                      className="w-full bg-[#090B0E] border border-surface-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-brand-500"
+                      className="w-full bg-[#0A0808] border border-[#261619] rounded-lg px-3 py-2 text-[#F1EEEE] focus:outline-none focus:border-[#FF000E]"
                     >
                       {INDIAN_STATES.map((s) => (
-                        <option key={s} value={s} className="bg-surface-900 text-white">
+                        <option key={s} value={s} className="bg-[#130E10] text-[#F1EEEE]">
                           {s}
                         </option>
                       ))}
@@ -424,26 +425,26 @@ export const CheckoutModal: React.FC = () => {
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-slate-400 mb-1">PIN Code (6 digits) *</label>
+                    <label className="block text-[#8E8587] mb-1">PIN Code (6 digits) *</label>
                     <input
                       type="text"
                       required
                       placeholder="e.g. 411001"
                       value={postalCode}
                       onChange={(e) => setPostalCode(e.target.value)}
-                      className="w-full bg-[#090B0E] border border-surface-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-brand-500"
+                      className="w-full bg-[#0A0808] border border-[#261619] rounded-lg px-3 py-2 text-[#F1EEEE] placeholder-[#5C5456] focus:outline-none focus:border-[#FF000E]"
                       maxLength={6}
                     />
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-slate-400 mb-1">Delivery Instructions (Optional)</label>
+                    <label className="block text-[#8E8587] mb-1">Delivery Instructions (Optional)</label>
                     <input
                       type="text"
                       placeholder="e.g. Leave with security / Call upon arrival"
                       value={deliveryInstructions}
                       onChange={(e) => setDeliveryInstructions(e.target.value)}
-                      className="w-full bg-[#090B0E] border border-surface-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-brand-500"
+                      className="w-full bg-[#0A0808] border border-[#261619] rounded-lg px-3 py-2 text-[#F1EEEE] placeholder-[#5C5456] focus:outline-none focus:border-[#FF000E]"
                     />
                   </div>
                 </div>
@@ -451,8 +452,8 @@ export const CheckoutModal: React.FC = () => {
 
               {/* Payment Method Selection */}
               <div className="space-y-3">
-                <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono flex items-center gap-2">
-                  <i className="bi bi-credit-card-2-front-fill text-brand-500"></i>
+                <h3 className="text-xs font-medium text-[#F1EEEE] uppercase tracking-wider font-mono flex items-center gap-2">
+                  <i className="bi bi-credit-card-2-front-fill text-[#FF000E]"></i>
                   <span>Payment Method</span>
                 </h3>
 
@@ -462,14 +463,14 @@ export const CheckoutModal: React.FC = () => {
                     onClick={() => setPaymentMethod('MANUAL_UPI')}
                     className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                       paymentMethod === 'MANUAL_UPI'
-                        ? 'border-brand-500 bg-brand-950/30 text-white shadow-xs'
-                        : 'border-surface-700 bg-[#090B0E] text-slate-400 hover:text-white'
+                        ? 'border-[#FF000E] bg-[#650008]/20 text-[#F1EEEE]'
+                        : 'border-[#261619] bg-[#130E10] text-[#8E8587] hover:text-[#F1EEEE]'
                     }`}
                   >
-                    <div className="font-bold text-sm text-emerald-400 flex items-center gap-1.5">
+                    <div className="font-semibold text-sm text-[#FF000E] flex items-center gap-1.5">
                       <i className="bi bi-qr-code"></i> Direct UPI
                     </div>
-                    <div className="text-[10px] text-slate-400 mt-1">GPay, PhonePe, Paytm (UTR)</div>
+                    <div className="text-[10px] text-[#8E8587] mt-1">GPay, PhonePe, Paytm (UTR)</div>
                   </button>
 
                   <button
@@ -477,35 +478,35 @@ export const CheckoutModal: React.FC = () => {
                     onClick={() => setPaymentMethod('COD')}
                     className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                       paymentMethod === 'COD'
-                        ? 'border-brand-500 bg-brand-950/30 text-white shadow-xs'
-                        : 'border-surface-700 bg-[#090B0E] text-slate-400 hover:text-white'
+                        ? 'border-[#FF000E] bg-[#650008]/20 text-[#F1EEEE]'
+                        : 'border-[#261619] bg-[#130E10] text-[#8E8587] hover:text-[#F1EEEE]'
                     }`}
                   >
-                    <div className="font-bold text-sm text-white flex items-center gap-1.5">
-                      <i className="bi bi-cash-stack text-amber-400"></i> Pay on Delivery
+                    <div className="font-semibold text-sm text-[#F1EEEE] flex items-center gap-1.5">
+                      <i className="bi bi-cash-stack text-[#FF000E]"></i> Pay on Delivery
                     </div>
-                    <div className="text-[10px] text-slate-400 mt-1">Cash or UPI on arrival</div>
+                    <div className="text-[10px] text-[#8E8587] mt-1">Cash or UPI on arrival</div>
                   </button>
                 </div>
 
                 {/* Direct UPI Instructions Box */}
                 {paymentMethod === 'MANUAL_UPI' && (
-                  <div className="p-3.5 rounded-xl bg-[#090B0E] border border-surface-800 space-y-2.5 text-xs">
+                  <div className="p-3.5 rounded-xl bg-[#130E10] border border-[#261619] space-y-2.5 text-xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400">Official Store UPI ID:</span>
+                      <span className="text-[#8E8587]">Official Store UPI ID:</span>
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-emerald-400 font-bold">{storeUpiId}</span>
+                        <span className="font-mono text-[#F1EEEE] font-semibold">{storeUpiId}</span>
                         <button
                           type="button"
                           onClick={handleCopyUpi}
-                          className="px-2 py-0.5 rounded bg-surface-800 hover:bg-surface-700 text-slate-200 text-[10px] cursor-pointer"
+                          className="px-2 py-0.5 rounded bg-[#1A1214] hover:bg-[#261619] border border-[#261619] text-[#F1EEEE] text-[10px] cursor-pointer"
                         >
                           {copiedUpi ? 'Copied!' : 'Copy'}
                         </button>
                       </div>
                     </div>
                     <div>
-                      <label className="block text-slate-400 mb-1">
+                      <label className="block text-[#8E8587] mb-1">
                         12-Digit UPI Transaction UTR Reference *
                       </label>
                       <input
@@ -514,7 +515,7 @@ export const CheckoutModal: React.FC = () => {
                         placeholder="e.g. 430129847120"
                         value={utrNumber}
                         onChange={(e) => setUtrNumber(e.target.value)}
-                        className="w-full bg-surface-950 border border-surface-700 rounded-lg px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-brand-500"
+                        className="w-full bg-[#0A0808] border border-[#261619] rounded-lg px-3 py-2 text-[#F1EEEE] font-mono text-xs focus:outline-none focus:border-[#FF000E]"
                         maxLength={18}
                       />
                     </div>
@@ -524,7 +525,7 @@ export const CheckoutModal: React.FC = () => {
 
               {/* Error Message */}
               {errorMessage && (
-                <div className="p-3 rounded-lg bg-rose-950/70 border border-rose-800 text-rose-300 text-xs">
+                <div className="p-3 rounded-lg bg-[#3D080C] border border-[#B0000A] text-[#FF2E3A] text-xs">
                   {errorMessage}
                 </div>
               )}
@@ -534,7 +535,7 @@ export const CheckoutModal: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3.5 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-bold text-sm tracking-wide transition-all cursor-pointer shadow-sm active:scale-98"
+                  className="w-full py-3.5 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] disabled:opacity-50 text-white font-medium text-sm tracking-wide transition-all cursor-pointer shadow-sm active:scale-98"
                 >
                   {isSubmitting ? 'Confirming Order...' : `Place Order • ${formatINR(cart.totalPaisa)}`}
                 </button>

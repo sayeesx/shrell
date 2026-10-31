@@ -35,14 +35,14 @@ import {
 } from './seedData';
 
 const STORAGE_KEYS = {
-  PRODUCTS: 'vahn_products_v2',
-  CATEGORIES: 'vahn_categories_v2',
-  BRANDS: 'vahn_brands_v2',
-  ORDERS: 'vahn_orders_v1',
-  INVENTORY_MOVEMENTS: 'vahn_inventory_movements_v1',
+  PRODUCTS: 'shrell_products_v4',
+  CATEGORIES: 'shrell_categories_v4',
+  BRANDS: 'shrell_brands_v3',
+  ORDERS: 'shrell_orders_v2',
+  INVENTORY_MOVEMENTS: 'shrell_inventory_movements_v2',
   SETTINGS: 'shrell_settings_v1',
-  COUPONS: 'vahn_coupons_v1',
-  COMPATIBILITY: 'vahn_compatibility_v1',
+  COUPONS: 'shrell_coupons_v2',
+  COMPATIBILITY: 'shrell_compatibility_v2',
 };
 
 function loadFromStorage<T>(key: string, fallback: T): T {

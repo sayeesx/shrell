@@ -2,28 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Brand red overrides — guarantee correct red regardless of Tailwind cache */
+/* Brand crimson-to-black overrides — signature #FF000E */
 @layer utilities {
-  .bg-brand-500  { background-color: #DC0000; }
-  .bg-brand-600  { background-color: #B00000; }
-  .bg-brand-400  { background-color: #FF2222; }
-  .bg-brand-50   { background-color: #FFF0F0; }
-  .bg-brand-100  { background-color: #FFD6D6; }
-  .bg-brand-950  { background-color: #330000; }
-  .text-brand-500 { color: #DC0000; }
-  .text-brand-400 { color: #FF2222; }
-  .text-brand-300 { color: #FF6666; }
-  .text-brand-600 { color: #B00000; }
-  .border-brand-500 { border-color: #DC0000; }
-  .border-brand-200 { border-color: #FFB3B3; }
-  .hover\:bg-brand-600:hover { background-color: #B00000; }
-  .hover\:bg-brand-50:hover  { background-color: #FFF0F0; }
-  .hover\:text-brand-500:hover { color: #DC0000; }
-  .hover\:text-brand-600:hover { color: #B00000; }
-  .hover\:border-brand-500:hover { border-color: #DC0000; }
-  .focus\:border-brand-500:focus { border-color: #DC0000; }
-  .focus\:ring-brand-500:focus { --tw-ring-color: #DC0000; }
-  .group:hover .group-hover\:text-brand-500 { color: #DC0000; }
+  .bg-brand-500  { background-color: #FF000E; }
+  .bg-brand-600  { background-color: #E0000C; }
+  .bg-brand-700  { background-color: #B0000A; }
+  .bg-brand-900  { background-color: #650008; }
+  .bg-brand-950  { background-color: #080000; }
+  .bg-brand-400  { background-color: #FF2E3A; }
+  .bg-brand-50   { background-color: #FFF0F1; }
+  .bg-brand-100  { background-color: #FFE0E2; }
+  .text-brand-500 { color: #FF000E; }
+  .text-brand-400 { color: #FF2E3A; }
+  .text-brand-300 { color: #FF666E; }
+  .text-brand-600 { color: #E0000C; }
+  .text-brand-700 { color: #B0000A; }
+  .text-brand-900 { color: #650008; }
+  .border-brand-500 { border-color: #FF000E; }
+  .border-brand-600 { border-color: #E0000C; }
+  .border-brand-700 { border-color: #B0000A; }
+  .border-brand-900 { border-color: #650008; }
+  .border-brand-200 { border-color: #FFB3B7; }
+  .hover\:bg-brand-600:hover { background-color: #E0000C; }
+  .hover\:bg-brand-500:hover { background-color: #FF000E; }
+  .hover\:bg-brand-50:hover  { background-color: #FFF0F1; }
+  .hover\:text-brand-500:hover { color: #FF000E; }
+  .hover\:text-brand-600:hover { color: #E0000C; }
+  .hover\:border-brand-500:hover { border-color: #FF000E; }
+  .focus\:border-brand-500:focus { border-color: #FF000E; }
+  .focus\:ring-brand-500:focus { --tw-ring-color: #FF000E; }
+  .group:hover .group-hover\:text-brand-500 { color: #FF000E; }
 }
 
 @layer base {
@@ -47,7 +55,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid #DC0000;
+    outline: 2px solid #FF000E;
     outline-offset: 2px;
   }
 
@@ -63,11 +71,11 @@
     }
   }
 
-  /* Light scrollbars for the light theme */
+  /* Dark cinematic scrollbars for the charcoal black theme */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: #F1F3F5; }
-  ::-webkit-scrollbar-thumb { background: #CED4DA; border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: #ADB5BD; }
+  ::-webkit-scrollbar-track { background: #0A0808; }
+  ::-webkit-scrollbar-thumb { background: #261619; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #650008; }
 }
 
 @layer utilities {
@@ -83,6 +91,31 @@
   .no-scrollbar {
     -ms-overflow-style: none !important;
     scrollbar-width: none !important;
+  }
+
+  /* Atmospheric red radial lighting behind main content */
+  .bg-atmospheric-red {
+    background-color: #0A0808;
+    background-image:
+      radial-gradient(ellipse 90% 45% at 50% -10%, rgba(224, 0, 12, 0.14) 0%, rgba(101, 0, 8, 0.06) 40%, transparent 75%),
+      radial-gradient(circle at 50% 100%, rgba(176, 0, 10, 0.05) 0%, transparent 50%);
+  }
+
+  /* Editorial Card: dark black-to-crimson gradient cards with soft light blending */
+  .editorial-card {
+    background: linear-gradient(180deg, #130E10 0%, #0A0808 100%);
+    border: 1px solid #261619;
+    box-shadow: 0 4px 20px -2px rgba(8, 0, 0, 0.7);
+  }
+
+  .editorial-card:hover {
+    border-color: #4F242C;
+  }
+
+  /* Warm off-white contrast panel */
+  .editorial-contrast-panel {
+    background-color: #F1EEEE;
+    color: #0A0808;
   }
 
   /* Desktop Infinite Horizontal Marquee Scroll */
@@ -124,5 +157,42 @@
 
   .animate-slide-left-drawer {
     animation: slideFromLeft 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Timeline-based SVG Feedback Animations */
+  @keyframes shrellDrawRing {
+    from { stroke-dashoffset: 1.01; }
+    to   { stroke-dashoffset: 0; }
+  }
+
+  @keyframes shrellDrawTick {
+    from { stroke-dashoffset: 1.1; }
+    to   { stroke-dashoffset: 0; }
+  }
+
+  @keyframes shrellBloom {
+    from { opacity: 0; transform: scale(0.82); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes shrellBadgePop {
+    0%   { transform: scale(1); }
+    45%  { transform: scale(1.07); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes shrellCrimsonGlow {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(255, 0, 14, 0)); }
+    50%      { filter: drop-shadow(0 8px 24px rgba(255, 0, 14, 0.45)); }
+  }
+
+  @keyframes shrellErrorGlow {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(176, 0, 10, 0)); }
+    50%      { filter: drop-shadow(0 8px 24px rgba(176, 0, 10, 0.45)); }
+  }
+
+  @keyframes shrellRipple {
+    0%   { opacity: 0.5; transform: scale(1); }
+    100% { opacity: 0;   transform: scale(1.4); }
   }
 }

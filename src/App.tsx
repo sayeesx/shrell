@@ -38,7 +38,7 @@ export const App: React.FC = () => {
   const shouldShowHeader = !isAdminRoute && (isHomePage || isCataloguePage);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0D0F14] text-slate-100 font-sans antialiased pb-16 md:pb-0">
+    <div className="min-h-screen flex flex-col bg-[#0A0808] bg-atmospheric-red text-[#F1EEEE] font-sans antialiased pb-16 md:pb-0">
       <ScrollToTop />
 
       {/* Global Phone & 4-Digit Verification Modal */}

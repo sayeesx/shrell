@@ -4,45 +4,46 @@ export default {
   theme: {
     extend: {
       colors: {
-        /* Dark zone — header, category strip, hero banner */
+        /* Crimson-to-black surface system */
         surface: {
-          950: '#0B0D11',
-          900: '#12161E',
-          850: '#161B25',
-          800: '#1A202C',
-          750: '#212A3A',
-          700: '#283244',
-          600: '#3E4D65',
+          950: '#080000', // near-black
+          900: '#0A0808', // charcoal black (dominant background)
+          850: '#120E0F', // deep card surface
+          800: '#1A1214', // card base & border
+          750: '#261619', // elevated border
+          700: '#361B20', // subtle crimson border
+          600: '#4F242C', // highlight border
         },
-        /* Light zone — page body, cards, content */
+        /* Warm off-white contrast panels & typography */
         canvas: {
-          0:   '#FFFFFF',
-          50:  '#F8F9FA',
-          100: '#F1F3F5',
-          200: '#E9ECEF',
-          300: '#DEE2E6',
-          400: '#CED4DA',
-          500: '#ADB5BD',
+          0:   '#F1EEEE', // warm off-white
+          50:  '#E5E0E0',
+          100: '#D8D1D1',
+          200: '#B8B0B1',
+          300: '#968E8F',
+          400: '#706869',
+          500: '#4C4546',
         },
-        /* Pure red accent — replaces lime green */
+        /* Signature crimson gradient system */
         brand: {
-          50:  '#FFF0F0',
-          100: '#FFD6D6',
-          200: '#FFB3B3',
-          300: '#FF6666',
-          400: '#FF2222',
-          500: '#DC0000',
-          600: '#B00000',
-          700: '#8B0000',
-          900: '#5A0000',
-          950: '#330000',
+          50:  '#FFF0F1',
+          100: '#FFE0E2',
+          200: '#FFB3B7',
+          300: '#FF666E',
+          400: '#FF2E3A',
+          500: '#FF000E', // vivid red (signature accent)
+          600: '#E0000C', // deep crimson
+          700: '#B0000A', // dark blood red
+          800: '#850009',
+          900: '#650008', // burgundy crimson
+          950: '#080000', // near-black
         },
         ink: {
-          900: '#111827',
-          700: '#374151',
-          500: '#6B7280',
-          400: '#9CA3AF',
-          300: '#D1D5DB',
+          900: '#0A0808',
+          700: '#221A1C',
+          500: '#5C5456',
+          400: '#8E8587',
+          300: '#C4BCBD',
         },
       },
       fontFamily: {

@@ -13,17 +13,17 @@ export const ProductImagePlaceholder: React.FC<ProductImagePlaceholderProps> = (
 }) => {
   return (
     <div
-      className={`w-full h-full flex flex-col items-center justify-center p-6 bg-[#0A0808] bg-gradient-to-b from-[#130E10]/80 to-[#0A0808] select-none relative overflow-hidden ${className}`}
+      className={`w-full h-full flex flex-col items-center justify-center p-2.5 sm:p-3 bg-[#0A0808] bg-gradient-to-b from-[#130E10]/80 to-[#0A0808] select-none relative overflow-hidden ${className}`}
       aria-label={alt}
     >
       {/* Subtle atmospheric crimson radial center glow */}
-      <div className="absolute inset-0 bg-radial from-[#650008]/15 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-radial from-[#650008]/20 via-transparent to-transparent pointer-events-none" />
 
-      {/* SHRELL Reduced-Opacity Grey Brand Logo */}
+      {/* SHRELL Reduced-Opacity Grey Brand Logo (Larger size) */}
       <img
         src="/logos/shrell-full_white-text_black-logo.png"
         alt={alt}
-        className="max-w-[70%] max-h-[55%] w-auto h-auto object-contain opacity-30 grayscale brightness-125 transition-all duration-300 pointer-events-none group-hover:scale-105 group-hover:opacity-40"
+        className="w-[88%] h-[78%] max-w-[92%] max-h-[82%] object-contain opacity-40 grayscale brightness-125 transition-all duration-300 pointer-events-none group-hover:scale-105 group-hover:opacity-55"
         loading="lazy"
       />
 

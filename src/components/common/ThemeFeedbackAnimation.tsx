@@ -33,7 +33,7 @@ export const ThemeSuccessAnimation: React.FC<FeedbackAnimationProps> = ({
       <div
         className="w-full h-full relative"
         style={{
-          animation: 'shrellBadgePop 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.55s both, shrellCrimsonGlow 1.1s ease-out 1.55s both',
+          animation: 'shrellBadgePop 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both, shrellCrimsonGlow 0.8s ease-out 0.45s both',
         }}
       >
         <svg
@@ -60,7 +60,7 @@ export const ThemeSuccessAnimation: React.FC<FeedbackAnimationProps> = ({
               opacity: 0,
               fillOpacity: 0.22,
               transformOrigin: 'center',
-              animation: 'shrellBloom 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.35s both',
+              animation: 'shrellBloom 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both',
             }}
           />
 
@@ -87,7 +87,7 @@ export const ThemeSuccessAnimation: React.FC<FeedbackAnimationProps> = ({
             style={{
               strokeDasharray: 1,
               strokeDashoffset: 1.01,
-              animation: 'shrellDrawRing 1.6s cubic-bezier(0.65, 0, 0.35, 1) both',
+              animation: 'shrellDrawRing 0.5s cubic-bezier(0.65, 0, 0.35, 1) both',
             }}
           />
 
@@ -101,11 +101,11 @@ export const ThemeSuccessAnimation: React.FC<FeedbackAnimationProps> = ({
             style={{
               opacity: 0,
               transformOrigin: 'center',
-              animation: 'shrellRipple 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.6s both',
+              animation: 'shrellRipple 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both',
             }}
           />
 
-          {/* Elegant checkmark: short arm, long arm, rounded joint */}
+          {/* Elegant checkmark: starts invisible to prevent initial rounded cap dot glitch */}
           <path
             d="M40 64 L55 79 L84 48"
             pathLength={1}
@@ -114,9 +114,10 @@ export const ThemeSuccessAnimation: React.FC<FeedbackAnimationProps> = ({
             strokeLinecap="round"
             strokeLinejoin="round"
             style={{
+              opacity: 0,
               strokeDasharray: 1,
-              strokeDashoffset: 1.1,
-              animation: 'shrellDrawTick 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.65s both',
+              strokeDashoffset: 1.05,
+              animation: 'shrellDrawTick 0.35s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards',
             }}
           />
         </svg>

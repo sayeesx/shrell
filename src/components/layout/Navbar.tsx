@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../application/CartContext';
 import { useAuth } from '../../application/AuthContext';
-const ANNOUNCEMENT_MESSAGES = [
+export const ANNOUNCEMENT_MESSAGES = [
   { text: 'Fast Surface Dispatch via BlueDart & Delhivery Express Logistics', icon: 'bi-box-seam-fill' },
   { text: 'Verified OEM Equipment Guaranteed', icon: 'bi-patch-check-fill' },
   { text: 'Secure Checkout with UPI & Cards', icon: 'bi-shield-lock-fill' },
@@ -64,24 +64,16 @@ export const Navbar: React.FC = () => {
           : 'bg-[#0A0808] border-b border-[#221215]/60'
       }`}
     >
-      {/* 1. Fluid Continuous Marquee (Smoothly glides up on scroll) */}
-      <div
-        className={`grid transition-[grid-template-rows,opacity,transform] duration-500 ease-in-out select-none ${
-          isScrolled
-            ? 'grid-rows-[0fr] opacity-0 -translate-y-2 pointer-events-none'
-            : 'grid-rows-[1fr] opacity-100 translate-y-0'
-        }`}
-      >
-        <div className="overflow-hidden bg-[#080000] border-b border-[#221215]/60 py-1.5 text-xs">
-          <div className="animate-marquee-scroll flex items-center gap-12 whitespace-nowrap">
-            {[...ANNOUNCEMENT_MESSAGES, ...ANNOUNCEMENT_MESSAGES].map((msg, i) => (
-              <div key={i} className="flex items-center gap-2.5 text-gray-300 font-medium font-sans">
-                <i className={`bi ${msg.icon} text-[#FF000E] text-xs`} aria-hidden="true" />
-                <span className="tracking-tight">{msg.text}</span>
-                <span className="text-[#3B1A1E] ml-6 text-sm">•</span>
-              </div>
-            ))}
-          </div>
+      {/* 1. Fluid Continuous Marquee (Desktop Only - Stays on top, does not hide when scrolling) */}
+      <div className="hidden md:block overflow-hidden bg-[#080000] border-b border-[#221215]/60 py-1.5 text-xs select-none">
+        <div className="animate-marquee-scroll flex items-center gap-12 whitespace-nowrap">
+          {[...ANNOUNCEMENT_MESSAGES, ...ANNOUNCEMENT_MESSAGES].map((msg, i) => (
+            <div key={i} className="flex items-center gap-2.5 text-gray-300 font-medium font-sans">
+              <i className={`bi ${msg.icon} text-[#FF000E] text-xs`} aria-hidden="true" />
+              <span className="tracking-tight">{msg.text}</span>
+              <span className="text-[#3B1A1E] ml-6 text-sm">•</span>
+            </div>
+          ))}
         </div>
       </div>
 

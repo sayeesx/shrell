@@ -332,62 +332,57 @@ export const HomePage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-5">
             {/* LEFT COLUMN: 2 Cards (4 cols on desktop) */}
             <div className="md:col-span-4 flex flex-col gap-4">
-              {/* Card 1: Light Off-White Panel */}
+              {/* Card 1: Light Off-White Panel with Shrell Washing Spray (imaged2.webp) */}
               <div className="rounded-2xl bg-[#F7F5F5] text-[#140E10] p-6 sm:p-7 relative overflow-hidden flex flex-col justify-between min-h-[220px] sm:min-h-[240px] group border border-white/40 shadow-sm">
                 <div className="flex items-start justify-between z-10">
                   <div className="w-28 sm:w-32 h-28 sm:h-32 -ml-2 -mt-2 relative">
                     <img
-                      src="/images/bento/bento_car_laser_tip.jpg"
-                      alt="Precision Laser Crafting"
-                      className="w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105"
+                      src="/imaged2.webp"
+                      alt="SHRELL Clay Bar & Washing Spray"
+                      className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
                   <div className="text-right">
                     <span className="block text-3xl sm:text-4xl font-extrabold text-[#FF000E] tracking-tight leading-none">
-                      95%
+                      99%
                     </span>
                     <span className="block text-xs sm:text-sm font-bold text-[#140E10] mt-1.5 leading-snug">
-                      Less Material<br />Waste
+                      Streak-Free<br />Paint Shine
                     </span>
                   </div>
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-black/10 flex items-center justify-between text-[11px] font-mono text-[#5C5456] uppercase tracking-wider">
-                  <span>CNC Laser Sculpted</span>
-                  <span className="text-[#FF000E] font-semibold">T6 Alloy</span>
+                  <span>Clay Bar &amp; Detailing Spray</span>
+                  <span className="text-[#FF000E] font-semibold">500ml Kit</span>
                 </div>
               </div>
 
-              {/* Card 2: Dark Graphite Panel */}
+              {/* Card 2: Dark Graphite Panel (SHRELL removed, updated for ceramic brakes) */}
               <div className="rounded-2xl bg-[#0E0A0B] border border-[#221215] p-6 sm:p-7 flex flex-col justify-between flex-1 min-h-[200px] group hover:border-[#4F242C] transition-all">
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 flex items-center justify-center">
-                      <img src="/logos/shrell-brandicon_no-bg.png" alt="Shrell" className="w-full h-full object-contain" />
-                    </div>
-                    <span className="text-[11px] font-bold tracking-widest uppercase text-[#8E8587]">
-                      SHRELL
-                    </span>
-                  </div>
                   <h3 className="text-2xl sm:text-3xl font-extrabold text-[#F1EEEE] tracking-tight leading-tight">
-                    Laser Cutting<br />Parts
+                    Ceramic Brake<br />Rotors &amp; Pads
                   </h3>
+                  <p className="text-xs text-[#8E8587] leading-relaxed">
+                    Ultra-premium stopping power with thermal dissipating vents.
+                  </p>
                 </div>
 
                 <div className="pt-4 flex items-end justify-between border-t border-[#221215] mt-4">
                   <div>
                     <p className="text-[11px] sm:text-xs text-[#8E8587] leading-tight">
-                      Satisfied users<br />around the world
+                      Satisfied drivers<br />around the world
                     </p>
                   </div>
                   <div className="text-2xl sm:text-3xl font-extrabold text-[#FF000E] tracking-tight">
-                    4.5K<sup className="text-sm sm:text-base font-bold">+</sup>
+                    12.4K<sup className="text-sm sm:text-base font-bold">+</sup>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* MIDDLE COLUMN: Tall Hero Card with Angled Chamfer Cut (4 cols on desktop) */}
+            {/* MIDDLE COLUMN: Tall Hero Card with Delivery Box (imaged.webp, Tag removed) */}
             <div className="md:col-span-4 relative group">
               <div
                 className="h-full min-h-[380px] sm:min-h-[460px] rounded-2xl bg-[#0A0808] border border-[#221215] hover:border-[#FF000E]/40 overflow-hidden relative flex flex-col justify-between p-6 transition-all duration-300 shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
@@ -395,32 +390,28 @@ export const HomePage: React.FC = () => {
                   clipPath: 'polygon(36px 0, 100% 0, 100% 100%, 0 100%, 0 36px)',
                 }}
               >
-                {/* Background 3D Hero Gear Image */}
+                {/* Background Delivery Man Image (imaged.webp) */}
                 <div className="absolute inset-0 z-0 overflow-hidden">
                   <img
-                    src="/images/bento/bento_car_gear_hero.jpg"
-                    alt="Precision Engineered 3D Gear"
-                    className="w-full h-full object-cover object-center filter brightness-95 group-hover:scale-105 transition-transform duration-700 ease-out"
+                    src="/imaged.webp"
+                    alt="SHRELL Express Delivery"
+                    className="w-full h-full object-cover object-top filter brightness-95 group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
-                  {/* Subtle red ambient light blending */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0808] via-transparent to-black/70 pointer-events-none" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(255,0,14,0.18),transparent_70%)] pointer-events-none" />
+                  {/* Subtle dark vignette */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0808] via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_70%,rgba(255,0,14,0.12),transparent_70%)] pointer-events-none" />
                 </div>
 
-                {/* Top Corner Angled Notch Tag */}
-                <div className="relative z-10 flex items-center justify-between">
-                  <div className="bg-[#0A0808]/85 backdrop-blur-md border border-[#3A141A] rounded-full px-3.5 py-1 text-[10px] sm:text-[11px] text-[#D8D1D1] font-mono tracking-wide">
-                    Access laser cutting easily online
-                  </div>
-                </div>
+                {/* Empty top slot (Access laser cutting tag removed) */}
+                <div className="relative z-10" />
 
                 {/* Bottom Tagline & Link */}
                 <div className="relative z-10 pt-6">
                   <Link
                     to="/catalogue"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/80 hover:bg-[#FF000E] text-white border border-[#3A141A] hover:border-[#FF000E] text-xs font-semibold backdrop-blur-md transition-all group/btn"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/85 hover:bg-[#FF000E] text-white border border-[#3A141A] hover:border-[#FF000E] text-xs font-semibold backdrop-blur-md transition-all group/btn shadow-lg"
                   >
-                    <span>Explore Hardware</span>
+                    <span>Express Doorstep Delivery</span>
                     <i className="bi bi-arrow-right text-xs group-hover/btn:translate-x-1 transition-transform" />
                   </Link>
                 </div>
@@ -429,7 +420,7 @@ export const HomePage: React.FC = () => {
 
             {/* RIGHT COLUMN: Red Hero Card + Square Badge Tile (4 cols on desktop) */}
             <div className="md:col-span-4 flex flex-col gap-4">
-              {/* Card 4: Signature Crimson Red Card with Chamfer Cut */}
+              {/* Card 4: Signature Crimson Red Card with Chamfer Cut (SHRELL removed) */}
               <div
                 className="rounded-2xl bg-gradient-to-br from-[#FF000E] via-[#E0000C] to-[#B0000A] text-white p-6 sm:p-7 relative overflow-hidden flex flex-col justify-between flex-1 min-h-[260px] sm:min-h-[290px] shadow-[0_12px_36px_rgba(255,0,14,0.3)] transition-all group"
                 style={{
@@ -437,27 +428,18 @@ export const HomePage: React.FC = () => {
                 }}
               >
                 <div className="space-y-4 relative z-10">
-                  <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 flex items-center justify-center">
-                      <img src="/logos/shrell-brandicon_no-bg.png" alt="Shrell" className="w-full h-full object-contain filter brightness-200" />
-                    </div>
-                    <span className="text-[11px] font-mono font-bold tracking-widest uppercase text-white/90">
-                      SHRELL
-                    </span>
-                  </div>
-
                   <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
-                    Efficient<br />Online Laser<br />Crafting
+                    Doorstep Express<br />Nationwide<br />Delivery
                   </h3>
 
                   <p className="text-xs sm:text-sm text-white/85 leading-relaxed font-sans max-w-xs">
-                    Discover the simplicity of laser cutting with easy online access and fast delivery of custom parts.
+                    Get premium automotive upgrades, genuine brake systems, and professional detailing kits delivered straight to your garage across 19,000+ pin codes.
                   </p>
                 </div>
 
                 <div className="relative z-10 pt-4 flex items-center justify-between border-t border-white/20">
                   <span className="text-[11px] font-mono uppercase tracking-wider text-white/80">
-                    OEM Grade Fitment
+                    Fast Express Courier
                   </span>
                   <Link
                     to="/catalogue"
@@ -479,23 +461,6 @@ export const HomePage: React.FC = () => {
                     className="w-full h-full object-contain filter brightness-0 invert drop-shadow-md"
                   />
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Reference Design Metadata Strip */}
-          <div className="pt-2 px-2 flex flex-wrap items-center justify-between text-xs text-[#8E8587] gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-mono text-[#5C5456] uppercase tracking-wider">Typography</span>
-              <span className="text-[#F1EEEE] font-medium font-sans">DM Sans</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-mono text-[#5C5456] uppercase tracking-wider">Colors</span>
-              <div className="flex items-center gap-1.5">
-                <span className="w-3.5 h-3.5 rounded-full bg-[#FFFFFF] border border-white/20" title="White" />
-                <span className="w-3.5 h-3.5 rounded-full bg-[#0E0A0B] border border-[#261619]" title="Charcoal" />
-                <span className="w-3.5 h-3.5 rounded-full bg-[#B0000A]" title="Crimson" />
-                <span className="w-3.5 h-3.5 rounded-full bg-[#FF000E]" title="Signature Red" />
               </div>
             </div>
           </div>

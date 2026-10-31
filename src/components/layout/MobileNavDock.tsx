@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../application/AuthContext';
+import { ANNOUNCEMENT_MESSAGES } from './Navbar';
 
 export const MobileNavDock: React.FC = () => {
   const location = useLocation();
@@ -63,10 +64,24 @@ export const MobileNavDock: React.FC = () => {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[#0A0808]/95 backdrop-blur-xl border-t border-[#221215] px-3 pt-2 pb-[max(0.65rem,env(safe-area-inset-bottom))] shadow-[0_-10px_35px_rgba(0,0,0,0.85)] select-none transition-all duration-300"
+      className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[#0A0808]/95 backdrop-blur-xl border-t border-[#221215] shadow-[0_-10px_35px_rgba(0,0,0,0.85)] select-none transition-all duration-300"
       aria-label="Mobile Navigation Dock"
     >
-      <div className="grid grid-cols-4 items-center gap-1 max-w-md mx-auto">
+      {/* Mobile Continuous Text Carousel Loop (Above the Dock Navbar) */}
+      <div className="overflow-hidden bg-[#080000] border-b border-[#221215]/80 py-1 text-[11px]">
+        <div className="animate-marquee-scroll flex items-center gap-8 whitespace-nowrap">
+          {[...ANNOUNCEMENT_MESSAGES, ...ANNOUNCEMENT_MESSAGES].map((msg, i) => (
+            <div key={i} className="flex items-center gap-2 text-gray-300 font-medium font-sans">
+              <i className={`bi ${msg.icon} text-[#FF000E] text-[10px]`} aria-hidden="true" />
+              <span className="tracking-tight">{msg.text}</span>
+              <span className="text-[#3B1A1E] ml-4 text-xs">•</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="px-3 pt-1.5 pb-[max(0.65rem,env(safe-area-inset-bottom))]">
+        <div className="grid grid-cols-4 items-center gap-1 max-w-md mx-auto">
         {/* 1, 2, 3: Categories, Featured, Deals */}
         {navItems.map((item) => (
           <Link
@@ -125,6 +140,7 @@ export const MobileNavDock: React.FC = () => {
             {user ? 'Account' : 'Login'}
           </span>
         </button>
+      </div>
       </div>
     </nav>
   );

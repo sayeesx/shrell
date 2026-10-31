@@ -228,25 +228,25 @@ export const HomePage: React.FC = () => {
 
       {/* 
         ================================================================
-        LIGHT BODY ZONE (Circle Theme White/Off-White Background)
+        PRODUCT CONTENT ZONE (Matches Hero & Header #0D0F14 aesthetic)
         All Product Content, Categories, and Systems
         ================================================================
       */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-10 sm:space-y-14">
         {/* SECTION 1: Crazy Finds */}
         <section className="space-y-4 sm:space-y-5">
-          <div className="flex items-center justify-between border-b border-gray-200/80 pb-2.5 sm:pb-3 gap-3">
+          <div className="flex items-center justify-between border-b border-surface-800 pb-2.5 sm:pb-3 gap-3">
             <div className="min-w-0">
-              <h2 className="text-xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+              <h2 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight">
                 Crazy Finds
               </h2>
-              <p className="text-xs sm:text-sm text-gray-500 mt-0.5 font-medium">
+              <p className="text-xs sm:text-sm text-slate-400 mt-0.5 font-medium">
                 Blink and you'll miss it
               </p>
             </div>
             <Link
               to="/catalogue"
-              className="text-xs sm:text-sm font-bold text-brand-600 hover:text-brand-700 flex items-center gap-1 transition-colors flex-shrink-0"
+              className="text-xs sm:text-sm font-bold text-brand-500 hover:text-brand-400 flex items-center gap-1 transition-colors flex-shrink-0"
             >
               <span>See All</span>
               <i className="bi bi-chevron-right text-[10px] sm:text-xs" aria-hidden="true"></i>
@@ -256,7 +256,7 @@ export const HomePage: React.FC = () => {
           {loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
               {[1, 2, 3, 4].map((n) => (
-                <div key={n} className="h-60 sm:h-72 rounded-lg bg-gray-200 animate-pulse" />
+                <div key={n} className="h-60 sm:h-72 rounded-lg bg-surface-900 border border-surface-800 animate-pulse" />
               ))}
             </div>
           ) : (
@@ -270,18 +270,18 @@ export const HomePage: React.FC = () => {
 
         {/* SECTION 2: Diwali Declutter & Festive Deals */}
         <section className="space-y-4 sm:space-y-5">
-          <div className="flex items-center justify-between border-b border-gray-200/80 pb-2.5 sm:pb-3 gap-3">
+          <div className="flex items-center justify-between border-b border-surface-800 pb-2.5 sm:pb-3 gap-3">
             <div className="min-w-0">
-              <h2 className="text-xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+              <h2 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight">
                 Festival Declutter Deals 🪔
               </h2>
-              <p className="text-xs sm:text-sm text-gray-500 mt-0.5 font-medium">
+              <p className="text-xs sm:text-sm text-slate-400 mt-0.5 font-medium">
                 Verified genuine equipment with up to ₹15,000 instant festival discounts
               </p>
             </div>
             <Link
               to="/catalogue"
-              className="text-xs sm:text-sm font-bold text-brand-600 hover:text-brand-700 flex items-center gap-1 transition-colors flex-shrink-0"
+              className="text-xs sm:text-sm font-bold text-brand-500 hover:text-brand-400 flex items-center gap-1 transition-colors flex-shrink-0"
             >
               <span>See All</span>
               <i className="bi bi-chevron-right text-[10px] sm:text-xs" aria-hidden="true"></i>
@@ -291,7 +291,7 @@ export const HomePage: React.FC = () => {
           {loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
               {[1, 2, 3, 4].map((n) => (
-                <div key={n} className="h-60 sm:h-72 rounded-lg bg-gray-200 animate-pulse" />
+                <div key={n} className="h-60 sm:h-72 rounded-lg bg-surface-900 border border-surface-800 animate-pulse" />
               ))}
             </div>
           ) : (
@@ -311,18 +311,18 @@ export const HomePage: React.FC = () => {
 
         {/* SECTION 3: Curated Equipment Systems */}
         <section className="space-y-5 sm:space-y-6">
-          <div className="flex items-center justify-between border-b border-gray-200/80 pb-2.5 sm:pb-3 gap-3">
+          <div className="flex items-center justify-between border-b border-surface-800 pb-2.5 sm:pb-3 gap-3">
             <div className="min-w-0">
-              <h2 className="text-xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+              <h2 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight">
                 Curated Equipment Systems
               </h2>
-              <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
+              <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
                 Field-tested car accessories for touring, protection, and lighting
               </p>
             </div>
             <Link
               to="/catalogue"
-              className="text-xs sm:text-sm font-bold text-brand-600 hover:text-brand-700 flex items-center gap-1 transition-colors flex-shrink-0"
+              className="text-xs sm:text-sm font-bold text-brand-500 hover:text-brand-400 flex items-center gap-1 transition-colors flex-shrink-0"
             >
               <span>View All</span>
               <i className="bi bi-chevron-right text-[10px] sm:text-xs" aria-hidden="true"></i>
@@ -334,9 +334,9 @@ export const HomePage: React.FC = () => {
               <Link
                 key={cat.id}
                 to={`/catalogue?category=${cat.slug}`}
-                className="group relative rounded-lg border border-gray-200/90 bg-white overflow-hidden flex flex-col transition-all duration-200"
+                className="group relative rounded-lg border border-surface-800 hover:border-surface-700 bg-[#0D0F14] overflow-hidden flex flex-col transition-all duration-200"
               >
-                <div className="aspect-[16/10] bg-gray-100 overflow-hidden relative">
+                <div className="aspect-[16/10] bg-[#090B0E] overflow-hidden relative">
                   <img
                     src={cat.imageUrl || 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80'}
                     alt={cat.name}
@@ -345,23 +345,23 @@ export const HomePage: React.FC = () => {
                     loading="lazy"
                     className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                   <div className="absolute bottom-2.5 left-2.5 text-white">
-                    <span className="text-[10px] font-mono uppercase tracking-wider bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-xs">
+                    <span className="text-[10px] font-mono uppercase tracking-wider bg-black/70 border border-surface-700 px-2 py-0.5 rounded-full backdrop-blur-xs">
                       {cat.productCount || 'OEM Grade'}
                     </span>
                   </div>
                 </div>
-                <div className="p-3.5 sm:p-4 flex-1 flex flex-col justify-between">
+                <div className="p-3.5 sm:p-4 flex-1 flex flex-col justify-between bg-[#0D0F14]">
                   <div>
-                    <h3 className="text-sm sm:text-base font-bold text-gray-900 group-hover:text-brand-600 transition-colors">
+                    <h3 className="text-sm sm:text-base font-bold text-slate-100 group-hover:text-brand-400 transition-colors">
                       {cat.name}
                     </h3>
-                    <p className="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
                       {cat.description}
                     </p>
                   </div>
-                  <div className="mt-3 flex items-center gap-1 text-xs font-semibold text-brand-600">
+                  <div className="mt-3 flex items-center gap-1 text-xs font-semibold text-brand-500">
                     <span>Explore category</span>
                     <i className="bi bi-arrow-right text-xs group-hover:translate-x-1 transition-transform" aria-hidden="true"></i>
                   </div>
@@ -372,61 +372,61 @@ export const HomePage: React.FC = () => {
         </section>
 
         {/* SECTION 4: Rigorous Material Testing & Indian Conditions */}
-        <section className="bg-white rounded-lg border border-gray-200/90 p-5 sm:p-10 space-y-8">
+        <section className="bg-surface-900/50 rounded-xl border border-surface-800 p-5 sm:p-10 space-y-8">
           <div className="max-w-3xl">
-            <h2 className="text-xl sm:text-3xl font-black text-gray-900 tracking-tight">
+            <h2 className="text-xl sm:text-3xl font-black text-white tracking-tight">
               Rigorous Material Testing for Indian Highways &amp; Weather
             </h2>
-            <p className="text-xs sm:text-sm text-gray-600 mt-2 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-400 mt-2 leading-relaxed">
               Accessories face high ambient heat up to 48°C, heavy monsoonal moisture, and continuous vibration. Every component adheres to stringent automotive durability standards.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-            <div className="p-5 rounded-lg bg-canvas-50 border border-gray-200/80 space-y-2.5">
-              <div className="w-10 h-10 rounded-lg bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-600 text-lg">
+            <div className="p-5 rounded-lg bg-[#0D0F14] border border-surface-800 space-y-2.5">
+              <div className="w-10 h-10 rounded-lg bg-surface-800 border border-surface-700 flex items-center justify-center text-brand-500 text-lg">
                 <i className="bi bi-wrench-adjustable-circle-fill" aria-hidden="true"></i>
               </div>
-              <h3 className="text-sm sm:text-base font-bold text-gray-900">Zero Drilling Fitment</h3>
-              <p className="text-xs text-gray-600 leading-relaxed">
+              <h3 className="text-sm sm:text-base font-bold text-white">Zero Drilling Fitment</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
                 All roof crossbars and floor protection systems mount using factory OEM points, preserving vehicle chassis integrity and original manufacturer warranties.
               </p>
             </div>
 
-            <div className="p-5 rounded-lg bg-canvas-50 border border-gray-200/80 space-y-2.5">
-              <div className="w-10 h-10 rounded-lg bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-600 text-lg">
+            <div className="p-5 rounded-lg bg-[#0D0F14] border border-surface-800 space-y-2.5">
+              <div className="w-10 h-10 rounded-lg bg-surface-800 border border-surface-700 flex items-center justify-center text-brand-500 text-lg">
                 <i className="bi bi-shield-fill-check" aria-hidden="true"></i>
               </div>
-              <h3 className="text-sm sm:text-base font-bold text-gray-900">Medical-Grade TPE Compounds</h3>
-              <p className="text-xs text-gray-600 leading-relaxed">
+              <h3 className="text-sm sm:text-base font-bold text-white">Medical-Grade TPE Compounds</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
                 Our floor liners utilize 100% recyclable thermoplastic elastomer with zero toxic phthalates or noxious rubber odors, even under intense direct sunlight.
               </p>
             </div>
 
-            <div className="p-5 rounded-lg bg-canvas-50 border border-gray-200/80 space-y-2.5">
-              <div className="w-10 h-10 rounded-lg bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-600 text-lg">
+            <div className="p-5 rounded-lg bg-[#0D0F14] border border-surface-800 space-y-2.5">
+              <div className="w-10 h-10 rounded-lg bg-surface-800 border border-surface-700 flex items-center justify-center text-brand-500 text-lg">
                 <i className="bi bi-patch-check-fill" aria-hidden="true"></i>
               </div>
-              <h3 className="text-sm sm:text-base font-bold text-gray-900">ECE R112 Homologation</h3>
-              <p className="text-xs text-gray-600 leading-relaxed">
+              <h3 className="text-sm sm:text-base font-bold text-white">ECE R112 Homologation</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
                 OSRAM auxiliary driving illumination meets certified beam geometry standards, providing safe forward visibility without blinding oncoming traffic.
               </p>
             </div>
           </div>
 
           {/* 4 Trust USP Badges */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-5 border-t border-gray-200">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-5 border-t border-surface-800">
             {[
               { icon: 'bi-truck', label: 'Pan-India Delivery', sub: 'Express Courier' },
               { icon: 'bi-credit-card-2-front-fill', label: 'UPI & COD Available', sub: 'Zero fee payments' },
               { icon: 'bi-headset', label: 'Technical Desk', sub: 'Engineer backed' },
               { icon: 'bi-recycle', label: '100% Recyclable TPE', sub: 'Zero toxic odor' },
             ].map((item) => (
-              <div key={item.label} className="flex items-center gap-2.5 p-3 rounded-lg bg-canvas-50 border border-gray-200/80">
-                <i className={`bi ${item.icon} text-brand-600 text-xl flex-shrink-0`} aria-hidden="true"></i>
+              <div key={item.label} className="flex items-center gap-2.5 p-3 rounded-lg bg-[#0D0F14] border border-surface-800">
+                <i className={`bi ${item.icon} text-brand-500 text-xl flex-shrink-0`} aria-hidden="true"></i>
                 <div>
-                  <div className="text-xs text-gray-900 font-bold leading-tight">{item.label}</div>
-                  <div className="text-[10px] text-gray-500">{item.sub}</div>
+                  <div className="text-xs text-slate-100 font-bold leading-tight">{item.label}</div>
+                  <div className="text-[10px] text-slate-400">{item.sub}</div>
                 </div>
               </div>
             ))}

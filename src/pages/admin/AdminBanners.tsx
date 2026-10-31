@@ -28,6 +28,38 @@ export const AdminBanners: React.FC = () => {
 
   const [uploading, setUploading] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<{ text: string; isError: boolean } | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  // Helper to safely compress uploaded images into lightweight data URLs when Cloudinary is unavailable
+  const fileToCompressedDataUrl = async (file: File | Blob, maxWidth = 1600): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', 0.85));
+          } else {
+            resolve(e.target?.result as string);
+          }
+        };
+        img.onerror = () => resolve(e.target?.result as string);
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
 
   // Crop Modal States
   const [cropModal, setCropModal] = useState<CropModalState>({
@@ -194,16 +226,46 @@ export const AdminBanners: React.FC = () => {
       let uploadedDesktopUrl = desktopPreview;
       let uploadedMobileUrl = mobilePreview;
 
-      // 1. Upload Desktop image via Cloudinary service (no compression, no bg removal)
+      // 1. Upload Desktop image via Cloudinary service, with safe local fallback
       if (desktopFile) {
-        const result = await cloudinaryService.uploadImage(desktopFile);
-        uploadedDesktopUrl = result.url;
+        try {
+          const result = await cloudinaryService.uploadImage(desktopFile);
+          uploadedDesktopUrl = result.url;
+        } catch (cloudErr) {
+          console.warn('Cloudinary upload error, using optimized local storage:', cloudErr);
+          uploadedDesktopUrl = await fileToCompressedDataUrl(desktopFile, 1400);
+        }
       }
 
       // 2. Upload Mobile image if provided
       if (mobileFile) {
-        const result = await cloudinaryService.uploadImage(mobileFile);
-        uploadedMobileUrl = result.url;
+        try {
+          const result = await cloudinaryService.uploadImage(mobileFile);
+          uploadedMobileUrl = result.url;
+        } catch (cloudErr) {
+          console.warn('Cloudinary upload error, using optimized local storage:', cloudErr);
+          uploadedMobileUrl = await fileToCompressedDataUrl(mobileFile, 800);
+        }
+      }
+
+      // 3. Ensure no temporary blob: URLs are persisted to repository
+      if (uploadedDesktopUrl && uploadedDesktopUrl.startsWith('blob:')) {
+        try {
+          const res = await fetch(uploadedDesktopUrl);
+          const blob = await res.blob();
+          uploadedDesktopUrl = await fileToCompressedDataUrl(blob, 1400);
+        } catch (e) {
+          console.warn('Failed to convert desktop blob to persistent data url:', e);
+        }
+      }
+      if (uploadedMobileUrl && uploadedMobileUrl.startsWith('blob:')) {
+        try {
+          const res = await fetch(uploadedMobileUrl);
+          const blob = await res.blob();
+          uploadedMobileUrl = await fileToCompressedDataUrl(blob, 800);
+        } catch (e) {
+          console.warn('Failed to convert mobile blob to persistent data url:', e);
+        }
       }
 
       // 3. Save to repository
@@ -212,11 +274,11 @@ export const AdminBanners: React.FC = () => {
         mobileImageUrl: uploadedMobileUrl || uploadedDesktopUrl,
         targetUrl: targetUrl.trim() || '/catalogue',
         altText: altText.trim() || 'Hero Banner',
-        order: Number(order) || 1,
-        isActive,
+        order: Number(order) || (banners.length + 1),
+        isActive: true,
       });
 
-      setStatusMessage({ text: 'Hero banner added successfully!', isError: false });
+      setStatusMessage({ text: 'Hero banner published successfully!', isError: false });
       setIsAdding(false);
       // Reset form
       setDesktopFile(null);
@@ -236,21 +298,38 @@ export const AdminBanners: React.FC = () => {
   };
 
   const handleToggleActive = async (banner: HeroBanner) => {
+    const nextState = !banner.isActive;
+    // Optimistic UI update
+    setBanners((prev) =>
+      prev.map((b) => (b.id === banner.id ? { ...b, isActive: nextState } : b))
+    );
     try {
-      await bannerRepository.update(banner.id, { isActive: !banner.isActive });
-      await loadBanners();
-    } catch (err) {
+      await bannerRepository.update(banner.id, { isActive: nextState });
+      setStatusMessage({
+        text: `Slide #${banner.order} marked as ${nextState ? 'Active' : 'Hidden'}!`,
+        isError: false,
+      });
+    } catch (err: any) {
       console.error('Failed to update banner:', err);
+      // Revert optimistic update
+      setBanners((prev) =>
+        prev.map((b) => (b.id === banner.id ? { ...b, isActive: !nextState } : b))
+      );
+      setStatusMessage({ text: err.message || 'Failed to update banner', isError: true });
     }
   };
 
   const handleDeleteBanner = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this hero banner?')) return;
     try {
+      // Optimistic UI update
+      setBanners((prev) => prev.filter((b) => b.id !== id));
+      setConfirmDeleteId(null);
       await bannerRepository.delete(id);
-      await loadBanners();
-    } catch (err) {
+      setStatusMessage({ text: 'Hero banner deleted successfully!', isError: false });
+    } catch (err: any) {
       console.error('Failed to delete banner:', err);
+      await loadBanners();
+      setStatusMessage({ text: err.message || 'Failed to delete banner', isError: true });
     }
   };
 
@@ -325,6 +404,32 @@ export const AdminBanners: React.FC = () => {
           <h2 className="text-sm font-bold text-slate-100 uppercase tracking-wider font-mono border-b border-surface-800 pb-2">
             Upload &amp; Custom Crop Hero Banner
           </h2>
+
+          {/* Banner Upload Dimensions Specifications */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl bg-surface-950 border border-surface-750">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-xs font-bold text-brand-400 font-mono">
+                <i className="bi bi-display text-sm"></i>
+                <span>Desktop Banner Size Specs</span>
+              </div>
+              <ul className="text-[11px] text-slate-300 space-y-0.5">
+                <li>• <strong>Recommended:</strong> 1920 × 600 px (or 1600 × 500 px)</li>
+                <li>• <strong>Aspect Ratio:</strong> 16:5 (~3.2:1)</li>
+                <li>• <strong>Storefront Display:</strong> Max height 320px</li>
+              </ul>
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-xs font-bold text-brand-400 font-mono">
+                <i className="bi bi-phone text-sm"></i>
+                <span>Mobile Banner Size Specs</span>
+              </div>
+              <ul className="text-[11px] text-slate-300 space-y-0.5">
+                <li>• <strong>Recommended:</strong> 800 × 450 px (or 750 × 420 px)</li>
+                <li>• <strong>Aspect Ratio:</strong> 16:9 (~1.78:1)</li>
+                <li>• <strong>Storefront Display:</strong> Max height 180px</li>
+              </ul>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Desktop Banner Upload */}
@@ -607,23 +712,46 @@ export const AdminBanners: React.FC = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-3 self-end md:self-center">
+                <div className="flex items-center gap-2 self-end md:self-center">
                   <button
                     type="button"
                     onClick={() => handleToggleActive(b)}
-                    className="px-3 py-1.5 rounded-md bg-surface-800 hover:bg-surface-750 text-xs font-mono text-slate-200 transition-colors"
+                    className={`px-3 py-1.5 rounded-md text-xs font-mono transition-colors border ${
+                      b.isActive
+                        ? 'bg-surface-800 hover:bg-surface-750 text-slate-200 border-surface-700'
+                        : 'bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-300 border-emerald-800'
+                    }`}
                   >
-                    {b.isActive ? 'Hide' : 'Show'}
+                    {b.isActive ? 'Hide' : 'Unhide'}
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteBanner(b.id)}
-                    className="p-1.5 rounded-md bg-surface-800 hover:bg-rose-950 text-slate-400 hover:text-rose-400 transition-colors"
-                    title="Delete banner"
-                  >
-                    <i className="bi bi-trash3 text-sm"></i>
-                  </button>
+                  {confirmDeleteId === b.id ? (
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteBanner(b.id)}
+                        className="px-2.5 py-1.5 rounded-md bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold tracking-wide transition-colors"
+                      >
+                        Confirm Delete
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDeleteId(null)}
+                        className="px-2 py-1.5 rounded-md bg-surface-800 hover:bg-surface-750 text-slate-300 text-xs transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDeleteId(b.id)}
+                      className="p-1.5 rounded-md bg-surface-800 hover:bg-rose-950 text-slate-400 hover:text-rose-400 transition-colors"
+                      title="Delete banner"
+                    >
+                      <i className="bi bi-trash3 text-sm"></i>
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

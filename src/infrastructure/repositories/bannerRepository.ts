@@ -1,6 +1,7 @@
 import { HeroBanner } from '../../domain/types';
 
-const STORAGE_KEY = 'vahn_hero_banners';
+const PRIMARY_KEY = 'shrell_hero_banners';
+const FALLBACK_KEY = 'vahn_hero_banners';
 
 const DEFAULT_BANNERS: HeroBanner[] = [
   {
@@ -36,20 +37,31 @@ export interface IBannerRepository {
 class BannerRepository implements IBannerRepository {
   private getStoredBanners(): HeroBanner[] {
     try {
-      const data = localStorage.getItem(STORAGE_KEY);
-      if (data) {
+      const data = localStorage.getItem(PRIMARY_KEY) || localStorage.getItem(FALLBACK_KEY);
+      if (data !== null) {
         return JSON.parse(data);
       }
     } catch (e) {
       console.warn('Failed to parse stored banners:', e);
     }
-    // Initialize defaults if empty
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_BANNERS));
+    // Initialize defaults if not configured yet
+    try {
+      localStorage.setItem(PRIMARY_KEY, JSON.stringify(DEFAULT_BANNERS));
+    } catch (e) {
+      console.warn('Could not store default banners in localStorage:', e);
+    }
     return DEFAULT_BANNERS;
   }
 
   private setStoredBanners(banners: HeroBanner[]): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(banners));
+    try {
+      const serialized = JSON.stringify(banners);
+      localStorage.setItem(PRIMARY_KEY, serialized);
+      localStorage.setItem(FALLBACK_KEY, serialized);
+    } catch (e) {
+      console.error('Failed to save banners to localStorage:', e);
+      throw new Error('Storage quota exceeded. Please upload smaller images or delete unused slides.');
+    }
   }
 
   async getAll(): Promise<HeroBanner[]> {

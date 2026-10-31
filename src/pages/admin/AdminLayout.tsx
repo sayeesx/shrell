@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Package,
@@ -18,13 +18,11 @@ import { getRepositoryMode } from '../../infrastructure/repositories';
 export const AdminLayout: React.FC = () => {
   const { user, isAdmin, logout } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
   const repoMode = getRepositoryMode();
 
   // Route Guard: Redirect to /admin/login if not logged in as admin
   if (!isAdmin) {
-    navigate('/admin/login');
-    return null;
+    return <Navigate to="/admin/login" replace />;
   }
 
   const navItems = [

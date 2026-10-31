@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "appwrite": {
+      "serverUrl": "https://mcp.appwrite.io/"
+    }
+  }
+}

@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Brand red overrides — guarantee correct red regardless of Tailwind cache */
+@layer utilities {
+  .bg-brand-500  { background-color: #DC0000; }
+  .bg-brand-600  { background-color: #B00000; }
+  .bg-brand-400  { background-color: #FF2222; }
+  .bg-brand-50   { background-color: #FFF0F0; }
+  .bg-brand-100  { background-color: #FFD6D6; }
+  .bg-brand-950  { background-color: #330000; }
+  .text-brand-500 { color: #DC0000; }
+  .text-brand-400 { color: #FF2222; }
+  .text-brand-300 { color: #FF6666; }
+  .text-brand-600 { color: #B00000; }
+  .border-brand-500 { border-color: #DC0000; }
+  .border-brand-200 { border-color: #FFB3B3; }
+  .hover\:bg-brand-600:hover { background-color: #B00000; }
+  .hover\:bg-brand-50:hover  { background-color: #FFF0F0; }
+  .hover\:text-brand-500:hover { color: #DC0000; }
+  .hover\:text-brand-600:hover { color: #B00000; }
+  .hover\:border-brand-500:hover { border-color: #DC0000; }
+  .focus\:border-brand-500:focus { border-color: #DC0000; }
+  .focus\:ring-brand-500:focus { --tw-ring-color: #DC0000; }
+  .group:hover .group-hover\:text-brand-500 { color: #DC0000; }
+}
+
+@layer base {
+  *, *::before, *::after {
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+  }
+
+  body {
+    font-family: 'Inter Tight', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  a[href], button, summary, select,
+  input[type="checkbox"], input[type="radio"], label[for] {
+    cursor: pointer;
+  }
+
+  button:disabled, input:disabled, select:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  :focus-visible {
+    outline: 2px solid #DC0000;
+    outline-offset: 2px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Light scrollbars for the light theme */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #F1F3F5; }
+  ::-webkit-scrollbar-thumb { background: #CED4DA; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #ADB5BD; }
+}
+
+@layer utilities {
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+
+  /* Fully hide scrollbars on all browsers including mobile WebKit */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    -webkit-appearance: none !important;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+
+  /* Desktop Infinite Horizontal Marquee Scroll */
+  @keyframes marqueeScroll {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
+  }
+
+  .animate-marquee-scroll {
+    display: flex;
+    width: max-content;
+    animation: marqueeScroll 28s linear infinite;
+    will-change: transform;
+  }
+
+  .animate-marquee-scroll:hover {
+    animation-play-state: paused;
+  }
+
+  /* Mobile 3D Rotating Cube */
+  .perspective-500 {
+    perspective: 500px;
+    -webkit-perspective: 500px;
+  }
+  .transform-style-3d {
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+}

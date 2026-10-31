@@ -1,0 +1,4 @@
+{
+  "name": "appwrite",
+  "description": "Appwrite integration plugin providing MCP server access for Appwrite API and documentation"
+}

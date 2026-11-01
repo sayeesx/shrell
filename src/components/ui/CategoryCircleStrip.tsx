@@ -86,10 +86,8 @@ export const CategoryCircleStrip: React.FC<CategoryCircleStripProps> = ({
                   src={cat.iconSrc}
                   alt=""
                   aria-hidden="true"
-                  className={`w-full h-full object-contain pointer-events-none transition-opacity ${
-                    isActive
-                      ? 'opacity-100 drop-shadow-[0_0_12px_rgba(255,0,14,0.5)]'
-                      : 'opacity-75 group-hover:opacity-100'
+                  className={`w-full h-full object-contain pointer-events-none opacity-100 ${
+                    isActive ? 'drop-shadow-[0_0_12px_rgba(255,0,14,0.5)]' : ''
                   }`}
                   loading="eager"
                 />

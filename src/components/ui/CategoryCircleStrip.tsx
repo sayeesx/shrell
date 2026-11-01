@@ -11,6 +11,8 @@ export interface CategoryItem {
 
 export const CATEGORY_ITEMS: CategoryItem[] = [
   { id: 'all', slug: '', label: 'All', iconSrc: '/icons/all.svg', to: '/catalogue' },
+  { id: 'wash', slug: 'wash', label: 'Car Wash', iconSrc: '/icons/wash.svg', to: '/catalogue?category=wash' },
+  { id: 'charger', slug: 'charging-power', label: 'Chargers', iconSrc: '/icons/charger.svg', to: '/catalogue?category=charging-power' },
   { id: 'freshner', slug: 'air-fresheners', label: 'Air Freshener', iconSrc: '/icons/freshner.svg', to: '/catalogue?category=air-fresheners' },
   { id: 'lighting', slug: 'auxiliary-lighting', label: 'Lighting', iconSrc: '/icons/light.svg', to: '/catalogue?category=auxiliary-lighting' },
   { id: 'mats', slug: 'all-weather-floor-protection', label: 'Floor Mats', iconSrc: '/icons/floormats.svg', to: '/catalogue?category=all-weather-floor-protection' },
@@ -77,20 +79,18 @@ export const CategoryCircleStrip: React.FC<CategoryCircleStripProps> = ({
               key={cat.id}
               to={cat.to}
               onClick={() => onSelect?.(cat.id)}
-              className="flex flex-col items-center gap-1.5 group min-w-[52px] sm:min-w-[60px] relative pb-1.5 transition-all focus:outline-none"
+              className="flex flex-col items-center gap-1.5 group min-w-[58px] sm:min-w-[68px] relative pb-2 transition-all focus:outline-none"
             >
-              <div
-                className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center p-2 transition-all ${
-                  isActive
-                    ? 'bg-[#1C1416] border-2 border-[#FF000E] shadow-[0_0_12px_rgba(255,0,14,0.35)]'
-                    : 'bg-[#140E10] border border-[#251518] hover:border-[#4F242C] hover:bg-[#1A1215]'
-                }`}
-              >
+              <div className="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transition-all">
                 <img
                   src={cat.iconSrc}
                   alt=""
                   aria-hidden="true"
-                  className="w-full h-full object-contain pointer-events-none"
+                  className={`w-full h-full object-contain pointer-events-none transition-opacity ${
+                    isActive
+                      ? 'opacity-100 drop-shadow-[0_0_8px_rgba(255,0,14,0.45)]'
+                      : 'opacity-75 group-hover:opacity-100'
+                  }`}
                   loading="eager"
                 />
               </div>

@@ -98,7 +98,9 @@ export class MockProductRepository implements IProductRepository {
           (q.includes('light') && c.slug.includes('lighting')) ||
           (q.includes('tyre') && c.slug.includes('tyre')) ||
           (q.includes('tool') && c.slug.includes('touring')) ||
-          (q.includes('recovery') && c.slug.includes('touring'))
+          (q.includes('recovery') && c.slug.includes('touring')) ||
+          (q.includes('wash') && (c.slug.includes('wash') || c.slug.includes('care'))) ||
+          (q.includes('charg') && (c.slug.includes('charg') || c.slug.includes('touring') || c.slug.includes('power')))
       );
       if (cat) {
         result = result.filter((p) => p.categoryId === cat.id);

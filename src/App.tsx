@@ -26,9 +26,11 @@ import { AdminOrders } from './pages/admin/AdminOrders';
 import { AdminInventory } from './pages/admin/AdminInventory';
 import { AdminCoupons } from './pages/admin/AdminCoupons';
 import { AdminSettings } from './pages/admin/AdminSettings';
+import { AdminSanity } from './pages/admin/AdminSanity';
 
 import { ScrollToTop } from './components/common/ScrollToTop';
 import { ShrellLoader } from './components/common/ShrellLoader';
+import { useNavigationLoading } from './application/NavigationLoadingContext';
 
 export const App: React.FC = () => {
   const location = useLocation();
@@ -36,17 +38,12 @@ export const App: React.FC = () => {
   const isHomePage = location.pathname === '/';
   const isCataloguePage = location.pathname.startsWith('/catalogue');
 
-  // Page load & route change navigation loader
-  const [isNavigating, setIsNavigating] = React.useState<boolean>(true);
+  const { isNavigating, startPageLoad } = useNavigationLoading();
 
+  // Route change notification: only triggers loader if page load is slow (> 320ms)
   React.useEffect(() => {
-    setIsNavigating(true);
-    const timer = setTimeout(() => {
-      setIsNavigating(false);
-    }, 450);
-
-    return () => clearTimeout(timer);
-  }, [location.pathname, location.search]);
+    startPageLoad();
+  }, [location.pathname, location.search, startPageLoad]);
 
   // Network offline state listener
   const [isOnline, setIsOnline] = React.useState<boolean>(
@@ -76,15 +73,13 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0A0808] bg-atmospheric-red text-[#F1EEEE] font-sans antialiased pb-16 md:pb-0">
-      {/* Page Load & Navigation Shrell Loader */}
+      {/* Clean Floating Shrell Loader (No background, shows only when taking time, plays full cycle) */}
       {isNavigating && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#0A0808]/85 backdrop-blur-sm pointer-events-none transition-opacity duration-300"
+          className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none transition-opacity duration-300"
           aria-live="polite"
         >
-          <div className="p-6 rounded-2xl bg-[#140E10]/95 border border-[#261619] shadow-2xl flex items-center justify-center">
-            <ShrellLoader size={68} />
-          </div>
+          <ShrellLoader size={64} />
         </div>
       )}
 
@@ -120,6 +115,7 @@ export const App: React.FC = () => {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboardOverview />} />
             <Route path="banners" element={<AdminBanners />} />
+            <Route path="sanity" element={<AdminSanity />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="inventory" element={<AdminInventory />} />

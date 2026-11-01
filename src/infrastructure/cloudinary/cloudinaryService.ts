@@ -54,8 +54,12 @@ class CloudinaryService {
         }
 
         const data = await response.json();
+        const rawUrl = data.secure_url || data.url || '';
+        const secureUrl = rawUrl.startsWith('http://')
+          ? rawUrl.replace(/^http:\/\//, 'https://')
+          : rawUrl;
         return {
-          url: data.secure_url || data.url,
+          url: secureUrl,
           publicId: data.public_id,
           format: data.format,
           width: data.width,

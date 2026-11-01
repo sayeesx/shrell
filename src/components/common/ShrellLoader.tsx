@@ -2,12 +2,14 @@ import React from 'react';
 
 interface ShrellLoaderProps {
   size?: number;
+  color?: string;
   className?: string;
   fullPage?: boolean;
 }
 
 export const ShrellLoader: React.FC<ShrellLoaderProps> = ({
-  size = 68,
+  size = 64,
+  color,
   className = '',
   fullPage = false,
 }) => {
@@ -21,8 +23,13 @@ export const ShrellLoader: React.FC<ShrellLoaderProps> = ({
         viewBox="270 277 1386 1383"
         role="img"
         aria-hidden="true"
-        style={{ width: size, height: size }}
-        className="overflow-hidden"
+        style={
+          {
+            '--loader-size': `${size}px`,
+            ...(color ? { color } : {}),
+          } as React.CSSProperties
+        }
+        className="shrell-loader-svg overflow-hidden"
       >
         <path
           className="shrell-loader-path"

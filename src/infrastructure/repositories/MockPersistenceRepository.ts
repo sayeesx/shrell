@@ -87,9 +87,28 @@ export class MockProductRepository implements IProductRepository {
     let result = [...this.products].filter((p) => p.isActive);
 
     if (params?.categorySlug) {
-      const cat = this.categories.find((c) => c.slug === params.categorySlug);
+      const q = params.categorySlug.toLowerCase();
+      const cat = this.categories.find(
+        (c) =>
+          c.slug.toLowerCase() === q ||
+          c.id.toLowerCase() === q ||
+          c.name.toLowerCase().includes(q) ||
+          (q.includes('fresh') && c.slug.includes('freshener')) ||
+          (q.includes('mat') && c.slug.includes('protection')) ||
+          (q.includes('light') && c.slug.includes('lighting')) ||
+          (q.includes('tyre') && c.slug.includes('tyre')) ||
+          (q.includes('tool') && c.slug.includes('touring')) ||
+          (q.includes('recovery') && c.slug.includes('touring'))
+      );
       if (cat) {
         result = result.filter((p) => p.categoryId === cat.id);
+      } else {
+        result = result.filter(
+          (p) =>
+            p.categoryId.toLowerCase().includes(q) ||
+            p.categoryName?.toLowerCase().includes(q) ||
+            p.name.toLowerCase().includes(q)
+        );
       }
     }
 

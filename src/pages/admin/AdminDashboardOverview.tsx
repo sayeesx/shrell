@@ -12,8 +12,10 @@ import { Order, Product } from '../../domain/types';
 import { formatINR } from '../../domain/services/CurrencyService';
 import { orderRepository, productRepository } from '../../infrastructure/repositories';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
+import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 
 export const AdminDashboardOverview: React.FC = () => {
+  const { finishPageLoad } = useNavigationLoading();
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,10 +33,11 @@ export const AdminDashboardOverview: React.FC = () => {
         console.error('Failed to load admin dashboard data:', err);
       } finally {
         setLoading(false);
+        finishPageLoad();
       }
     }
     loadStats();
-  }, []);
+  }, [finishPageLoad]);
 
   // Compute live real metrics from database
   const totalRevenue = orders.reduce((acc, o) => acc + o.totalPaisa, 0);

@@ -3,8 +3,10 @@ import { Save, Check } from 'lucide-react';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { settingsRepository } from '../../infrastructure/repositories';
 import { paisaToRupees, rupeesToPaisa } from '../../domain/services/CurrencyService';
+import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 
 export const AdminSettings: React.FC = () => {
+  const { finishPageLoad } = useNavigationLoading();
   const [storeName, setStoreName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [contactPhone, setContactPhone] = useState('');
@@ -35,6 +37,7 @@ export const AdminSettings: React.FC = () => {
         console.error('Failed to load settings:', err);
       } finally {
         setLoading(false);
+        finishPageLoad();
       }
     }
     load();

@@ -101,11 +101,15 @@ export const AdminProducts: React.FC = () => {
     const selectedCat = categories.find((c) => c.id === categoryId);
     const selectedBrand = brands.find((b) => b.id === brandId);
 
+    const cleanImageUrl = imageUrl.trim().startsWith('http://res.cloudinary.com/')
+      ? imageUrl.trim().replace(/^http:\/\/res\.cloudinary\.com\//, 'https://res.cloudinary.com/')
+      : imageUrl.trim();
+
     const images = [
       {
         id: `img-${Date.now()}`,
         productId: '',
-        url: imageUrl.trim() || '/logos/shrell-full_white-text_black-logo.png',
+        url: cleanImageUrl || '/logos/shrell-full_white-text_black-logo.png',
         altText: name,
         sortOrder: 1,
         isPrimary: true,

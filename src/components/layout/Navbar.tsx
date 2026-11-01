@@ -67,8 +67,13 @@ export const Navbar: React.FC = () => {
       {/* 1. Fluid Continuous Marquee (Desktop Only - Stays on top, does not hide when scrolling) */}
       <div className="hidden md:block overflow-hidden bg-[#080000] border-b border-[#221215]/60 py-1.5 text-xs select-none">
         <div className="animate-marquee-scroll flex items-center gap-12 whitespace-nowrap">
-          {[...ANNOUNCEMENT_MESSAGES, ...ANNOUNCEMENT_MESSAGES].map((msg, i) => (
-            <div key={i} className="flex items-center gap-2.5 text-gray-300 font-medium font-sans">
+          {[
+            ...ANNOUNCEMENT_MESSAGES,
+            ...ANNOUNCEMENT_MESSAGES,
+            ...ANNOUNCEMENT_MESSAGES,
+            ...ANNOUNCEMENT_MESSAGES,
+          ].map((msg, i) => (
+            <div key={i} className="flex items-center gap-2.5 text-gray-300 font-medium font-sans shrink-0">
               <i className={`bi ${msg.icon} text-[#FF000E] text-xs`} aria-hidden="true" />
               <span className="tracking-tight">{msg.text}</span>
               <span className="text-[#3B1A1E] ml-6 text-sm">•</span>
@@ -92,7 +97,7 @@ export const Navbar: React.FC = () => {
               <img
                 src="/logos/shrell-logo-white.png"
                 alt="SHRELL Automotive"
-                className="h-[25px] lg:h-[27px] w-auto object-contain transition-transform group-hover:scale-[1.02]"
+                className="h-[25px] lg:h-[27px] w-auto object-contain"
               />
             </Link>
           </div>
@@ -121,13 +126,13 @@ export const Navbar: React.FC = () => {
             </div>
           </form>
 
-          {/* Desktop Nav Links (Categories, Featured, Deals, Profile) */}
+          {/* Desktop Nav Links (Home, Categories, Deals, Profile) */}
           <nav className="flex items-center gap-6 text-sm font-medium text-gray-300 font-sans">
+            <Link to="/" className="hover:text-white transition-colors">
+              Home
+            </Link>
             <Link to="/catalogue" className="hover:text-white transition-colors">
               Categories
-            </Link>
-            <Link to="/catalogue?sort=newest" className="hover:text-white transition-colors">
-              Featured
             </Link>
             <Link to="/catalogue?deals=true" className="hover:text-white transition-colors">
               Deals

@@ -58,7 +58,7 @@ export const ProfilePage: React.FC = () => {
               <img
                 src="/logos/shrell-logo-white.png"
                 alt="SHRELL Automotive"
-                className="h-[22px] w-auto object-contain transition-transform group-hover:scale-105"
+                className="h-[22px] w-auto object-contain"
               />
             </Link>
           </div>

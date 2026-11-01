@@ -3,9 +3,12 @@ import { Link } from 'react-router-dom';
 import { Product, HeroBanner } from '../../domain/types';
 import { productRepository, bannerRepository } from '../../infrastructure/repositories';
 import { ProductCard } from '../../components/ui/ProductCard';
+import { CategoryCircleStrip } from '../../components/ui/CategoryCircleStrip';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
+import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 
 export const HomePage: React.FC = () => {
+  const { finishPageLoad } = useNavigationLoading();
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [banners, setBanners] = useState<HeroBanner[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -52,10 +55,11 @@ export const HomePage: React.FC = () => {
         console.error('Failed to load home page catalogue data:', err);
       } finally {
         setLoading(false);
+        finishPageLoad();
       }
     }
     loadData();
-  }, []);
+  }, [finishPageLoad]);
 
   // Carousel timer loop
   useEffect(() => {
@@ -78,21 +82,6 @@ export const HomePage: React.FC = () => {
     setCurrentSlide((prev) => (prev + 1) % banners.length);
   };
 
-  const categoryIcons = [
-    { id: 'all', icon: 'bi-grid-fill', label: 'All', to: '/catalogue' },
-    { id: 'freshner', icon: 'bi-tree-fill', label: 'Air Freshener', to: '/catalogue?category=air-fresheners' },
-    { id: 'lighting', icon: 'bi-lightbulb-fill', label: 'Lighting', to: '/catalogue?category=auxiliary-lighting' },
-    { id: 'mats', icon: 'floor-mat', label: 'Floor Mats', to: '/catalogue?category=all-weather-floor-protection' },
-    { id: 'cams', icon: 'bi-camera-video-fill', label: 'Dash Cams', to: '/catalogue?category=dash-cameras' },
-    { id: 'tyre', icon: 'tyre-care', label: 'Tyre Care', to: '/catalogue?category=tyre-care-air-systems' },
-    { id: 'recovery', icon: 'bi-tools', label: 'Recovery', to: '/catalogue?category=touring-recovery-gear' },
-    { id: 'audio', icon: 'bi-speaker-fill', label: 'Audio & Tech', to: '/catalogue?category=audio' },
-    { id: 'wash', icon: 'bi-droplet-half', label: 'Car Care', to: '/catalogue?category=car-care' },
-    { id: 'cooling', icon: 'bi-thermometer-half', label: 'Cooling', to: '/catalogue?category=cooling-systems' },
-    { id: 'power', icon: 'bi-usb-plug-fill', label: 'Chargers', to: '/catalogue?category=charging-power' },
-    { id: 'more', icon: 'bi-boxes', label: 'Others', to: '/catalogue' },
-  ];
-
   return (
     <div className="space-y-8 sm:space-y-12 pb-20">
       {/* 
@@ -105,56 +94,11 @@ export const HomePage: React.FC = () => {
       <section className="bg-[#0A0808] text-white pt-1 sm:pt-2 pb-4 sm:pb-6 rounded-b-xl sm:rounded-b-2xl border-b border-[#221215]">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-3 sm:space-y-4">
           {/* Category Icons Row (Circle Style) - completely hidden scrollbar */}
-          <div
-            className="overflow-x-auto no-scrollbar pt-1 pb-2 -mx-3 px-3 sm:mx-0 sm:px-0"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
-          >
-            <div className="flex items-center gap-6 sm:gap-9 min-w-max justify-start md:justify-center">
-              {categoryIcons.map((cat) => {
-                const isActive = activeCategoryTab === cat.id;
-                return (
-                  <Link
-                    key={cat.id}
-                    to={cat.to}
-                    onClick={() => setActiveCategoryTab(cat.id)}
-                    className="flex flex-col items-center gap-1 group min-w-[48px] sm:min-w-[54px] relative pb-1.5 transition-all"
-                  >
-                    <div
-                      className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all ${
-                        isActive
-                          ? 'text-[#FF000E]'
-                          : 'text-gray-400 group-hover:text-white'
-                      }`}
-                    >
-                      {cat.id === 'freshner' ? (
-                        <i className="bi bi-tree-fill text-lg sm:text-xl leading-none" aria-hidden="true"></i>
-                      ) : cat.id === 'mats' ? (
-                        <svg viewBox="0 0 24 24" className="w-[18px] h-[18px] fill-current" aria-hidden="true">
-                          <path fillRule="evenodd" clipRule="evenodd" d="M4.5 3A1.5 1.5 0 0 0 3 4.5v15A1.5 1.5 0 0 0 4.5 21h15a1.5 1.5 0 0 0 1.5-1.5v-15A1.5 1.5 0 0 0 19.5 3h-15ZM5 5h14v14H5V5Zm3 3a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1Zm0 4a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1Zm0 4a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1Z"/>
-                        </svg>
-                      ) : cat.id === 'tyre' ? (
-                        <svg viewBox="0 0 24 24" className="w-[18px] h-[18px] fill-current" aria-hidden="true">
-                          <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2Zm-8 10a8 8 0 1 1 16 0 8 8 0 0 1-16 0Zm8-5.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11Zm0 3.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-1-4.25a.75.75 0 0 1 1.5 0v1.5a.75.75 0 0 1-1.5 0v-1.5Zm0 7a.75.75 0 0 1 1.5 0v1.5a.75.75 0 0 1-1.5 0v-1.5Zm-4.25-2.25a.75.75 0 0 1 0-1.5h1.5a.75.75 0 0 1 0 1.5h-1.5Zm7 0a.75.75 0 0 1 0-1.5h1.5a.75.75 0 0 1 0 1.5h-1.5Z"/>
-                        </svg>
-                      ) : (
-                        <i className={`bi ${cat.icon} text-lg sm:text-xl leading-none`} aria-hidden="true"></i>
-                      )}
-                    </div>
-                    <span
-                      className={`text-[11px] sm:text-[12px] font-medium tracking-tight text-center whitespace-nowrap transition-colors ${
-                        isActive ? 'text-[#FF000E] font-semibold' : 'text-gray-400 group-hover:text-gray-200'
-                      }`}
-                    >
-                      {cat.label}
-                    </span>
-                    {isActive && (
-                      <span className="absolute bottom-0 inset-x-2 h-0.5 bg-[#FF000E] rounded-full transition-all"></span>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
+          <CategoryCircleStrip
+            activeId={activeCategoryTab}
+            onSelect={(id) => setActiveCategoryTab(id)}
+            className="-mx-3 px-3 sm:mx-0 sm:px-0"
+          />
 
           {/* 
             Pure Image-Only Banner Carousel
@@ -180,8 +124,9 @@ export const HomePage: React.FC = () => {
                 >
                   {/* Desktop Image Banner (Bigger on desktop browser) */}
                   <img
-                    src={banners[currentSlide]?.desktopImageUrl}
+                    src={banners[currentSlide]?.desktopImageUrl?.replace(/^http:\/\/res\.cloudinary\.com\//, 'https://res.cloudinary.com/')}
                     alt={banners[currentSlide]?.altText || 'Hero Banner'}
+                    referrerPolicy="no-referrer"
                     className="hidden md:block w-full max-h-[480px] lg:max-h-[560px] xl:max-h-[620px] object-cover sm:object-contain rounded-lg mx-auto"
                     onError={(e) => {
                       const target = e.currentTarget;
@@ -193,8 +138,9 @@ export const HomePage: React.FC = () => {
 
                   {/* Mobile Image Banner (Strictly unchanged) */}
                   <img
-                    src={banners[currentSlide]?.mobileImageUrl || banners[currentSlide]?.desktopImageUrl}
+                    src={(banners[currentSlide]?.mobileImageUrl || banners[currentSlide]?.desktopImageUrl)?.replace(/^http:\/\/res\.cloudinary\.com\//, 'https://res.cloudinary.com/')}
                     alt={banners[currentSlide]?.altText || 'Hero Banner'}
+                    referrerPolicy="no-referrer"
                     className="block md:hidden w-full max-h-[180px] object-cover rounded-lg"
                     onError={(e) => {
                       const target = e.currentTarget;
@@ -333,13 +279,13 @@ export const HomePage: React.FC = () => {
             {/* LEFT COLUMN: 2 Cards (4 cols on desktop) */}
             <div className="md:col-span-4 flex flex-col gap-4">
               {/* Card 1: Light Off-White Panel with Shrell Washing Spray (imaged2.webp) */}
-              <div className="rounded-2xl bg-[#F7F5F5] text-[#140E10] p-6 sm:p-7 relative overflow-hidden flex flex-col justify-between min-h-[220px] sm:min-h-[240px] group border border-white/40 shadow-sm">
+              <div className="rounded-2xl bg-[#F7F5F5] text-[#140E10] p-6 sm:p-7 relative overflow-hidden flex flex-col justify-between min-h-[230px] sm:min-h-[250px] group border border-white/40 shadow-sm">
                 <div className="flex items-start justify-between z-10">
-                  <div className="w-28 sm:w-32 h-28 sm:h-32 -ml-2 -mt-2 relative">
+                  <div className="w-32 sm:w-40 h-32 sm:h-40 -ml-2 -mt-2 relative flex-shrink-0">
                     <img
                       src="/imaged2.webp"
                       alt="SHRELL Clay Bar & Washing Spray"
-                      className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-contain scale-110 sm:scale-120"
                     />
                   </div>
                   <div className="text-right">
@@ -358,18 +304,37 @@ export const HomePage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Card 2: Dark Graphite Panel (SHRELL removed, updated for ceramic brakes) */}
-              <div className="rounded-2xl bg-[#0E0A0B] border border-[#221215] p-6 sm:p-7 flex flex-col justify-between flex-1 min-h-[200px] group hover:border-[#4F242C] transition-all">
-                <div className="space-y-2">
-                  <h3 className="text-2xl sm:text-3xl font-extrabold text-[#F1EEEE] tracking-tight leading-tight">
-                    Ceramic Brake<br />Rotors &amp; Pads
+              {/* Card 2: Dark Graphite Panel with Car Interior Vacuum (imaged3.webp with light image background) */}
+              <div className="rounded-2xl bg-[#0E0A0B] border border-[#221215] p-6 sm:p-7 flex flex-col justify-between flex-1 min-h-[230px] sm:min-h-[250px] group hover:border-[#4F242C] transition-all">
+                <div className="flex items-start justify-between gap-3 z-10">
+                  {/* Vacuum Sucker Image with Light Background Container (just like Clay Bar card) */}
+                  <div className="w-28 sm:w-36 h-28 sm:h-36 rounded-xl bg-[#F7F5F5] p-2.5 flex items-center justify-center overflow-hidden border border-white/30 shadow-sm relative flex-shrink-0">
+                    <img
+                      src="/imaged3.webp"
+                      alt="SHRELL Car Interior Vacuum Sucker"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <div className="text-right">
+                    <span className="block text-2xl sm:text-3xl font-extrabold text-[#FF000E] tracking-tight leading-none">
+                      8.5K<span className="text-sm font-bold uppercase ml-0.5">Pa</span>
+                    </span>
+                    <span className="block text-xs sm:text-sm font-bold text-[#F1EEEE] mt-1.5 leading-snug">
+                      High-Power<br />Cyclone Suction
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 mt-3">
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-[#F1EEEE] tracking-tight leading-tight">
+                    Car Interior Vacuum
                   </h3>
                   <p className="text-xs text-[#8E8587] leading-relaxed">
-                    Ultra-premium stopping power with thermal dissipating vents.
+                    Ultra-high cyclonic suction power for deep car cabin cleaning and detailing.
                   </p>
                 </div>
 
-                <div className="pt-4 flex items-end justify-between border-t border-[#221215] mt-4">
+                <div className="pt-3 flex items-end justify-between border-t border-[#221215] mt-3">
                   <div>
                     <p className="text-[11px] sm:text-xs text-[#8E8587] leading-tight">
                       Satisfied drivers<br />around the world
@@ -395,7 +360,7 @@ export const HomePage: React.FC = () => {
                   <img
                     src="/imaged.webp"
                     alt="SHRELL Express Delivery"
-                    className="w-full h-full object-cover object-top filter brightness-95 group-hover:scale-105 transition-transform duration-700 ease-out"
+                    className="w-full h-full object-cover object-top filter brightness-95"
                   />
                   {/* Subtle dark vignette */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0A0808] via-transparent to-transparent pointer-events-none" />
@@ -453,7 +418,7 @@ export const HomePage: React.FC = () => {
 
               {/* Card 5: Square Brand Accent Tile */}
               <div className="rounded-2xl bg-[#FF000E] p-6 flex items-center justify-center relative overflow-hidden h-[130px] sm:h-[140px] group shadow-[0_8px_24px_rgba(255,0,14,0.25)]">
-                <div className="w-20 h-20 relative flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                <div className="w-20 h-20 relative flex items-center justify-center">
                   {/* Clean White Cutout Logo Emblem */}
                   <img
                     src="/logos/shrell-brandicon_no-bg.png"

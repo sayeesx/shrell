@@ -4,9 +4,16 @@ import { useCart } from '../../application/CartContext';
 import { formatINR } from '../../domain/services/CurrencyService';
 import { whatsAppService } from '../../features/whatsapp/WhatsAppService';
 import { ProductImagePlaceholder } from '../../components/common/ProductImagePlaceholder';
+import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 
 export const CartPage: React.FC = () => {
   const { cart, updateQuantity, removeItem, clearCart, applyCoupon, removeCoupon, openCheckout } = useCart();
+  const { finishPageLoad } = useNavigationLoading();
+
+  React.useEffect(() => {
+    finishPageLoad();
+  }, [finishPageLoad]);
+
   const [couponCode, setCouponCode] = useState('');
   const [couponMessage, setCouponMessage] = useState<{ text: string; isError: boolean } | null>(
     null
@@ -112,7 +119,7 @@ export const CartPage: React.FC = () => {
                 {/* Product Info */}
                 <div className="flex items-center gap-4 flex-1">
                   <div className="w-20 h-16 rounded-md overflow-hidden flex-shrink-0 border border-[#261619] bg-[#0A0808]">
-                    <ProductImagePlaceholder showBadge={false} alt={item.product.name} />
+                    <ProductImagePlaceholder src={item.product.images?.[0]?.url} showBadge={false} alt={item.product.name} />
                   </div>
 
                   <div className="space-y-1">

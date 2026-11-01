@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './application/AuthContext';
 import { VehicleProvider } from './application/VehicleContext';
 import { CartProvider } from './application/CartContext';
+import { NavigationLoadingProvider } from './application/NavigationLoadingContext';
 import { App } from './App';
 import './styles/index.css';
 
@@ -21,13 +22,15 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AuthProvider>
-          <VehicleProvider>
-            <CartProvider>
-              <App />
-            </CartProvider>
-          </VehicleProvider>
-        </AuthProvider>
+        <NavigationLoadingProvider>
+          <AuthProvider>
+            <VehicleProvider>
+              <CartProvider>
+                <App />
+              </CartProvider>
+            </VehicleProvider>
+          </AuthProvider>
+        </NavigationLoadingProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </React.StrictMode>

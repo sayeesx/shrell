@@ -3,10 +3,13 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Product } from '../../domain/types';
 import { productRepository } from '../../infrastructure/repositories';
 import { ProductCard } from '../../components/ui/ProductCard';
+import { CategoryCircleStrip } from '../../components/ui/CategoryCircleStrip';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
+import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 
 export const CataloguePage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { finishPageLoad } = useNavigationLoading();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -31,6 +34,7 @@ export const CataloguePage: React.FC = () => {
         console.error('Catalogue fetch error:', err);
       } finally {
         setLoading(false);
+        finishPageLoad();
       }
     }
 
@@ -46,7 +50,12 @@ export const CataloguePage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 sm:space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-6 sm:space-y-8">
+      {/* Top Zone Category Menu Strip (Just like in Home Page) */}
+      <section className="bg-[#0A0808] text-white pt-1 sm:pt-2 pb-3 sm:pb-4 rounded-xl sm:rounded-2xl border border-[#221215] px-3 sm:px-6 shadow-sm">
+        <CategoryCircleStrip className="-mx-2 px-2 sm:mx-0 sm:px-0" />
+      </section>
+
       {/* Page Header */}
       <div className="flex items-center justify-between border-b border-[#221215] pb-4 sm:pb-5">
         <div>

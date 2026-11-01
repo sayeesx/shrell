@@ -6,8 +6,8 @@ const FALLBACK_KEY = 'vahn_hero_banners';
 const DEFAULT_BANNERS: HeroBanner[] = [
   {
     id: 'banner-01',
-    desktopImageUrl: '/shrell-opengraph.png',
-    mobileImageUrl: '/shrell-opengraph.png',
+    desktopImageUrl: 'https://res.cloudinary.com/dy1i55fut/image/upload/v1793512009/uykqili5ey5zhdkdondv.png',
+    mobileImageUrl: 'https://res.cloudinary.com/dy1i55fut/image/upload/v1793512009/uykqili5ey5zhdkdondv.png',
     targetUrl: '/catalogue',
     altText: 'SHRELL Premium Automotive Overland Equipment',
     isActive: true,
@@ -16,8 +16,8 @@ const DEFAULT_BANNERS: HeroBanner[] = [
   },
   {
     id: 'banner-02',
-    desktopImageUrl: '/logos/shrell-brandicon_black-bg.png',
-    mobileImageUrl: '/logos/shrell-brandicon_black-bg.png',
+    desktopImageUrl: 'https://res.cloudinary.com/dy1i55fut/image/upload/v1793512017/xdcqllkepn85jebh4gqj.webp',
+    mobileImageUrl: 'https://res.cloudinary.com/dy1i55fut/image/upload/v1793512017/xdcqllkepn85jebh4gqj.webp',
     targetUrl: '/catalogue',
     altText: 'SHRELL Precision Engineered Automotive Systems',
     isActive: true,
@@ -41,7 +41,34 @@ class BannerRepository implements IBannerRepository {
       if (data !== null) {
         const parsed = JSON.parse(data);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          const sanitized = parsed.map((b) => {
+            let desktop = b.desktopImageUrl || '';
+            let mobile = b.mobileImageUrl || '';
+
+            // Upgrade legacy relative default paths to live Cloudinary banners
+            if (!desktop || desktop.includes('shrell-opengraph') || desktop.includes('shrell-brandicon')) {
+              desktop = DEFAULT_BANNERS[0].desktopImageUrl;
+            }
+            if (!mobile || mobile.includes('shrell-opengraph') || mobile.includes('shrell-brandicon')) {
+              mobile = DEFAULT_BANNERS[0].mobileImageUrl;
+            }
+
+            if (desktop.startsWith('http://')) desktop = desktop.replace(/^http:\/\//, 'https://');
+            if (mobile.startsWith('http://')) mobile = mobile.replace(/^http:\/\//, 'https://');
+
+            return {
+              ...b,
+              desktopImageUrl: desktop,
+              mobileImageUrl: mobile,
+            };
+          });
+
+          // If changes were made, persist updated Cloudinary links
+          try {
+            localStorage.setItem(PRIMARY_KEY, JSON.stringify(sanitized));
+          } catch (_) {}
+
+          return sanitized;
         }
       }
     } catch (e) {

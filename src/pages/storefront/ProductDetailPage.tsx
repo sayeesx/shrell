@@ -6,9 +6,12 @@ import { productRepository } from '../../infrastructure/repositories';
 import { useCart } from '../../application/CartContext';
 import { ProductCard } from '../../components/ui/ProductCard';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
+import { useNavigationLoading } from '../../application/NavigationLoadingContext';
+
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { addItem, openCheckout } = useCart();
+  const { finishPageLoad } = useNavigationLoading();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
@@ -16,6 +19,7 @@ export const ProductDetailPage: React.FC = () => {
   const [quantity, setQuantity] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
   const [addedMessage, setAddedMessage] = useState<string>('');
+  const [imageError, setImageError] = useState<boolean>(false);
 
   const productViews = [
     { id: 1, label: 'Front Fitment', tag: 'Primary' },
@@ -59,6 +63,7 @@ export const ProductDetailPage: React.FC = () => {
         console.error('Failed to load product detail:', err);
       } finally {
         setLoading(false);
+        finishPageLoad();
         requestAnimationFrame(() => {
           window.scrollTo(0, 0);
           document.documentElement.scrollTop = 0;
@@ -70,7 +75,7 @@ export const ProductDetailPage: React.FC = () => {
       }
     }
     loadProduct();
-  }, [slug]);
+  }, [slug, finishPageLoad]);
 
   if (loading) {
     return (
@@ -130,7 +135,7 @@ export const ProductDetailPage: React.FC = () => {
               <img
                 src="/logos/shrell-logo-white.png"
                 alt="SHRELL Automotive"
-                className="h-[22px] w-auto object-contain transition-transform group-hover:scale-105"
+                className="h-[22px] w-auto object-contain"
               />
             </Link>
           </div>
@@ -153,14 +158,32 @@ export const ProductDetailPage: React.FC = () => {
           <div className="space-y-4">
             {/* Main Product Image - Free-floating without box or border */}
             <div className="relative aspect-square sm:aspect-[4/3] flex items-center justify-center p-4 sm:p-8 select-none">
-              <img
-                src="/logos/shrell-full_white-text_black-logo.png"
-                alt={`${product.name} - ${productViews[selectedImageIndex].label}`}
-                className="w-56 sm:w-72 max-h-60 object-contain opacity-35 filter brightness-125 grayscale transition-all duration-300"
-              />
+              {(() => {
+                const rawUrl = product.images?.[selectedImageIndex]?.url || product.images?.[0]?.url;
+                let cleanUrl = rawUrl?.trim() || '';
+                if (cleanUrl.startsWith('http://res.cloudinary.com/')) {
+                  cleanUrl = cleanUrl.replace('http://res.cloudinary.com/', 'https://res.cloudinary.com/');
+                }
+                const isReal = Boolean(cleanUrl && !imageError && !cleanUrl.includes('shrell-full_white-text_black-logo.png'));
+                return isReal ? (
+                  <img
+                    src={cleanUrl}
+                    alt={`${product.name} - ${productViews[selectedImageIndex]?.label || 'Product View'}`}
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full max-h-72 object-contain transition-all duration-300"
+                    onError={() => setImageError(true)}
+                  />
+                ) : (
+                  <img
+                    src="/logos/shrell-full_white-text_black-logo.png"
+                    alt={`${product.name} - ${productViews[selectedImageIndex]?.label || 'Product View'}`}
+                    className="w-56 sm:w-72 max-h-60 object-contain opacity-35 filter brightness-125 grayscale transition-all duration-300"
+                  />
+                );
+              })()}
               <div className="absolute bottom-2 left-2 pointer-events-none">
                 <span className="text-[10px] font-mono tracking-wider uppercase text-slate-400 bg-[#0A0808]/80 px-2 py-0.5 rounded-full border border-[#261619]">
-                  {productViews[selectedImageIndex].label}
+                  {productViews[selectedImageIndex]?.label || 'View'}
                 </span>
               </div>
             </div>
@@ -169,11 +192,21 @@ export const ProductDetailPage: React.FC = () => {
             <div className="flex items-center gap-3 pt-1">
               {productViews.map((view, idx) => {
                 const isSelected = selectedImageIndex === idx;
+                const thumbRaw = product.images?.[idx]?.url || product.images?.[0]?.url;
+                let thumbClean = thumbRaw?.trim() || '';
+                if (thumbClean.startsWith('http://res.cloudinary.com/')) {
+                  thumbClean = thumbClean.replace('http://res.cloudinary.com/', 'https://res.cloudinary.com/');
+                }
+                const isThumbReal = Boolean(thumbClean && !thumbClean.includes('shrell-full_white-text_black-logo.png'));
+
                 return (
                   <button
                     key={view.id}
                     type="button"
-                    onClick={() => setSelectedImageIndex(idx)}
+                    onClick={() => {
+                      setSelectedImageIndex(idx);
+                      setImageError(false);
+                    }}
                     className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg transition-all flex items-center justify-center p-1.5 cursor-pointer select-none ${
                       isSelected
                         ? 'ring-2 ring-[#FF000E] bg-[#160D0F]'
@@ -182,11 +215,20 @@ export const ProductDetailPage: React.FC = () => {
                     aria-label={`View ${view.label}`}
                     title={view.label}
                   >
-                    <img
-                      src="/logos/shrell-full_white-text_black-logo.png"
-                      alt={view.label}
-                      className="w-full h-full object-contain opacity-40 brightness-125 grayscale"
-                    />
+                    {isThumbReal ? (
+                      <img
+                        src={thumbClean}
+                        alt={view.label}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      <img
+                        src="/logos/shrell-full_white-text_black-logo.png"
+                        alt={view.label}
+                        className="w-full h-full object-contain opacity-40 brightness-125 grayscale"
+                      />
+                    )}
                   </button>
                 );
               })}

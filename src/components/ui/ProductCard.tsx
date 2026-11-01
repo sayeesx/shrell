@@ -47,7 +47,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         to={`/product/${product.slug}`}
         className="block relative aspect-square sm:aspect-[4/3] bg-[#080000] border-b border-[#221215] overflow-hidden"
       >
-        <ProductImagePlaceholder alt={product.name} />
+        <ProductImagePlaceholder src={product.images?.[0]?.url} alt={product.name} />
 
         {/* Top-right Wishlist Button */}
         <button

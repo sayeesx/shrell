@@ -16,12 +16,10 @@ export const MobileNavDock: React.FC = () => {
     return null;
   }
 
+  const isHomeActive = location.pathname === '/';
   const isCategoriesActive =
     location.pathname === '/catalogue' &&
-    !location.search.includes('sort=newest') &&
     !location.search.includes('deals=true');
-  const isFeaturedActive =
-    location.pathname === '/catalogue' && location.search.includes('sort=newest');
   const isDealsActive =
     location.pathname === '/catalogue' && location.search.includes('deals=true');
   const isProfileActive = location.pathname === '/profile';
@@ -37,20 +35,20 @@ export const MobileNavDock: React.FC = () => {
 
   const navItems = [
     {
+      id: 'home',
+      label: 'Home',
+      to: '/',
+      isActive: isHomeActive,
+      iconActive: 'bi-house-door-fill',
+      iconInactive: 'bi-house-door',
+    },
+    {
       id: 'categories',
       label: 'Categories',
       to: '/catalogue',
       isActive: isCategoriesActive,
       iconActive: 'bi-grid-fill',
       iconInactive: 'bi-grid',
-    },
-    {
-      id: 'featured',
-      label: 'Featured',
-      to: '/catalogue?sort=newest',
-      isActive: isFeaturedActive,
-      iconActive: 'bi-stars',
-      iconInactive: 'bi-stars',
     },
     {
       id: 'deals',

@@ -64,7 +64,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    *, *::before, *::after {
+    *:not(.animate-marquee-scroll):not(.shrell-loader-path):not(.shrell-loader-svg) {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
@@ -121,19 +121,27 @@
 
   /* Desktop Infinite Horizontal Marquee Scroll */
   @keyframes marqueeScroll {
-    0% { transform: translate3d(0, 0, 0); }
-    100% { transform: translate3d(-50%, 0, 0); }
+    0% {
+      transform: translateX(0);
+      -webkit-transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+      -webkit-transform: translateX(-50%);
+    }
   }
 
   .animate-marquee-scroll {
-    display: flex;
-    width: max-content;
-    animation: marqueeScroll 28s linear infinite;
+    display: flex !important;
+    width: max-content !important;
+    animation: marqueeScroll 30s linear infinite !important;
+    -webkit-animation: marqueeScroll 30s linear infinite !important;
     will-change: transform;
   }
 
   .animate-marquee-scroll:hover {
-    animation-play-state: paused;
+    animation-play-state: paused !important;
+    -webkit-animation-play-state: paused !important;
   }
 
   /* Mobile 3D Rotating Cube */
@@ -208,8 +216,19 @@
   }
 
   /* Shrell Signature 5-Path Loader Animation */
+  .shrell-loader-svg {
+    width: var(--loader-size, 64px);
+    height: var(--loader-size, 64px);
+  }
+  @media (max-width: 640px) {
+    .shrell-loader-svg {
+      width: calc(var(--loader-size, 64px) * 0.65);
+      height: calc(var(--loader-size, 64px) * 0.65);
+    }
+  }
+
   .shrell-loader-path {
-    fill: #FF000E;
+    fill: #FFFFFF;
     opacity: 0;
     transform-box: fill-box;
     transform-origin: center;

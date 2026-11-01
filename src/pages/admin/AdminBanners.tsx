@@ -4,6 +4,7 @@ import { bannerRepository } from '../../infrastructure/repositories';
 import { cloudinaryService } from '../../infrastructure/cloudinary/cloudinaryService';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
+import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 
 interface CropModalState {
   isOpen: boolean;
@@ -13,6 +14,7 @@ interface CropModalState {
 }
 
 export const AdminBanners: React.FC = () => {
+  const { finishPageLoad } = useNavigationLoading();
   const [banners, setBanners] = useState<HeroBanner[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
@@ -89,6 +91,7 @@ export const AdminBanners: React.FC = () => {
       console.error('Failed to load banners:', err);
     } finally {
       setLoading(false);
+      finishPageLoad();
     }
   };
 
@@ -269,10 +272,17 @@ export const AdminBanners: React.FC = () => {
         }
       }
 
+      const finalDesktopUrl = uploadedDesktopUrl?.startsWith('http://')
+        ? uploadedDesktopUrl.replace(/^http:\/\//, 'https://')
+        : uploadedDesktopUrl;
+      const finalMobileUrl = (uploadedMobileUrl || uploadedDesktopUrl)?.startsWith('http://')
+        ? (uploadedMobileUrl || uploadedDesktopUrl).replace(/^http:\/\//, 'https://')
+        : (uploadedMobileUrl || uploadedDesktopUrl);
+
       // 3. Save to repository
       await bannerRepository.create({
-        desktopImageUrl: uploadedDesktopUrl,
-        mobileImageUrl: uploadedMobileUrl || uploadedDesktopUrl,
+        desktopImageUrl: finalDesktopUrl,
+        mobileImageUrl: finalMobileUrl,
         targetUrl: targetUrl.trim() || '/catalogue',
         altText: altText.trim() || 'Hero Banner',
         order: Number(order) || (banners.length + 1),
@@ -486,12 +496,27 @@ export const AdminBanners: React.FC = () => {
                     <input
                       type="file"
                       accept="image/*"
-                      required
                       onChange={handleDesktopFileChange}
                       className="hidden"
                     />
                   </label>
                 )}
+              </div>
+              {/* Direct URL Input Fallback */}
+              <div className="pt-1">
+                <label className="block text-[11px] font-mono text-slate-400 mb-1">
+                  Or Paste Direct Cloudinary / Image URL:
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://res.cloudinary.com/..."
+                  value={desktopPreview.startsWith('http') ? desktopPreview : ''}
+                  onChange={(e) => {
+                    setDesktopPreview(e.target.value);
+                    setDesktopFile(null);
+                  }}
+                  className="w-full px-3 py-1.5 bg-surface-950 border border-surface-700 rounded-md text-xs font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-brand-500"
+                />
               </div>
             </div>
 
@@ -553,6 +578,22 @@ export const AdminBanners: React.FC = () => {
                     />
                   </label>
                 )}
+              </div>
+              {/* Direct Mobile URL Input */}
+              <div className="pt-1">
+                <label className="block text-[11px] font-mono text-slate-400 mb-1">
+                  Or Paste Direct Mobile Cloudinary / Image URL:
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://res.cloudinary.com/..."
+                  value={mobilePreview.startsWith('http') ? mobilePreview : ''}
+                  onChange={(e) => {
+                    setMobilePreview(e.target.value);
+                    setMobileFile(null);
+                  }}
+                  className="w-full px-3 py-1.5 bg-surface-950 border border-surface-700 rounded-md text-xs font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-brand-500"
+                />
               </div>
             </div>
           </div>

@@ -26,6 +26,10 @@ import {
   testSanityConnection,
   fetchSanityProducts,
   createSanityProduct,
+  fetchSanityBanners,
+  createSanityBanner,
+  deleteSanityBanner,
+  toggleSanityBannerActive,
   ConnectionTestResult,
 } from '../../infrastructure/sanity/sanityClient';
 import { INITIAL_PRODUCTS } from '../../infrastructure/repositories/seedData';
@@ -38,11 +42,26 @@ export const AdminSanity: React.FC = () => {
   const [statusMessage, setStatusMessage] = useState<{ text: string; isError: boolean } | null>(null);
 
   // Active Tab
-  const [activeTab, setActiveTab] = useState<'config' | 'products' | 'create' | 'schemas' | 'export'>('config');
+  const [activeTab, setActiveTab] = useState<'config' | 'products' | 'create' | 'banners' | 'schemas' | 'export'>('config');
 
   // Sanity Live Products State
   const [sanityProducts, setSanityProducts] = useState<any[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
+
+  // Sanity Live Banners State
+  const [sanityBanners, setSanityBanners] = useState<any[]>([]);
+  const [loadingBanners, setLoadingBanners] = useState(false);
+
+  // Banner Upload Form State
+  const [bannerTitle, setBannerTitle] = useState('');
+  const [bannerAltText, setBannerAltText] = useState('');
+  const [bannerTargetUrl, setBannerTargetUrl] = useState('/catalogue');
+  const [bannerOrder, setBannerOrder] = useState('1');
+  const [bannerDesktopFile, setBannerDesktopFile] = useState<File | null>(null);
+  const [bannerDesktopPreview, setBannerDesktopPreview] = useState('');
+  const [bannerMobileFile, setBannerMobileFile] = useState<File | null>(null);
+  const [bannerMobilePreview, setBannerMobilePreview] = useState('');
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
 
   // Create Product Form State
   const [newProductName, setNewProductName] = useState('');
@@ -115,6 +134,95 @@ export const AdminSanity: React.FC = () => {
       console.warn('Error loading Sanity products:', err);
     } finally {
       setLoadingProducts(false);
+    }
+  };
+
+  const loadSanityBanners = async () => {
+    setLoadingBanners(true);
+    try {
+      const docs = await fetchSanityBanners(true);
+      setSanityBanners(docs);
+    } catch (err) {
+      console.warn('Error loading Sanity banners:', err);
+    } finally {
+      setLoadingBanners(false);
+    }
+  };
+
+  const handleCreateBanner = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bannerTitle.trim()) {
+      setStatusMessage({ text: 'Banner title / alt text is required.', isError: true });
+      return;
+    }
+    if (!bannerDesktopFile && !bannerDesktopPreview) {
+      setStatusMessage({ text: 'Please select a desktop banner image to upload.', isError: true });
+      return;
+    }
+
+    setIsUploadingBanner(true);
+    setStatusMessage(null);
+    try {
+      const result = await createSanityBanner({
+        title: bannerTitle.trim(),
+        altText: bannerAltText.trim() || bannerTitle.trim(),
+        targetUrl: bannerTargetUrl.trim() || '/catalogue',
+        order: parseInt(bannerOrder) || 1,
+        isActive: true,
+        desktopImageFile: bannerDesktopFile || undefined,
+        mobileImageFile: bannerMobileFile || undefined,
+      });
+
+      if (result.success) {
+        setStatusMessage({
+          text: `Hero banner "${bannerTitle}" published to Sanity (ID: ${result.id})!`,
+          isError: false,
+        });
+        setBannerTitle('');
+        setBannerAltText('');
+        setBannerTargetUrl('/catalogue');
+        setBannerOrder('1');
+        setBannerDesktopFile(null);
+        setBannerDesktopPreview('');
+        setBannerMobileFile(null);
+        setBannerMobilePreview('');
+        await loadSanityBanners();
+      } else {
+        setStatusMessage({ text: result.error || 'Failed to publish banner to Sanity.', isError: true });
+      }
+    } catch (err: any) {
+      setStatusMessage({ text: err?.message || 'Error uploading banner.', isError: true });
+    } finally {
+      setIsUploadingBanner(false);
+    }
+  };
+
+  const handleDeleteBanner = async (id: string) => {
+    if (!window.confirm('Delete this banner from Sanity?')) return;
+    try {
+      const res = await deleteSanityBanner(id);
+      if (res.success) {
+        setStatusMessage({ text: 'Banner deleted from Sanity.', isError: false });
+        await loadSanityBanners();
+      } else {
+        setStatusMessage({ text: res.error || 'Failed to delete banner.', isError: true });
+      }
+    } catch (e: any) {
+      setStatusMessage({ text: e?.message || 'Error deleting banner.', isError: true });
+    }
+  };
+
+  const handleToggleBanner = async (id: string, currentState: boolean) => {
+    try {
+      const res = await toggleSanityBannerActive(id, !currentState);
+      if (res.success) {
+        setStatusMessage({ text: `Banner ${!currentState ? 'activated' : 'deactivated'} in Sanity.`, isError: false });
+        await loadSanityBanners();
+      } else {
+        setStatusMessage({ text: res.error || 'Failed to update banner.', isError: true });
+      }
+    } catch (e: any) {
+      setStatusMessage({ text: e?.message || 'Error updating banner.', isError: true });
     }
   };
 
@@ -392,6 +500,21 @@ export const banner = defineType({
           }`}
         >
           + Quick Add Product
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab('banners');
+            loadSanityBanners();
+          }}
+          className={`px-4 py-2.5 text-xs font-mono font-semibold border-b-2 transition-colors whitespace-nowrap ${
+            activeTab === 'banners'
+              ? 'border-brand-500 text-brand-400'
+              : 'border-transparent text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          Hero Banners ({sanityBanners.length})
         </button>
 
         <button
@@ -777,7 +900,285 @@ export const banner = defineType({
         </form>
       )}
 
-      {/* TAB 4: Studio Schemas */}
+      {/* TAB 4: Hero Banners & Asset Upload */}
+      {activeTab === 'banners' && (
+        <div className="space-y-6">
+          {/* Banner Upload Form */}
+          <form onSubmit={handleCreateBanner} className="space-y-5 bg-surface-900 border border-surface-800 rounded-xl p-5 sm:p-6">
+            <div className="border-b border-surface-800 pb-3 flex items-center justify-between">
+              <div>
+                <h2 className="text-sm font-bold font-mono text-slate-100 uppercase tracking-wide flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4 text-brand-400" />
+                  <span>Upload Hero Banner to Sanity CMS</span>
+                </h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  Upload desktop and mobile banner assets directly to Sanity Asset CDN and publish live hero slides.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={loadSanityBanners}
+                disabled={loadingBanners}
+                className="px-3 py-1.5 rounded-lg bg-surface-800 hover:bg-surface-750 text-slate-200 border border-surface-700 text-xs font-mono flex items-center gap-1.5"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loadingBanners ? 'animate-spin' : ''}`} />
+                <span>Refresh</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="space-y-1.5">
+                <label className="block text-xs font-mono font-semibold text-slate-300">
+                  Banner Title *
+                </label>
+                <input
+                  type="text"
+                  value={bannerTitle}
+                  onChange={(e) => setBannerTitle(e.target.value)}
+                  placeholder="e.g. Overland Expedition Essentials"
+                  className="w-full px-3 py-2 bg-surface-950 border border-surface-700 rounded-lg text-xs font-mono text-slate-100 placeholder-slate-600 focus:outline-none focus:border-brand-500"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-mono font-semibold text-slate-300">
+                  Target Click URL
+                </label>
+                <input
+                  type="text"
+                  value={bannerTargetUrl}
+                  onChange={(e) => setBannerTargetUrl(e.target.value)}
+                  placeholder="/catalogue or /catalogue?category=lighting"
+                  className="w-full px-3 py-2 bg-surface-950 border border-surface-700 rounded-lg text-xs font-mono text-slate-100 placeholder-slate-600 focus:outline-none focus:border-brand-500"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-mono font-semibold text-slate-300">
+                  Alt Text (Accessibility)
+                </label>
+                <input
+                  type="text"
+                  value={bannerAltText}
+                  onChange={(e) => setBannerAltText(e.target.value)}
+                  placeholder="SHRELL Expedition Equipment"
+                  className="w-full px-3 py-2 bg-surface-950 border border-surface-700 rounded-lg text-xs font-mono text-slate-100 placeholder-slate-600 focus:outline-none focus:border-brand-500"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-mono font-semibold text-slate-300">
+                  Display Order
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={bannerOrder}
+                  onChange={(e) => setBannerOrder(e.target.value)}
+                  className="w-full px-3 py-2 bg-surface-950 border border-surface-700 rounded-lg text-xs font-mono text-slate-100 focus:outline-none focus:border-brand-500"
+                />
+              </div>
+
+              {/* Desktop Image File */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-mono font-semibold text-slate-300">
+                  Desktop Banner Image * (Landscape ~16:5 ratio)
+                </label>
+                <div className="border border-dashed border-surface-700 rounded-lg p-3 bg-surface-950/60 hover:border-surface-600 transition-colors">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setBannerDesktopFile(file);
+                        setBannerDesktopPreview(URL.createObjectURL(file));
+                      }
+                    }}
+                    className="block w-full text-xs text-slate-400 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-mono file:bg-surface-800 file:text-slate-200 hover:file:bg-surface-750 cursor-pointer"
+                  />
+                  {bannerDesktopPreview && (
+                    <div className="mt-3 relative rounded overflow-hidden max-h-36 bg-surface-950 border border-surface-800">
+                      <img src={bannerDesktopPreview} alt="Desktop Preview" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setBannerDesktopFile(null);
+                          setBannerDesktopPreview('');
+                        }}
+                        className="absolute top-1 right-1 px-1.5 py-0.5 rounded bg-black/70 text-slate-200 text-[10px] hover:bg-black"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Mobile Image File */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-mono font-semibold text-slate-300">
+                  Mobile Banner Image (Optional - falls back to desktop)
+                </label>
+                <div className="border border-dashed border-surface-700 rounded-lg p-3 bg-surface-950/60 hover:border-surface-600 transition-colors">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setBannerMobileFile(file);
+                        setBannerMobilePreview(URL.createObjectURL(file));
+                      }
+                    }}
+                    className="block w-full text-xs text-slate-400 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-mono file:bg-surface-800 file:text-slate-200 hover:file:bg-surface-750 cursor-pointer"
+                  />
+                  {bannerMobilePreview && (
+                    <div className="mt-3 relative rounded overflow-hidden max-h-36 bg-surface-950 border border-surface-800">
+                      <img src={bannerMobilePreview} alt="Mobile Preview" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setBannerMobileFile(null);
+                          setBannerMobilePreview('');
+                        }}
+                        className="absolute top-1 right-1 px-1.5 py-0.5 rounded bg-black/70 text-slate-200 text-[10px] hover:bg-black"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-surface-800 flex justify-end">
+              <button
+                type="submit"
+                disabled={isUploadingBanner}
+                className="px-6 py-2.5 rounded-lg bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white text-xs font-mono font-bold flex items-center gap-2 cursor-pointer transition-colors"
+              >
+                {isUploadingBanner ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Uploading Asset &amp; Publishing to Sanity...</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Upload &amp; Publish Banner to Sanity</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+
+          {/* Live Sanity Banners Listing */}
+          <div className="bg-surface-900 border border-surface-800 rounded-xl p-5 space-y-4">
+            <div className="flex items-center justify-between border-b border-surface-800 pb-3">
+              <div>
+                <h3 className="text-sm font-bold font-mono text-slate-100 flex items-center gap-2">
+                  <Database className="w-4 h-4 text-brand-400" />
+                  <span>Live Sanity Banners ({sanityBanners.length})</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Banners currently fetched live from Sanity CMS via GROQ query.
+                </p>
+              </div>
+            </div>
+
+            {loadingBanners ? (
+              <div className="py-12 flex items-center justify-center gap-3 text-slate-400 text-xs font-mono">
+                <RefreshCw className="w-4 h-4 animate-spin text-brand-400" />
+                <span>Loading Sanity banners...</span>
+              </div>
+            ) : sanityBanners.length === 0 ? (
+              <div className="py-12 text-center text-slate-400 space-y-2">
+                <ImageIcon className="w-8 h-8 mx-auto text-slate-600" />
+                <p className="text-xs font-mono">No banners found in Sanity CMS yet.</p>
+                <p className="text-[11px] text-slate-500">
+                  Use the upload form above to add your first hero banner slide to Sanity!
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {sanityBanners.map((banner) => (
+                  <div
+                    key={banner._id}
+                    className="p-3.5 rounded-lg bg-surface-950 border border-surface-800 flex flex-col justify-between space-y-3"
+                  >
+                    <div className="space-y-2">
+                      <div className="relative rounded overflow-hidden aspect-[16/7] bg-surface-900 border border-surface-800">
+                        {banner.desktopImageUrl ? (
+                          <img
+                            src={banner.desktopImageUrl}
+                            alt={banner.altText || banner.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-slate-600 text-xs font-mono">
+                            No image preview
+                          </div>
+                        )}
+                        <div className="absolute top-2 left-2 flex gap-1">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
+                            banner.isActive !== false ? 'bg-emerald-500/80 text-white' : 'bg-red-500/80 text-white'
+                          }`}>
+                            {banner.isActive !== false ? 'ACTIVE' : 'INACTIVE'}
+                          </span>
+                          <span className="px-1.5 py-0.5 rounded bg-black/70 text-slate-300 text-[10px] font-mono">
+                            #{banner.order || 1}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="text-xs font-bold text-slate-100 truncate">
+                          {banner.title || banner.altText || 'Hero Banner'}
+                        </div>
+                        <div className="text-[11px] font-mono text-slate-400 truncate mt-0.5">
+                          Target: {banner.targetUrl || '/catalogue'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-surface-800/60">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleBanner(banner._id, banner.isActive !== false)}
+                        className="text-[11px] font-mono text-slate-300 hover:text-white flex items-center gap-1 transition-colors"
+                      >
+                        {banner.isActive !== false ? (
+                          <>
+                            <EyeOff className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Deactivate</span>
+                          </>
+                        ) : (
+                          <>
+                            <Eye className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Activate</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteBanner(banner._id)}
+                        className="text-[11px] font-mono text-red-400 hover:text-red-300 transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 5: Studio Schemas */}
       {activeTab === 'schemas' && (
         <div className="space-y-6">
           <div className="bg-surface-900 border border-surface-800 rounded-xl p-5 space-y-4">

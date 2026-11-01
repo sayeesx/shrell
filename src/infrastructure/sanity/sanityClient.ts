@@ -199,14 +199,17 @@ export async function fetchSanityCategories(): Promise<any[]> {
 /**
  * Query hero banners from Sanity CMS.
  */
-export async function fetchSanityBanners(): Promise<any[]> {
+export async function fetchSanityBanners(includeInactive = false): Promise<any[]> {
   const client = getSanityClient();
   if (!client || !isSanityConfigured()) {
     return [];
   }
 
   try {
-    const query = `*[_type in ["banner", "heroBanner"] && (isActive == true || !defined(isActive))] | order(order asc) {
+    const filter = includeInactive
+      ? `*[_type in ["banner", "heroBanner"]]`
+      : `*[_type in ["banner", "heroBanner"] && (isActive == true || !defined(isActive))]`;
+    const query = `${filter} | order(order asc) {
       _id,
       title,
       altText,
@@ -214,7 +217,8 @@ export async function fetchSanityBanners(): Promise<any[]> {
       order,
       isActive,
       "desktopImageUrl": desktopImage.asset->url,
-      "mobileImageUrl": mobileImage.asset->url
+      "mobileImageUrl": mobileImage.asset->url,
+      _createdAt
     }`;
 
     const data = await client.fetch(query);
@@ -222,6 +226,185 @@ export async function fetchSanityBanners(): Promise<any[]> {
   } catch (err) {
     console.warn('Sanity banners fetch error:', err);
     return [];
+  }
+}
+
+/**
+ * Upload an image asset to Sanity CMS.
+ */
+export async function uploadSanityAsset(
+  file: File | Blob,
+  filename = 'banner-image.png'
+): Promise<{ success: boolean; assetId?: string; url?: string; error?: string }> {
+  const config = getSanityConfig();
+  if (!config.token) {
+    return {
+      success: false,
+      error: 'A Sanity API write token is required to upload assets.',
+    };
+  }
+
+  const client = getSanityClient();
+  if (!client) {
+    return { success: false, error: 'Sanity client not configured.' };
+  }
+
+  try {
+    const asset = await client.assets.upload('image', file, {
+      filename,
+      contentType: file.type || 'image/png',
+    });
+    return { success: true, assetId: asset._id, url: asset.url };
+  } catch (err: any) {
+    return { success: false, error: err?.message || String(err) };
+  }
+}
+
+/**
+ * Create a new hero banner in Sanity CMS using write token.
+ * Supports direct File asset uploads or existing image URLs.
+ */
+export async function createSanityBanner(bannerData: {
+  title: string;
+  altText?: string;
+  targetUrl?: string;
+  order?: number;
+  isActive?: boolean;
+  desktopImageFile?: File | Blob;
+  mobileImageFile?: File | Blob;
+  desktopImageUrl?: string;
+  mobileImageUrl?: string;
+}): Promise<{ success: boolean; id?: string; error?: string }> {
+  const config = getSanityConfig();
+  if (!config.token) {
+    return {
+      success: false,
+      error: 'A Sanity API write token is required to create banners from the admin dashboard.',
+    };
+  }
+
+  const client = getSanityClient();
+  if (!client) {
+    return { success: false, error: 'Sanity client not configured.' };
+  }
+
+  try {
+    let desktopAssetId: string | undefined;
+    let mobileAssetId: string | undefined;
+
+    // 1. Upload desktop image if file is provided
+    if (bannerData.desktopImageFile) {
+      const uploadRes = await uploadSanityAsset(
+        bannerData.desktopImageFile,
+        'desktop-banner.png'
+      );
+      if (!uploadRes.success || !uploadRes.assetId) {
+        return { success: false, error: uploadRes.error || 'Failed to upload desktop image to Sanity.' };
+      }
+      desktopAssetId = uploadRes.assetId;
+    }
+
+    // 2. Upload mobile image if file is provided
+    if (bannerData.mobileImageFile) {
+      const uploadRes = await uploadSanityAsset(
+        bannerData.mobileImageFile,
+        'mobile-banner.png'
+      );
+      if (uploadRes.success && uploadRes.assetId) {
+        mobileAssetId = uploadRes.assetId;
+      }
+    }
+
+    // 3. Construct banner document
+    const doc: any = {
+      _type: 'banner',
+      title: bannerData.title,
+      altText: bannerData.altText || bannerData.title,
+      targetUrl: bannerData.targetUrl || '/catalogue',
+      order: bannerData.order || 1,
+      isActive: bannerData.isActive !== false,
+      publishedAt: new Date().toISOString(),
+    };
+
+    if (desktopAssetId) {
+      doc.desktopImage = {
+        _type: 'image',
+        asset: {
+          _type: 'reference',
+          _ref: desktopAssetId,
+        },
+      };
+    }
+
+    if (mobileAssetId) {
+      doc.mobileImage = {
+        _type: 'image',
+        asset: {
+          _type: 'reference',
+          _ref: mobileAssetId,
+        },
+      };
+    } else if (desktopAssetId) {
+      doc.mobileImage = {
+        _type: 'image',
+        asset: {
+          _type: 'reference',
+          _ref: desktopAssetId,
+        },
+      };
+    }
+
+    const created = await client.create(doc);
+    return { success: true, id: created._id };
+  } catch (err: any) {
+    return { success: false, error: err?.message || String(err) };
+  }
+}
+
+/**
+ * Delete a banner from Sanity CMS.
+ */
+export async function deleteSanityBanner(id: string): Promise<{ success: boolean; error?: string }> {
+  const config = getSanityConfig();
+  if (!config.token) {
+    return { success: false, error: 'A Sanity API write token is required to delete documents.' };
+  }
+
+  const client = getSanityClient();
+  if (!client) {
+    return { success: false, error: 'Sanity client not configured.' };
+  }
+
+  try {
+    await client.delete(id);
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message || String(err) };
+  }
+}
+
+/**
+ * Toggle active state of a banner in Sanity CMS.
+ */
+export async function toggleSanityBannerActive(
+  id: string,
+  isActive: boolean
+): Promise<{ success: boolean; error?: string }> {
+  const config = getSanityConfig();
+  if (!config.token) {
+    return { success: false, error: 'A Sanity API write token is required to update documents.' };
+  }
+
+  const client = getSanityClient();
+  if (!client) {
+    return { success: false, error: 'Sanity client not configured.' };
+  }
+
+  try {
+    await client.patch(id).set({ isActive }).commit();
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message || String(err) };
   }
 }
 

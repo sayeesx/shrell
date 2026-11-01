@@ -68,10 +68,10 @@ export const CategoryCircleStrip: React.FC<CategoryCircleStripProps> = ({
   return (
     <nav
       aria-label="Product Categories Navigation"
-      className={`overflow-x-auto no-scrollbar pt-1 pb-2 select-none ${className}`}
+      className={`overflow-x-auto no-scrollbar pt-2 pb-3 select-none ${className}`}
       style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
     >
-      <div className="flex items-center gap-5 sm:gap-7 min-w-max justify-start md:justify-center px-1">
+      <div className="flex items-center gap-6 sm:gap-8 min-w-max justify-start md:justify-center px-2">
         {CATEGORY_ITEMS.map((cat) => {
           const isActive = resolvedActiveId === cat.id;
           return (
@@ -79,23 +79,23 @@ export const CategoryCircleStrip: React.FC<CategoryCircleStripProps> = ({
               key={cat.id}
               to={cat.to}
               onClick={() => onSelect?.(cat.id)}
-              className="flex flex-col items-center gap-1.5 group min-w-[58px] sm:min-w-[68px] relative pb-2 transition-all focus:outline-none"
+              className="flex flex-col items-center gap-2 group min-w-[72px] sm:min-w-[88px] relative pb-2.5 transition-all focus:outline-none"
             >
-              <div className="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transition-all">
+              <div className="w-[72px] h-[72px] sm:w-[88px] sm:h-[88px] flex items-center justify-center transition-all">
                 <img
                   src={cat.iconSrc}
                   alt=""
                   aria-hidden="true"
                   className={`w-full h-full object-contain pointer-events-none transition-opacity ${
                     isActive
-                      ? 'opacity-100 drop-shadow-[0_0_8px_rgba(255,0,14,0.45)]'
+                      ? 'opacity-100 drop-shadow-[0_0_12px_rgba(255,0,14,0.5)]'
                       : 'opacity-75 group-hover:opacity-100'
                   }`}
                   loading="eager"
                 />
               </div>
               <span
-                className={`text-[11px] sm:text-[12px] font-medium tracking-tight text-center whitespace-nowrap transition-colors ${
+                className={`text-[12px] sm:text-[13px] font-medium tracking-tight text-center whitespace-nowrap transition-colors ${
                   isActive ? 'text-[#FF000E] font-semibold' : 'text-gray-400 group-hover:text-gray-200'
                 }`}
               >

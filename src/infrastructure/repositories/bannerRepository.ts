@@ -1,4 +1,11 @@
 import { HeroBanner } from '../../domain/types';
+import {
+  fetchSanityBanners,
+  createSanityBanner,
+  deleteSanityBanner,
+  toggleSanityBannerActive,
+} from '../sanity/sanityClient';
+import { isSanityConfigured } from '../sanity/sanityConfig';
 
 const PRIMARY_KEY = 'shrell_hero_banners';
 const FALLBACK_KEY = 'vahn_hero_banners';
@@ -29,7 +36,10 @@ const DEFAULT_BANNERS: HeroBanner[] = [
 export interface IBannerRepository {
   getAll(): Promise<HeroBanner[]>;
   getAllForAdmin(): Promise<HeroBanner[]>;
-  create(banner: Omit<HeroBanner, 'id' | 'createdAt'>): Promise<HeroBanner>;
+  create(banner: Omit<HeroBanner, 'id' | 'createdAt'> & {
+    desktopImageFile?: File | Blob;
+    mobileImageFile?: File | Blob;
+  }): Promise<HeroBanner>;
   update(id: string, updates: Partial<HeroBanner>): Promise<HeroBanner>;
   delete(id: string): Promise<boolean>;
 }
@@ -95,6 +105,26 @@ class BannerRepository implements IBannerRepository {
   }
 
   async getAll(): Promise<HeroBanner[]> {
+    if (isSanityConfigured()) {
+      try {
+        const sanityDocs = await fetchSanityBanners(false);
+        if (sanityDocs && sanityDocs.length > 0) {
+          return sanityDocs.map((d: any, idx: number) => ({
+            id: d._id,
+            desktopImageUrl: d.desktopImageUrl,
+            mobileImageUrl: d.mobileImageUrl || d.desktopImageUrl,
+            targetUrl: d.targetUrl || '/catalogue',
+            altText: d.altText || d.title || 'SHRELL Banner',
+            isActive: d.isActive !== false,
+            order: d.order || idx + 1,
+            createdAt: d._createdAt || new Date().toISOString(),
+          }));
+        }
+      } catch (err) {
+        console.warn('Failed to fetch banners from Sanity, using fallback:', err);
+      }
+    }
+
     const banners = this.getStoredBanners();
     const active = banners
       .filter((b) => b.isActive)
@@ -106,37 +136,111 @@ class BannerRepository implements IBannerRepository {
   }
 
   async getAllForAdmin(): Promise<HeroBanner[]> {
+    if (isSanityConfigured()) {
+      try {
+        const sanityDocs = await fetchSanityBanners(true);
+        if (sanityDocs && sanityDocs.length > 0) {
+          return sanityDocs.map((d: any, idx: number) => ({
+            id: d._id,
+            desktopImageUrl: d.desktopImageUrl,
+            mobileImageUrl: d.mobileImageUrl || d.desktopImageUrl,
+            targetUrl: d.targetUrl || '/catalogue',
+            altText: d.altText || d.title || 'SHRELL Banner',
+            isActive: d.isActive !== false,
+            order: d.order || idx + 1,
+            createdAt: d._createdAt || new Date().toISOString(),
+          }));
+        }
+      } catch (err) {
+        console.warn('Failed to fetch admin banners from Sanity, using fallback:', err);
+      }
+    }
+
     const banners = this.getStoredBanners();
     return banners.sort((a, b) => a.order - b.order);
   }
 
-  async create(bannerData: Omit<HeroBanner, 'id' | 'createdAt'>): Promise<HeroBanner> {
+  async create(
+    bannerData: Omit<HeroBanner, 'id' | 'createdAt'> & {
+      desktopImageFile?: File | Blob;
+      mobileImageFile?: File | Blob;
+    }
+  ): Promise<HeroBanner> {
+    const { desktopImageFile, mobileImageFile, ...cleanData } = bannerData;
     const banners = this.getStoredBanners();
     const newBanner: HeroBanner = {
-      ...bannerData,
+      ...cleanData,
       id: `banner-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       createdAt: new Date().toISOString(),
     };
     banners.push(newBanner);
     this.setStoredBanners(banners);
+
+    if (isSanityConfigured()) {
+      try {
+        const res = await createSanityBanner({
+          title: bannerData.altText || 'Hero Banner',
+          altText: bannerData.altText,
+          targetUrl: bannerData.targetUrl,
+          order: bannerData.order,
+          isActive: bannerData.isActive,
+          desktopImageFile,
+          mobileImageFile,
+          desktopImageUrl: bannerData.desktopImageUrl,
+          mobileImageUrl: bannerData.mobileImageUrl,
+        });
+        if (res.success && res.id) {
+          newBanner.id = res.id;
+        }
+      } catch (e) {
+        console.warn('Failed to create banner in Sanity:', e);
+      }
+    }
+
     return newBanner;
   }
 
   async update(id: string, updates: Partial<HeroBanner>): Promise<HeroBanner> {
+    if (isSanityConfigured() && updates.isActive !== undefined) {
+      try {
+        await toggleSanityBannerActive(id, updates.isActive);
+      } catch (e) {
+        console.warn('Failed to update banner in Sanity:', e);
+      }
+    }
+
     const banners = this.getStoredBanners();
     const index = banners.findIndex((b) => b.id === id);
-    if (index === -1) {
-      throw new Error(`Banner with ID ${id} not found.`);
+    if (index !== -1) {
+      banners[index] = {
+        ...banners[index],
+        ...updates,
+      };
+      this.setStoredBanners(banners);
+      return banners[index];
     }
-    banners[index] = {
-      ...banners[index],
+    return {
+      id,
+      desktopImageUrl: '',
+      mobileImageUrl: '',
+      targetUrl: '/catalogue',
+      altText: 'Hero Banner',
+      isActive: true,
+      order: 1,
+      createdAt: new Date().toISOString(),
       ...updates,
     };
-    this.setStoredBanners(banners);
-    return banners[index];
   }
 
   async delete(id: string): Promise<boolean> {
+    if (isSanityConfigured()) {
+      try {
+        await deleteSanityBanner(id);
+      } catch (e) {
+        console.warn('Failed to delete banner in Sanity:', e);
+      }
+    }
+
     let banners = this.getStoredBanners();
     const initialLen = banners.length;
     banners = banners.filter((b) => b.id !== id);

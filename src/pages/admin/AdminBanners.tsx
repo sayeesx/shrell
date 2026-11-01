@@ -279,10 +279,12 @@ export const AdminBanners: React.FC = () => {
         ? (uploadedMobileUrl || uploadedDesktopUrl).replace(/^http:\/\//, 'https://')
         : (uploadedMobileUrl || uploadedDesktopUrl);
 
-      // 3. Save to repository
+      // 3. Save to repository (persists to Sanity CMS when configured, with local fallback)
       await bannerRepository.create({
         desktopImageUrl: finalDesktopUrl,
         mobileImageUrl: finalMobileUrl,
+        desktopImageFile: desktopFile || undefined,
+        mobileImageFile: mobileFile || undefined,
         targetUrl: targetUrl.trim() || '/catalogue',
         altText: altText.trim() || 'Hero Banner',
         order: Number(order) || (banners.length + 1),

@@ -17,7 +17,7 @@ const STORAGE_KEY = 'shrell_sanity_config';
 const DEFAULT_CONFIG: SanityConfig = {
   projectId: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SANITY_PROJECT_ID) || '',
   dataset: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SANITY_DATASET) || 'production',
-  apiVersion: '2024-01-01',
+  apiVersion: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SANITY_API_VERSION) || '2024-01-01',
   useCdn: true,
   token: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SANITY_API_TOKEN) || '',
   studioUrl: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SANITY_STUDIO_URL) || '',

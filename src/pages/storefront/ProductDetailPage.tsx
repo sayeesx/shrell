@@ -241,11 +241,11 @@ export const ProductDetailPage: React.FC = () => {
 
             {/* Price Row */}
             <div className="flex items-center gap-2.5 flex-wrap">
-              <span className={`text-2xl sm:text-3xl font-bold tracking-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
+              <span className={`text-2xl sm:text-3xl font-bold font-tight tracking-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
                 {formatINR(product.pricePaisa)}
               </span>
               {product.compareAtPricePaisa && (
-                <span className="text-base sm:text-lg text-[#7A7575] line-through font-normal">
+                <span className="text-base sm:text-lg text-[#7A7575] line-through font-normal font-tight">
                   {formatINR(product.compareAtPricePaisa)}
                 </span>
               )}
@@ -303,7 +303,7 @@ export const ProductDetailPage: React.FC = () => {
                 type="button"
                 onClick={handleAddToCart}
                 disabled={isOutOfStock || isAddingToCart}
-                className={`w-full py-3 sm:py-3.5 rounded-lg border disabled:opacity-40 font-medium text-sm transition-all cursor-pointer flex items-center justify-center overflow-hidden ${isDark ? 'border-[#261619] bg-[#130E10] hover:bg-[#1A1214] text-[#F1EEEE]' : 'border-[#E0DBD2] bg-[#F5F3EE] hover:bg-[#EDE9E1] text-[#140E10]'}`}
+                className={`relative w-full py-3 sm:py-3.5 rounded-lg border disabled:opacity-40 font-medium text-sm transition-colors cursor-pointer flex items-center justify-center overflow-hidden ${isDark ? 'border-[#261619] bg-[#130E10] hover:bg-[#1A1214] text-[#F1EEEE]' : 'border-[#E0DBD2] bg-[#F5F3EE] hover:bg-[#EDE9E1] text-[#140E10]'}`}
               >
                 <span className={`transition-all duration-300 ${isAddingToCart ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}>
                   Add to cart
@@ -319,7 +319,7 @@ export const ProductDetailPage: React.FC = () => {
                 type="button"
                 onClick={handleBuyNow}
                 disabled={isOutOfStock || isBuyingNow}
-                className="relative w-full py-3.5 sm:py-4 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] disabled:opacity-40 text-white font-medium text-sm transition-all cursor-pointer flex items-center justify-center overflow-hidden"
+                className="relative w-full py-3.5 sm:py-4 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] disabled:opacity-40 text-white font-medium text-sm transition-colors cursor-pointer flex items-center justify-center overflow-hidden"
               >
                 <span className={`transition-all duration-300 ${isBuyingNow ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}>
                   Buy it now

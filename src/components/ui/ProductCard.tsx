@@ -94,17 +94,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {/* Price Stack */}
           <div className="min-w-0">
             <div className="flex items-baseline gap-1 sm:gap-1.5 flex-wrap">
-              <span className={`text-sm sm:text-base font-bold tracking-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
+              <span className={`text-sm sm:text-base font-bold font-tight tracking-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
                 {formatINR(product.pricePaisa)}
               </span>
               {product.compareAtPricePaisa && (
-                <span className="text-[10px] sm:text-xs text-[#7A7575] line-through">
+                <span className="text-[10px] sm:text-xs text-[#7A7575] line-through font-tight">
                   {formatINR(product.compareAtPricePaisa)}
                 </span>
               )}
             </div>
             {savingsPaisa > 0 && (
-              <div className="text-[10px] sm:text-[11px] font-medium text-emerald-500 truncate">
+              <div className="text-[10px] sm:text-[11px] font-medium font-tight text-emerald-500 truncate">
                 Save {formatINR(savingsPaisa)}
               </div>
             )}

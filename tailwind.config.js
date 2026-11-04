@@ -50,6 +50,7 @@ export default {
       fontFamily: {
         sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
         mono: ['"DM Sans"', 'monospace'],
+        tight: ['"Inter Tight"', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
         none: 'none',

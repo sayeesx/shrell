@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Force Inter Tight for all numbers */
+@layer base {
+  * {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
 /* ============================================================
    CSS CUSTOM PROPERTIES — THEME SYSTEM
    dark  = pure black (#000000) background, white text

@@ -63,12 +63,12 @@ export const Navbar: React.FC = () => {
     <header
       className={`sticky top-0 z-40 transition-all duration-500 ease-in-out ${
         isScrolled
-          ? 'bg-[#0A0808]/95 backdrop-blur-md border-b border-[#221215] shadow-xl rounded-b-2xl sm:rounded-b-3xl text-white'
+          ? 'bg-[#0A0808]/95 backdrop-blur-md border-b border-[#221215] shadow-xl rounded-b-[32px] text-white'
           : 'bg-[#0A0808] border-b border-[#221215]/60 text-white'
       }`}
     >
       {/* 1. Fluid Continuous Marquee (Desktop Only - Stays on top, does not hide when scrolling) */}
-      <div className="hidden md:block overflow-hidden border-b py-1.5 text-xs select-none bg-[#080000] border-[#221215]/60">
+      <div className={`hidden md:block overflow-hidden border-b py-1.5 text-xs select-none transition-colors ${isDark ? 'bg-[#080000] border-[#221215]/60' : 'bg-[#F5F3EE] border-[#E0DBD2]/60'}`}>
         <div className="animate-marquee-scroll flex items-center gap-12 whitespace-nowrap">
           {[
             ...ANNOUNCEMENT_MESSAGES,
@@ -76,10 +76,10 @@ export const Navbar: React.FC = () => {
             ...ANNOUNCEMENT_MESSAGES,
             ...ANNOUNCEMENT_MESSAGES,
           ].map((msg, i) => (
-            <div key={i} className="flex items-center gap-2.5 font-medium font-sans shrink-0 text-gray-300">
+            <div key={i} className={`flex items-center gap-2.5 font-medium font-sans shrink-0 ${isDark ? 'text-gray-300' : 'text-[#5C5456]'}`}>
               <i className={`bi ${msg.icon} text-[#FF000E] text-xs`} aria-hidden="true" />
               <span className="tracking-tight">{msg.text}</span>
-              <span className="ml-6 text-sm text-[#3B1A1E]">•</span>
+              <span className={`ml-6 text-sm ${isDark ? 'text-[#3B1A1E]' : 'text-[#D6D0C7]'}`}>•</span>
             </div>
           ))}
         </div>

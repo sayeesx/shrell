@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Product, HeroBanner } from '../../domain/types';
 import { productRepository, bannerRepository } from '../../infrastructure/repositories';
 import { ProductCard } from '../../components/ui/ProductCard';
-import { CategoryCircleStrip } from '../../components/ui/CategoryCircleStrip';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 import { useTheme } from '../../application/ThemeContext';
@@ -14,7 +13,6 @@ export const HomePage: React.FC = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [banners, setBanners] = useState<HeroBanner[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [activeCategoryTab, setActiveCategoryTab] = useState<string>('all');
   const [currentSlide, setCurrentSlide] = useState<number>(0);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -88,26 +86,14 @@ export const HomePage: React.FC = () => {
     <div className="space-y-8 sm:space-y-12 pb-20">
       {/* 
         ================================================================
-        DARK TOP ZONE (Circle Theme Header Shell)
-        Reduced height for mobile and desktop
-        Holds Category Strip + Image-Only Carousel Banner
+        Hero Banner Section (No Background)
+        Height strictly constrained so hero never stretches when image height is large.
+        Supports manual swipe gestures on mobile devices.
+        Clicking banner navigates directly to target page.
         ================================================================
       */}
-      <section className={`text-white pt-1 sm:pt-2 pb-4 sm:pb-6 rounded-b-xl sm:rounded-b-2xl border-b ${isDark ? 'bg-[#0A0808] border-[#221215]' : 'bg-[#F5F3EE] border-[#E0DBD2]'}`}>
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-3 sm:space-y-4">
-          {/* Category Icons Row (Circle Style) - completely hidden scrollbar */}
-          <CategoryCircleStrip
-            activeId={activeCategoryTab}
-            onSelect={(id) => setActiveCategoryTab(id)}
-            className="-mx-3 px-3 sm:mx-0 sm:px-0"
-          />
-
-          {/* 
-            Pure Image-Only Banner Carousel
-            Height strictly constrained so hero never stretches when image height is large.
-            Supports manual swipe gestures on mobile devices.
-            Clicking banner navigates directly to target page.
-          */}
+      <section className="pt-1 sm:pt-2 pb-4 sm:pb-6">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           {banners.length > 0 && (
             <div
               className="relative rounded-lg overflow-hidden bg-transparent group flex items-center justify-center w-full max-h-[180px] sm:max-h-[260px] md:max-h-[480px] lg:max-h-[560px] xl:max-h-[620px] select-none touch-pan-y"
@@ -252,6 +238,10 @@ export const HomePage: React.FC = () => {
               {(featuredProducts.slice(4, 8).length > 0 ? featuredProducts.slice(4, 8) : featuredProducts.slice(0, 4)).map((product, idx) => (
                 <ProductCard key={`deal-${product.id}-${idx}`} product={product} />
               ))}
+            </div>
+          ) : (
+            <div className="h-56 flex items-center justify-center">
+              <p className="text-sm text-[#8E8587]">No deals available</p>
             </div>
           )}
         </section>

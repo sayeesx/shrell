@@ -10,6 +10,7 @@ import { useTheme } from './application/ThemeContext';
 // Storefront Pages
 import { HomePage } from './pages/storefront/HomePage';
 import { CataloguePage } from './pages/storefront/CataloguePage';
+import { DealsPage } from './pages/storefront/DealsPage';
 import { ProductDetailPage } from './pages/storefront/ProductDetailPage';
 import { CartPage } from './pages/storefront/CartPage';
 import { OrderTrackingPage } from './pages/storefront/OrderTrackingPage';
@@ -106,6 +107,7 @@ export const App: React.FC = () => {
           {/* Storefront Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/catalogue" element={<CataloguePage />} />
+          <Route path="/deals" element={<DealsPage />} />
           <Route path="/product/:slug" element={<ProductDetailPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<Navigate to="/cart" replace />} />

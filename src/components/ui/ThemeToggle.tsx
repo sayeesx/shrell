@@ -22,7 +22,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '', compac
           : 'bg-[#EDE9E1] hover:bg-[#E0DBD2] border border-[#D6D0C7] text-[#3A3030] hover:text-[#140E10]'}
         px-2.5 py-1.5 text-xs font-medium ${className}`}
     >
-      <i className={`bi ${isDark ? 'bi-brightness-high' : 'bi-moon-stars'} text-sm leading-none`} aria-hidden="true" />
+      <i className={`bi ${isDark ? 'bi-moon' : 'bi-moon-stars'} text-sm leading-none`} aria-hidden="true" />
       {!compact && (
         <span className="hidden sm:inline">{isDark ? 'Light' : 'Dark'}</span>
       )}

@@ -43,6 +43,7 @@ export const HomePage: React.FC = () => {
   };
 
   useEffect(() => {
+    setLoading(true); // Reset loading state when component mounts
     async function loadData() {
       try {
         const [prodResult, bannerResult] = await Promise.all([
@@ -92,7 +93,7 @@ export const HomePage: React.FC = () => {
         Clicking banner navigates directly to target page.
         ================================================================
       */}
-      <section className="pt-1 sm:pt-2 pb-4 sm:pb-6">
+      <section className="pt-4 sm:pt-2 pb-0 sm:pb-4">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           {banners.length > 0 && (
             <div
@@ -183,7 +184,7 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* PRODUCT CONTENT ZONE */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-10 sm:space-y-14">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-10 sm:space-y-14 pt-6">
         {/* SECTION 1: Crazy Finds */}
         <section className="space-y-4 sm:space-y-5">
           <div className={`flex items-center justify-between border-b pb-2.5 sm:pb-3 gap-3 ${isDark ? 'border-[#221215]' : 'border-[#E0DBD2]'}`}>

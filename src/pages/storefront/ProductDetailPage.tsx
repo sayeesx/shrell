@@ -26,10 +26,10 @@ export const ProductDetailPage: React.FC = () => {
   const [isBuyingNow, setIsBuyingNow] = useState(false);
 
   const productViews = [
-    { id: 1, label: 'Front Fitment', tag: 'Primary' },
-    { id: 2, label: 'Side Geometry', tag: '3/4 Angle' },
-    { id: 3, label: 'Mounting Points', tag: 'OEM Spec' },
-    { id: 4, label: 'Package Kit', tag: 'Complete' },
+    { id: 1, label: '' },
+    { id: 2, label: '' },
+    { id: 3, label: '' },
+    { id: 4, label: '' },
   ];
 
   // Accordion open states
@@ -179,18 +179,15 @@ export const ProductDetailPage: React.FC = () => {
                     onError={() => setImageError(true)}
                   />
                 ) : (
-                  <img
-                    src="/logos/shrell-full_white-text_black-logo.png"
-                    alt={`${product.name} - ${productViews[selectedImageIndex]?.label || 'Product View'}`}
-                    className="w-56 sm:w-72 max-h-60 object-contain opacity-35 filter brightness-125 grayscale transition-all duration-300"
-                  />
+                  <div className={`w-56 sm:w-72 max-h-60 flex items-center justify-center ${isDark ? 'opacity-40' : 'opacity-20'}`}>
+                    <img
+                      src="/logos/shrell-full_white-text_black-logo.png"
+                      alt={`${product.name} - ${productViews[selectedImageIndex]?.label || 'Product View'}`}
+                      className={`w-full h-full object-contain transition-all duration-300 ${isDark ? 'grayscale brightness-125' : 'grayscale brightness-50'}`}
+                    />
+                  </div>
                 );
               })()}
-              <div className="absolute bottom-2 left-2 pointer-events-none">
-                <span className={`text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 rounded-full border ${isDark ? 'text-slate-400 bg-[#0A0808]/80 border-[#261619]' : 'text-[#5C5456] bg-white/80 border-[#E0DBD2]'}`}>
-                  {productViews[selectedImageIndex]?.label || 'View'}
-                </span>
-              </div>
             </div>
 
             {/* 4 Small Selectable Image Cubes */}

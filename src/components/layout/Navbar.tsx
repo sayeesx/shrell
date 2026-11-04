@@ -137,7 +137,7 @@ export const Navbar: React.FC = () => {
             <Link to="/catalogue" className="transition-colors hover:text-white">
               Categories
             </Link>
-            <Link to="/catalogue?deals=true" className="transition-colors hover:text-white">
+            <Link to="/deals" className="transition-colors hover:text-white">
               Deals
             </Link>
             <button
@@ -187,16 +187,8 @@ export const Navbar: React.FC = () => {
             <div className="flex items-center gap-2 flex-shrink-0">
               <ThemeToggle compact />
               <Link
-                to="/catalogue"
-                className="p-2 rounded-full border transition-colors flex items-center justify-center active:scale-95 cursor-pointer bg-[#130E10] hover:bg-[#1D1214] border-[#221215] text-white"
-                title="Categories Menu"
-                aria-label="Categories Menu"
-              >
-                <i className="bi bi-grid-fill text-sm leading-none" />
-              </Link>
-              <Link
                 to="/cart"
-                className="relative p-2 rounded-full border transition-colors flex items-center justify-center active:scale-95 cursor-pointer bg-[#130E10] hover:bg-[#1D1214] border-[#221215] text-white"
+                className="relative p-2 rounded-lg border transition-colors flex items-center justify-center active:scale-95 cursor-pointer bg-[#130E10] hover:bg-[#1D1214] border-[#221215] text-white"
                 aria-label={`Cart with ${itemCount} items`}
               >
                 <i className="bi bi-bag text-sm leading-none" />

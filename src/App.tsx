@@ -5,6 +5,7 @@ import { Footer } from './components/layout/Footer';
 import { MobileNavDock } from './components/layout/MobileNavDock';
 import { AuthModal } from './components/auth/AuthModal';
 import { CheckoutModal } from './components/checkout/CheckoutModal';
+import { useTheme } from './application/ThemeContext';
 
 // Storefront Pages
 import { HomePage } from './pages/storefront/HomePage';
@@ -37,6 +38,7 @@ export const App: React.FC = () => {
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isHomePage = location.pathname === '/';
   const isCataloguePage = location.pathname.startsWith('/catalogue');
+  const { isDark } = useTheme();
 
   const { isNavigating, startPageLoad } = useNavigationLoading();
 
@@ -72,7 +74,11 @@ export const App: React.FC = () => {
   const shouldShowHeader = !isAdminRoute && (isHomePage || isCataloguePage);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0A0808] bg-atmospheric-red text-[#F1EEEE] font-sans antialiased pb-16 md:pb-0">
+    <div
+      className={`min-h-screen flex flex-col bg-atmospheric-red font-sans antialiased pb-16 md:pb-0 transition-colors duration-300 ${
+        isDark ? 'bg-[#000000] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'
+      }`}
+    >
       {/* Clean Floating Shrell Loader (No background, shows only when taking time, plays full cycle) */}
       {isNavigating && (
         <div

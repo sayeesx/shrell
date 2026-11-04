@@ -8,8 +8,10 @@ import {
   productRepository,
 } from '../../infrastructure/repositories';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
+import { useTheme } from '../../application/ThemeContext';
 
 export const AdminProducts: React.FC = () => {
+  const { isDark } = useTheme();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -188,20 +190,19 @@ export const AdminProducts: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-surface-800 pb-4">
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-100 font-mono tracking-tight">
+          <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
             PRODUCT MANAGEMENT
           </h1>
-          <p className="text-xs text-slate-400 font-mono mt-0.5">
+          <p className={`text-xs font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
             Create, edit catalogue inventory, pricing and technical metadata
           </p>
         </div>
-
         <button
           type="button"
           onClick={openCreateModal}
-          className="px-4 py-2.5 rounded bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-1.5 transition-colors self-start sm:self-auto"
+          className="px-4 py-2.5 rounded bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-1.5 transition-colors self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>Add New Product</span>
@@ -210,7 +211,7 @@ export const AdminProducts: React.FC = () => {
 
       {/* Search Input */}
       <div className="max-w-md relative">
-        <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <Search className={`w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`} />
         <input
           type="text"
           placeholder="Filter by part name or SKU..."
@@ -452,7 +453,7 @@ export const AdminProducts: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold uppercase tracking-wider"
+                  className="px-5 py-2.5 rounded bg-brand-500 hover:bg-brand-600 text-white font-bold uppercase tracking-wider"
                 >
                   Save Product
                 </button>

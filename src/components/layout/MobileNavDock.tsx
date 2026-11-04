@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../application/AuthContext';
+import { useTheme } from '../../application/ThemeContext';
 import { ANNOUNCEMENT_MESSAGES } from './Navbar';
 
 export const MobileNavDock: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, openAuthModal } = useAuth();
+  const { isDark } = useTheme();
 
   const isCheckout = location.pathname === '/checkout';
   const isAdmin = location.pathname.startsWith('/admin');
@@ -62,17 +64,21 @@ export const MobileNavDock: React.FC = () => {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[#0A0808]/95 backdrop-blur-xl border-t border-[#221215] shadow-[0_-10px_35px_rgba(0,0,0,0.85)] select-none transition-all duration-300"
+      className={`fixed bottom-0 left-0 right-0 z-40 md:hidden backdrop-blur-xl border-t select-none transition-all duration-300 ${
+        isDark
+          ? 'bg-[#0A0808]/95 border-[#221215] shadow-[0_-10px_35px_rgba(0,0,0,0.85)]'
+          : 'bg-white/95 border-[#E0DBD2] shadow-[0_-4px_20px_rgba(0,0,0,0.08)]'
+      }`}
       aria-label="Mobile Navigation Dock"
     >
       {/* Mobile Continuous Text Carousel Loop (Above the Dock Navbar) */}
-      <div className="overflow-hidden bg-[#080000] border-b border-[#221215]/80 py-1 text-[11px]">
+      <div className={`overflow-hidden border-b py-1 text-[11px] ${isDark ? 'bg-[#080000] border-[#221215]/80' : 'bg-[#F5F3EE] border-[#E0DBD2]/80'}`}>
         <div className="animate-marquee-scroll flex items-center gap-8 whitespace-nowrap">
           {[...ANNOUNCEMENT_MESSAGES, ...ANNOUNCEMENT_MESSAGES].map((msg, i) => (
-            <div key={i} className="flex items-center gap-2 text-gray-300 font-medium font-sans">
+            <div key={i} className={`flex items-center gap-2 font-medium font-sans ${isDark ? 'text-gray-300' : 'text-[#5C5456]'}`}>
               <i className={`bi ${msg.icon} text-[#FF000E] text-[10px]`} aria-hidden="true" />
               <span className="tracking-tight">{msg.text}</span>
-              <span className="text-[#3B1A1E] ml-4 text-xs">•</span>
+              <span className={`ml-4 text-xs ${isDark ? 'text-[#3B1A1E]' : 'text-[#D6D0C7]'}`}>•</span>
             </div>
           ))}
         </div>
@@ -87,22 +93,25 @@ export const MobileNavDock: React.FC = () => {
             to={item.to}
             className="group relative flex flex-col items-center justify-center py-1 transition-transform active:scale-95 duration-200 cursor-pointer"
           >
-            {/* Pure Red Active Icon without Background */}
             <div className="w-12 h-8 flex items-center justify-center transition-all duration-200">
               <i
                 className={`bi ${item.isActive ? item.iconActive : item.iconInactive} text-[23px] leading-none transition-colors ${
-                  item.isActive ? 'text-[#FF000E]' : 'text-gray-400 group-hover:text-white'
+                  item.isActive
+                    ? 'text-[#FF000E]'
+                    : isDark
+                      ? 'text-gray-400 group-hover:text-white'
+                      : 'text-[#8E8587] group-hover:text-[#140E10]'
                 }`}
                 aria-hidden="true"
               />
             </div>
-
-            {/* Label */}
             <span
               className={`text-[10px] tracking-tight transition-all duration-200 ${
                 item.isActive
                   ? 'text-[#FF000E] font-semibold'
-                  : 'text-gray-400 font-normal group-hover:text-gray-200'
+                  : isDark
+                    ? 'text-gray-400 font-normal group-hover:text-gray-200'
+                    : 'text-[#8E8587] font-normal group-hover:text-[#140E10]'
               }`}
             >
               {item.label}
@@ -117,22 +126,25 @@ export const MobileNavDock: React.FC = () => {
           className="group relative flex flex-col items-center justify-center py-1 transition-transform active:scale-95 duration-200 cursor-pointer"
           aria-label="Account profile"
         >
-          {/* Pure Red Active Icon without Background */}
           <div className="w-12 h-8 flex items-center justify-center transition-all duration-200">
             <i
               className={`bi ${isProfileActive ? 'bi-person-fill' : 'bi-person'} text-[23px] leading-none transition-colors ${
-                isProfileActive ? 'text-[#FF000E]' : 'text-gray-400 group-hover:text-white'
+                isProfileActive
+                  ? 'text-[#FF000E]'
+                  : isDark
+                    ? 'text-gray-400 group-hover:text-white'
+                    : 'text-[#8E8587] group-hover:text-[#140E10]'
               }`}
               aria-hidden="true"
             />
           </div>
-
-          {/* Label */}
           <span
             className={`text-[10px] tracking-tight transition-all duration-200 ${
               isProfileActive
                 ? 'text-[#FF000E] font-semibold'
-                : 'text-gray-400 font-normal group-hover:text-gray-200'
+                : isDark
+                  ? 'text-gray-400 font-normal group-hover:text-gray-200'
+                  : 'text-[#8E8587] font-normal group-hover:text-[#140E10]'
             }`}
           >
             {user ? 'Account' : 'Login'}

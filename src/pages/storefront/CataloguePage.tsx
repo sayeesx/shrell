@@ -6,10 +6,12 @@ import { ProductCard } from '../../components/ui/ProductCard';
 import { CategoryCircleStrip } from '../../components/ui/CategoryCircleStrip';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
+import { useTheme } from '../../application/ThemeContext';
 
 export const CataloguePage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { finishPageLoad } = useNavigationLoading();
+  const { isDark } = useTheme();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -51,24 +53,23 @@ export const CataloguePage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-6 sm:space-y-8">
-      {/* Top Zone Category Menu Strip (Just like in Home Page) */}
-      <section className="bg-[#0A0808] text-white pt-1 sm:pt-2 pb-3 sm:pb-4 rounded-xl sm:rounded-2xl border border-[#221215] px-3 sm:px-6 shadow-sm">
+      {/* Top Zone Category Menu Strip */}
+      <section className={`pt-1 sm:pt-2 pb-3 sm:pb-4 rounded-xl sm:rounded-2xl border px-3 sm:px-6 shadow-sm ${isDark ? 'bg-[#0A0808] text-white border-[#221215]' : 'bg-[#F5F3EE] text-[#140E10] border-[#E0DBD2]'}`}>
         <CategoryCircleStrip className="-mx-2 px-2 sm:mx-0 sm:px-0" />
       </section>
 
       {/* Page Header */}
-      <div className="flex items-center justify-between border-b border-[#221215] pb-4 sm:pb-5">
+      <div className={`flex items-center justify-between border-b pb-4 sm:pb-5 ${isDark ? 'border-[#221215]' : 'border-[#E0DBD2]'}`}>
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#F1EEEE] tracking-tight">
+          <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
             Equipment Catalogue
           </h1>
           {search && (
-            <p className="text-xs text-slate-400 mt-1">
-              Search results for: <span className="font-medium text-[#F1EEEE]">"{search}"</span>
+            <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
+              Search results for: <span className={`font-medium ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>"{search}"</span>
             </p>
           )}
         </div>
-
         {search && (
           <button
             type="button"
@@ -88,17 +89,17 @@ export const CataloguePage: React.FC = () => {
             <ShrellLoader size={76} />
           </div>
         ) : products.length === 0 ? (
-          <div className="p-12 text-center rounded-xl bg-[#0E0A0B] border border-[#221215] space-y-4 max-w-lg mx-auto">
-            <i className="bi bi-box-seam text-4xl text-slate-500" aria-hidden="true"></i>
-            <h3 className="text-base font-semibold text-[#F1EEEE]">No accessories found</h3>
-            <p className="text-xs text-slate-400">
+          <div className={`p-12 text-center rounded-xl border space-y-4 max-w-lg mx-auto ${isDark ? 'bg-[#0E0A0B] border-[#221215]' : 'bg-[#F5F3EE] border-[#E0DBD2]'}`}>
+            <i className={`bi bi-box-seam text-4xl ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`} aria-hidden="true"></i>
+            <h3 className={`text-base font-semibold ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>No accessories found</h3>
+            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
               We couldn't find any accessories matching your criteria. Try browsing our entire collection.
             </p>
             <div>
               <Link
                 to="/catalogue"
                 onClick={handleClearFilters}
-                className="inline-block px-5 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-medium transition-colors shadow-sm"
+                className="inline-block px-5 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-medium transition-colors"
               >
                 View All Products
               </Link>

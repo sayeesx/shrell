@@ -4,8 +4,10 @@ import { Coupon } from '../../domain/types';
 import { couponRepository } from '../../infrastructure/repositories';
 import { formatINR, rupeesToPaisa } from '../../domain/services/CurrencyService';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
+import { useTheme } from '../../application/ThemeContext';
 
 export const AdminCoupons: React.FC = () => {
+  const { isDark } = useTheme();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [code, setCode] = useState('');
   const [discountType, setDiscountType] = useState<'PERCENTAGE' | 'FIXED_AMOUNT'>('PERCENTAGE');
@@ -66,20 +68,19 @@ export const AdminCoupons: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-surface-800 pb-4">
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-100 font-mono tracking-tight">
-            PROMOTIONAL COUPONS & OFFERS
+          <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
+            PROMOTIONAL COUPONS &amp; OFFERS
           </h1>
-          <p className="text-xs text-slate-400 font-mono mt-0.5">
+          <p className={`text-xs font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
             Configure percentage and fixed discount vouchers with minimum order thresholds
           </p>
         </div>
-
         <button
           type="button"
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2.5 rounded bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-1.5 transition-colors self-start sm:self-auto"
+          className="px-4 py-2.5 rounded bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-1.5 transition-colors self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>Create Coupon</span>
@@ -87,39 +88,31 @@ export const AdminCoupons: React.FC = () => {
       </div>
 
       {/* Coupons Table */}
-      <div className="bg-surface-900 border border-surface-700 rounded-lg overflow-x-auto shadow-elevation">
+      <div className={`border rounded-lg overflow-x-auto ${isDark ? 'bg-surface-900 border-surface-700' : 'bg-white border-[#E0DBD2]'}`}>
         <table className="w-full text-left text-xs font-mono min-w-[650px]">
-          <thead className="bg-surface-950/60 border-b border-surface-800 text-slate-400">
+          <thead className={`border-b ${isDark ? 'bg-surface-950/60 border-surface-800 text-slate-400' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#5C5456]'}`}>
             <tr>
-              <th className="px-4 py-3">Coupon Code</th>
-              <th className="px-4 py-3">Discount Type</th>
-              <th className="px-4 py-3">Value</th>
-              <th className="px-4 py-3">Min Order</th>
-              <th className="px-4 py-3">Usage Count</th>
-              <th className="px-4 py-3">Status</th>
+              {['Coupon Code','Discount Type','Value','Min Order','Usage Count','Status'].map(h => (
+                <th key={h} className="px-4 py-3">{h}</th>
+              ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-surface-800">
+          <tbody className={`divide-y ${isDark ? 'divide-surface-800' : 'divide-[#E0DBD2]'}`}>
             {coupons.map((c) => (
-              <tr key={c.id} className="hover:bg-surface-850/50">
+              <tr key={c.id} className={isDark ? 'hover:bg-surface-850/50' : 'hover:bg-[#F5F3EE]'}>
                 <td className="px-4 py-3 font-bold text-brand-400 flex items-center gap-2">
-                  <Tag className="w-3.5 h-3.5" />
-                  <span>{c.code}</span>
+                  <Tag className="w-3.5 h-3.5" /><span>{c.code}</span>
                 </td>
-                <td className="px-4 py-3 text-slate-300">{c.discountType}</td>
-                <td className="px-4 py-3 font-semibold text-slate-100">
+                <td className={`px-4 py-3 ${isDark ? 'text-slate-300' : 'text-[#3A3030]'}`}>{c.discountType}</td>
+                <td className={`px-4 py-3 font-semibold ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
                   {c.discountType === 'PERCENTAGE'
                     ? `${c.discountValue}% (Max ${c.maxDiscountPaisa ? formatINR(c.maxDiscountPaisa) : 'None'})`
                     : formatINR(c.discountValue)}
                 </td>
-                <td className="px-4 py-3 text-slate-400">{formatINR(c.minOrderPaisa)}</td>
-                <td className="px-4 py-3 text-slate-300">
-                  {c.usedCount} / {c.maxUses}
-                </td>
+                <td className={`px-4 py-3 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>{formatINR(c.minOrderPaisa)}</td>
+                <td className={`px-4 py-3 ${isDark ? 'text-slate-300' : 'text-[#3A3030]'}`}>{c.usedCount} / {c.maxUses}</td>
                 <td className="px-4 py-3">
-                  <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-950/80 text-emerald-300 border border-emerald-800 font-bold">
-                    ACTIVE
-                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-950/80 text-emerald-300 border border-emerald-800 font-bold">ACTIVE</span>
                 </td>
               </tr>
             ))}
@@ -129,82 +122,40 @@ export const AdminCoupons: React.FC = () => {
 
       {/* Create Coupon Modal */}
       {isModalOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-        >
-          <div className="relative w-full max-w-md bg-surface-900 border border-surface-700 rounded-lg shadow-elevation p-6 space-y-4">
-            <h2 className="text-sm font-bold text-slate-100 font-mono uppercase tracking-wider border-b border-surface-800 pb-2">
+        <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className={`relative w-full max-w-md border rounded-lg p-6 space-y-4 ${isDark ? 'bg-surface-900 border-surface-700' : 'bg-white border-[#E0DBD2]'}`}>
+            <h2 className={`text-sm font-bold font-mono uppercase tracking-wider border-b pb-2 ${isDark ? 'text-slate-100 border-surface-800' : 'text-[#140E10] border-[#E0DBD2]'}`}>
               Create New Promotion Coupon
             </h2>
-
             <form onSubmit={handleCreateCoupon} className="space-y-4 text-xs font-mono">
               <div>
-                <label className="block uppercase text-slate-400 mb-1">Coupon Code *</label>
-                <input
-                  type="text"
-                  required
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.toUpperCase())}
-                  placeholder="e.g. MONSOON15"
-                  className="w-full bg-surface-950 border border-surface-700 rounded px-3 py-2 text-slate-100 uppercase"
-                />
+                <label className={`block uppercase mb-1 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>Coupon Code *</label>
+                <input type="text" required value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="e.g. MONSOON15"
+                  className={`w-full border rounded px-3 py-2 uppercase focus:outline-none focus:border-brand-500 ${isDark ? 'bg-surface-950 border-surface-700 text-slate-100' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10]'}`} />
               </div>
-
               <div>
-                <label className="block uppercase text-slate-400 mb-1">Discount Type</label>
-                <select
-                  value={discountType}
-                  onChange={(e) => setDiscountType(e.target.value as any)}
-                  className="w-full bg-surface-950 border border-surface-700 rounded px-3 py-2 text-slate-100"
-                >
+                <label className={`block uppercase mb-1 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>Discount Type</label>
+                <select value={discountType} onChange={(e) => setDiscountType(e.target.value as any)}
+                  className={`w-full border rounded px-3 py-2 focus:outline-none focus:border-brand-500 ${isDark ? 'bg-surface-950 border-surface-700 text-slate-100' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10]'}`}>
                   <option value="PERCENTAGE">Percentage (%)</option>
                   <option value="FIXED_AMOUNT">Fixed INR Amount (₹)</option>
                 </select>
               </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block uppercase text-slate-400 mb-1">
-                    {discountType === 'PERCENTAGE' ? 'Percentage Value' : 'Rupees Value'} *
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    min="1"
-                    value={discountValue}
-                    onChange={(e) => setDiscountValue(e.target.value)}
-                    className="w-full bg-surface-950 border border-surface-700 rounded px-3 py-2 text-slate-100"
-                  />
+                  <label className={`block uppercase mb-1 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>{discountType === 'PERCENTAGE' ? 'Percentage Value' : 'Rupees Value'} *</label>
+                  <input type="number" required min="1" value={discountValue} onChange={(e) => setDiscountValue(e.target.value)}
+                    className={`w-full border rounded px-3 py-2 focus:outline-none focus:border-brand-500 ${isDark ? 'bg-surface-950 border-surface-700 text-slate-100' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10]'}`} />
                 </div>
-
                 <div>
-                  <label className="block uppercase text-slate-400 mb-1">Min Order (INR) *</label>
-                  <input
-                    type="number"
-                    required
-                    value={minOrderRupees}
-                    onChange={(e) => setMinOrderRupees(e.target.value)}
-                    className="w-full bg-surface-950 border border-surface-700 rounded px-3 py-2 text-slate-100"
-                  />
+                  <label className={`block uppercase mb-1 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>Min Order (INR) *</label>
+                  <input type="number" required value={minOrderRupees} onChange={(e) => setMinOrderRupees(e.target.value)}
+                    className={`w-full border rounded px-3 py-2 focus:outline-none focus:border-brand-500 ${isDark ? 'bg-surface-950 border-surface-700 text-slate-100' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10]'}`} />
                 </div>
               </div>
-
-              <div className="pt-2 flex justify-end gap-3 border-t border-surface-800">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-slate-400 hover:text-slate-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold uppercase tracking-wider"
-                >
-                  Save Coupon
-                </button>
+              <div className={`pt-2 flex justify-end gap-3 border-t ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
+                <button type="button" onClick={() => setIsModalOpen(false)} className={`px-4 py-2 ${isDark ? 'text-slate-400 hover:text-slate-200' : 'text-[#5C5456] hover:text-[#140E10]'}`}>Cancel</button>
+                <button type="submit" className="px-4 py-2 rounded bg-brand-500 hover:bg-brand-600 text-white font-bold uppercase tracking-wider">Save Coupon</button>
               </div>
             </form>
           </div>

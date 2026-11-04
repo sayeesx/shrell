@@ -11,8 +11,6 @@ export interface CategoryItem {
 
 export const CATEGORY_ITEMS: CategoryItem[] = [
   { id: 'all', slug: '', label: 'All', iconSrc: '/icons/all.svg', to: '/catalogue' },
-  { id: 'wash', slug: 'wash', label: 'Car Wash', iconSrc: '/icons/wash.svg', to: '/catalogue?category=wash' },
-  { id: 'charger', slug: 'charging-power', label: 'Chargers', iconSrc: '/icons/charger.svg', to: '/catalogue?category=charging-power' },
   { id: 'freshner', slug: 'air-fresheners', label: 'Air Freshener', iconSrc: '/icons/freshner.svg', to: '/catalogue?category=air-fresheners' },
   { id: 'lighting', slug: 'auxiliary-lighting', label: 'Lighting', iconSrc: '/icons/light.svg', to: '/catalogue?category=auxiliary-lighting' },
   { id: 'mats', slug: 'all-weather-floor-protection', label: 'Floor Mats', iconSrc: '/icons/floormats.svg', to: '/catalogue?category=all-weather-floor-protection' },

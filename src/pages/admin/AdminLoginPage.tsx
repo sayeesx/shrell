@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../application/AuthContext';
+import { useTheme } from '../../application/ThemeContext';
+import { ThemeToggle } from '../../components/ui/ThemeToggle';
+import { ShrellLoader } from '../../components/common/ShrellLoader';
 
 export const AdminLoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { loginAsAdmin } = useAuth();
+  const { isDark } = useTheme();
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -26,20 +30,25 @@ export const AdminLoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface-950 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md bg-surface-900 border border-surface-700 rounded-lg p-8 shadow-elevation space-y-6">
+    <div className={`min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-300 ${isDark ? 'bg-surface-950' : 'bg-[#FFFEFA]'}`}>
+      {/* Theme toggle top-right */}
+      <div className="fixed top-4 right-4">
+        <ThemeToggle />
+      </div>
+
+      <div className={`w-full max-w-md rounded-lg p-8 space-y-6 border ${isDark ? 'bg-surface-900 border-surface-700' : 'bg-white border-[#E0DBD2]'}`}>
         <div className="text-center space-y-3">
-          <div className="w-14 h-14 rounded-2xl bg-surface-950 border border-surface-700 flex items-center justify-center mx-auto p-2.5 shadow-inner">
+          <div className={`w-14 h-14 rounded-2xl border flex items-center justify-center mx-auto p-2.5 ${isDark ? 'bg-surface-950 border-surface-700' : 'bg-[#F5F3EE] border-[#E0DBD2]'}`}>
             <img
               src="/logos/shrell-brandicon_no-bg.png"
               alt="SHRELL"
-              className="w-full h-full object-contain"
+              className={`w-full h-full object-contain ${!isDark ? 'brightness-0' : ''}`}
             />
           </div>
-          <h1 className="text-xl font-bold text-slate-100 font-mono tracking-wider">
+          <h1 className={`text-xl font-bold font-mono tracking-wider ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
             SHRELL OPERATIONS CONSOLE
           </h1>
-          <p className="text-xs text-slate-400">
+          <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
             Internal administrative gateway for inventory & order dispatch
           </p>
         </div>
@@ -53,11 +62,11 @@ export const AdminLoginPage: React.FC = () => {
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label htmlFor="admin-key" className="block text-xs font-mono uppercase text-slate-400 mb-1.5">
+            <label htmlFor="admin-key" className={`block text-xs font-mono uppercase mb-1.5 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
               Administrative Passkey
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Lock className={`w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`} />
               <input
                 id="admin-key"
                 type="password"
@@ -65,10 +74,10 @@ export const AdminLoginPage: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter admin security key..."
-                className="w-full bg-surface-950 border border-surface-700 rounded pl-9 pr-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-brand-500"
+                className={`w-full border rounded pl-9 pr-3 py-2 text-xs font-mono focus:outline-none focus:border-brand-500 ${isDark ? 'bg-surface-950 border-surface-700 text-slate-100' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10]'}`}
               />
             </div>
-            <div className="text-[10px] text-slate-500 font-mono mt-1">
+            <div className={`text-[10px] font-mono mt-1 ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`}>
               For initial development setup, use: <code className="text-brand-400">shrelladmin2026</code>
             </div>
           </div>
@@ -76,19 +85,27 @@ export const AdminLoginPage: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full min-h-[44px] px-4 py-2.5 rounded bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-slate-950 font-bold text-xs font-mono uppercase tracking-wider transition-colors"
+            className="w-full min-h-[44px] px-4 py-2.5 rounded bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-bold text-xs font-mono uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
           >
-            {isSubmitting ? 'Authenticating...' : 'Authorize Session'}
+            {isSubmitting ? (
+              <><ShrellLoader size={18} white /><span>Authenticating...</span></>
+            ) : (
+              'Authorize Session'
+            )}
           </button>
         </form>
 
-        <div className="text-center pt-2 border-t border-surface-800">
+        <div className={`text-center pt-2 border-t ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
           <Link
             to="/"
-            className="text-xs font-mono text-slate-400 hover:text-slate-200 transition-colors inline-flex items-center gap-2 group cursor-pointer"
+            className={`text-xs font-mono transition-colors inline-flex items-center gap-2 group cursor-pointer ${isDark ? 'text-slate-400 hover:text-slate-200' : 'text-[#5C5456] hover:text-[#140E10]'}`}
             aria-label="SHRELL Storefront"
           >
-            <img src="/logos/shrell-logo-white.png" alt="SHRELL" className="h-4 w-auto object-contain" />
+            <img
+              src="/logos/shrell-logo-white.png"
+              alt="SHRELL"
+              className={`h-4 w-auto object-contain ${!isDark ? 'brightness-0' : ''}`}
+            />
             <span>Customer Storefront</span>
           </Link>
         </div>

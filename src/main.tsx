@@ -6,6 +6,7 @@ import { AuthProvider } from './application/AuthContext';
 import { VehicleProvider } from './application/VehicleContext';
 import { CartProvider } from './application/CartContext';
 import { NavigationLoadingProvider } from './application/NavigationLoadingContext';
+import { ThemeProvider } from './application/ThemeContext';
 import { App } from './App';
 import './styles/index.css';
 
@@ -22,15 +23,17 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <NavigationLoadingProvider>
-          <AuthProvider>
-            <VehicleProvider>
-              <CartProvider>
-                <App />
-              </CartProvider>
-            </VehicleProvider>
-          </AuthProvider>
-        </NavigationLoadingProvider>
+        <ThemeProvider>
+          <NavigationLoadingProvider>
+            <AuthProvider>
+              <VehicleProvider>
+                <CartProvider>
+                  <App />
+                </CartProvider>
+              </VehicleProvider>
+            </AuthProvider>
+          </NavigationLoadingProvider>
+        </ThemeProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </React.StrictMode>

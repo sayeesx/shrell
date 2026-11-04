@@ -5,6 +5,7 @@ import { cloudinaryService } from '../../infrastructure/cloudinary/cloudinarySer
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
+import { useTheme } from '../../application/ThemeContext';
 
 interface CropModalState {
   isOpen: boolean;
@@ -15,6 +16,7 @@ interface CropModalState {
 
 export const AdminBanners: React.FC = () => {
   const { finishPageLoad } = useNavigationLoading();
+  const { isDark } = useTheme();
   const [banners, setBanners] = useState<HeroBanner[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
@@ -349,12 +351,12 @@ export const AdminBanners: React.FC = () => {
   return (
     <div className="space-y-6 max-w-5xl">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-surface-800 pb-4">
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-100 font-mono tracking-tight">
+          <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
             Hero Carousel Banners
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
             Upload custom cropped banners for desktop &amp; mobile with page navigation links. Background transparency preserved.
           </p>
         </div>

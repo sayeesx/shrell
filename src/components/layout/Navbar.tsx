@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../application/CartContext';
 import { useAuth } from '../../application/AuthContext';
+import { useTheme } from '../../application/ThemeContext';
+import { ThemeToggle } from '../ui/ThemeToggle';
 export const ANNOUNCEMENT_MESSAGES = [
   { text: 'Fast Surface Dispatch via BlueDart & Delhivery Express Logistics', icon: 'bi-box-seam-fill' },
   { text: 'Verified OEM Equipment Guaranteed', icon: 'bi-patch-check-fill' },
@@ -12,6 +14,7 @@ export const ANNOUNCEMENT_MESSAGES = [
 export const Navbar: React.FC = () => {
   const { itemCount } = useCart();
   const { user, openAuthModal } = useAuth();
+  const { isDark } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
@@ -58,14 +61,14 @@ export const Navbar: React.FC = () => {
 
   return (
     <header
-      className={`sticky top-0 z-40 text-white transition-all duration-500 ease-in-out ${
+      className={`sticky top-0 z-40 transition-all duration-500 ease-in-out ${
         isScrolled
-          ? 'bg-[#0A0808]/95 backdrop-blur-md border-b border-[#221215] shadow-xl rounded-b-2xl sm:rounded-b-3xl'
-          : 'bg-[#0A0808] border-b border-[#221215]/60'
+          ? 'bg-[#0A0808]/95 backdrop-blur-md border-b border-[#221215] shadow-xl rounded-b-2xl sm:rounded-b-3xl text-white'
+          : 'bg-[#0A0808] border-b border-[#221215]/60 text-white'
       }`}
     >
       {/* 1. Fluid Continuous Marquee (Desktop Only - Stays on top, does not hide when scrolling) */}
-      <div className="hidden md:block overflow-hidden bg-[#080000] border-b border-[#221215]/60 py-1.5 text-xs select-none">
+      <div className="hidden md:block overflow-hidden border-b py-1.5 text-xs select-none bg-[#080000] border-[#221215]/60">
         <div className="animate-marquee-scroll flex items-center gap-12 whitespace-nowrap">
           {[
             ...ANNOUNCEMENT_MESSAGES,
@@ -73,10 +76,10 @@ export const Navbar: React.FC = () => {
             ...ANNOUNCEMENT_MESSAGES,
             ...ANNOUNCEMENT_MESSAGES,
           ].map((msg, i) => (
-            <div key={i} className="flex items-center gap-2.5 text-gray-300 font-medium font-sans shrink-0">
+            <div key={i} className="flex items-center gap-2.5 font-medium font-sans shrink-0 text-gray-300">
               <i className={`bi ${msg.icon} text-[#FF000E] text-xs`} aria-hidden="true" />
               <span className="tracking-tight">{msg.text}</span>
-              <span className="text-[#3B1A1E] ml-6 text-sm">•</span>
+              <span className="ml-6 text-sm text-[#3B1A1E]">•</span>
             </div>
           ))}
         </div>
@@ -114,7 +117,7 @@ export const Navbar: React.FC = () => {
                 placeholder="What's on your mind? Search accessories..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white text-gray-900 placeholder:text-gray-500 rounded-full pl-11 pr-11 py-2.5 text-sm font-normal shadow-sm border border-transparent focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-sans"
+                className="w-full rounded-full pl-11 pr-11 py-2.5 text-sm font-normal shadow-sm border border-transparent focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-sans bg-white text-gray-900 placeholder:text-gray-500"
               />
               <button
                 type="submit"
@@ -127,31 +130,32 @@ export const Navbar: React.FC = () => {
           </form>
 
           {/* Desktop Nav Links (Home, Categories, Deals, Profile) */}
-          <nav className="flex items-center gap-6 text-sm font-medium text-gray-300 font-sans">
+          <nav className="flex items-center gap-6 text-sm font-medium font-sans text-gray-300">
             <Link to="/" className="hover:text-white transition-colors">
               Home
             </Link>
-            <Link to="/catalogue" className="hover:text-white transition-colors">
+            <Link to="/catalogue" className="transition-colors hover:text-white">
               Categories
             </Link>
-            <Link to="/catalogue?deals=true" className="hover:text-white transition-colors">
+            <Link to="/catalogue?deals=true" className="transition-colors hover:text-white">
               Deals
             </Link>
             <button
               type="button"
               onClick={handleProfileClick}
-              className="hover:text-white transition-colors flex items-center gap-1.5 text-sm font-medium cursor-pointer"
+              className="transition-colors flex items-center gap-1.5 text-sm font-medium cursor-pointer hover:text-white"
             >
               <i className="bi bi-person text-base" />
               <span>{user ? 'Account' : 'Profile'}</span>
             </button>
           </nav>
 
-          {/* Right Action: Clean Rounded Background Cart Button */}
+          {/* Right Action: Cart + Theme Toggle */}
           <div className="flex items-center gap-2.5 sm:gap-3 flex-shrink-0">
+            <ThemeToggle compact />
             <Link
               to="/cart"
-              className="relative p-2.5 rounded-full bg-[#130E10] hover:bg-[#1D1214] border border-[#221215] text-white transition-colors flex items-center justify-center active:scale-95 cursor-pointer"
+              className="relative p-2.5 rounded-full border text-white transition-colors flex items-center justify-center active:scale-95 cursor-pointer bg-[#130E10] hover:bg-[#1D1214] border-[#221215]"
               aria-label={`Cart with ${itemCount} items`}
             >
               <i className="bi bi-bag text-lg leading-none" aria-hidden="true" />
@@ -181,9 +185,10 @@ export const Navbar: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2 flex-shrink-0">
+              <ThemeToggle compact />
               <Link
                 to="/catalogue"
-                className="p-2 rounded-full bg-[#130E10] hover:bg-[#1D1214] border border-[#221215] text-white transition-colors flex items-center justify-center active:scale-95 cursor-pointer"
+                className="p-2 rounded-full border transition-colors flex items-center justify-center active:scale-95 cursor-pointer bg-[#130E10] hover:bg-[#1D1214] border-[#221215] text-white"
                 title="Categories Menu"
                 aria-label="Categories Menu"
               >
@@ -191,7 +196,7 @@ export const Navbar: React.FC = () => {
               </Link>
               <Link
                 to="/cart"
-                className="relative p-2 rounded-full bg-[#130E10] hover:bg-[#1D1214] border border-[#221215] text-white transition-colors flex items-center justify-center active:scale-95 cursor-pointer"
+                className="relative p-2 rounded-full border transition-colors flex items-center justify-center active:scale-95 cursor-pointer bg-[#130E10] hover:bg-[#1D1214] border-[#221215] text-white"
                 aria-label={`Cart with ${itemCount} items`}
               >
                 <i className="bi bi-bag text-sm leading-none" />
@@ -216,7 +221,7 @@ export const Navbar: React.FC = () => {
                 placeholder="What's on your mind? Search parts..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white text-gray-900 placeholder:text-gray-500 rounded-full pl-10 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 font-sans shadow-xs"
+                className="w-full rounded-full pl-10 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 font-sans shadow-xs bg-white text-gray-900 placeholder:text-gray-500"
               />
               {searchQuery ? (
                 <button

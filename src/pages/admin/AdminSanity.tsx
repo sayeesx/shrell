@@ -33,8 +33,10 @@ import {
   ConnectionTestResult,
 } from '../../infrastructure/sanity/sanityClient';
 import { INITIAL_PRODUCTS } from '../../infrastructure/repositories/seedData';
+import { useTheme } from '../../application/ThemeContext';
 
 export const AdminSanity: React.FC = () => {
+  const { isDark } = useTheme();
   const [config, setConfig] = useState<SanityConfig>(getSanityConfig());
   const [showToken, setShowToken] = useState(false);
   const [testResult, setTestResult] = useState<ConnectionTestResult | null>(null);
@@ -338,17 +340,17 @@ export const banner = defineType({
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 py-6">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-surface-800 pb-5">
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-5 ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
         <div>
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-red-950/70 border border-red-800/80 flex items-center justify-center text-red-400">
               <Sparkles className="w-4 h-4" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold font-mono tracking-tight text-slate-100">
+            <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
               Sanity CMS Integration Hub
             </h1>
           </div>
-          <p className="text-xs text-slate-400 mt-1 font-sans">
+          <p className={`text-xs mt-1 font-sans ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
             Connect Sanity Headless CMS for live product catalogue, image management, and real-time storefront synchronization.
           </p>
         </div>
@@ -462,7 +464,7 @@ export const banner = defineType({
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-surface-800 overflow-x-auto gap-2">
+      <div className={`flex border-b overflow-x-auto gap-2 ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
         <button
           type="button"
           onClick={() => setActiveTab('config')}
@@ -857,12 +859,16 @@ export const banner = defineType({
                 onChange={(e) => setNewProductCategory(e.target.value)}
                 className="w-full px-3 py-2 bg-surface-950 border border-surface-700 rounded-lg text-xs font-mono text-slate-100 focus:outline-none focus:border-brand-500"
               >
-                <option value="lighting">LED Headlamps &amp; Bulbs</option>
-                <option value="dashcam">4K Dash Cams &amp; Sensors</option>
-                <option value="interior">Interior Seat Covers &amp; Mats</option>
-                <option value="freshners">Car Perfumes &amp; Freshners</option>
-                <option value="cleaning">Car Care &amp; Detailing</option>
-                <option value="tyre">Tyre Care &amp; Inflators</option>
+                <option value="air-fresheners">Air Fresheners</option>
+                <option value="auxiliary-lighting">Lighting</option>
+                <option value="all-weather-floor-protection">Floor Mats</option>
+                <option value="dash-cameras">Dash Cams</option>
+                <option value="tyre-care-air-systems">Tyre Care</option>
+                <option value="touring-recovery-gear">Recovery</option>
+                <option value="audio">Audio &amp; Tech</option>
+                <option value="car-care">Car Care</option>
+                <option value="cooling-systems">Cooling</option>
+                <option value="others">Others</option>
               </select>
             </div>
 

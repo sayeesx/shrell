@@ -13,51 +13,64 @@ const NavigationLoadingContext = createContext<NavigationLoadingContextValue>({
 });
 
 const DELAY_THRESHOLD_MS = 320; // Only trigger loader if page load exceeds this duration
-const FULL_CYCLE_MS = 2400; // Complete cycle of the shrellGo keyframe animation
+const FULL_CYCLE_MS = 2400;     // Complete cycle of the shrellGo keyframe animation
 
 export const NavigationLoadingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isNavigating, setIsNavigating] = useState(false);
-  const showTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Track state in a ref so callbacks don't need isNavigating in their deps array
+  // This prevents stale-closure re-render loops in admin pages.
+  const isNavigatingRef = useRef(false);
+  const showTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const animationStartTimeRef = useRef<number>(0);
 
+  const setNavigating = (value: boolean) => {
+    isNavigatingRef.current = value;
+    setIsNavigating(value);
+  };
+
+  // Stable: no deps that change between renders
   const startPageLoad = useCallback(() => {
-    // If a hide timer was running, clear it
     if (hideTimerRef.current) {
       clearTimeout(hideTimerRef.current);
       hideTimerRef.current = null;
     }
 
-    // Schedule loader to display ONLY if page takes longer than DELAY_THRESHOLD_MS
-    if (!showTimerRef.current && !isNavigating) {
+    if (!showTimerRef.current && !isNavigatingRef.current) {
       showTimerRef.current = setTimeout(() => {
-        setIsNavigating(true);
+        setNavigating(true);
         animationStartTimeRef.current = Date.now();
         showTimerRef.current = null;
       }, DELAY_THRESHOLD_MS);
     }
-  }, [isNavigating]);
+  }, []); // stable — uses ref not state
 
+  // Stable: no deps that change between renders
   const finishPageLoad = useCallback(() => {
-    // If the page finished loading quickly (before the delay threshold), cancel the loader
+    // Cancel pending show timer (page loaded fast — no loader needed)
     if (showTimerRef.current) {
       clearTimeout(showTimerRef.current);
       showTimerRef.current = null;
+      // Even if not navigating visually, make sure state is clean
+      if (isNavigatingRef.current) {
+        setNavigating(false);
+      }
       return;
     }
 
-    // If the loader was activated, ensure it displays for at least the full animation cycle (2.4s)
-    if (isNavigating) {
+    // If loader is visible, ensure it completes at least one full animation cycle
+    if (isNavigatingRef.current) {
       const elapsed = Date.now() - animationStartTimeRef.current;
       const remainingForFullCycle = Math.max(0, FULL_CYCLE_MS - elapsed);
 
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
       hideTimerRef.current = setTimeout(() => {
-        setIsNavigating(false);
+        setNavigating(false);
         hideTimerRef.current = null;
       }, remainingForFullCycle);
     }
-  }, [isNavigating]);
+  }, []); // stable — uses ref not state
 
   return (
     <NavigationLoadingContext.Provider value={{ isNavigating, startPageLoad, finishPageLoad }}>

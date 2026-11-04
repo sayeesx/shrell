@@ -3,8 +3,10 @@ import { Layers, Search, History, ArrowUpDown } from 'lucide-react';
 import { InventoryMovement, Product } from '../../domain/types';
 import { inventoryRepository, productRepository } from '../../infrastructure/repositories';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
+import { useTheme } from '../../application/ThemeContext';
 
 export const AdminInventory: React.FC = () => {
+  const { isDark } = useTheme();
   const [products, setProducts] = useState<Product[]>([]);
   const [movements, setMovements] = useState<InventoryMovement[]>([]);
   const [search, setSearch] = useState('');
@@ -66,11 +68,11 @@ export const AdminInventory: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Page Title */}
-      <div className="border-b border-surface-800 pb-4">
-        <h1 className="text-xl sm:text-2xl font-bold text-slate-100 font-mono tracking-tight">
-          INVENTORY MANAGEMENT & AUDIT TRAIL
+      <div className={`border-b pb-4 ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
+        <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
+          INVENTORY MANAGEMENT &amp; AUDIT TRAIL
         </h1>
-        <p className="text-xs text-slate-400 font-mono mt-0.5">
+        <p className={`text-xs font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
           Atomic warehouse stock movements, reservation controls and intake records
         </p>
       </div>
@@ -78,43 +80,35 @@ export const AdminInventory: React.FC = () => {
       {/* Stock Levels Table */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h2 className="text-sm font-bold text-slate-100 font-mono uppercase tracking-wider flex items-center gap-2">
+          <h2 className={`text-sm font-bold font-mono uppercase tracking-wider flex items-center gap-2 ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
             <Layers className="w-4 h-4 text-brand-500" />
             Current Warehouse Stock
           </h2>
-
           <div className="max-w-xs w-full relative">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Filter part or SKU..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-surface-900 border border-surface-700 rounded pl-8 pr-3 py-1.5 text-xs font-mono text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-brand-500"
-            />
+            <Search className={`w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`} />
+            <input type="text" placeholder="Filter part or SKU..." value={search} onChange={(e) => setSearch(e.target.value)}
+              className={`w-full border rounded pl-8 pr-3 py-1.5 text-xs font-mono placeholder:text-slate-500 focus:outline-none focus:border-brand-500 ${isDark ? 'bg-surface-900 border-surface-700 text-slate-100' : 'bg-white border-[#E0DBD2] text-[#140E10]'}`} />
           </div>
         </div>
 
-        <div className="bg-surface-900 border border-surface-700 rounded-lg overflow-x-auto shadow-elevation">
+        <div className={`border rounded-lg overflow-x-auto ${isDark ? 'bg-surface-900 border-surface-700' : 'bg-white border-[#E0DBD2]'}`}>
           <table className="w-full text-left text-xs font-mono min-w-[650px]">
-            <thead className="bg-surface-950/60 border-b border-surface-800 text-slate-400">
+            <thead className={`border-b ${isDark ? 'bg-surface-950/60 border-surface-800 text-slate-400' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#5C5456]'}`}>
               <tr>
-                <th className="px-4 py-3">SKU & Item Name</th>
-                <th className="px-4 py-3">Category</th>
-                <th className="px-4 py-3">Available On Hand</th>
-                <th className="px-4 py-3">Threshold Status</th>
-                <th className="px-4 py-3 text-right">Adjustment</th>
+                {['SKU & Item Name','Category','Available On Hand','Threshold Status','Adjustment'].map((h,i) => (
+                  <th key={h} className={`px-4 py-3${i===4?' text-right':''}`}>{h}</th>
+                ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-surface-800">
+            <tbody className={`divide-y ${isDark ? 'divide-surface-800' : 'divide-[#E0DBD2]'}`}>
               {filteredProducts.map((p) => (
-                <tr key={p.id} className="hover:bg-surface-850/50">
+                <tr key={p.id} className={isDark ? 'hover:bg-surface-850/50' : 'hover:bg-[#F5F3EE]'}>
                   <td className="px-4 py-3">
-                    <span className="font-semibold text-slate-200">{p.name}</span>
-                    <div className="text-[10px] text-slate-500">{p.sku}</div>
+                    <span className={`font-semibold ${isDark ? 'text-slate-200' : 'text-[#140E10]'}`}>{p.name}</span>
+                    <div className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`}>{p.sku}</div>
                   </td>
-                  <td className="px-4 py-3 text-slate-400">{p.categoryName || 'Automotive'}</td>
-                  <td className="px-4 py-3 font-bold text-slate-100">{p.stockQuantity} units</td>
+                  <td className={`px-4 py-3 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>{p.categoryName || 'Automotive'}</td>
+                  <td className={`px-4 py-3 font-bold ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>{p.stockQuantity} units</td>
                   <td className="px-4 py-3">
                     {p.stockQuantity <= 5 ? (
                       <span className="px-2 py-0.5 rounded text-[10px] bg-rose-950/80 text-rose-300 border border-rose-800 font-bold">
@@ -264,7 +258,7 @@ export const AdminInventory: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold uppercase tracking-wider"
+                  className="px-4 py-2 rounded bg-brand-500 hover:bg-brand-600 text-white font-bold uppercase tracking-wider"
                 >
                   Confirm Adjustment
                 </button>

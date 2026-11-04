@@ -6,9 +6,11 @@ import { ProductCard } from '../../components/ui/ProductCard';
 import { CategoryCircleStrip } from '../../components/ui/CategoryCircleStrip';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
+import { useTheme } from '../../application/ThemeContext';
 
 export const HomePage: React.FC = () => {
   const { finishPageLoad } = useNavigationLoading();
+  const { isDark } = useTheme();
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [banners, setBanners] = useState<HeroBanner[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -91,7 +93,7 @@ export const HomePage: React.FC = () => {
         Holds Category Strip + Image-Only Carousel Banner
         ================================================================
       */}
-      <section className="bg-[#0A0808] text-white pt-1 sm:pt-2 pb-4 sm:pb-6 rounded-b-xl sm:rounded-b-2xl border-b border-[#221215]">
+      <section className={`text-white pt-1 sm:pt-2 pb-4 sm:pb-6 rounded-b-xl sm:rounded-b-2xl border-b ${isDark ? 'bg-[#0A0808] border-[#221215]' : 'bg-[#F5F3EE] border-[#E0DBD2]'}`}>
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-3 sm:space-y-4">
           {/* Category Icons Row (Circle Style) - completely hidden scrollbar */}
           <CategoryCircleStrip
@@ -194,33 +196,24 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 
-        ================================================================
-        PRODUCT CONTENT ZONE (Matches Hero & Header #0A0808 aesthetic)
-        All Product Content, Categories, and Systems
-        ================================================================
-      */}
+      {/* PRODUCT CONTENT ZONE */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-10 sm:space-y-14">
         {/* SECTION 1: Crazy Finds */}
         <section className="space-y-4 sm:space-y-5">
-          <div className="flex items-center justify-between border-b border-[#221215] pb-2.5 sm:pb-3 gap-3">
+          <div className={`flex items-center justify-between border-b pb-2.5 sm:pb-3 gap-3 ${isDark ? 'border-[#221215]' : 'border-[#E0DBD2]'}`}>
             <div className="min-w-0">
-              <h2 className="text-xl sm:text-2xl font-bold text-[#F1EEEE] tracking-tight">
+              <h2 className={`text-xl sm:text-2xl font-bold tracking-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
                 Crazy Finds
               </h2>
-              <p className="text-xs sm:text-sm text-slate-400 mt-0.5 font-normal">
+              <p className={`text-xs sm:text-sm mt-0.5 font-normal ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
                 Blink and you'll miss it
               </p>
             </div>
-            <Link
-              to="/catalogue"
-              className="text-xs sm:text-sm font-semibold text-[#FF000E] hover:text-[#E0000C] flex items-center gap-1 transition-colors flex-shrink-0"
-            >
+            <Link to="/catalogue" className="text-xs sm:text-sm font-semibold text-[#FF000E] hover:text-[#E0000C] flex items-center gap-1 transition-colors flex-shrink-0">
               <span>See All</span>
               <i className="bi bi-chevron-right text-[10px] sm:text-xs" aria-hidden="true"></i>
             </Link>
           </div>
-
           {loading ? (
             <div className="h-56 flex items-center justify-center">
               <ShrellLoader size={64} />
@@ -236,39 +229,29 @@ export const HomePage: React.FC = () => {
 
         {/* SECTION 2: Festival Declutter Deals */}
         <section className="space-y-4 sm:space-y-5">
-          <div className="flex items-center justify-between border-b border-[#221215] pb-2.5 sm:pb-3 gap-3">
+          <div className={`flex items-center justify-between border-b pb-2.5 sm:pb-3 gap-3 ${isDark ? 'border-[#221215]' : 'border-[#E0DBD2]'}`}>
             <div className="min-w-0">
-              <h2 className="text-xl sm:text-2xl font-bold text-[#F1EEEE] tracking-tight">
+              <h2 className={`text-xl sm:text-2xl font-bold tracking-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
                 Festival Declutter Deals 🪔
               </h2>
-              <p className="text-xs sm:text-sm text-slate-400 mt-0.5 font-normal">
+              <p className={`text-xs sm:text-sm mt-0.5 font-normal ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
                 Verified genuine equipment with up to ₹15,000 instant festival discounts
               </p>
             </div>
-            <Link
-              to="/catalogue"
-              className="text-xs sm:text-sm font-semibold text-[#FF000E] hover:text-[#E0000C] flex items-center gap-1 transition-colors flex-shrink-0"
-            >
+            <Link to="/catalogue" className="text-xs sm:text-sm font-semibold text-[#FF000E] hover:text-[#E0000C] flex items-center gap-1 transition-colors flex-shrink-0">
               <span>See All</span>
               <i className="bi bi-chevron-right text-[10px] sm:text-xs" aria-hidden="true"></i>
             </Link>
           </div>
-
           {loading ? (
             <div className="h-56 flex items-center justify-center">
               <ShrellLoader size={64} />
             </div>
-          ) : (
+          ) : featuredProducts.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-              {featuredProducts.slice(4, 8).length > 0 ? (
-                featuredProducts.slice(4, 8).map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))
-              ) : (
-                featuredProducts.slice(0, 4).map((product) => (
-                  <ProductCard key={`alt-${product.id}`} product={product} />
-                ))
-              )}
+              {(featuredProducts.slice(4, 8).length > 0 ? featuredProducts.slice(4, 8) : featuredProducts.slice(0, 4)).map((product, idx) => (
+                <ProductCard key={`deal-${product.id}-${idx}`} product={product} />
+              ))}
             </div>
           )}
         </section>
@@ -431,62 +414,46 @@ export const HomePage: React.FC = () => {
           </div>
         </section>
 
-        {/* SECTION 4: Rigorous Material Testing & Indian Conditions */}
-        <section className="bg-[#0E0A0B] rounded-xl border border-[#221215] p-5 sm:p-10 space-y-8">
+        {/* SECTION 4: Rigorous Material Testing */}
+        <section className={`rounded-xl border p-5 sm:p-10 space-y-8 ${isDark ? 'bg-[#0E0A0B] border-[#221215]' : 'bg-[#F5F3EE] border-[#E0DBD2]'}`}>
           <div className="max-w-3xl">
-            <h2 className="text-xl sm:text-2xl font-bold text-[#F1EEEE] tracking-tight">
+            <h2 className={`text-xl sm:text-2xl font-bold tracking-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
               Rigorous Material Testing for Indian Highways &amp; Weather
             </h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-2 leading-relaxed font-normal">
+            <p className={`text-xs sm:text-sm mt-2 leading-relaxed font-normal ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
               Accessories face high ambient heat up to 48°C, heavy monsoonal moisture, and continuous vibration. Every component adheres to stringent automotive durability standards.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-            <div className="p-5 rounded-lg bg-[#130E10] border border-[#221215] space-y-2.5">
-              <div className="w-10 h-10 rounded-lg bg-[#1D1214] border border-[#2F171B] flex items-center justify-center text-[#FF000E] text-lg">
-                <i className="bi bi-wrench-adjustable-circle-fill" aria-hidden="true"></i>
+            {[
+              { icon: 'bi-wrench-adjustable-circle-fill', title: 'Zero Drilling Fitment', body: 'All roof crossbars and floor protection systems mount using factory OEM points, preserving vehicle chassis integrity and original manufacturer warranties.' },
+              { icon: 'bi-shield-fill-check', title: 'Medical-Grade TPE Compounds', body: 'Our floor liners utilize 100% recyclable thermoplastic elastomer with zero toxic phthalates or noxious rubber odors, even under intense direct sunlight.' },
+              { icon: 'bi-patch-check-fill', title: 'ECE R112 Homologation', body: 'OSRAM auxiliary driving illumination meets certified beam geometry standards, providing safe forward visibility without blinding oncoming traffic.' },
+            ].map((card) => (
+              <div key={card.title} className={`p-5 rounded-lg border space-y-2.5 ${isDark ? 'bg-[#130E10] border-[#221215]' : 'bg-white border-[#E0DBD2]'}`}>
+                <div className={`w-10 h-10 rounded-lg border flex items-center justify-center text-[#FF000E] text-lg ${isDark ? 'bg-[#1D1214] border-[#2F171B]' : 'bg-[#FFE0E2] border-[#FFB3B7]'}`}>
+                  <i className={`bi ${card.icon}`} aria-hidden="true"></i>
+                </div>
+                <h3 className={`text-sm sm:text-base font-semibold ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>{card.title}</h3>
+                <p className={`text-xs leading-relaxed font-normal ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>{card.body}</p>
               </div>
-              <h3 className="text-sm sm:text-base font-semibold text-[#F1EEEE]">Zero Drilling Fitment</h3>
-              <p className="text-xs text-slate-400 leading-relaxed font-normal">
-                All roof crossbars and floor protection systems mount using factory OEM points, preserving vehicle chassis integrity and original manufacturer warranties.
-              </p>
-            </div>
-
-            <div className="p-5 rounded-lg bg-[#130E10] border border-[#221215] space-y-2.5">
-              <div className="w-10 h-10 rounded-lg bg-[#1D1214] border border-[#2F171B] flex items-center justify-center text-[#FF000E] text-lg">
-                <i className="bi bi-shield-fill-check" aria-hidden="true"></i>
-              </div>
-              <h3 className="text-sm sm:text-base font-semibold text-[#F1EEEE]">Medical-Grade TPE Compounds</h3>
-              <p className="text-xs text-slate-400 leading-relaxed font-normal">
-                Our floor liners utilize 100% recyclable thermoplastic elastomer with zero toxic phthalates or noxious rubber odors, even under intense direct sunlight.
-              </p>
-            </div>
-
-            <div className="p-5 rounded-lg bg-[#130E10] border border-[#221215] space-y-2.5">
-              <div className="w-10 h-10 rounded-lg bg-[#1D1214] border border-[#2F171B] flex items-center justify-center text-[#FF000E] text-lg">
-                <i className="bi bi-patch-check-fill" aria-hidden="true"></i>
-              </div>
-              <h3 className="text-sm sm:text-base font-semibold text-[#F1EEEE]">ECE R112 Homologation</h3>
-              <p className="text-xs text-slate-400 leading-relaxed font-normal">
-                OSRAM auxiliary driving illumination meets certified beam geometry standards, providing safe forward visibility without blinding oncoming traffic.
-              </p>
-            </div>
+            ))}
           </div>
 
           {/* 4 Trust USP Badges */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-5 border-t border-[#221215]">
+          <div className={`grid grid-cols-2 sm:grid-cols-4 gap-3 pt-5 border-t ${isDark ? 'border-[#221215]' : 'border-[#E0DBD2]'}`}>
             {[
               { icon: 'bi-truck', label: 'Pan-India Delivery', sub: 'Express Courier' },
               { icon: 'bi-credit-card-2-front-fill', label: 'UPI & COD Available', sub: 'Zero fee payments' },
               { icon: 'bi-headset', label: 'Technical Desk', sub: 'Engineer backed' },
               { icon: 'bi-recycle', label: '100% Recyclable TPE', sub: 'Zero toxic odor' },
             ].map((item) => (
-              <div key={item.label} className="flex items-center gap-2.5 p-3 rounded-lg bg-[#130E10] border border-[#221215]">
+              <div key={item.label} className={`flex items-center gap-2.5 p-3 rounded-lg border ${isDark ? 'bg-[#130E10] border-[#221215]' : 'bg-white border-[#E0DBD2]'}`}>
                 <i className={`bi ${item.icon} text-[#FF000E] text-xl flex-shrink-0`} aria-hidden="true"></i>
                 <div>
-                  <div className="text-xs text-[#F1EEEE] font-semibold leading-tight">{item.label}</div>
-                  <div className="text-[10px] text-slate-400">{item.sub}</div>
+                  <div className={`text-xs font-semibold leading-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>{item.label}</div>
+                  <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>{item.sub}</div>
                 </div>
               </div>
             ))}

@@ -2,6 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   CSS CUSTOM PROPERTIES — THEME SYSTEM
+   dark  = pure black (#000000) background, white text
+   light = near-white (#FFFEFA / rgb 255,255,254,250 ~= #FFFEFA) background, dark text
+   ============================================================ */
+:root {
+  /* Default: dark theme */
+  --bg-base:        #000000;
+  --bg-card:        #0A0808;
+  --bg-card-raised: #130E10;
+  --bg-input:       #0A0808;
+  --bg-sidebar:     #0A0808;
+  --bg-nav:         #0A0808;
+  --bg-footer:      #080000;
+  --border-base:    #221215;
+  --border-card:    #261619;
+  --border-elevated:#361B20;
+  --text-primary:   #F1EEEE;
+  --text-secondary: #C4BCBD;
+  --text-muted:     #8E8587;
+  --text-faint:     #5C5456;
+  --text-placeholder:#5C5456;
+  --loader-stroke:  #FF000E;
+  --scrollbar-track:#0A0808;
+  --scrollbar-thumb:#261619;
+  --scrollbar-hover:#650008;
+}
+
+/* Light theme overrides applied via html.light */
+html.light {
+  --bg-base:        #FFFEFA;
+  --bg-card:        #F5F3EE;
+  --bg-card-raised: #EDE9E1;
+  --bg-input:       #FFFFFF;
+  --bg-sidebar:     #F5F3EE;
+  --bg-nav:         #FFFFFF;
+  --bg-footer:      #F0EDE6;
+  --border-base:    #E0DBD2;
+  --border-card:    #D6D0C7;
+  --border-elevated:#C8C2B6;
+  --text-primary:   #140E10;
+  --text-secondary: #3A3030;
+  --text-muted:     #5C5456;
+  --text-faint:     #8E8587;
+  --text-placeholder:#9E9898;
+  --loader-stroke:  #FF000E;
+  --scrollbar-track:#FFFEFA;
+  --scrollbar-thumb:#D6D0C7;
+  --scrollbar-hover:#FF000E;
+}
+
 /* Brand crimson-to-black overrides — signature #FF000E */
 @layer utilities {
   .bg-brand-500  { background-color: #FF000E; }
@@ -43,6 +94,9 @@
   body, html {
     font-family: 'DM Sans', sans-serif !important;
     scroll-behavior: smooth;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 
   a[href], button, summary, select,
@@ -72,11 +126,11 @@
     }
   }
 
-  /* Dark cinematic scrollbars for the charcoal black theme */
+  /* Theme-aware scrollbars */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: #0A0808; }
-  ::-webkit-scrollbar-thumb { background: #261619; border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: #650008; }
+  ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+  ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
 }
 
 @layer utilities {
@@ -94,23 +148,35 @@
     scrollbar-width: none !important;
   }
 
-  /* Atmospheric red radial lighting behind main content */
+  /* Atmospheric red radial lighting behind main content (dark only) */
   .bg-atmospheric-red {
-    background-color: #0A0808;
+    background-color: var(--bg-base);
     background-image:
       radial-gradient(ellipse 90% 45% at 50% -10%, rgba(224, 0, 12, 0.14) 0%, rgba(101, 0, 8, 0.06) 40%, transparent 75%),
       radial-gradient(circle at 50% 100%, rgba(176, 0, 10, 0.05) 0%, transparent 50%);
+  }
+
+  html.light .bg-atmospheric-red {
+    background-image: none;
   }
 
   /* Editorial Card: dark black-to-crimson gradient cards with soft light blending */
   .editorial-card {
     background: linear-gradient(180deg, #130E10 0%, #0A0808 100%);
     border: 1px solid #261619;
-    box-shadow: 0 4px 20px -2px rgba(8, 0, 0, 0.7);
+  }
+
+  html.light .editorial-card {
+    background: linear-gradient(180deg, #EDE9E1 0%, #F5F3EE 100%);
+    border: 1px solid #D6D0C7;
   }
 
   .editorial-card:hover {
     border-color: #4F242C;
+  }
+
+  html.light .editorial-card:hover {
+    border-color: #FF000E;
   }
 
   /* Warm off-white contrast panel */
@@ -118,6 +184,26 @@
     background-color: #F1EEEE;
     color: #0A0808;
   }
+
+  html.light .editorial-contrast-panel {
+    background-color: #EDE9E1;
+    color: #140E10;
+  }
+
+  /* Theme-aware utility classes */
+  .theme-bg-base        { background-color: var(--bg-base); }
+  .theme-bg-card        { background-color: var(--bg-card); }
+  .theme-bg-card-raised { background-color: var(--bg-card-raised); }
+  .theme-bg-input       { background-color: var(--bg-input); }
+  .theme-bg-sidebar     { background-color: var(--bg-sidebar); }
+  .theme-bg-nav         { background-color: var(--bg-nav); }
+  .theme-bg-footer      { background-color: var(--bg-footer); }
+  .theme-border         { border-color: var(--border-base); }
+  .theme-border-card    { border-color: var(--border-card); }
+  .theme-text-primary   { color: var(--text-primary); }
+  .theme-text-secondary { color: var(--text-secondary); }
+  .theme-text-muted     { color: var(--text-muted); }
+  .theme-text-faint     { color: var(--text-faint); }
 
   /* Desktop Infinite Horizontal Marquee Scroll */
   @keyframes marqueeScroll {
@@ -228,7 +314,7 @@
   }
 
   .shrell-loader-path {
-    fill: #FFFFFF;
+    fill: var(--loader-fill, #FF000E);
     opacity: 0;
     transform-box: fill-box;
     transform-origin: center;
@@ -239,6 +325,11 @@
   .shrell-loader-path:nth-child(3) { animation-delay: 0.24s; }
   .shrell-loader-path:nth-child(4) { animation-delay: 0.36s; }
   .shrell-loader-path:nth-child(5) { animation-delay: 0.48s; }
+
+  /* Override: white loader when on a red background */
+  .loader-on-red .shrell-loader-path {
+    fill: #FFFFFF !important;
+  }
 
   @keyframes shrellGo {
     0% { opacity: 0; transform: translate(-110px, 110px); }
@@ -257,3 +348,4 @@
     }
   }
 }
+

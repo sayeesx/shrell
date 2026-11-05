@@ -336,7 +336,7 @@ export const HomePage: React.FC = () => {
                     src="/imaged.webp"
                     alt="SHRELL Express Delivery"
                     className="w-full h-full object-cover object-top"
-                    style={{ filter: 'none', brightness: '95%' }}
+                    style={{ filter: 'none' } as React.CSSProperties}
                   />
                   {/* Subtle dark vignette */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0A0808] via-transparent to-transparent pointer-events-none" />

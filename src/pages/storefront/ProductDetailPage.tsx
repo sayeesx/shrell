@@ -140,9 +140,9 @@ export const ProductDetailPage: React.FC = () => {
         <div className={`flex items-center justify-between pb-3 border-b ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
           <Link to="/" className="flex items-center group cursor-pointer" aria-label="SHRELL Home">
             <img
-              src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png.png'}
+              src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
               alt="SHRELL Automotive"
-              className="h-[22px] w-auto object-contain"
+              className={`w-auto object-contain ${isDark ? 'h-[22px]' : 'h-[30px]'}`}
             />
           </Link>
           <Link

@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Product, HeroBanner } from '../../domain/types';
 import { productRepository, bannerRepository } from '../../infrastructure/repositories';
 import { ProductCard } from '../../components/ui/ProductCard';
-import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 import { useTheme } from '../../application/ThemeContext';
 
@@ -201,17 +200,18 @@ export const HomePage: React.FC = () => {
               <i className="bi bi-chevron-right text-[10px] sm:text-xs" aria-hidden="true"></i>
             </Link>
           </div>
-          {loading ? (
-            <div className="h-56 flex items-center justify-center">
-              <ShrellLoader size={64} />
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-              {featuredProducts.slice(0, 4).map((product) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+            {loading ? (
+              // Show empty skeleton cards while loading
+              Array.from({ length: 4 }).map((_, idx) => (
+                <div key={idx} className={`border rounded-xl overflow-hidden h-64 ${isDark ? 'bg-[#0A0808] border-[#221215]' : 'bg-white border-[#E0DBD2]'}`} />
+              ))
+            ) : (
+              featuredProducts.slice(0, 4).map((product) => (
                 <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          )}
+              ))
+            )}
+          </div>
         </section>
 
         {/* SECTION 2: Festival Declutter Deals */}
@@ -230,21 +230,22 @@ export const HomePage: React.FC = () => {
               <i className="bi bi-chevron-right text-[10px] sm:text-xs" aria-hidden="true"></i>
             </Link>
           </div>
-          {loading ? (
-            <div className="h-56 flex items-center justify-center">
-              <ShrellLoader size={64} />
-            </div>
-          ) : featuredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-              {(featuredProducts.slice(4, 8).length > 0 ? featuredProducts.slice(4, 8) : featuredProducts.slice(0, 4)).map((product, idx) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+            {loading ? (
+              // Show empty skeleton cards while loading
+              Array.from({ length: 4 }).map((_, idx) => (
+                <div key={idx} className={`border rounded-xl overflow-hidden h-64 ${isDark ? 'bg-[#0A0808] border-[#221215]' : 'bg-white border-[#E0DBD2]'}`} />
+              ))
+            ) : featuredProducts.length > 0 ? (
+              (featuredProducts.slice(4, 8).length > 0 ? featuredProducts.slice(4, 8) : featuredProducts.slice(0, 4)).map((product, idx) => (
                 <ProductCard key={`deal-${product.id}-${idx}`} product={product} />
-              ))}
-            </div>
-          ) : (
-            <div className="h-56 flex items-center justify-center">
-              <p className="text-sm text-[#8E8587]">No deals available</p>
-            </div>
-          )}
+              ))
+            ) : (
+              <div className="col-span-full h-56 flex items-center justify-center">
+                <p className="text-sm text-[#8E8587]">No deals available</p>
+              </div>
+            )}
+          </div>
         </section>
 
         {/* SECTION 3: Titleless Editorial Bento Grid (Exact match to reference design) */}
@@ -282,7 +283,7 @@ export const HomePage: React.FC = () => {
               <div className="rounded-2xl bg-[#0E0A0B] border border-[#221215] p-6 sm:p-7 flex flex-col justify-between flex-1 min-h-[230px] sm:min-h-[250px] group hover:border-[#4F242C] transition-all">
                 <div className="flex items-start justify-between gap-3 z-10">
                   {/* SUV Ad Image - No Background, Larger */}
-                  <div className="w-36 sm:w-52 h-36 sm:h-52 rounded-xl p-2.5 flex items-center justify-center overflow-hidden relative flex-shrink-0">
+                  <div className="w-40 sm:w-56 h-40 sm:h-56 rounded-xl p-2.5 flex items-center justify-center overflow-hidden relative flex-shrink-0">
                     <img
                       src="/suv.webp"
                       alt="Ultra Shampoo Variants"

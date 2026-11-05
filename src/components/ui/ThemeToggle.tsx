@@ -11,45 +11,41 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
   const { toggleTheme, isDark } = useTheme();
 
   return (
-    <div className={`toggle-switch ${className}`}>
-      <label className="switch-label">
+    <div className={`toggle-switch ${className}`} style={{ width: '50px', height: '25px' }}>
+      <label className="switch-label" style={{ 
+        position: 'absolute',
+        width: '100%',
+        height: '25px',
+        backgroundColor: isDark ? '#28292c' : '#d8dbe0',
+        borderRadius: '25px',
+        cursor: 'pointer',
+        border: '2px solid',
+        borderColor: isDark ? '#28292c' : '#d8dbe0'
+      }}>
         <input 
           type="checkbox" 
           className="checkbox" 
           checked={!isDark}
           onChange={toggleTheme}
           aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+          style={{ position: 'absolute', display: 'none' }}
         />
-        <span className="slider" />
+        <span className="slider" style={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          borderRadius: '25px',
+          transition: '0.3s',
+          backgroundColor: isDark ? '#28292c' : '#d8dbe0'
+        }} />
       </label>
       <style>{`
-        .toggle-switch {
-          position: relative;
-          width: 50px;
-          height: 25px;
-        }
-        .switch-label {
-          position: absolute;
-          width: 100%;
-          height: 25px;
-          background-color: #28292c;
-          border-radius: 25px;
-          cursor: pointer;
-          border: 2px solid #28292c;
-        }
         .checkbox {
           position: absolute;
-          display: none;
-        }
-        .slider {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          border-radius: 25px;
-          transition: 0.3s;
+          display: none !important;
         }
         .checkbox:checked ~ .slider {
-          background-color: #d8dbe0;
+          background-color: #d8dbe0 !important;
         }
         .slider::before {
           content: "";

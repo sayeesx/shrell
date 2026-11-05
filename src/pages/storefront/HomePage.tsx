@@ -4,7 +4,6 @@ import { Product, HeroBanner } from '../../domain/types';
 import { productRepository, bannerRepository } from '../../infrastructure/repositories';
 import { ProductCard } from '../../components/ui/ProductCard';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
-import { ShimmerSkeleton } from '../../components/common/ShimmerSkeleton';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 import { useTheme } from '../../application/ThemeContext';
 
@@ -96,12 +95,7 @@ export const HomePage: React.FC = () => {
       */}
       <section className="pt-4 sm:pt-2 pb-0 sm:pb-4">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          {loading ? (
-            <ShimmerSkeleton 
-              aspectRatio="aspect-[16/9] sm:aspect-[21/9]" 
-              className="max-h-[180px] sm:max-h-[260px] md:max-h-[480px] lg:max-h-[560px] xl:max-h-[620px]"
-            />
-          ) : banners.length > 0 && (
+          {banners.length > 0 && (
             <div
               className="relative rounded-lg overflow-hidden bg-transparent group flex items-center justify-center w-full max-h-[180px] sm:max-h-[260px] md:max-h-[480px] lg:max-h-[560px] xl:max-h-[620px] select-none touch-pan-y"
               onMouseEnter={() => setIsPaused(true)}
@@ -287,8 +281,8 @@ export const HomePage: React.FC = () => {
               {/* Card 2: Dark Graphite Panel - Ultra Shampoo Launching Soon */}
               <div className="rounded-2xl bg-[#0E0A0B] border border-[#221215] p-6 sm:p-7 flex flex-col justify-between flex-1 min-h-[230px] sm:min-h-[250px] group hover:border-[#4F242C] transition-all">
                 <div className="flex items-start justify-between gap-3 z-10">
-                  {/* SUV Ad Image */}
-                  <div className="w-28 sm:w-36 h-28 sm:h-36 rounded-xl bg-[#F7F5F5] p-2.5 flex items-center justify-center overflow-hidden border border-white/30 shadow-sm relative flex-shrink-0">
+                  {/* SUV Ad Image - No Background, Larger */}
+                  <div className="w-32 sm:w-44 h-32 sm:h-44 rounded-xl p-2.5 flex items-center justify-center overflow-hidden relative flex-shrink-0">
                     <img
                       src="/suv.webp"
                       alt="Ultra Shampoo Variants"
@@ -308,11 +302,14 @@ export const HomePage: React.FC = () => {
                     Ultra Shampoo
                   </h3>
                   <p className="text-xs text-[#8E8587] leading-relaxed">
-                    <span className="text-[#FF000E] font-semibold">Lavender Breeze</span> and <span className="text-[#FF000E] font-semibold">Passionfruit Martini</span>
+                    <span className="text-blue-400 font-semibold">Lavender Breeze</span> and <span className="text-red-400 font-semibold">Passionfruit Martini</span>
                   </p>
-                  <p className="text-xs text-[#8E8587] leading-relaxed mt-2">
-                    Launching Soon - Pre-Book Now
-                  </p>
+                  <Link
+                    to="/pre-book"
+                    className="inline-block mt-3 px-3 py-1.5 bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-semibold rounded-full transition-all"
+                  >
+                    Pre-Book Now
+                  </Link>
                 </div>
               </div>
             </div>
@@ -414,51 +411,6 @@ export const HomePage: React.FC = () => {
           </div>
         </section>
 
-        {/* SECTION 4: Rigorous Material Testing */}
-        <section className={`rounded-xl border p-5 sm:p-10 space-y-8 ${isDark ? 'bg-[#0E0A0B] border-[#221215]' : 'bg-[#F5F3EE] border-[#E0DBD2]'}`}>
-          <div className="max-w-3xl">
-            <h2 className={`text-xl sm:text-2xl font-bold tracking-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
-              Rigorous Material Testing for Indian Highways &amp; Weather
-            </h2>
-            <p className={`text-xs sm:text-sm mt-2 leading-relaxed font-normal ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
-              Accessories face high ambient heat up to 48°C, heavy monsoonal moisture, and continuous vibration. Every component adheres to stringent automotive durability standards.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-            {[
-              { icon: 'bi-wrench-adjustable-circle-fill', title: 'Zero Drilling Fitment', body: 'All roof crossbars and floor protection systems mount using factory OEM points, preserving vehicle chassis integrity and original manufacturer warranties.' },
-              { icon: 'bi-shield-fill-check', title: 'Medical-Grade TPE Compounds', body: 'Our floor liners utilize 100% recyclable thermoplastic elastomer with zero toxic phthalates or noxious rubber odors, even under intense direct sunlight.' },
-              { icon: 'bi-patch-check-fill', title: 'ECE R112 Homologation', body: 'OSRAM auxiliary driving illumination meets certified beam geometry standards, providing safe forward visibility without blinding oncoming traffic.' },
-            ].map((card) => (
-              <div key={card.title} className={`p-5 rounded-lg border space-y-2.5 ${isDark ? 'bg-[#130E10] border-[#221215]' : 'bg-white border-[#E0DBD2]'}`}>
-                <div className={`w-10 h-10 rounded-lg border flex items-center justify-center text-[#FF000E] text-lg ${isDark ? 'bg-[#1D1214] border-[#2F171B]' : 'bg-[#FFE0E2] border-[#FFB3B7]'}`}>
-                  <i className={`bi ${card.icon}`} aria-hidden="true"></i>
-                </div>
-                <h3 className={`text-sm sm:text-base font-semibold ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>{card.title}</h3>
-                <p className={`text-xs leading-relaxed font-normal ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>{card.body}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* 4 Trust USP Badges */}
-          <div className={`grid grid-cols-2 sm:grid-cols-4 gap-3 pt-5 border-t ${isDark ? 'border-[#221215]' : 'border-[#E0DBD2]'}`}>
-            {[
-              { icon: 'bi-truck', label: 'Pan-India Delivery', sub: 'Express Courier' },
-              { icon: 'bi-credit-card-2-front-fill', label: 'UPI & COD Available', sub: 'Zero fee payments' },
-              { icon: 'bi-headset', label: 'Technical Desk', sub: 'Engineer backed' },
-              { icon: 'bi-recycle', label: '100% Recyclable TPE', sub: 'Zero toxic odor' },
-            ].map((item) => (
-              <div key={item.label} className={`flex items-center gap-2.5 p-3 rounded-lg border ${isDark ? 'bg-[#130E10] border-[#221215]' : 'bg-white border-[#E0DBD2]'}`}>
-                <i className={`bi ${item.icon} text-[#FF000E] text-xl flex-shrink-0`} aria-hidden="true"></i>
-                <div>
-                  <div className={`text-xs font-semibold leading-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>{item.label}</div>
-                  <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>{item.sub}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
       </div>
     </div>
   );

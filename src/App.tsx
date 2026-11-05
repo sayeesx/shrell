@@ -17,6 +17,7 @@ import { OrderTrackingPage } from './pages/storefront/OrderTrackingPage';
 import { PoliciesPage } from './pages/storefront/PoliciesPage';
 import { ProfilePage } from './pages/storefront/ProfilePage';
 import { OfflinePage } from './pages/storefront/OfflinePage';
+import { PreBookPage } from './pages/storefront/PreBookPage';
 
 // Admin Pages
 import { AdminLoginPage } from './pages/admin/AdminLoginPage';
@@ -113,6 +114,7 @@ export const App: React.FC = () => {
           <Route path="/checkout" element={<Navigate to="/cart" replace />} />
           <Route path="/track" element={<OrderTrackingPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/pre-book" element={<PreBookPage />} />
           <Route path="/offline" element={<OfflinePage onRetry={() => setIsOnline(true)} />} />
           <Route path="/shipping-policy" element={<PoliciesPage />} />
           <Route path="/returns-policy" element={<PoliciesPage />} />

@@ -6,47 +6,6 @@ export const Footer: React.FC = () => {
   const { isDark } = useTheme();
   return (
     <footer className={`border-t text-sm transition-colors duration-300 ${isDark ? 'bg-[#080000] border-[#221215] text-slate-400' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#5C5456]'}`}>
-      {/* Trust Pillars */}
-      <div className={`border-b py-8 px-4 sm:px-6 lg:px-8 ${isDark ? 'border-[#221215]/80' : 'border-[#E0DBD2]/80'}`}>
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-          <div className="flex items-start gap-3.5">
-            <div className={`p-2.5 rounded-xl border text-[#FF000E] flex-shrink-0 ${isDark ? 'bg-[#0E0A0B] border-[#221215]' : 'bg-[#EDE9E1] border-[#E0DBD2]'}`}>
-              <i className="bi bi-patch-check-fill text-lg leading-none" aria-hidden="true"></i>
-            </div>
-            <div>
-              <h4 className={`font-semibold text-sm ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>Engineered Precision</h4>
-              <p className={`text-xs mt-1 leading-relaxed ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
-                TPE laser-fit floor liners, extruded T6 aluminium cargo racks, and homologated ECE auxiliary lighting.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3.5">
-            <div className={`p-2.5 rounded-xl border text-[#FF000E] flex-shrink-0 ${isDark ? 'bg-[#0E0A0B] border-[#221215]' : 'bg-[#EDE9E1] border-[#E0DBD2]'}`}>
-              <i className="bi bi-truck text-lg leading-none" aria-hidden="true"></i>
-            </div>
-            <div>
-              <h4 className={`font-semibold text-sm ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>Insured Direct Transit</h4>
-              <p className={`text-xs mt-1 leading-relaxed ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
-                All consignments packed in heavy duty corrugated crates and tracked via BlueDart Express &amp; Delhivery.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3.5">
-            <div className={`p-2.5 rounded-xl border text-[#FF000E] flex-shrink-0 ${isDark ? 'bg-[#0E0A0B] border-[#221215]' : 'bg-[#EDE9E1] border-[#E0DBD2]'}`}>
-              <i className="bi bi-arrow-repeat text-lg leading-none" aria-hidden="true"></i>
-            </div>
-            <div>
-              <h4 className={`font-semibold text-sm ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>7-Day Fitment Guarantee</h4>
-              <p className={`text-xs mt-1 leading-relaxed ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
-                Complete replacement or hassle-free return if the accessory does not mate cleanly with your vehicle.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Footer Links */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">

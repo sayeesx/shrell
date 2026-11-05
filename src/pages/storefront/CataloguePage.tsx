@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../../application/ThemeContext';
+import { ShrellLoader } from '../../components/common/ShrellLoader';
 
 export const CataloguePage: React.FC = () => {
   const { isDark } = useTheme();
@@ -10,7 +11,7 @@ export const CataloguePage: React.FC = () => {
       <div className="max-w-md w-full text-center space-y-6">
         <div className="space-y-3">
           <div className="w-20 h-20 mx-auto rounded-xl bg-[#FF000E]/10 flex items-center justify-center">
-            <i className="bi bi-grid-3x3-gap text-4xl text-[#FF000E]" aria-hidden="true"></i>
+            <ShrellLoader size={48} />
           </div>
           
           <h1 className={`text-3xl font-bold ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>

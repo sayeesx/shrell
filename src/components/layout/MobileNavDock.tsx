@@ -72,7 +72,7 @@ export const MobileNavDock: React.FC = () => {
       aria-label="Mobile Navigation Dock"
     >
       {/* Mobile Continuous Text Carousel Loop (Above the Dock Navbar) */}
-      <div className={`overflow-hidden border-b py-1 text-[11px] ${isDark ? 'bg-[#080000] border-[#221215]/80' : 'bg-[#F5F3EE] border-[#E0DBD2]/80'}`}>
+      <div className={`overflow-hidden border-b py-1 text-[11px] md:bg-black ${isDark ? 'bg-[#080000] border-[#221215]/80' : 'bg-[#F5F3EE] border-[#E0DBD2]/80'}`}>
         <div className="animate-marquee-scroll flex items-center gap-8 whitespace-nowrap">
           {[...ANNOUNCEMENT_MESSAGES, ...ANNOUNCEMENT_MESSAGES].map((msg, i) => (
             <div key={i} className={`flex items-center gap-2 font-medium font-sans ${isDark ? 'text-gray-300' : 'text-[#5C5456]'}`}>

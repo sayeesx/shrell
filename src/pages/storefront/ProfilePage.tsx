@@ -4,15 +4,19 @@ import { useAuth } from '../../application/AuthContext';
 import { useCart } from '../../application/CartContext';
 import { useVehicle } from '../../application/VehicleContext';
 import { useTheme } from '../../application/ThemeContext';
+import { useNavigationLoading } from '../../application/NavigationLoadingContext';
+
 export const ProfilePage: React.FC = () => {
   const { user, logout, openAuthModal } = useAuth();
   const { itemCount } = useCart();
   const { selectedVehicle } = useVehicle();
   const { isDark } = useTheme();
+  const { finishPageLoad } = useNavigationLoading();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    finishPageLoad();
+  }, [finishPageLoad]);
 
   if (!user) {
     return (
@@ -76,7 +80,7 @@ export const ProfilePage: React.FC = () => {
               <h1 className={`text-2xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-[#140E10]'}`}>
                 +91 {formattedPhone}
               </h1>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-950/70 text-emerald-300 border border-emerald-800 self-center sm:self-auto">
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold self-center sm:self-auto ${isDark ? 'bg-emerald-950/70 text-emerald-300 border border-emerald-800' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
                 <i className="bi bi-patch-check-fill text-xs" /> Verified Member
               </span>
             </div>
@@ -135,7 +139,7 @@ export const ProfilePage: React.FC = () => {
             rel="noopener noreferrer"
             className={`rounded-2xl border p-5 transition-all flex items-start gap-4 group ${isDark ? 'bg-surface-900 border-surface-800 hover:border-surface-700' : 'bg-white border-[#E0DBD2] hover:border-emerald-300'}`}
           >
-            <div className="w-11 h-11 rounded-xl bg-emerald-950/80 border border-emerald-800 flex items-center justify-center text-emerald-400 flex-shrink-0">
+            <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${isDark ? 'bg-emerald-950/80 border border-emerald-800 text-emerald-400' : 'bg-emerald-50 border border-emerald-200 text-emerald-600'}`}>
               <i className="bi bi-whatsapp text-xl" />
             </div>
             <div className="flex-1">

@@ -184,7 +184,7 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* PRODUCT CONTENT ZONE */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-10 sm:space-y-14 pt-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-10 sm:space-y-14 pt-2">
         {/* SECTION 1: Crazy Finds */}
         <section className="space-y-4 sm:space-y-5">
           <div className={`flex items-center justify-between border-b pb-2.5 sm:pb-3 gap-3 ${isDark ? 'border-[#221215]' : 'border-[#E0DBD2]'}`}>
@@ -287,6 +287,7 @@ export const HomePage: React.FC = () => {
                       src="/imaged3.webp"
                       alt="SHRELL Car Interior Vacuum Sucker"
                       className="w-full h-full object-contain"
+                      style={{ filter: 'none' }}
                     />
                   </div>
                   <div className="text-right">
@@ -334,7 +335,8 @@ export const HomePage: React.FC = () => {
                   <img
                     src="/imaged.webp"
                     alt="SHRELL Express Delivery"
-                    className="w-full h-full object-cover object-top filter brightness-95"
+                    className="w-full h-full object-cover object-top"
+                    style={{ filter: 'none', brightness: '95%' }}
                   />
                   {/* Subtle dark vignette */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0A0808] via-transparent to-transparent pointer-events-none" />
@@ -376,17 +378,29 @@ export const HomePage: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="relative z-10 pt-4 flex items-center justify-between border-t border-white/20">
-                  <span className="text-[11px] font-mono uppercase tracking-wider text-white/80">
-                    Fast Express Courier
-                  </span>
-                  <Link
-                    to="/catalogue"
-                    className="w-7 h-7 rounded-full bg-white/20 hover:bg-white text-white hover:text-[#FF000E] flex items-center justify-center transition-all"
-                    aria-label="Catalogue"
-                  >
-                    <i className="bi bi-chevron-right text-xs" />
-                  </Link>
+                <div className="relative z-10 pt-4 space-y-3">
+                  {/* Shrell Truck Image */}
+                  <div className="w-full h-32 flex items-center justify-center">
+                    <img
+                      src="/images/bento/shrell-truck.webp"
+                      alt="SHRELL Branded Delivery Truck"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between border-t border-white/20 pt-3">
+                    <span className="text-[11px] font-mono uppercase tracking-wider text-white/80">
+                      Fast Express Courier
+                    </span>
+                    <Link
+                      to="/track"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 hover:bg-white text-white hover:text-[#FF000E] text-[10px] font-semibold transition-all"
+                      aria-label="Track Your Delivery"
+                    >
+                      <i className="bi bi-box-seam text-xs" />
+                      <span>Track Delivery</span>
+                    </Link>
+                  </div>
                 </div>
               </div>
 

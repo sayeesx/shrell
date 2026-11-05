@@ -192,8 +192,8 @@ export const CheckoutModal: React.FC = () => {
         {/* Header */}
         <div className={`flex items-center justify-between px-4 sm:px-6 py-3.5 border-b flex-shrink-0 ${isDark ? 'border-[#261619] bg-[#0A0808]' : 'border-[#E0DBD2] bg-[#F5F3EE]'}`}>
           <Link to="/" onClick={closeCheckout} className="flex items-center group cursor-pointer" aria-label="SHRELL Home">
-            <img src="/logos/shrell-logo-white.png" alt="SHRELL Automotive"
-              className={`h-[22px] w-auto object-contain ${!isDark ? 'brightness-0' : ''}`} />
+            <img src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-main.png'} alt="SHRELL Automotive"
+              className="h-[22px] w-auto object-contain" />
           </Link>
           <button
             type="button"

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Product, HeroBanner } from '../../domain/types';
 import { productRepository, bannerRepository } from '../../infrastructure/repositories';
 import { ProductCard } from '../../components/ui/ProductCard';
-import { ShrellLoader } from '../../components/common/ShrellLoader';
+import { ShimmerSkeleton } from '../../components/common/ShimmerSkeleton';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 import { useTheme } from '../../application/ThemeContext';
 
@@ -95,90 +95,94 @@ export const HomePage: React.FC = () => {
       */}
       <section className="pt-4 sm:pt-2 pb-0 sm:pb-4">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          {banners.length > 0 && (
-            <div
-              className="relative rounded-lg overflow-hidden bg-transparent group flex items-center justify-center w-full max-h-[180px] sm:max-h-[260px] md:max-h-[480px] lg:max-h-[560px] xl:max-h-[620px] select-none touch-pan-y"
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-              onTouchStart={onTouchStart}
-              onTouchMove={onTouchMove}
-              onTouchEnd={onTouchEnd}
-            >
-              {/* Active Banner Slide with Link */}
-              <div className="w-full relative transition-all duration-300 flex items-center justify-center">
-                <Link
-                  to={banners[currentSlide]?.targetUrl || '/catalogue'}
-                  className="block w-full focus:outline-none flex items-center justify-center"
-                  aria-label={banners[currentSlide]?.altText || 'Featured Automotive Banner'}
-                >
-                  {/* Desktop Image Banner (Bigger on desktop browser) */}
-                  <img
-                    src={banners[currentSlide]?.desktopImageUrl?.replace(/^http:\/\/res\.cloudinary\.com\//, 'https://res.cloudinary.com/')}
-                    alt={banners[currentSlide]?.altText || 'Hero Banner'}
-                    referrerPolicy="no-referrer"
-                    className="hidden md:block w-full max-h-[480px] lg:max-h-[560px] xl:max-h-[620px] object-cover sm:object-contain rounded-lg mx-auto"
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      if (!target.src.endsWith('/shrell-opengraph.png')) {
-                        target.src = '/shrell-opengraph.png';
-                      }
-                    }}
-                  />
+          {loading ? (
+            <ShimmerSkeleton type="banner" className="rounded-lg" />
+          ) : (
+            banners.length > 0 && (
+              <div
+                className="relative rounded-lg overflow-hidden bg-transparent group flex items-center justify-center w-full max-h-[180px] sm:max-h-[260px] md:max-h-[480px] lg:max-h-[560px] xl:max-h-[620px] select-none touch-pan-y"
+                onMouseEnter={() => setIsPaused(true)}
+                onMouseLeave={() => setIsPaused(false)}
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+              >
+                {/* Active Banner Slide with Link */}
+                <div className="w-full relative transition-all duration-300 flex items-center justify-center">
+                  <Link
+                    to={banners[currentSlide]?.targetUrl || '/catalogue'}
+                    className="block w-full focus:outline-none flex items-center justify-center"
+                    aria-label={banners[currentSlide]?.altText || 'Featured Automotive Banner'}
+                  >
+                    {/* Desktop Image Banner (Bigger on desktop browser) */}
+                    <img
+                      src={banners[currentSlide]?.desktopImageUrl?.replace(/^http:\/\/res\.cloudinary\.com\//, 'https://res.cloudinary.com/')}
+                      alt={banners[currentSlide]?.altText || 'Hero Banner'}
+                      referrerPolicy="no-referrer"
+                      className="hidden md:block w-full max-h-[480px] lg:max-h-[560px] xl:max-h-[620px] object-cover sm:object-contain rounded-lg mx-auto"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.src.endsWith('/shrell-opengraph.png')) {
+                          target.src = '/shrell-opengraph.png';
+                        }
+                      }}
+                    />
 
-                  {/* Mobile Image Banner (Strictly unchanged) */}
-                  <img
-                    src={(banners[currentSlide]?.mobileImageUrl || banners[currentSlide]?.desktopImageUrl)?.replace(/^http:\/\/res\.cloudinary\.com\//, 'https://res.cloudinary.com/')}
-                    alt={banners[currentSlide]?.altText || 'Hero Banner'}
-                    referrerPolicy="no-referrer"
-                    className="block md:hidden w-full max-h-[180px] object-cover rounded-lg"
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      if (!target.src.endsWith('/shrell-opengraph.png')) {
-                        target.src = '/shrell-opengraph.png';
-                      }
-                    }}
-                  />
-                </Link>
+                    {/* Mobile Image Banner (Strictly unchanged) */}
+                    <img
+                      src={(banners[currentSlide]?.mobileImageUrl || banners[currentSlide]?.desktopImageUrl)?.replace(/^http:\/\/res\.cloudinary\.com\//, 'https://res.cloudinary.com/')}
+                      alt={banners[currentSlide]?.altText || 'Hero Banner'}
+                      referrerPolicy="no-referrer"
+                      className="block md:hidden w-full max-h-[180px] object-cover rounded-lg"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.src.endsWith('/shrell-opengraph.png')) {
+                          target.src = '/shrell-opengraph.png';
+                        }
+                      }}
+                    />
+                  </Link>
+                </div>
+
+                {/* Prev / Next Arrows */}
+                {banners.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handlePrevSlide}
+                      className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-xs text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10"
+                      aria-label="Previous banner"
+                    >
+                      <i className="bi bi-chevron-left text-sm sm:text-base"></i>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleNextSlide}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-xs text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10"
+                      aria-label="Next banner"
+                    >
+                      <i className="bi bi-chevron-right text-sm sm:text-base"></i>
+                    </button>
+
+                    {/* Indicator Dots */}
+                    <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5">
+                      {banners.map((b, idx) => (
+                        <button
+                          key={b.id}
+                          type="button"
+                          onClick={() => setCurrentSlide(idx)}
+                          aria-label={`Slide ${idx + 1}`}
+                          className={`h-1.5 rounded-full transition-all ${
+                            currentSlide === idx ? 'w-6 bg-[#FF000E] shadow-xs' : 'w-1.5 bg-white/40 hover:bg-white/70'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
-
-              {/* Prev / Next Arrows */}
-              {banners.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={handlePrevSlide}
-                    className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-xs text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10"
-                    aria-label="Previous banner"
-                  >
-                    <i className="bi bi-chevron-left text-sm sm:text-base"></i>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleNextSlide}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-xs text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10"
-                    aria-label="Next banner"
-                  >
-                    <i className="bi bi-chevron-right text-sm sm:text-base"></i>
-                  </button>
-
-                  {/* Indicator Dots */}
-                  <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5">
-                    {banners.map((b, idx) => (
-                      <button
-                        key={b.id}
-                        type="button"
-                        onClick={() => setCurrentSlide(idx)}
-                        aria-label={`Slide ${idx + 1}`}
-                        className={`h-1.5 rounded-full transition-all ${
-                          currentSlide === idx ? 'w-6 bg-[#FF000E] shadow-xs' : 'w-1.5 bg-white/40 hover:bg-white/70'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
+            )
           )}
         </div>
       </section>
@@ -202,8 +206,10 @@ export const HomePage: React.FC = () => {
             </Link>
           </div>
           {loading ? (
-            <div className="h-56 flex items-center justify-center">
-              <ShrellLoader size={64} />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <ShimmerSkeleton key={index} type="product" />
+              ))}
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
@@ -231,8 +237,10 @@ export const HomePage: React.FC = () => {
             </Link>
           </div>
           {loading ? (
-            <div className="h-56 flex items-center justify-center">
-              <ShrellLoader size={64} />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <ShimmerSkeleton key={index} type="product" />
+              ))}
             </div>
           ) : featuredProducts.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
@@ -380,7 +388,7 @@ export const HomePage: React.FC = () => {
 
                 <div className="relative z-10 pt-4 space-y-3">
                   {/* Shrell Truck Image */}
-                  <div className="w-full h-32 flex items-center justify-center">
+                  <div className="w-full h-40 flex items-center justify-center">
                     <img
                       src="/images/bento/shrell-truck.webp"
                       alt="SHRELL Branded Delivery Truck"

@@ -102,9 +102,9 @@ export const AdminLoginPage: React.FC = () => {
             aria-label="SHRELL Storefront"
           >
             <img
-              src="/logos/shrell-logo-white.png"
+              src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-main.png'}
               alt="SHRELL"
-              className={`h-4 w-auto object-contain ${!isDark ? 'brightness-0' : ''}`}
+              className="h-4 w-auto object-contain"
             />
             <span>Customer Storefront</span>
           </Link>

@@ -263,9 +263,9 @@ export const CheckoutPage: React.FC = () => {
             aria-label="SHRELL Home"
           >
             <img
-              src="/logos/shrell-logo-white.png"
+              src="/logos/shrell-main.png"
               alt="SHRELL Automotive"
-              className="h-[22px] w-auto object-contain filter invert"
+              className="h-[22px] w-auto object-contain"
             />
           </Link>
         </div>

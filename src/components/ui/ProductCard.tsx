@@ -42,12 +42,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const isOutOfStock = product.stockQuantity <= 0;
 
-  // Calculate savings
-  const savingsPaisa =
-    product.compareAtPricePaisa && product.compareAtPricePaisa > product.pricePaisa
-      ? product.compareAtPricePaisa - product.pricePaisa
-      : 0;
-
   const offersCount = 5 + ((product.id.charCodeAt(0) * 3) % 15);
 
   return (
@@ -84,13 +78,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       {/* Body Metadata */}
       <div className="p-2.5 sm:p-3.5 flex-1 flex flex-col justify-between">
         <div>
-          <h3 className={`text-xs sm:text-sm font-medium line-clamp-2 leading-snug transition-colors min-h-[2.2rem] sm:min-h-[2.5rem] ${isDark ? 'text-[#F1EEEE] group-hover:text-[#FF000E]' : 'text-[#140E10] group-hover:text-[#FF000E]'}`}>
+          <h3 className={`text-xs sm:text-sm font-medium line-clamp-2 leading-snug transition-colors ${isDark ? 'text-[#F1EEEE] group-hover:text-[#FF000E]' : 'text-[#140E10] group-hover:text-[#FF000E]'}`}>
             <Link to={`/product/${product.slug}`}>{product.name}</Link>
           </h3>
         </div>
 
         {/* Pricing and Action Row */}
-        <div className={`mt-2 pt-2 border-t flex items-center justify-between gap-1.5 ${isDark ? 'border-[#221215]' : 'border-[#E0DBD2]'}`}>
+        <div className={`mt-1 pt-1 border-t flex items-center justify-between gap-1.5 ${isDark ? 'border-[#221215]' : 'border-[#E0DBD2]'}`}>
           {/* Price Stack */}
           <div className="min-w-0">
             <div className="flex items-baseline gap-1 sm:gap-1.5 flex-wrap">
@@ -103,11 +97,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 </span>
               )}
             </div>
-            {savingsPaisa > 0 && (
-              <div className="text-[10px] sm:text-[11px] font-medium font-tight text-emerald-500 truncate">
-                Save {formatINR(savingsPaisa)}
-              </div>
-            )}
           </div>
 
           {/* Quick Add Button — shows ShrellLoader (white) while adding */}

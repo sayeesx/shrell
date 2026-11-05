@@ -1,12 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Truck, RefreshCw, ShieldCheck } from 'lucide-react';
 import { useTheme } from '../../application/ThemeContext';
+import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 
 export const PoliciesPage: React.FC = () => {
   const location = useLocation();
   const path = location.pathname;
   const { isDark } = useTheme();
+  const { finishPageLoad } = useNavigationLoading();
+
+  useEffect(() => {
+    finishPageLoad();
+  }, [finishPageLoad]);
 
   const sectionCls = `p-6 rounded-lg border space-y-4 ${isDark ? 'bg-surface-900 border-surface-700' : 'bg-white border-[#E0DBD2]'}`;
   const headingCls = `text-base font-bold ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`;

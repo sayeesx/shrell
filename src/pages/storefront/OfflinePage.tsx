@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { useTheme } from '../../application/ThemeContext';
+import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 
 interface OfflinePageProps {
   onRetry?: () => void;
@@ -10,6 +11,11 @@ export const OfflinePage: React.FC<OfflinePageProps> = ({ onRetry }) => {
   const [checking, setChecking] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const { isDark } = useTheme();
+  const { finishPageLoad } = useNavigationLoading();
+
+  useEffect(() => {
+    finishPageLoad();
+  }, [finishPageLoad]);
 
   const handleRetry = async () => {
     setChecking(true);

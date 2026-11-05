@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../application/CartContext';
 import { Order, PaymentMethod } from '../../domain/types';
 import { formatINR, paisaToRupees } from '../../domain/services/CurrencyService';
 import { orderRepository } from '../../infrastructure/repositories';
 import { whatsAppService } from '../../features/whatsapp/WhatsAppService';
+import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 
 const INDIAN_STATES = [
   'Andhra Pradesh',
@@ -35,6 +36,11 @@ const INDIAN_STATES = [
 
 export const CheckoutPage: React.FC = () => {
   const { cart, clearCart } = useCart();
+  const { finishPageLoad } = useNavigationLoading();
+
+  useEffect(() => {
+    finishPageLoad();
+  }, [finishPageLoad]);
 
   // Form Fields
   const [fullName, setFullName] = useState('');
@@ -263,9 +269,9 @@ export const CheckoutPage: React.FC = () => {
             aria-label="SHRELL Home"
           >
             <img
-              src="/logos/shrell-main.png"
+              src="/logos/shrell-logo-white.png"
               alt="SHRELL Automotive"
-              className="h-[22px] w-auto object-contain"
+              className="h-[22px] w-auto object-contain filter invert"
             />
           </Link>
         </div>

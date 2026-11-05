@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Order } from '../../domain/types';
 import { orderRepository } from '../../infrastructure/repositories';
 import { formatINR } from '../../domain/services/CurrencyService';
 import { useTheme } from '../../application/ThemeContext';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
+import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 
 export const OrderTrackingPage: React.FC = () => {
   const [orderQuery, setOrderQuery] = useState('');
@@ -11,6 +12,11 @@ export const OrderTrackingPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { isDark } = useTheme();
+  const { finishPageLoad } = useNavigationLoading();
+
+  useEffect(() => {
+    finishPageLoad();
+  }, [finishPageLoad]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -54,9 +54,9 @@ export const Footer: React.FC = () => {
           <div className="space-y-4 md:col-span-1">
             <Link to="/" className="inline-block group" aria-label="SHRELL Automotive Home">
               <img
-                src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-main.png'}
+                src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png.png'}
                 alt="SHRELL Automotive"
-                className={`h-7 w-auto object-contain transition-opacity group-hover:opacity-90`}
+                className="h-7 w-auto object-contain transition-opacity group-hover:opacity-90"
               />
             </Link>
             <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>

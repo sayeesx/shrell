@@ -60,9 +60,9 @@ export const ProfilePage: React.FC = () => {
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center group cursor-pointer" aria-label="SHRELL Home">
             <img
-              src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-main.png'}
+              src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png.png'}
               alt="SHRELL Automotive"
-              className={`h-[22px] w-auto object-contain`}
+              className="h-[22px] w-auto object-contain"
             />
           </Link>
           <span className={`text-[11px] font-bold tracking-wider uppercase font-mono ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`}>

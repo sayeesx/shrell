@@ -49,9 +49,9 @@ export const AdminLayout: React.FC = () => {
           <div className="flex items-center gap-2.5">
             <div className={`w-8 h-8 rounded-lg border p-1 flex items-center justify-center flex-shrink-0 shadow-xs ${isDark ? 'bg-surface-950 border-surface-700/80' : 'bg-white border-[#E0DBD2]'}`}>
               <img
-                src="/logos/shrell-brandicon_no-bg.png"
+                src={isDark ? '/logos/shrell-brandicon_no-bg.png' : '/logos/shrell-blacktext-redlogo.png.png'}
                 alt="SHRELL"
-                className={`w-full h-full object-contain ${!isDark ? 'brightness-0' : ''}`}
+                className="w-full h-full object-contain"
               />
             </div>
             <div>

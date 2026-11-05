@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Product, HeroBanner } from '../../domain/types';
 import { productRepository, bannerRepository } from '../../infrastructure/repositories';
 import { ProductCard } from '../../components/ui/ProductCard';
+import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { ShimmerSkeleton } from '../../components/common/ShimmerSkeleton';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 import { useTheme } from '../../application/ThemeContext';
@@ -96,93 +97,94 @@ export const HomePage: React.FC = () => {
       <section className="pt-4 sm:pt-2 pb-0 sm:pb-4">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           {loading ? (
-            <ShimmerSkeleton type="banner" className="rounded-lg" />
-          ) : (
-            banners.length > 0 && (
-              <div
-                className="relative rounded-lg overflow-hidden bg-transparent group flex items-center justify-center w-full max-h-[180px] sm:max-h-[260px] md:max-h-[480px] lg:max-h-[560px] xl:max-h-[620px] select-none touch-pan-y"
-                onMouseEnter={() => setIsPaused(true)}
-                onMouseLeave={() => setIsPaused(false)}
-                onTouchStart={onTouchStart}
-                onTouchMove={onTouchMove}
-                onTouchEnd={onTouchEnd}
-              >
-                {/* Active Banner Slide with Link */}
-                <div className="w-full relative transition-all duration-300 flex items-center justify-center">
-                  <Link
-                    to={banners[currentSlide]?.targetUrl || '/catalogue'}
-                    className="block w-full focus:outline-none flex items-center justify-center"
-                    aria-label={banners[currentSlide]?.altText || 'Featured Automotive Banner'}
-                  >
-                    {/* Desktop Image Banner (Bigger on desktop browser) */}
-                    <img
-                      src={banners[currentSlide]?.desktopImageUrl?.replace(/^http:\/\/res\.cloudinary\.com\//, 'https://res.cloudinary.com/')}
-                      alt={banners[currentSlide]?.altText || 'Hero Banner'}
-                      referrerPolicy="no-referrer"
-                      className="hidden md:block w-full max-h-[480px] lg:max-h-[560px] xl:max-h-[620px] object-cover sm:object-contain rounded-lg mx-auto"
-                      onError={(e) => {
-                        const target = e.currentTarget;
-                        if (!target.src.endsWith('/shrell-opengraph.png')) {
-                          target.src = '/shrell-opengraph.png';
-                        }
-                      }}
-                    />
+            <ShimmerSkeleton 
+              aspectRatio="aspect-[16/9] sm:aspect-[21/9]" 
+              className="max-h-[180px] sm:max-h-[260px] md:max-h-[480px] lg:max-h-[560px] xl:max-h-[620px]"
+            />
+          ) : banners.length > 0 && (
+            <div
+              className="relative rounded-lg overflow-hidden bg-transparent group flex items-center justify-center w-full max-h-[180px] sm:max-h-[260px] md:max-h-[480px] lg:max-h-[560px] xl:max-h-[620px] select-none touch-pan-y"
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            >
+              {/* Active Banner Slide with Link */}
+              <div className="w-full relative transition-all duration-300 flex items-center justify-center">
+                <Link
+                  to={banners[currentSlide]?.targetUrl || '/catalogue'}
+                  className="block w-full focus:outline-none flex items-center justify-center"
+                  aria-label={banners[currentSlide]?.altText || 'Featured Automotive Banner'}
+                >
+                  {/* Desktop Image Banner (Bigger on desktop browser) */}
+                  <img
+                    src={banners[currentSlide]?.desktopImageUrl?.replace(/^http:\/\/res\.cloudinary\.com\//, 'https://res.cloudinary.com/')}
+                    alt={banners[currentSlide]?.altText || 'Hero Banner'}
+                    referrerPolicy="no-referrer"
+                    className="hidden md:block w-full max-h-[480px] lg:max-h-[560px] xl:max-h-[620px] object-cover sm:object-contain rounded-lg mx-auto"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (!target.src.endsWith('/shrell-opengraph.png')) {
+                        target.src = '/shrell-opengraph.png';
+                      }
+                    }}
+                  />
 
-                    {/* Mobile Image Banner (Strictly unchanged) */}
-                    <img
-                      src={(banners[currentSlide]?.mobileImageUrl || banners[currentSlide]?.desktopImageUrl)?.replace(/^http:\/\/res\.cloudinary\.com\//, 'https://res.cloudinary.com/')}
-                      alt={banners[currentSlide]?.altText || 'Hero Banner'}
-                      referrerPolicy="no-referrer"
-                      className="block md:hidden w-full max-h-[180px] object-cover rounded-lg"
-                      onError={(e) => {
-                        const target = e.currentTarget;
-                        if (!target.src.endsWith('/shrell-opengraph.png')) {
-                          target.src = '/shrell-opengraph.png';
-                        }
-                      }}
-                    />
-                  </Link>
-                </div>
-
-                {/* Prev / Next Arrows */}
-                {banners.length > 1 && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={handlePrevSlide}
-                      className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-xs text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10"
-                      aria-label="Previous banner"
-                    >
-                      <i className="bi bi-chevron-left text-sm sm:text-base"></i>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleNextSlide}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-xs text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10"
-                      aria-label="Next banner"
-                    >
-                      <i className="bi bi-chevron-right text-sm sm:text-base"></i>
-                    </button>
-
-                    {/* Indicator Dots */}
-                    <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5">
-                      {banners.map((b, idx) => (
-                        <button
-                          key={b.id}
-                          type="button"
-                          onClick={() => setCurrentSlide(idx)}
-                          aria-label={`Slide ${idx + 1}`}
-                          className={`h-1.5 rounded-full transition-all ${
-                            currentSlide === idx ? 'w-6 bg-[#FF000E] shadow-xs' : 'w-1.5 bg-white/40 hover:bg-white/70'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  </>
-                )}
+                  {/* Mobile Image Banner (Strictly unchanged) */}
+                  <img
+                    src={(banners[currentSlide]?.mobileImageUrl || banners[currentSlide]?.desktopImageUrl)?.replace(/^http:\/\/res\.cloudinary\.com\//, 'https://res.cloudinary.com/')}
+                    alt={banners[currentSlide]?.altText || 'Hero Banner'}
+                    referrerPolicy="no-referrer"
+                    className="block md:hidden w-full max-h-[180px] object-cover rounded-lg"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (!target.src.endsWith('/shrell-opengraph.png')) {
+                        target.src = '/shrell-opengraph.png';
+                      }
+                    }}
+                  />
+                </Link>
               </div>
-            )
+
+              {/* Prev / Next Arrows */}
+              {banners.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handlePrevSlide}
+                    className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-xs text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10"
+                    aria-label="Previous banner"
+                  >
+                    <i className="bi bi-chevron-left text-sm sm:text-base"></i>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleNextSlide}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-xs text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10"
+                    aria-label="Next banner"
+                  >
+                    <i className="bi bi-chevron-right text-sm sm:text-base"></i>
+                  </button>
+
+                  {/* Indicator Dots */}
+                  <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5">
+                    {banners.map((b, idx) => (
+                      <button
+                        key={b.id}
+                        type="button"
+                        onClick={() => setCurrentSlide(idx)}
+                        aria-label={`Slide ${idx + 1}`}
+                        className={`h-1.5 rounded-full transition-all ${
+                          currentSlide === idx ? 'w-6 bg-[#FF000E] shadow-xs' : 'w-1.5 bg-white/40 hover:bg-white/70'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           )}
         </div>
       </section>
@@ -206,10 +208,8 @@ export const HomePage: React.FC = () => {
             </Link>
           </div>
           {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <ShimmerSkeleton key={index} type="product" />
-              ))}
+            <div className="h-56 flex items-center justify-center">
+              <ShrellLoader size={64} />
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
@@ -237,10 +237,8 @@ export const HomePage: React.FC = () => {
             </Link>
           </div>
           {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <ShimmerSkeleton key={index} type="product" />
-              ))}
+            <div className="h-56 flex items-center justify-center">
+              <ShrellLoader size={64} />
             </div>
           ) : featuredProducts.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
@@ -286,46 +284,35 @@ export const HomePage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Card 2: Dark Graphite Panel with Car Interior Vacuum (imaged3.webp with light image background) */}
+              {/* Card 2: Dark Graphite Panel - Ultra Shampoo Launching Soon */}
               <div className="rounded-2xl bg-[#0E0A0B] border border-[#221215] p-6 sm:p-7 flex flex-col justify-between flex-1 min-h-[230px] sm:min-h-[250px] group hover:border-[#4F242C] transition-all">
                 <div className="flex items-start justify-between gap-3 z-10">
-                  {/* Vacuum Sucker Image with Light Background Container (just like Clay Bar card) */}
+                  {/* SUV Ad Image */}
                   <div className="w-28 sm:w-36 h-28 sm:h-36 rounded-xl bg-[#F7F5F5] p-2.5 flex items-center justify-center overflow-hidden border border-white/30 shadow-sm relative flex-shrink-0">
                     <img
-                      src="/imaged3.webp"
-                      alt="SHRELL Car Interior Vacuum Sucker"
+                      src="/suv.webp"
+                      alt="Ultra Shampoo Variants"
                       className="w-full h-full object-contain"
                       style={{ filter: 'none' }}
                     />
                   </div>
                   <div className="text-right">
-                    <span className="block text-2xl sm:text-3xl font-extrabold text-[#FF000E] tracking-tight leading-none">
-                      8.5K<span className="text-sm font-bold uppercase ml-0.5">Pa</span>
-                    </span>
-                    <span className="block text-xs sm:text-sm font-bold text-[#F1EEEE] mt-1.5 leading-snug">
-                      High-Power<br />Cyclone Suction
+                    <span className="block text-xs sm:text-sm font-extrabold text-[#FF000E] tracking-tight leading-tight uppercase">
+                      Coming<br />Soon
                     </span>
                   </div>
                 </div>
 
                 <div className="space-y-1.5 mt-3">
                   <h3 className="text-xl sm:text-2xl font-extrabold text-[#F1EEEE] tracking-tight leading-tight">
-                    Car Interior Vacuum
+                    Ultra Shampoo
                   </h3>
                   <p className="text-xs text-[#8E8587] leading-relaxed">
-                    Ultra-high cyclonic suction power for deep car cabin cleaning and detailing.
+                    <span className="text-[#FF000E] font-semibold">Lavender Breeze</span> and <span className="text-[#FF000E] font-semibold">Passionfruit Martini</span>
                   </p>
-                </div>
-
-                <div className="pt-3 flex items-end justify-between border-t border-[#221215] mt-3">
-                  <div>
-                    <p className="text-[11px] sm:text-xs text-[#8E8587] leading-tight">
-                      Satisfied drivers<br />around the world
-                    </p>
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-extrabold text-[#FF000E] tracking-tight">
-                    12.4K<sup className="text-sm sm:text-base font-bold">+</sup>
-                  </div>
+                  <p className="text-xs text-[#8E8587] leading-relaxed mt-2">
+                    Launching Soon - Pre-Book Now
+                  </p>
                 </div>
               </div>
             </div>
@@ -387,8 +374,8 @@ export const HomePage: React.FC = () => {
                 </div>
 
                 <div className="relative z-10 pt-4 space-y-3">
-                  {/* Shrell Truck Image */}
-                  <div className="w-full h-40 flex items-center justify-center">
+                  {/* Shrell Truck Image - Increased Size */}
+                  <div className="w-full h-44 sm:h-48 flex items-center justify-center">
                     <img
                       src="/images/bento/shrell-truck.webp"
                       alt="SHRELL Branded Delivery Truck"

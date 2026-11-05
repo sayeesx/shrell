@@ -98,7 +98,7 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2 flex-shrink-0 group cursor-pointer" aria-label="SHRELL Home">
               <img
-                src="/logos/shrell-main.png"
+                src="/logos/shrell-logo-white.png"
                 alt="SHRELL Automotive"
                 className="h-[25px] lg:h-[27px] w-auto object-contain"
               />
@@ -177,7 +177,7 @@ export const Navbar: React.FC = () => {
             <div className="flex items-center min-w-0">
               <Link to="/" className="flex items-center flex-shrink-0 group cursor-pointer" aria-label="SHRELL Home">
                 <img
-                  src="/logos/shrell-main.png"
+                  src="/logos/shrell-logo-white.png"
                   alt="SHRELL Automotive"
                   className="h-[21px] w-auto object-contain"
                 />

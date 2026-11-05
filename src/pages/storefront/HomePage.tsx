@@ -282,7 +282,7 @@ export const HomePage: React.FC = () => {
               <div className="rounded-2xl bg-[#0E0A0B] border border-[#221215] p-6 sm:p-7 flex flex-col justify-between flex-1 min-h-[230px] sm:min-h-[250px] group hover:border-[#4F242C] transition-all">
                 <div className="flex items-start justify-between gap-3 z-10">
                   {/* SUV Ad Image - No Background, Larger */}
-                  <div className="w-32 sm:w-44 h-32 sm:h-44 rounded-xl p-2.5 flex items-center justify-center overflow-hidden relative flex-shrink-0">
+                  <div className="w-36 sm:w-52 h-36 sm:h-52 rounded-xl p-2.5 flex items-center justify-center overflow-hidden relative flex-shrink-0">
                     <img
                       src="/suv.webp"
                       alt="Ultra Shampoo Variants"
@@ -302,7 +302,7 @@ export const HomePage: React.FC = () => {
                     Ultra Shampoo
                   </h3>
                   <p className="text-xs text-[#8E8587] leading-relaxed">
-                    <span className="text-blue-400 font-semibold">Lavender Breeze</span> and <span className="text-red-400 font-semibold">Passionfruit Martini</span>
+                    <span className="font-semibold" style={{ color: '#8843B1' }}>Lavender Breeze</span> and <span className="font-semibold" style={{ color: '#E75306' }}>Passionfruit Martini</span>
                   </p>
                   <Link
                     to="/pre-book"

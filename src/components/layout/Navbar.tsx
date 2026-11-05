@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../application/CartContext';
 import { useAuth } from '../../application/AuthContext';
-import { useTheme } from '../../application/ThemeContext';
 import { ThemeToggle } from '../ui/ThemeToggle';
 export const ANNOUNCEMENT_MESSAGES = [
   { text: 'Fast Surface Dispatch via BlueDart & Delhivery Express Logistics', icon: 'bi-box-seam-fill' },
@@ -14,7 +13,6 @@ export const ANNOUNCEMENT_MESSAGES = [
 export const Navbar: React.FC = () => {
   const { itemCount } = useCart();
   const { user, openAuthModal } = useAuth();
-  const { isDark } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
@@ -68,7 +66,7 @@ export const Navbar: React.FC = () => {
       }`}
     >
       {/* 1. Fluid Continuous Marquee (Desktop Only - Stays on top, does not hide when scrolling) */}
-      <div className="hidden md:block overflow-hidden border-b py-1.5 text-xs select-none bg-black border-black">
+      <div className="hidden md:block overflow-hidden py-1.5 text-xs select-none bg-black">
         <div className="animate-marquee-scroll flex items-center gap-12 whitespace-nowrap">
           {[
             ...ANNOUNCEMENT_MESSAGES,
@@ -79,7 +77,7 @@ export const Navbar: React.FC = () => {
             <div key={i} className="flex items-center gap-2.5 font-medium font-sans shrink-0 text-gray-300">
               <i className={`bi ${msg.icon} text-[#FF000E] text-xs`} aria-hidden="true" />
               <span className="tracking-tight">{msg.text}</span>
-              <span className={`ml-6 text-sm ${isDark ? 'text-[#3B1A1E]' : 'text-[#D6D0C7]'}`}>•</span>
+              <span className="ml-6 text-sm text-gray-600">•</span>
             </div>
           ))}
         </div>

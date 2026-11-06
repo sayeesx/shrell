@@ -142,7 +142,7 @@ export const ProductDetailPage: React.FC = () => {
             <img
               src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
               alt="SHRELL Automotive"
-              className={`w-auto object-contain ${isDark ? 'h-[22px]' : 'h-[30px]'}`}
+              className="h-[22px] w-auto object-contain"
             />
           </Link>
           <Link

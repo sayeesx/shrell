@@ -280,20 +280,19 @@ export const HomePage: React.FC = () => {
               </div>
 
               {/* Card 2: Dark Graphite Panel - Ultra Shampoo Launching Soon */}
-              <div className="rounded-2xl bg-[#0E0A0B] border border-[#221215] p-6 sm:p-7 flex flex-col justify-between flex-1 min-h-[230px] sm:min-h-[250px] group hover:border-[#4F242C] transition-all">
+              <div className="rounded-2xl bg-[#0E0A0B] border border-[#221215] p-6 sm:p-7 flex flex-col justify-between flex-1 min-h-[230px] sm:min-h-[250px] group hover:border-[#4F242C] transition-all relative overflow-hidden">
                 <div className="flex items-start justify-between gap-3 z-10">
-                  {/* SUV Ad Image - No Background, Larger */}
-                  <div className="w-40 sm:w-56 h-40 sm:h-56 rounded-xl p-2.5 flex items-center justify-center overflow-hidden relative flex-shrink-0">
+                  {/* SUV Ad Image - No Background, Much Larger */}
+                  <div className="w-56 sm:w-72 h-36 sm:h-44 -ml-2 -mt-2 flex items-center justify-start overflow-visible relative flex-shrink-0">
                     <img
                       src="/suv.webp"
                       alt="Ultra Shampoo Variants"
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-contain scale-110 sm:scale-125 origin-left group-hover:scale-130 transition-transform duration-300"
                       style={{ filter: 'none' }}
                     />
                   </div>
                   <div className="text-right">
                     <span className="block text-xs sm:text-sm font-extrabold text-[#FF000E] tracking-tight leading-tight uppercase">
-                      Coming<br />Soon
                     </span>
                   </div>
                 </div>

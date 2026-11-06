@@ -21,7 +21,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
           : 'bg-[#EDE9E1] hover:bg-[#E0DBD2] text-gray-700'
       } ${className}`}
     >
-      <i className={`bi ${isDark ? 'bi-sun-fill' : 'bi-moon-stars-fill'} text-lg leading-none`} aria-hidden="true" />
+      <i className={`bi ${isDark ? 'bi-sun-fill' : 'bi-moon-fill'} text-lg leading-none`} aria-hidden="true" />
     </button>
   );
 };

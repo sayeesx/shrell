@@ -5,7 +5,6 @@ import { formatINR } from '../../domain/services/CurrencyService';
 import { useCart } from '../../application/CartContext';
 import { useTheme } from '../../application/ThemeContext';
 import { ProductImagePlaceholder } from '../common/ProductImagePlaceholder';
-import { ShrellLoader } from '../common/ShrellLoader';
 
 interface ProductCardProps {
   product: Product;
@@ -99,12 +98,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </div>
           </div>
 
-          {/* Quick Add Button — shows ShrellLoader (white) while adding */}
+          {/* Quick Add Button */}
           <button
             type="button"
             onClick={handleAddToCart}
             disabled={isOutOfStock || isAdding}
-            className={`relative min-h-[32px] sm:min-h-[34px] px-3 py-1 rounded-md text-xs font-semibold flex items-center justify-center gap-1 transition-all flex-shrink-0 overflow-hidden ${
+            className={`relative min-h-[32px] sm:min-h-[34px] px-3 py-1 rounded-md text-xs font-semibold flex items-center justify-center gap-1.5 transition-all flex-shrink-0 select-none outline-none focus:outline-none focus:ring-0 disabled:opacity-100 ${
               added
                 ? 'bg-[#E0000C] text-white min-w-[70px] sm:min-w-[80px]'
                 : isAdding
@@ -113,7 +112,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     ? isDark
                       ? 'bg-[#1A1214] text-[#7A7575] cursor-not-allowed border border-[#261619] min-w-[70px] sm:min-w-[80px]'
                       : 'bg-[#F0EDE6] text-[#9E9898] cursor-not-allowed border border-[#E0DBD2] min-w-[70px] sm:min-w-[80px]'
-                    : 'bg-[#FF000E] hover:bg-[#E0000C] text-white active:scale-95 min-w-[70px] sm:min-w-[80px]'
+                    : 'bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#E0000C] text-white active:scale-95 min-w-[70px] sm:min-w-[80px]'
             }`}
             aria-label={
               isOutOfStock
@@ -124,17 +123,47 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             }
           >
             {isAdding ? (
-              <ShrellLoader size={16} white />
+              <svg
+                className="animate-spin h-3.5 w-3.5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="3.5"
+                />
+                <path
+                  className="opacity-100"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
             ) : added ? (
               <>
-                <i className="bi bi-check-lg text-sm" aria-hidden="true"></i>
-                <span className="hidden sm:inline">Added</span>
+                <i className="bi bi-check-lg text-sm leading-none" aria-hidden="true"></i>
+                <span className="whitespace-nowrap">Added to cart</span>
               </>
             ) : isOutOfStock ? (
               <span>Out</span>
             ) : (
               <>
-                <i className="bi bi-cart-plus text-xs" aria-hidden="true"></i>
+                <svg
+                  viewBox="270 277 1386 1383"
+                  className="w-3.5 h-3.5 fill-current flex-shrink-0"
+                  aria-hidden="true"
+                >
+                  <path d="M290,430 Q290,297 420,297 L1150,297 L1050,435 Q1010,483 950,483 L745,483 Q690,490 655,522 L470,730 Q440,775 430,850 L420,950 Q400,1050 292,1065 Z" />
+                  <path d="M880,580 L985,581 L545,1112 Q520,1135 490,1135 L430,1135 Q405,1130 405,1103 Q405,1090 415,1080 L790,630 Q830,585 880,580 Z" />
+                  <path d="M1415,297 L1510,297 Q1630,300 1636,430 L1636,662 L1340,662 Q1290,670 1255,710 L930,1110 L650,1282 Q620,1313 570,1313 L290,1313 L290,1520 Q295,1635 415,1640 L520,1640 Z" />
+                  <path d="M1410,838 L1500,838 Q1525,845 1522,875 L1150,1315 Q1110,1360 1050,1360 L950,1360 L1370,865 Q1390,840 1410,838 Z" />
+                  <path d="M1636,910 L1636,1520 Q1630,1635 1510,1640 L750,1640 L840,1515 Q880,1490 935,1488 L1355,1488 Q1430,1480 1448,1400 L1505,1050 Q1530,925 1636,910 Z" />
+                </svg>
                 <span>Add</span>
               </>
             )}

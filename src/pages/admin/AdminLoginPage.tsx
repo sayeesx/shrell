@@ -40,7 +40,7 @@ export const AdminLoginPage: React.FC = () => {
         <div className="text-center space-y-3">
           <div className={`w-14 h-14 rounded-2xl border flex items-center justify-center mx-auto p-2.5 ${isDark ? 'bg-surface-950 border-surface-700' : 'bg-[#F5F3EE] border-[#E0DBD2]'}`}>
             <img
-              src={isDark ? '/logos/shrell-brandicon_no-bg.png' : '/logos/shrell-blacktext-redlogo.png'}
+              src="/logos/shrell-brandicon_no-bg.png"
               alt="SHRELL"
               className="w-full h-full object-contain"
             />
@@ -104,7 +104,7 @@ export const AdminLoginPage: React.FC = () => {
             <img
               src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
               alt="SHRELL"
-              className={`w-auto object-contain ${isDark ? 'h-4' : 'h-5'}`}
+              className="h-4 w-auto object-contain"
             />
             <span>Customer Storefront</span>
           </Link>

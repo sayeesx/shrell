@@ -11,7 +11,6 @@ export const HomePage: React.FC = () => {
   const { isDark } = useTheme();
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [banners, setBanners] = useState<HeroBanner[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [currentSlide, setCurrentSlide] = useState<number>(0);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -42,7 +41,6 @@ export const HomePage: React.FC = () => {
   };
 
   useEffect(() => {
-    setLoading(true); // Reset loading state when component mounts
     async function loadData() {
       try {
         const [prodResult, bannerResult] = await Promise.all([
@@ -54,7 +52,6 @@ export const HomePage: React.FC = () => {
       } catch (err) {
         console.error('Failed to load home page catalogue data:', err);
       } finally {
-        setLoading(false);
         finishPageLoad();
       }
     }
@@ -201,16 +198,9 @@ export const HomePage: React.FC = () => {
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-            {loading ? (
-              // Show empty skeleton cards while loading
-              Array.from({ length: 4 }).map((_, idx) => (
-                <div key={idx} className={`border rounded-xl overflow-hidden h-64 ${isDark ? 'bg-[#0A0808] border-[#221215]' : 'bg-white border-[#E0DBD2]'}`} />
-              ))
-            ) : (
-              featuredProducts.slice(0, 4).map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))
-            )}
+            {featuredProducts.slice(0, 4).map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
         </section>
 
@@ -231,12 +221,7 @@ export const HomePage: React.FC = () => {
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-            {loading ? (
-              // Show empty skeleton cards while loading
-              Array.from({ length: 4 }).map((_, idx) => (
-                <div key={idx} className={`border rounded-xl overflow-hidden h-64 ${isDark ? 'bg-[#0A0808] border-[#221215]' : 'bg-white border-[#E0DBD2]'}`} />
-              ))
-            ) : featuredProducts.length > 0 ? (
+            {featuredProducts.length > 0 ? (
               (featuredProducts.slice(4, 8).length > 0 ? featuredProducts.slice(4, 8) : featuredProducts.slice(0, 4)).map((product, idx) => (
                 <ProductCard key={`deal-${product.id}-${idx}`} product={product} />
               ))
@@ -281,35 +266,54 @@ export const HomePage: React.FC = () => {
 
               {/* Card 2: Dark Graphite Panel - Ultra Shampoo Launching Soon */}
               <div className="rounded-2xl bg-[#0E0A0B] border border-[#221215] p-6 sm:p-7 flex flex-col justify-between flex-1 min-h-[230px] sm:min-h-[250px] group hover:border-[#4F242C] transition-all relative overflow-hidden">
-                <div className="flex items-start justify-between gap-3 z-10">
-                  {/* SUV Ad Image - No Background, Much Larger */}
-                  <div className="w-56 sm:w-72 h-36 sm:h-44 -ml-2 -mt-2 flex items-center justify-start overflow-visible relative flex-shrink-0">
-                    <img
-                      src="/suv.webp"
-                      alt="Ultra Shampoo Variants"
-                      className="w-full h-full object-contain scale-110 sm:scale-125 origin-left group-hover:scale-130 transition-transform duration-300"
-                      style={{ filter: 'none' }}
-                    />
+                {/* Top: Shifted Texts with Background for Lavender and Passionfruit */}
+                <div className="relative z-10 space-y-2.5 max-w-[70%] sm:max-w-[65%]">
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-extrabold text-[#F1EEEE] tracking-tight leading-tight">
+                      Ultra Shampoo
+                    </h3>
+                    <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                      <span
+                        className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold border backdrop-blur-xs"
+                        style={{
+                          backgroundColor: 'rgba(136, 67, 177, 0.22)',
+                          color: '#D8B4FE',
+                          borderColor: 'rgba(136, 67, 177, 0.4)',
+                        }}
+                      >
+                        Lavender Breeze
+                      </span>
+                      <span
+                        className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold border backdrop-blur-xs"
+                        style={{
+                          backgroundColor: 'rgba(231, 83, 6, 0.22)',
+                          color: '#FDBA74',
+                          borderColor: 'rgba(231, 83, 6, 0.4)',
+                        }}
+                      >
+                        Passionfruit Martini
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <span className="block text-xs sm:text-sm font-extrabold text-[#FF000E] tracking-tight leading-tight uppercase">
-                    </span>
+
+                  <div>
+                    <Link
+                      to="/pre-book"
+                      className="inline-block px-3 py-1.5 bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-semibold rounded-full transition-all shadow-sm"
+                    >
+                      Pre-Book Now
+                    </Link>
                   </div>
                 </div>
 
-                <div className="space-y-1.5 mt-3">
-                  <h3 className="text-xl sm:text-2xl font-extrabold text-[#F1EEEE] tracking-tight leading-tight">
-                    Ultra Shampoo
-                  </h3>
-                  <p className="text-xs text-[#8E8587] leading-relaxed">
-                    <span className="font-semibold" style={{ color: '#8843B1' }}>Lavender Breeze</span> and <span className="font-semibold" style={{ color: '#E75306' }}>Passionfruit Martini</span>
-                  </p>
-                  <Link
-                    to="/pre-book"
-                    className="inline-block mt-3 px-3 py-1.5 bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-semibold rounded-full transition-all"
-                  >
-                    Pre-Book Now
-                  </Link>
+                {/* Bottom Right Corner: SUV Image */}
+                <div className="absolute -bottom-1 -right-3 sm:-right-2 w-52 sm:w-64 h-32 sm:h-40 pointer-events-none flex items-end justify-end">
+                  <img
+                    src="/suv.webp"
+                    alt="Ultra Shampoo Variants"
+                    className="w-full h-full object-contain scale-110 sm:scale-125 origin-bottom-right group-hover:scale-130 transition-transform duration-300"
+                    style={{ filter: 'none' }}
+                  />
                 </div>
               </div>
             </div>
@@ -332,7 +336,6 @@ export const HomePage: React.FC = () => {
                   />
                   {/* Subtle dark vignette */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0A0808] via-transparent to-transparent pointer-events-none" />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_70%,rgba(255,0,14,0.12),transparent_70%)] pointer-events-none" />
                 </div>
 
                 {/* Empty top slot (Access laser cutting tag removed) */}

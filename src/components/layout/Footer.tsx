@@ -15,7 +15,7 @@ export const Footer: React.FC = () => {
               <img
                 src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
                 alt="SHRELL Automotive"
-                className="h-7 w-auto object-contain transition-opacity group-hover:opacity-90"
+                className={`w-auto object-contain transition-opacity group-hover:opacity-90 ${isDark ? 'h-7' : 'h-[30px]'}`}
               />
             </Link>
             <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>

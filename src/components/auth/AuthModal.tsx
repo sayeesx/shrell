@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../application/AuthContext';
+import { useTheme } from '../../application/ThemeContext';
 import { useBodyScrollLock } from '../common/useBodyScrollLock';
 import { ThemeSuccessAnimation, ThemeErrorAnimation } from '../common/ThemeFeedbackAnimation';
 import { ShrellLoader } from '../common/ShrellLoader';
 
 export const AuthModal: React.FC = () => {
   const { isAuthModalOpen, closeAuthModal, loginWithPhone } = useAuth();
+  const { isDark } = useTheme();
   const navigate = useNavigate();
 
   useBodyScrollLock(isAuthModalOpen);
@@ -162,14 +164,18 @@ export const AuthModal: React.FC = () => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto overscroll-contain">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
         onClick={closeAuthModal}
         aria-hidden="true"
       />
 
       {/* Modal Container: Elevated above virtual keyboard on mobile */}
       <div
-        className="relative w-full max-w-sm sm:max-w-md bg-[#0E0A0B] text-[#F1EEEE] border border-[#261619] rounded-3xl p-6 sm:p-8 z-10 shadow-[0_25px_60px_rgba(0,0,0,0.9)] transition-all duration-300 ease-out my-auto max-h-[calc(100dvh-2rem)] overflow-y-auto"
+        className={`relative w-full max-w-sm sm:max-w-md rounded-3xl p-6 sm:p-8 z-10 transition-all duration-300 ease-out my-auto max-h-[calc(100dvh-2rem)] overflow-y-auto ${
+          isDark
+            ? 'bg-[#0E0A0B] text-[#F1EEEE] border border-[#261619] shadow-[0_25px_60px_rgba(0,0,0,0.9)]'
+            : 'bg-[#FFFEFA] text-[#140E10] border border-[#E0DBD2] shadow-[0_25px_60px_rgba(0,0,0,0.12)]'
+        }`}
         style={{
           transform: keyboardOffset > 0 ? `translateY(-${Math.min(keyboardOffset * 0.45, 140)}px)` : undefined,
         }}
@@ -177,39 +183,56 @@ export const AuthModal: React.FC = () => {
         aria-modal="true"
       >
         {/* Mobile Indicator Bar */}
-        <div className="w-10 h-1 bg-[#261619] rounded-full mx-auto mb-4 sm:hidden" />
+        <div className={`w-10 h-1 rounded-full mx-auto mb-4 sm:hidden ${isDark ? 'bg-[#261619]' : 'bg-[#E0DBD2]'}`} />
 
         {/* Close Button */}
         <button
           type="button"
           onClick={closeAuthModal}
-          className="absolute top-5 right-5 text-[#8E8587] hover:text-[#F1EEEE] w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer"
+          className={`absolute top-5 right-5 w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
+            isDark
+              ? 'text-[#8E8587] hover:text-[#F1EEEE] hover:bg-[#1A1214]'
+              : 'text-[#5C5456] hover:text-[#140E10] hover:bg-[#EDE9E1]'
+          }`}
           aria-label="Close modal"
         >
           <i className="bi bi-x-lg text-sm" aria-hidden="true" />
         </button>
 
         {/* ======================================================== */}
-        {/* STEP 1: PHONE NUMBER INPUT                               */}
+        {/* STEP 1: PHONE NUMBER INPUT (LOGIN MODAL)                  */}
         {/* ======================================================== */}
         {step === 'phone' && (
-          <div className="space-y-6 pt-2">
+          <div className="space-y-5 pt-1">
+            {/* SHRELL Brand Logo for both Light & Dark Theme */}
+            <div className="flex justify-center pb-1">
+              <img
+                src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
+                alt="SHRELL"
+                className="h-6 sm:h-7 w-auto object-contain"
+              />
+            </div>
+
             <div>
-              <h2 className="text-xl sm:text-2xl font-semibold text-[#F1EEEE] tracking-tight font-sans">
+              <h2 className={`text-xl sm:text-2xl font-semibold tracking-tight font-sans ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
                 Enter your phone number
               </h2>
-              <p className="text-xs sm:text-sm text-[#8E8587] mt-1 font-sans">
+              <p className={`text-xs sm:text-sm mt-1 font-sans ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>
                 We'll text you a 4-digit code to verify your phone.
               </p>
             </div>
 
             <form onSubmit={handlePhoneSubmit} className="space-y-4">
               <div>
-                <label htmlFor="auth-phone-input" className="block text-xs font-medium text-[#D8D1D1] mb-1.5 font-sans">
+                <label htmlFor="auth-phone-input" className={`block text-xs font-medium mb-1.5 font-sans ${isDark ? 'text-[#D8D1D1]' : 'text-[#3A3030]'}`}>
                   Phone Number
                 </label>
-                <div className="flex rounded-full border border-[#261619] bg-[#130E10] overflow-hidden focus-within:ring-2 focus-within:ring-[#FF000E] focus-within:border-[#FF000E] transition-all">
-                  <div className="flex items-center px-4 bg-[#1A1214] text-[#D8D1D1] text-xs font-medium border-r border-[#261619] select-none">
+                <div className={`flex rounded-full border overflow-hidden focus-within:ring-2 focus-within:ring-[#FF000E] focus-within:border-[#FF000E] transition-all ${
+                  isDark ? 'border-[#261619] bg-[#130E10]' : 'border-[#E0DBD2] bg-[#FFFFFF]'
+                }`}>
+                  <div className={`flex items-center px-4 text-xs font-medium border-r select-none ${
+                    isDark ? 'bg-[#1A1214] text-[#D8D1D1] border-[#261619]' : 'bg-[#F5F3EE] text-[#3A3030] border-[#E0DBD2]'
+                  }`}>
                     +91
                   </div>
                   <input
@@ -220,7 +243,9 @@ export const AuthModal: React.FC = () => {
                     placeholder="98765 43210"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="w-full px-4 py-3 text-sm text-[#F1EEEE] placeholder-[#5C5456] bg-transparent focus:outline-none tracking-wider font-sans font-medium"
+                    className={`w-full px-4 py-3 text-sm bg-transparent focus:outline-none tracking-wider font-sans font-medium ${
+                      isDark ? 'text-[#F1EEEE] placeholder-[#5C5456]' : 'text-[#140E10] placeholder-[#9E9898]'
+                    }`}
                     maxLength={14}
                   />
                 </div>
@@ -237,13 +262,13 @@ export const AuthModal: React.FC = () => {
               </button>
             </form>
 
-            <p className="text-[11px] text-[#8E8587] text-center leading-relaxed font-sans">
+            <p className={`text-[11px] text-center leading-relaxed font-sans ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>
               By continuing, you agree to SHRELL Automotive's{' '}
-              <a href="/privacy-policy" className="underline hover:text-[#F1EEEE]">
+              <a href="/privacy-policy" className={`underline ${isDark ? 'hover:text-[#F1EEEE]' : 'hover:text-[#140E10]'}`}>
                 Privacy Policy
               </a>{' '}
               and{' '}
-              <a href="/shipping-policy" className="underline hover:text-[#F1EEEE]">
+              <a href="/shipping-policy" className={`underline ${isDark ? 'hover:text-[#F1EEEE]' : 'hover:text-[#140E10]'}`}>
                 Terms of Service
               </a>
               .
@@ -252,17 +277,17 @@ export const AuthModal: React.FC = () => {
         )}
 
         {/* ======================================================== */}
-        {/* STEP 2: 4-DIGIT CODE INPUT                               */}
+        {/* STEP 2: 4-DIGIT CODE INPUT (VERIFY MODAL — NO LOGO)       */}
         {/* ======================================================== */}
         {step === 'otp' && (
           <div className="space-y-6 pt-2">
             <div>
-              <h2 className="text-xl sm:text-2xl font-semibold text-[#F1EEEE] tracking-tight font-sans">
+              <h2 className={`text-xl sm:text-2xl font-semibold tracking-tight font-sans ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
                 Verify phone number
               </h2>
-              <p className="text-xs sm:text-sm text-[#8E8587] mt-1 font-sans">
+              <p className={`text-xs sm:text-sm mt-1 font-sans ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>
                 Enter the 4-digit code sent to{' '}
-                <span className="font-medium text-[#F1EEEE]">
+                <span className={`font-medium ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
                   +91 {phoneNumber.replace(/\D/g, '')}
                 </span>
                 .{' '}
@@ -291,10 +316,14 @@ export const AuthModal: React.FC = () => {
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   disabled={isVerifying}
                   className={`w-14 h-14 sm:w-16 sm:h-16 text-center text-2xl font-bold rounded-2xl border transition-all duration-150 focus:outline-none ${
-                    otp[index]
-                      ? 'border-[#B0000A] bg-[#1A1214] text-[#F1EEEE]'
-                      : 'border-[#261619] bg-[#130E10] text-[#F1EEEE] hover:border-[#4F242C]'
-                  } focus:border-[#FF000E] focus:bg-[#1A1214] focus:ring-2 focus:ring-[#FF000E]/20`}
+                    isDark
+                      ? otp[index]
+                        ? 'border-[#B0000A] bg-[#1A1214] text-[#F1EEEE]'
+                        : 'border-[#261619] bg-[#130E10] text-[#F1EEEE] hover:border-[#4F242C]'
+                      : otp[index]
+                        ? 'border-[#FF000E] bg-[#FFFFFF] text-[#140E10] shadow-sm'
+                        : 'border-[#E0DBD2] bg-[#F5F3EE] text-[#140E10] hover:border-[#C8C2B6]'
+                  } focus:border-[#FF000E] ${isDark ? 'focus:bg-[#1A1214]' : 'focus:bg-[#FFFFFF]'} focus:ring-2 focus:ring-[#FF000E]/20`}
                   aria-label={`Digit ${index + 1}`}
                 />
               ))}
@@ -310,7 +339,7 @@ export const AuthModal: React.FC = () => {
               </div>
             ) : (
               <div className="text-center pt-1">
-                <p className="text-xs text-[#8E8587] font-sans">
+                <p className={`text-xs font-sans ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>
                   Didn't receive the code?{' '}
                   <button
                     type="button"
@@ -324,7 +353,7 @@ export const AuthModal: React.FC = () => {
             )}
 
             <div className="pt-2">
-              <p className="text-[11px] text-[#8E8587] text-center font-sans">
+              <p className={`text-[11px] text-center font-sans ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>
                 Tip: Enter any 4 numbers for instant access.
               </p>
             </div>
@@ -332,7 +361,7 @@ export const AuthModal: React.FC = () => {
         )}
 
         {/* ======================================================== */}
-        {/* STEP 3: SUCCESSFUL (Editorial Theme Animated Badge)       */}
+        {/* STEP 3: SUCCESSFUL (THEME-AWARE SUCCESS MODAL)            */}
         {/* ======================================================== */}
         {step === 'success' && (
           <div className="space-y-6 pt-4 pb-2 text-center">
@@ -342,10 +371,10 @@ export const AuthModal: React.FC = () => {
             </div>
 
             <div className="space-y-1">
-              <h2 className="text-2xl font-semibold text-[#F1EEEE] tracking-tight font-sans">
+              <h2 className={`text-2xl font-semibold tracking-tight font-sans ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
                 Successful
               </h2>
-              <p className="text-xs sm:text-sm text-[#8E8587] max-w-[260px] mx-auto leading-relaxed font-sans">
+              <p className={`text-xs sm:text-sm max-w-[260px] mx-auto leading-relaxed font-sans ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>
                 Your New Experience is successfully added.
               </p>
             </div>
@@ -361,7 +390,7 @@ export const AuthModal: React.FC = () => {
         )}
 
         {/* ======================================================== */}
-        {/* STEP 4: ERROR STATE (Theme Error Cross Animation)         */}
+        {/* STEP 4: ERROR STATE                                       */}
         {/* ======================================================== */}
         {step === 'error' && (
           <div className="space-y-6 pt-4 pb-2 text-center">
@@ -370,10 +399,10 @@ export const AuthModal: React.FC = () => {
             </div>
 
             <div className="space-y-1">
-              <h2 className="text-2xl font-semibold text-[#F1EEEE] tracking-tight font-sans">
+              <h2 className={`text-2xl font-semibold tracking-tight font-sans ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
                 Verification Failed
               </h2>
-              <p className="text-xs sm:text-sm text-[#8E8587] max-w-[260px] mx-auto leading-relaxed font-sans">
+              <p className={`text-xs sm:text-sm max-w-[260px] mx-auto leading-relaxed font-sans ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>
                 {errorMessage || 'The code entered could not be verified. Please try again.'}
               </p>
             </div>

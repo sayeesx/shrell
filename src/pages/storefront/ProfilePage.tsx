@@ -62,7 +62,7 @@ export const ProfilePage: React.FC = () => {
             <img
               src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
               alt="SHRELL Automotive"
-              className="h-[22px] w-auto object-contain"
+              className={`w-auto object-contain ${isDark ? 'h-[22px]' : 'h-[24px]'}`}
             />
           </Link>
           <span className={`text-[11px] font-bold tracking-wider uppercase font-mono ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`}>

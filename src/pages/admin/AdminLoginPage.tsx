@@ -104,7 +104,7 @@ export const AdminLoginPage: React.FC = () => {
             <img
               src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
               alt="SHRELL"
-              className="h-4 w-auto object-contain"
+              className={`w-auto object-contain ${isDark ? 'h-4' : 'h-[18px]'}`}
             />
             <span>Customer Storefront</span>
           </Link>

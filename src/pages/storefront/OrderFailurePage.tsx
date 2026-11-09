@@ -113,3 +113,4 @@ export const OrderFailurePage: React.FC = () => {
     </div>
   );
 };
+

@@ -15,13 +15,13 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
       onClick={toggleTheme}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
       title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-      className={`flex items-center justify-center w-7.5 h-7.5 sm:w-8 sm:h-8 rounded-full transition-all cursor-pointer ${
+      className={`shrink-0 flex items-center justify-center w-8 h-8 rounded-full border transition-all cursor-pointer active:scale-95 ${
         isDark
-          ? 'bg-[#130E10] hover:bg-[#1D1214] text-yellow-400'
-          : 'bg-[#EDE9E1] hover:bg-[#E0DBD2] text-gray-700'
+          ? 'bg-[#130E10] hover:bg-[#1A1214] border-[#261619] text-yellow-400'
+          : 'bg-[#EDE9E1] hover:bg-[#E0DBD2] border-[#D6D0C7] text-gray-700'
       } ${className}`}
     >
-      <i className={`bi ${isDark ? 'bi-sun-fill' : 'bi-moon-fill'} text-sm sm:text-base leading-none`} aria-hidden="true" />
+      <i className={`bi ${isDark ? 'bi-sun-fill' : 'bi-moon-fill'} text-base leading-none`} aria-hidden="true" />
     </button>
   );
 };

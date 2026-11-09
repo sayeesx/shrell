@@ -64,7 +64,7 @@ export const CheckoutModal: React.FC = () => {
   const [createdOrder, setCreatedOrder] = useState<Order | null>(null);
   const [copiedUpi, setCopiedUpi] = useState(false);
 
-  const storeUpiId = import.meta.env.VITE_STORE_UPI_ID || 'shrell@icici';
+  const storeUpiId = import.meta.env.VITE_STORE_UPI_ID || '';
 
   // Reset order state when modal closes
   useEffect(() => {

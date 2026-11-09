@@ -7,7 +7,7 @@ export class ManualUPIAdapter implements IPaymentAdapter {
   private merchantName: string;
 
   constructor(upiId?: string, merchantName?: string) {
-    this.upiId = upiId || import.meta.env.VITE_STORE_UPI_ID || 'shrell@icici';
+    this.upiId = upiId || import.meta.env.VITE_STORE_UPI_ID || '';
     this.merchantName = merchantName || import.meta.env.VITE_STORE_UPI_NAME || 'SHRELL Automotive India';
   }
 

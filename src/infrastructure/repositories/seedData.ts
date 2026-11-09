@@ -15,8 +15,8 @@ export const INITIAL_SETTINGS: StoreSettings = {
   contactEmail: 'orders@shrell.com',
   contactPhone: '+91 98765 43210',
   whatsappSupportNumber: '919876543210',
-  storeUpiId: 'shrell@icici',
-  storeUpiName: 'SHRELL Automotive India',
+  storeUpiId: '',
+  storeUpiName: '',
   freeShippingThresholdPaisa: 499900, // ₹4,999.00
   standardShippingPaisa: 25000, // ₹250.00
   gstRatePercent: 18,

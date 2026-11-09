@@ -121,7 +121,7 @@ export const AdminSettings: React.FC = () => {
             <div>
               <label className={labelCls}>Store UPI VPA Handle</label>
               <input type="text" required value={storeUpiId} onChange={(e) => setStoreUpiId(e.target.value)}
-                placeholder="e.g. shrell@icici" className={inputCls} />
+                placeholder="" className={inputCls} />
             </div>
             <div>
               <label className={labelCls}>Registered Merchant Name</label>

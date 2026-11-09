@@ -129,8 +129,8 @@ export const ProductDetailPage: React.FC = () => {
     setTimeout(() => {
       const res = addItem(product, quantity);
       setIsBuyingNow(false);
-      if (res.success) navigate('/checkout');
-    }, 600);
+      if (res.success) navigate('/cart');
+    }, 400);
   };
 
 

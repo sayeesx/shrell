@@ -32,11 +32,11 @@ export const ProductDetailPage: React.FC = () => {
     { id: 4, label: '' },
   ];
 
-  // Accordion open states
+  // Accordion open states - Shipping & Warranty expanded by default on all screens
   const [openAccordions, setOpenAccordions] = useState<{ [key: string]: boolean }>({
     description: true,
     specs: false,
-    shipping: false,
+    shipping: true,
   });
 
   const toggleAccordion = (key: string) => {
@@ -135,23 +135,20 @@ export const ProductDetailPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-[#0A0808] bg-atmospheric-red text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'}`}>
-      <div className="max-w-2xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-8 space-y-10">
-        {/* Top Product Navigation */}
-        <div className={`flex items-center justify-between pb-3 border-b ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
-          <Link to="/" className="flex items-center group cursor-pointer" aria-label="SHRELL Home">
-            <img
-              src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
-              alt="SHRELL Automotive"
-              className={`w-auto object-contain ${isDark ? 'h-[22px]' : 'h-[24px]'}`}
-            />
-          </Link>
-          <Link
-            to="/cart"
-            className={`relative p-2 rounded-full border transition-colors flex items-center justify-center cursor-pointer ${isDark ? 'bg-[#130E10] hover:bg-[#1A1214] text-[#F1EEEE] border-[#261619]' : 'bg-[#F5F3EE] hover:bg-[#EDE9E1] text-[#140E10] border-[#E0DBD2]'}`}
-            aria-label="View cart"
+      <div className="max-w-2xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-36 sm:pb-16 space-y-8 sm:space-y-10">
+        {/* Minimal Back Navigation (No topbar with cart) */}
+        <div>
+          <button
+            type="button"
+            onClick={() => window.history.back()}
+            className={`inline-flex items-center gap-2 text-xs font-medium transition-colors cursor-pointer ${
+              isDark ? 'text-[#8E8587] hover:text-[#F1EEEE]' : 'text-[#5C5456] hover:text-[#140E10]'
+            }`}
+            aria-label="Go back"
           >
-            <i className="bi bi-bag text-sm" />
-          </Link>
+            <i className="bi bi-arrow-left text-sm" aria-hidden="true" />
+            <span>Back</span>
+          </button>
         </div>
 
         {/* Main Product Showcase */}

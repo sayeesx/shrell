@@ -355,7 +355,7 @@ html.light {
     }
   }
 
-  /* Shrell Cart Button Skew-Sweep "Added to Cart" Animation */
+  /* Shrell Cart Button Skew-Sweep "Added to Cart" & "Checkout" Flip Animation */
   .shrell-cart-btn {
     position: relative;
     overflow: hidden;
@@ -370,7 +370,8 @@ html.light {
     z-index: 10;
   }
 
-  .shrell-cart-btn.is-added .btn-default-content {
+  .shrell-cart-btn.is-added .btn-default-content,
+  .shrell-cart-btn.is-checkout .btn-default-content {
     opacity: 0;
     transform: translateY(-150%);
   }
@@ -395,7 +396,36 @@ html.light {
   .shrell-cart-btn.is-added .btn-added-content {
     transform: translateX(-50%) translateY(-50%);
     opacity: 1;
-    transition: all 900ms cubic-bezier(0.48, 0, 0.12, 1);
+    transition: all 700ms cubic-bezier(0.48, 0, 0.12, 1);
+  }
+
+  .shrell-cart-btn.is-checkout .btn-added-content {
+    transform: translateX(-50%) translateY(-190%) rotate(-8deg);
+    opacity: 0;
+    transition: all 500ms cubic-bezier(0.48, 0, 0.12, 1);
+  }
+
+  .shrell-cart-btn .btn-checkout-content {
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateY(225%) translateX(-50%) rotate(8deg);
+    opacity: 0;
+    z-index: 30;
+    white-space: nowrap;
+    pointer-events: none;
+    transition: all 500ms cubic-bezier(0.48, 0, 0.12, 1);
+  }
+
+  .shrell-cart-btn.is-checkout .btn-checkout-content {
+    transform: translateX(-50%) translateY(-50%) rotate(0deg);
+    opacity: 1;
+    transition: all 600ms cubic-bezier(0.48, 0, 0.12, 1);
   }
 
   .shrell-cart-btn::after {
@@ -413,7 +443,8 @@ html.light {
     pointer-events: none;
   }
 
-  .shrell-cart-btn.is-added::after {
+  .shrell-cart-btn.is-added::after,
+  .shrell-cart-btn.is-checkout::after {
     transform-origin: bottom center;
     transform: skewY(9.3deg) scaleY(3);
   }

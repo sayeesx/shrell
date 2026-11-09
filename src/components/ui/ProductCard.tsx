@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Product } from '../../domain/types';
 import { formatINR } from '../../domain/services/CurrencyService';
 import { useCart } from '../../application/CartContext';
@@ -11,26 +11,51 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { addItem } = useCart();
+  const { cart, addItem } = useCart();
   const { isDark } = useTheme();
-  const [added, setAdded] = useState(false);
-  const [isAdding, setIsAdding] = useState(false);
+  const navigate = useNavigate();
+
+  const isInCart = cart.items.some((it) => it.productId === product.id);
+
+  // Button state machine: 'idle' | 'adding' | 'added' | 'checkout'
+  const [btnState, setBtnState] = useState<'idle' | 'adding' | 'added' | 'checkout'>(() =>
+    isInCart ? 'checkout' : 'idle'
+  );
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  // Sync state if cart changes externally
+  useEffect(() => {
+    if (!isInCart && btnState === 'checkout') {
+      setBtnState('idle');
+    }
+  }, [isInCart, btnState]);
+
+  const handleButtonClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (isAdding || added) return;
-    setIsAdding(true);
-    // Small delay to show loader then confirm
+
+    // If button has transitioned to checkout, clicking it takes customer directly to cart/checkout
+    if (btnState === 'checkout') {
+      navigate('/cart');
+      return;
+    }
+
+    if (btnState === 'adding' || btnState === 'added' || product.stockQuantity <= 0) return;
+
+    setBtnState('adding');
     setTimeout(() => {
       const res = addItem(product, 1);
-      setIsAdding(false);
       if (res.success) {
-        setAdded(true);
-        setTimeout(() => setAdded(false), 2000);
+        // 1. Show "Added to cart"
+        setBtnState('added');
+        // 2. Rotate with skew-sweep animation into "Checkout" button
+        setTimeout(() => {
+          setBtnState('checkout');
+        }, 900);
+      } else {
+        setBtnState('idle');
       }
-    }, 600);
+    }, 500);
   };
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
@@ -40,8 +65,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   const isOutOfStock = product.stockQuantity <= 0;
-
   const offersCount = 5 + ((product.id.charCodeAt(0) * 3) % 15);
+
+  const isActionActive = btnState === 'added' || btnState === 'checkout';
 
   return (
     <article className={`group relative border rounded-xl overflow-hidden flex flex-col transition-all duration-200 ${isDark ? 'bg-[#0A0808] bg-gradient-to-b from-[#130E10] to-[#0A0808] border-[#221215] hover:border-[#4F242C]' : 'bg-white border-[#E0DBD2] hover:border-[#FF000E]/40'}`}>
@@ -84,10 +110,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Pricing and Action Row */}
         <div className={`mt-2 pt-2 border-t flex items-center justify-between gap-1.5 ${isDark ? 'border-[#221215]' : 'border-[#E0DBD2]'}`}>
-          {/* Price Stack — hides when added to cart */}
+          {/* Price Stack — hides smoothly when in active action state */}
           <div
             className={`min-w-0 transition-all duration-300 ${
-              added ? 'opacity-0 invisible w-0 overflow-hidden m-0 p-0' : 'opacity-100'
+              isActionActive ? 'opacity-0 invisible w-0 overflow-hidden m-0 p-0' : 'opacity-100'
             }`}
           >
             <div className="flex items-baseline gap-1 sm:gap-1.5 flex-wrap">
@@ -102,33 +128,37 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </div>
           </div>
 
-          {/* Quick Add Button with Skew-Sweep "Added to cart" Animation */}
+          {/* Quick Add Button with Skew-Sweep "Added to cart" -> Rotate to "Checkout" Animation */}
           <button
             type="button"
-            onClick={handleAddToCart}
-            disabled={isOutOfStock || isAdding}
-            className={`shrell-cart-btn ${added ? 'is-added' : ''} relative min-h-[32px] sm:min-h-[34px] px-3 py-1 rounded-md text-xs font-semibold flex items-center justify-center transition-all flex-shrink-0 select-none outline-none focus:outline-none focus:ring-0 disabled:opacity-100 ${
-              added
-                ? 'bg-[#E0000C] text-white w-full'
-                : isAdding
-                  ? 'bg-[#FF000E] text-white cursor-wait min-w-[70px] sm:min-w-[80px]'
-                  : isOutOfStock
-                    ? isDark
-                      ? 'bg-[#1A1214] text-[#7A7575] cursor-not-allowed border border-[#261619] min-w-[70px] sm:min-w-[80px]'
-                      : 'bg-[#F0EDE6] text-[#9E9898] cursor-not-allowed border border-[#E0DBD2] min-w-[70px] sm:min-w-[80px]'
-                    : 'bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#E0000C] text-white active:scale-95 min-w-[70px] sm:min-w-[80px]'
+            onClick={handleButtonClick}
+            disabled={isOutOfStock || btnState === 'adding'}
+            className={`shrell-cart-btn ${btnState === 'added' ? 'is-added' : ''} ${btnState === 'checkout' ? 'is-checkout' : ''} relative min-h-[32px] sm:min-h-[34px] px-3 py-1 rounded-lg text-xs font-semibold flex items-center justify-center transition-all flex-shrink-0 select-none outline-none focus:outline-none focus:ring-0 disabled:opacity-100 ${
+              btnState === 'checkout'
+                ? 'bg-[#D0000B] hover:bg-[#B0000A] text-white w-full shadow-sm cursor-pointer'
+                : btnState === 'added'
+                  ? 'bg-[#E0000C] text-white w-full'
+                  : btnState === 'adding'
+                    ? 'bg-[#FF000E] text-white cursor-wait min-w-[70px] sm:min-w-[80px]'
+                    : isOutOfStock
+                      ? isDark
+                        ? 'bg-[#1A1214] text-[#7A7575] cursor-not-allowed border border-[#261619] min-w-[70px] sm:min-w-[80px]'
+                        : 'bg-[#F0EDE6] text-[#9E9898] cursor-not-allowed border border-[#E0DBD2] min-w-[70px] sm:min-w-[80px]'
+                      : 'bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#E0000C] text-white active:scale-95 min-w-[70px] sm:min-w-[80px]'
             }`}
             aria-label={
               isOutOfStock
                 ? `${product.name} is sold out`
-                : added
-                  ? `Added ${product.name} to cart`
-                  : `Add ${product.name} to cart`
+                : btnState === 'checkout'
+                  ? `Proceed to cart for ${product.name}`
+                  : btnState === 'added'
+                    ? `Added ${product.name} to cart`
+                    : `Add ${product.name} to cart`
             }
           >
             {/* Default state (Add + Shrell icon or loading spinner) */}
             <span className="btn-default-content flex items-center justify-center gap-1.5">
-              {isAdding ? (
+              {btnState === 'adding' ? (
                 <svg
                   className="animate-spin h-3.5 w-3.5 text-white"
                   xmlns="http://www.w3.org/2000/svg"
@@ -174,6 +204,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <span className="btn-added-content">
               <i className="bi bi-check-lg text-sm leading-none" aria-hidden="true"></i>
               <span>Added to cart</span>
+            </span>
+
+            {/* Rotated Checkout / Order Now state */}
+            <span className="btn-checkout-content">
+              <i className="bi bi-arrow-right-circle-fill text-xs leading-none" aria-hidden="true"></i>
+              <span>Checkout &rarr;</span>
             </span>
           </button>
         </div>

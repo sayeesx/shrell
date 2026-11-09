@@ -8,33 +8,7 @@ import { orderRepository } from '../../infrastructure/repositories';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 import { useTheme } from '../../application/ThemeContext';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
-
-const INDIAN_STATES = [
-  'Andhra Pradesh',
-  'Assam',
-  'Bihar',
-  'Chandigarh',
-  'Chhattisgarh',
-  'Delhi',
-  'Goa',
-  'Gujarat',
-  'Haryana',
-  'Himachal Pradesh',
-  'Jammu and Kashmir',
-  'Jharkhand',
-  'Karnataka',
-  'Kerala',
-  'Madhya Pradesh',
-  'Maharashtra',
-  'Odisha',
-  'Punjab',
-  'Rajasthan',
-  'Tamil Nadu',
-  'Telangana',
-  'Uttar Pradesh',
-  'Uttarakhand',
-  'West Bengal',
-];
+import { StateSearchDropdown } from '../../components/checkout/StateSearchDropdown';
 
 type CheckoutStep = 'address' | 'payment' | 'summary';
 
@@ -546,20 +520,7 @@ export const CheckoutPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold mb-1 opacity-80">State *</label>
-                    <select
-                      value={state}
-                      onChange={(e) => setState(e.target.value)}
-                      className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
-                        isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
-                      }`}
-                    >
-                      {INDIAN_STATES.map((st) => (
-                        <option key={st} value={st} className={isDark ? 'bg-[#181113]' : 'bg-white'}>
-                          {st}
-                        </option>
-                      ))}
-                    </select>
+                    <StateSearchDropdown value={state} onChange={setState} />
                   </div>
                 </div>
 

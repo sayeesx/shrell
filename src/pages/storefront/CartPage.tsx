@@ -98,10 +98,12 @@ export const CartPage: React.FC = () => {
         </div>
         <Link
           to="/catalogue"
-          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white font-semibold text-xs uppercase tracking-wider transition-colors shadow-sm active:scale-95"
+          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white font-semibold text-xs uppercase tracking-wider transition-colors shadow-sm active:scale-95 cursor-pointer"
         >
           <span>Explore Equipment Catalogue</span>
-          <i className="bi bi-arrow-right text-xs" aria-hidden="true" />
+          <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+            <i className="bi bi-arrow-right text-[10px]" aria-hidden="true" />
+          </span>
         </Link>
       </div>
     );
@@ -122,7 +124,7 @@ export const CartPage: React.FC = () => {
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-colors cursor-pointer active:scale-95 ${
+            className={`w-9 h-9 rounded-full border flex items-center justify-center transition-colors cursor-pointer active:scale-95 ${
               isDark ? 'bg-[#130E10] border-[#2D161A] text-[#F1EEEE]' : 'bg-[#F5F3EE] border-[#D0C9BE] text-[#140E10]'
             }`}
             aria-label="Go back"
@@ -449,10 +451,12 @@ export const CartPage: React.FC = () => {
           <button
             type="button"
             onClick={() => navigate('/checkout')}
-            className="flex-1 py-3 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+            className="flex-1 py-3 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
           >
             <span>Select address at next step</span>
-            <i className="bi bi-arrow-right text-xs" />
+            <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+              <i className="bi bi-arrow-right text-[10px]" />
+            </span>
           </button>
         </div>
       </div>
@@ -805,10 +809,12 @@ export const CartPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/checkout')}
-                  className="w-full py-3 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-xs uppercase tracking-wider text-center shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  className="w-full py-3 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-xs uppercase tracking-wider text-center shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <span>Select address at next step</span>
-                  <i className="bi bi-arrow-right text-xs" />
+                  <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                    <i className="bi bi-arrow-right text-[10px]" />
+                  </span>
                 </button>
               </div>
 

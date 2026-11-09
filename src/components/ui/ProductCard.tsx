@@ -206,10 +206,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               <span>Added to cart</span>
             </span>
 
-            {/* Rotated Checkout / Order Now state with single arrow */}
+            {/* Rotated Checkout / Order Now state with round-background arrow */}
             <span className="btn-checkout-content flex items-center justify-center gap-1.5 font-bold">
               <span>Checkout</span>
-              <i className="bi bi-arrow-right text-xs leading-none" aria-hidden="true"></i>
+              <span className="w-4.5 h-4.5 rounded-full bg-white/25 flex items-center justify-center shrink-0">
+                <i className="bi bi-arrow-right text-[10px] leading-none" aria-hidden="true"></i>
+              </span>
             </span>
           </button>
         </div>

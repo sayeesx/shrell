@@ -30,8 +30,19 @@ export const CheckoutPage: React.FC = () => {
     window.scrollTo(0, 0);
   }, [finishPageLoad, currentStep]);
 
-  // Form Fields - Auto-fill from logged in user details if available
-  const [fullName, setFullName] = useState(() => user?.name || '');
+  // Check if an email is a legitimate user email (not an auto-generated internal string)
+  const isRealEmail = (em?: string): boolean => {
+    if (!em || !em.trim()) return false;
+    const lower = em.toLowerCase();
+    return (
+      !lower.includes('@customer.shrell.com') &&
+      !lower.includes('@guest.shrell.com') &&
+      !lower.includes('@internal')
+    );
+  };
+
+  // Form Fields - Auto-fill from logged in user details ONLY if valid
+  const [fullName, setFullName] = useState(() => (user?.name && user.name !== 'Valued Customer' ? user.name : ''));
   const [phone, setPhone] = useState(() => {
     if (user?.phone) {
       const clean = user.phone.replace(/[^0-9]/g, '');
@@ -39,7 +50,7 @@ export const CheckoutPage: React.FC = () => {
     }
     return '';
   });
-  const [email, setEmail] = useState(() => user?.email || '');
+  const [email, setEmail] = useState(() => (isRealEmail(user?.email) ? user!.email : ''));
   const [addressLine1, setAddressLine1] = useState('');
   const [addressLine2, setAddressLine2] = useState('');
   const [city, setCity] = useState('');
@@ -54,16 +65,16 @@ export const CheckoutPage: React.FC = () => {
         const clean = user.phone.replace(/[^0-9]/g, '');
         setPhone(clean.slice(-10));
       }
-      if (user.name && !fullName) {
+      if (user.name && user.name !== 'Valued Customer' && !fullName) {
         setFullName(user.name);
       }
-      if (user.email && !email) {
+      if (isRealEmail(user.email) && !email) {
         setEmail(user.email);
       }
     }
   }, [user]);
 
-  // Selected Payment Method (matching reference list)
+  // Selected Payment Method
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>('MANUAL_UPI');
   const [customerUpiId, setCustomerUpiId] = useState('');
   const [utrNumber, setUtrNumber] = useState('');
@@ -84,7 +95,7 @@ export const CheckoutPage: React.FC = () => {
   // If cart is empty, redirect to cart
   if (cart.items.length === 0) {
     return (
-      <div className={`min-h-[80vh] flex flex-col items-center justify-center p-6 text-center space-y-6 ${
+      <div className={`min-h-[80vh] flex flex-col items-center justify-center p-6 text-center space-y-6 pb-36 ${
         isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'
       }`}>
         <div className={`w-20 h-20 rounded-full border flex items-center justify-center mx-auto ${
@@ -98,9 +109,12 @@ export const CheckoutPage: React.FC = () => {
         </p>
         <Link
           to="/cart"
-          className="px-6 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-semibold uppercase tracking-wider transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
         >
-          Return to Cart
+          <span>Return to Cart</span>
+          <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+            <i className="bi bi-arrow-right text-[10px]" />
+          </span>
         </Link>
       </div>
     );
@@ -288,9 +302,9 @@ export const CheckoutPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'}`}>
-      <div className="max-w-xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-44 md:pb-16 space-y-5">
+      <div className="max-w-xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-56 md:pb-16 space-y-4">
 
-        {/* Topbar Header (Matching Reference Screen 1 & 2 & 3) */}
+        {/* Topbar Header (Pure clean navigation matching exact reference images) */}
         <div className="flex items-center justify-between pb-3 border-b border-inherit/20">
           <button
             type="button"
@@ -323,65 +337,6 @@ export const CheckoutPage: React.FC = () => {
           </Link>
         </div>
 
-        {/* Progress Step Tabs (Separating Address, Payment Method, and Order Summary) */}
-        <div className="flex items-center justify-center gap-2 sm:gap-3 text-xs font-semibold">
-          <button
-            type="button"
-            onClick={() => setSearchParams({ step: 'address' })}
-            className={`px-3 py-1.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
-              currentStep === 'address'
-                ? 'bg-[#FF000E] text-white border-[#FF000E]'
-                : isDark
-                  ? 'bg-[#130E10] text-gray-400 border-[#261619] hover:text-white'
-                  : 'bg-[#F5F3EE] text-gray-600 border-[#E0DBD2] hover:text-black'
-            }`}
-          >
-            <span className="w-4 h-4 rounded-full bg-black/20 flex items-center justify-center text-[10px]">1</span>
-            <span className="hidden sm:inline">Delivery Address</span>
-            <span className="sm:hidden">Address</span>
-            {currentStep !== 'address' && <i className="bi bi-check text-xs text-emerald-400" />}
-          </button>
-
-          <i className="bi bi-chevron-right text-gray-400 text-[10px]" />
-
-          <button
-            type="button"
-            onClick={() => {
-              if (validateAddress()) setSearchParams({ step: 'payment' });
-            }}
-            className={`px-3 py-1.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
-              currentStep === 'payment'
-                ? 'bg-[#FF000E] text-white border-[#FF000E]'
-                : isDark
-                  ? 'bg-[#130E10] text-gray-400 border-[#261619] hover:text-white'
-                  : 'bg-[#F5F3EE] text-gray-600 border-[#E0DBD2] hover:text-black'
-            }`}
-          >
-            <span className="w-4 h-4 rounded-full bg-black/20 flex items-center justify-center text-[10px]">2</span>
-            <span>Payment</span>
-            {currentStep === 'summary' && <i className="bi bi-check text-xs text-emerald-400" />}
-          </button>
-
-          <i className="bi bi-chevron-right text-gray-400 text-[10px]" />
-
-          <button
-            type="button"
-            onClick={() => {
-              if (validateAddress()) setSearchParams({ step: 'summary' });
-            }}
-            className={`px-3 py-1.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
-              currentStep === 'summary'
-                ? 'bg-[#FF000E] text-white border-[#FF000E]'
-                : isDark
-                  ? 'bg-[#130E10] text-gray-500 border-[#261619]'
-                  : 'bg-[#F5F3EE] text-gray-400 border-[#E0DBD2]'
-            }`}
-          >
-            <span className="w-4 h-4 rounded-full bg-black/20 flex items-center justify-center text-[10px]">3</span>
-            <span>Summary</span>
-          </button>
-        </div>
-
         {/* Error Notification */}
         {errorMessage && (
           <div className="p-3.5 rounded-lg bg-rose-950/70 border border-rose-800 text-rose-300 text-xs font-medium flex items-center gap-2">
@@ -394,19 +349,18 @@ export const CheckoutPage: React.FC = () => {
         {/* STEP 1: DELIVERY ADDRESS TAB                                              */}
         {/* ========================================================================= */}
         {currentStep === 'address' && (
-          <form onSubmit={handleProceedToPayment} className="space-y-5">
-            <div className={`p-4 sm:p-5 rounded-xl border space-y-4 ${
+          <form onSubmit={handleProceedToPayment} className="space-y-4">
+            <div className={`p-4 sm:p-5 rounded-xl border space-y-3.5 ${
               isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
             }`}>
-              <div className="flex items-center justify-between border-b pb-3 border-inherit/20">
+              <div className="border-b pb-2.5 border-inherit/20">
                 <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2">
                   <i className="bi bi-geo-alt-fill text-[#FF000E]" />
                   <span>Consignee &amp; Delivery Details</span>
                 </h2>
-                <span className="text-[11px] text-gray-500">Step 1 of 3</span>
               </div>
 
-              <div className="space-y-3.5 text-xs">
+              <div className="space-y-3 text-xs">
                 <div>
                   <label className="block text-[11px] font-semibold mb-1 opacity-80">Full Name *</label>
                   <input
@@ -421,7 +375,7 @@ export const CheckoutPage: React.FC = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-[11px] font-semibold mb-1 opacity-80">
                       Mobile Number (10 Digits) *
@@ -446,7 +400,9 @@ export const CheckoutPage: React.FC = () => {
                   <div>
                     <label className="block text-[11px] font-semibold mb-1 opacity-80">
                       Email Address (Optional)
-                      {user?.email && <span className="ml-1.5 text-emerald-500 font-normal text-[10px]">(Auto-filled)</span>}
+                      {isRealEmail(user?.email) && email === user?.email && (
+                        <span className="ml-1.5 text-emerald-500 font-normal text-[10px]">(Auto-filled)</span>
+                      )}
                     </label>
                     <input
                       type="email"
@@ -460,7 +416,7 @@ export const CheckoutPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-[11px] font-semibold mb-1 opacity-80">Postal PIN Code (6 Digits) *</label>
                     <input
@@ -505,7 +461,7 @@ export const CheckoutPage: React.FC = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-[11px] font-semibold mb-1 opacity-80">Apartment / Area / Landmark (Optional)</label>
                     <input
@@ -539,15 +495,39 @@ export const CheckoutPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Step 1 CTA Button */}
-            <div className="pt-2">
+            {/* Desktop Step 1 CTA Button (In-flow) */}
+            <div className="hidden md:block pt-2">
               <button
                 type="submit"
-                className="w-full py-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2"
               >
                 <span>Proceed to Payment Method</span>
-                <i className="bi bi-arrow-right text-sm" />
+                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                  <i className="bi bi-arrow-right text-[10px]" />
+                </span>
               </button>
+            </div>
+
+            {/* Mobile Fixed Bottom CTA Button (Fixed on top of dock nav bar and text carousel) */}
+            <div
+              className={`fixed left-0 right-0 z-30 md:hidden p-3 border-t backdrop-blur-xl transition-all ${
+                isDark
+                  ? 'bg-[#0A0808]/95 border-[#2D161A] shadow-[0_-8px_25px_rgba(0,0,0,0.85)]'
+                  : 'bg-white/95 border-[#D0C9BE] shadow-[0_-4px_18px_rgba(0,0,0,0.1)]'
+              }`}
+              style={{ bottom: 'calc(78px + env(safe-area-inset-bottom, 0px))' }}
+            >
+              <div className="max-w-xl mx-auto">
+                <button
+                  type="submit"
+                  className="w-full py-3 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <span>Proceed to Payment Method</span>
+                  <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                    <i className="bi bi-arrow-right text-[10px]" />
+                  </span>
+                </button>
+              </div>
             </div>
           </form>
         )}
@@ -556,10 +536,10 @@ export const CheckoutPage: React.FC = () => {
         {/* STEP 2: PAYMENT METHOD TAB (Exact match to Reference Screen 1)            */}
         {/* ========================================================================= */}
         {currentStep === 'payment' && (
-          <div className="space-y-4">
+          <div className="space-y-3.5">
 
             {/* Address Recap Chip */}
-            <div className={`p-3.5 rounded-lg border flex items-center justify-between text-xs ${
+            <div className={`p-3 rounded-lg border flex items-center justify-between text-xs ${
               isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2]'
             }`}>
               <div className="flex items-center gap-2.5 min-w-0">
@@ -578,7 +558,7 @@ export const CheckoutPage: React.FC = () => {
             </div>
 
             {/* Payment Method Cards List (Pure list from Reference Screen 1) */}
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {paymentOptions.map((opt) => {
                 const isSelected =
                   (opt.title === 'Credit/Debit cards' && selectedMethod === 'RAZORPAY') ||
@@ -591,7 +571,7 @@ export const CheckoutPage: React.FC = () => {
                   <div
                     key={opt.title}
                     onClick={() => setSelectedMethod(opt.id)}
-                    className={`p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer select-none ${
+                    className={`p-3 sm:p-3.5 rounded-xl border transition-all cursor-pointer select-none ${
                       isSelected
                         ? isDark
                           ? 'bg-[#1A1214] border-[#FF000E] ring-1 ring-[#FF000E]'
@@ -602,40 +582,47 @@ export const CheckoutPage: React.FC = () => {
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3.5 min-w-0">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 border ${
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 border ${
                           isSelected
                             ? 'bg-[#FF000E] text-white border-[#FF000E]'
                             : isDark
                               ? 'bg-[#181113] text-gray-300 border-[#261619]'
                               : 'bg-[#F5F3EE] text-gray-700 border-[#E0DBD2]'
                         }`}>
-                          <i className={`bi ${opt.icon} text-lg`} />
+                          <i className={`bi ${opt.icon} text-base`} />
                         </div>
                         <div className="min-w-0">
-                          <span className="font-bold text-sm block leading-tight">{opt.title}</span>
-                          <span className={`text-[11px] block mt-0.5 truncate ${isDark ? 'text-[#8E8587]' : 'text-[#706869]'}`}>
+                          <span className="font-bold text-xs sm:text-sm block leading-tight">{opt.title}</span>
+                          <span className={`text-[10.5px] block mt-0.5 truncate ${isDark ? 'text-[#8E8587]' : 'text-[#706869]'}`}>
                             {opt.description}
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 shrink-0">
-                        <i className={`bi bi-chevron-right text-xs transition-transform ${
-                          isSelected ? 'text-[#FF000E] translate-x-0.5' : 'text-gray-400'
-                        }`} />
+                      {/* Arrow with round background */}
+                      <div className="shrink-0 ml-2">
+                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs transition-colors ${
+                          isSelected
+                            ? 'bg-[#FF000E] text-white'
+                            : isDark
+                              ? 'bg-white/10 text-gray-300'
+                              : 'bg-black/5 text-gray-600'
+                        }`}>
+                          <i className="bi bi-chevron-right text-[10px]" />
+                        </span>
                       </div>
                     </div>
 
                     {/* Pay by any UPI App sub-inputs */}
                     {isSelected && opt.title === 'Pay by any UPI App' && (
-                      <div className={`mt-3.5 pt-3.5 border-t space-y-3 ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`} onClick={(e) => e.stopPropagation()}>
+                      <div className={`mt-3 pt-3 border-t space-y-2.5 ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`} onClick={(e) => e.stopPropagation()}>
                         {storeUpiId && (
-                          <div className={`p-3 rounded-lg border space-y-2 text-xs ${
+                          <div className={`p-2.5 rounded-lg border space-y-1.5 text-xs ${
                             isDark ? 'bg-[#0E0A0B] border-[#261619]' : 'bg-[#F5F3EE] border-[#E0DBD2]'
                           }`}>
                             <div className="flex items-center justify-between">
-                              <span className="font-semibold text-gray-400">Store UPI ID</span>
+                              <span className="font-semibold text-gray-400 text-[11px]">Store UPI ID</span>
                               <button
                                 type="button"
                                 onClick={handleCopyUpi}
@@ -660,7 +647,7 @@ export const CheckoutPage: React.FC = () => {
                             value={customerUpiId}
                             onChange={(e) => setCustomerUpiId(e.target.value.trim())}
                             placeholder=""
-                            className={`w-full rounded-lg px-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                            className={`w-full rounded-lg px-3 py-2 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                               isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                             }`}
                           />
@@ -676,7 +663,7 @@ export const CheckoutPage: React.FC = () => {
                             value={utrNumber}
                             onChange={(e) => setUtrNumber(e.target.value.trim())}
                             placeholder=""
-                            className={`w-full rounded-lg px-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                            className={`w-full rounded-lg px-3 py-2 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                               isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                             }`}
                           />
@@ -688,28 +675,53 @@ export const CheckoutPage: React.FC = () => {
               })}
             </div>
 
-            {/* Bottom Button matching Screen 1 "Add Payment Method" */}
-            <div className="pt-4">
+            {/* Desktop Step 2 CTA Button */}
+            <div className="hidden md:block pt-3">
               <button
                 type="button"
                 onClick={() => handleProceedToSummary()}
-                className="w-full py-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2"
               >
                 <span>Add Payment Method</span>
-                <i className="bi bi-arrow-right text-sm" />
+                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                  <i className="bi bi-arrow-right text-[10px]" />
+                </span>
               </button>
+            </div>
+
+            {/* Mobile Fixed Bottom CTA Button (Fixed on top of dock nav bar and text carousel) */}
+            <div
+              className={`fixed left-0 right-0 z-30 md:hidden p-3 border-t backdrop-blur-xl transition-all ${
+                isDark
+                  ? 'bg-[#0A0808]/95 border-[#2D161A] shadow-[0_-8px_25px_rgba(0,0,0,0.85)]'
+                  : 'bg-white/95 border-[#D0C9BE] shadow-[0_-4px_18px_rgba(0,0,0,0.1)]'
+              }`}
+              style={{ bottom: 'calc(78px + env(safe-area-inset-bottom, 0px))' }}
+            >
+              <div className="max-w-xl mx-auto">
+                <button
+                  type="button"
+                  onClick={() => handleProceedToSummary()}
+                  className="w-full py-3 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <span>Add Payment Method</span>
+                  <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                    <i className="bi bi-arrow-right text-[10px]" />
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         )}
 
         {/* ========================================================================= */}
-        {/* STEP 3: ORDER SUMMARY TAB (Separated on different tab as requested)       */}
+        {/* STEP 3: ORDER SUMMARY TAB                                                 */}
         {/* ========================================================================= */}
         {currentStep === 'summary' && (
-          <form onSubmit={handleSubmitOrder} className="space-y-4">
+          <form onSubmit={handleSubmitOrder} className="space-y-3.5">
 
             {/* Delivery Address Chip */}
-            <div className={`p-4 rounded-xl border flex items-center justify-between text-xs ${
+            <div className={`p-3.5 rounded-xl border flex items-center justify-between text-xs ${
               isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2]'
             }`}>
               <div className="space-y-1 min-w-0 pr-3">
@@ -717,7 +729,7 @@ export const CheckoutPage: React.FC = () => {
                   <i className="bi bi-geo-alt-fill" />
                   <span>Delivery Address</span>
                 </div>
-                <div className="font-semibold text-sm">{fullName} ({phone})</div>
+                <div className="font-semibold text-xs sm:text-sm">{fullName} ({phone})</div>
                 <div className="text-gray-400 truncate">{addressLine1}, {city} - {postalCode}, {state}</div>
               </div>
               <button
@@ -730,7 +742,7 @@ export const CheckoutPage: React.FC = () => {
             </div>
 
             {/* Selected Payment Method Chip */}
-            <div className={`p-4 rounded-xl border flex items-center justify-between text-xs ${
+            <div className={`p-3.5 rounded-xl border flex items-center justify-between text-xs ${
               isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2]'
             }`}>
               <div className="space-y-1 min-w-0 pr-3">
@@ -738,7 +750,7 @@ export const CheckoutPage: React.FC = () => {
                   <i className="bi bi-credit-card-2-front" />
                   <span>Payment Method</span>
                 </div>
-                <div className="font-semibold text-sm">
+                <div className="font-semibold text-xs sm:text-sm">
                   {selectedMethod === 'MANUAL_UPI' && 'UPI Transfer / Wallet'}
                   {selectedMethod === 'RAZORPAY' && 'Credit / Debit Card / Net Banking'}
                   {selectedMethod === 'COD' && 'Cash on Delivery'}
@@ -755,22 +767,22 @@ export const CheckoutPage: React.FC = () => {
             </div>
 
             {/* Order Items & Price Summary Card */}
-            <div className={`p-4 sm:p-5 rounded-xl border space-y-3.5 ${
+            <div className={`p-3.5 sm:p-4 rounded-xl border space-y-3 ${
               isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
             }`}>
-              <div className="flex items-center justify-between border-b pb-2.5 border-inherit/20">
-                <h3 className="font-bold text-sm">Order Summary ({cart.items.length} items)</h3>
+              <div className="flex items-center justify-between border-b pb-2 border-inherit/20">
+                <h3 className="font-bold text-xs sm:text-sm">Order Summary ({cart.items.length} items)</h3>
                 <Link to="/cart" className="text-xs text-[#FF000E] hover:underline font-semibold">
                   Review Cart
                 </Link>
               </div>
 
               {/* Items Preview */}
-              <div className="max-h-52 overflow-y-auto space-y-2.5 pr-1">
+              <div className="max-h-52 overflow-y-auto space-y-2 pr-1">
                 {cart.items.map((it) => (
                   <div key={it.productId} className="flex items-center justify-between gap-3 text-xs">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className={`w-9 h-9 rounded-full overflow-hidden shrink-0 border flex items-center justify-center p-1 ${
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className={`w-8 h-8 rounded-lg overflow-hidden shrink-0 border flex items-center justify-center p-0.5 ${
                         isDark ? 'bg-[#181113] border-[#261619]' : 'bg-[#F5F3EE] border-[#E0DBD2]'
                       }`}>
                         <img
@@ -781,7 +793,7 @@ export const CheckoutPage: React.FC = () => {
                       </div>
                       <div className="min-w-0">
                         <span className="truncate block font-medium">{it.product.name}</span>
-                        <span className="text-[11px] text-gray-500 font-mono">Qty: {it.quantity}</span>
+                        <span className="text-[10.5px] text-gray-500 font-mono">Qty: {it.quantity}</span>
                       </div>
                     </div>
                     <span className="font-mono font-semibold shrink-0">{formatINR(it.subtotalPaisa)}</span>
@@ -790,7 +802,7 @@ export const CheckoutPage: React.FC = () => {
               </div>
 
               {/* Price Breakdown */}
-              <div className={`pt-3 border-t space-y-2 text-xs ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
+              <div className={`pt-2.5 border-t space-y-1.5 text-xs ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Sub total</span>
                   <span className="font-semibold">{formatINR(cart.subtotalPaisa)}</span>
@@ -807,27 +819,27 @@ export const CheckoutPage: React.FC = () => {
                     <span className="font-semibold">−{formatINR(cart.discountPaisa)}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-[11px] opacity-70">
+                <div className="flex justify-between text-[10.5px] opacity-70">
                   <span>GST (18% Included)</span>
                   <span className="font-mono">{formatINR(cart.taxPaisa)}</span>
                 </div>
               </div>
 
               {/* Total Payable */}
-              <div className={`pt-3 border-t flex justify-between items-center ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
-                <span className="font-bold text-base">Total Payable</span>
-                <span className="font-extrabold text-xl text-[#FF000E]">
+              <div className={`pt-2.5 border-t flex justify-between items-center ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
+                <span className="font-bold text-xs sm:text-sm">Total Payable</span>
+                <span className="font-extrabold text-base sm:text-lg text-[#FF000E]">
                   {formatINR(cart.totalPaisa)}
                 </span>
               </div>
             </div>
 
-            {/* Final Place Order & Pay CTA Button (Matching Reference Screen 3 "Proceed to Pay") */}
-            <div className="pt-2">
+            {/* Desktop Step 3 CTA Button */}
+            <div className="hidden md:block pt-2">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-3.5 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
@@ -835,9 +847,52 @@ export const CheckoutPage: React.FC = () => {
                     <span>Processing Order...</span>
                   </div>
                 ) : (
-                  <span>Proceed to Pay</span>
+                  <>
+                    <span>Proceed to Pay</span>
+                    <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                      <i className="bi bi-arrow-right text-[10px]" />
+                    </span>
+                  </>
                 )}
               </button>
+            </div>
+
+            {/* Mobile Fixed Bottom CTA Button (Fixed on top of dock nav bar and text carousel) */}
+            <div
+              className={`fixed left-0 right-0 z-30 md:hidden p-3 border-t backdrop-blur-xl transition-all ${
+                isDark
+                  ? 'bg-[#0A0808]/95 border-[#2D161A] shadow-[0_-8px_25px_rgba(0,0,0,0.85)]'
+                  : 'bg-white/95 border-[#D0C9BE] shadow-[0_-4px_18px_rgba(0,0,0,0.1)]'
+              }`}
+              style={{ bottom: 'calc(78px + env(safe-area-inset-bottom, 0px))' }}
+            >
+              <div className="max-w-xl mx-auto flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <span className="text-[10px] text-gray-400 block leading-tight">Total</span>
+                  <span className="font-extrabold text-sm text-[#FF000E] font-tight block leading-tight">
+                    {formatINR(cart.totalPaisa)}
+                  </span>
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 py-3 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center gap-1.5">
+                      <ShrellLoader size={16} white />
+                      <span>Processing...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <span>Proceed to Pay</span>
+                      <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                        <i className="bi bi-arrow-right text-[10px]" />
+                      </span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </form>
         )}

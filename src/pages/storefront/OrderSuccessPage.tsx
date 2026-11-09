@@ -61,10 +61,10 @@ export const OrderSuccessPage: React.FC = () => {
             <span className="w-2 h-2 rounded-full bg-emerald-400 translate-y-6 translate-x-8" />
           </div>
 
-          {/* Deep Solid Crimson Checkmark Badge (Authoritative, rich, not light or washed-out) */}
+          {/* Solid Vibrant Brand Red Checkmark Badge (Exact match to Reference Screen 3) */}
           <div className="relative pt-4 flex justify-center">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#C4000A] to-[#800006] border border-[#E0000C]/50 flex items-center justify-center shadow-xl shadow-[#800006]/40 text-white animate-scale-up">
-              <i className="bi bi-check2 text-5xl font-extrabold stroke-[2]" />
+            <div className="w-24 h-24 rounded-full bg-[#FF000E] border-2 border-white/20 flex items-center justify-center shadow-xl shadow-[#FF000E]/35 text-white animate-scale-up">
+              <i className="bi bi-check-lg text-5xl font-extrabold stroke-[2]" />
             </div>
           </div>
 
@@ -92,7 +92,7 @@ export const OrderSuccessPage: React.FC = () => {
             }`}>
               <div className="flex justify-between">
                 <span className="text-gray-400">Total Paid</span>
-                <span className="font-bold text-[#D0000B]">{totalAmount}</span>
+                <span className="font-bold text-[#FF000E]">{totalAmount}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Payment Mode</span>
@@ -111,10 +111,12 @@ export const OrderSuccessPage: React.FC = () => {
           <div className="space-y-3 pt-2">
             <Link
               to={`/track?orderId=${encodeURIComponent(orderId)}`}
-              className="w-full py-3.5 rounded-xl bg-[#D0000B] hover:bg-[#B0000A] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Track Order</span>
-              <i className="bi bi-arrow-right text-sm" />
+              <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                <i className="bi bi-arrow-right text-xs" />
+              </span>
             </Link>
 
             <Link

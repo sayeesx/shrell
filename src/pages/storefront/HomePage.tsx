@@ -348,7 +348,9 @@ export const HomePage: React.FC = () => {
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/85 hover:bg-[#FF000E] text-white border border-[#3A141A] hover:border-[#FF000E] text-xs font-semibold backdrop-blur-md transition-all group/btn shadow-lg"
                   >
                     <span>Express Doorstep Delivery</span>
-                    <i className="bi bi-arrow-right text-xs group-hover/btn:translate-x-1 transition-transform" />
+                    <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                      <i className="bi bi-arrow-right text-[10px] group-hover/btn:translate-x-0.5 transition-transform" />
+                    </span>
                   </Link>
                 </div>
               </div>

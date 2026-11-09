@@ -47,8 +47,8 @@ export const OrderFailurePage: React.FC = () => {
 
           {/* Big Circular Warning Badge */}
           <div className="pt-4 flex justify-center">
-            <div className={`w-24 h-24 rounded-full flex items-center justify-center border-2 border-[#C4000A] shadow-lg shadow-[#800006]/30 ${
-              isDark ? 'bg-[#22070A] text-[#FF2E3A]' : 'bg-[#FFF0F1] text-[#D0000B]'
+            <div className={`w-24 h-24 rounded-full flex items-center justify-center border-2 border-[#FF000E]/40 shadow-lg shadow-[#FF000E]/20 ${
+              isDark ? 'bg-[#22070A] text-[#FF000E]' : 'bg-[#FFF0F1] text-[#FF000E]'
             }`}>
               <i className="bi bi-x-lg text-4xl font-bold" />
             </div>
@@ -79,10 +79,12 @@ export const OrderFailurePage: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/checkout')}
-              className="w-full py-3.5 rounded-xl bg-[#D0000B] hover:bg-[#B0000A] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2"
             >
               <span>Retry Payment</span>
-              <i className="bi bi-arrow-clockwise text-sm" />
+              <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                <i className="bi bi-arrow-clockwise text-xs" />
+              </span>
             </button>
 
             <Link
@@ -90,7 +92,7 @@ export const OrderFailurePage: React.FC = () => {
               className={`w-full py-3.5 rounded-xl border font-bold text-sm tracking-wide transition-all active:scale-98 flex items-center justify-center ${
                 isDark
                   ? 'bg-[#181113] hover:bg-[#201518] border-[#261619] text-[#F1EEEE]'
-                  : 'bg-[#F5F3EE] hover:bg-[#EDE9E1] border-[#E0DBD2] text-[#140E10]'
+                  : 'bg-[#FFE0E2] hover:bg-[#FFD2D5] border-[#FFB3B7] text-[#9A0008]'
               }`}
             >
               <span>Back to Cart</span>

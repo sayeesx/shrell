@@ -67,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const session: UserSession = {
       id: `cust-${Date.now()}`,
       name,
-      email: `${phone}@customer.shrell.com`,
+      email: '',
       phone,
       role: 'customer',
     };
@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const session: UserSession = {
       id: `cust-${Date.now()}`,
       name,
-      email: email || `${phone}@guest.shrell.com`,
+      email: email ? email.trim() : '',
       phone,
       role: 'customer',
     };

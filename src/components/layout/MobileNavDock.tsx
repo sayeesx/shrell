@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../application/AuthContext';
 import { useTheme } from '../../application/ThemeContext';
+import { useCart } from '../../application/CartContext';
 import { ANNOUNCEMENT_MESSAGES } from './Navbar';
 
 export const MobileNavDock: React.FC = () => {
@@ -9,21 +10,19 @@ export const MobileNavDock: React.FC = () => {
   const navigate = useNavigate();
   const { user, openAuthModal } = useAuth();
   const { isDark } = useTheme();
+  const { itemCount } = useCart();
 
-  const isCheckout = location.pathname === '/checkout';
+  const isCheckout = location.pathname.startsWith('/checkout') || location.pathname.startsWith('/order-');
   const isAdmin = location.pathname.startsWith('/admin');
 
-  // Do not show on checkout or admin portal
+  // Do not show on checkout, order status, or admin portal
   if (isCheckout || isAdmin) {
     return null;
   }
 
   const isHomeActive = location.pathname === '/';
-  const isCategoriesActive =
-    location.pathname === '/catalogue' &&
-    !location.search.includes('deals=true');
-  const isDealsActive =
-    location.pathname === '/catalogue' && location.search.includes('deals=true');
+  const isCategoriesActive = location.pathname.startsWith('/catalogue');
+  const isCartActive = location.pathname === '/cart';
   const isProfileActive = location.pathname === '/profile';
 
   const handleProfileClick = (e: React.MouseEvent) => {
@@ -53,12 +52,13 @@ export const MobileNavDock: React.FC = () => {
       iconInactive: 'bi-grid',
     },
     {
-      id: 'deals',
-      label: 'Deals',
-      to: '/catalogue?deals=true',
-      isActive: isDealsActive,
-      iconActive: 'bi-tag-fill',
-      iconInactive: 'bi-tag',
+      id: 'cart',
+      label: 'Cart',
+      to: '/cart',
+      isActive: isCartActive,
+      iconActive: 'bi-bag-fill',
+      iconInactive: 'bi-bag',
+      badge: itemCount,
     },
   ];
 
@@ -93,7 +93,7 @@ export const MobileNavDock: React.FC = () => {
             to={item.to}
             className="group relative flex flex-col items-center justify-center py-1 transition-transform active:scale-95 duration-200 cursor-pointer"
           >
-            <div className="w-12 h-8 flex items-center justify-center transition-all duration-200">
+            <div className="w-12 h-8 flex items-center justify-center transition-all duration-200 relative">
               <i
                 className={`bi ${item.isActive ? item.iconActive : item.iconInactive} text-[23px] leading-none transition-colors ${
                   item.isActive
@@ -104,6 +104,11 @@ export const MobileNavDock: React.FC = () => {
                 }`}
                 aria-hidden="true"
               />
+              {item.badge !== undefined && item.badge > 0 && (
+                <span className="absolute -top-1 right-1.5 bg-[#FF000E] text-white text-[9px] font-bold min-w-[15px] h-[15px] rounded-full flex items-center justify-center px-0.5 leading-none shadow-xs">
+                  {item.badge}
+                </span>
+              )}
             </div>
             <span
               className={`text-[10px] tracking-tight transition-all duration-200 ${

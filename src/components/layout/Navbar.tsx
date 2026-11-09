@@ -127,7 +127,7 @@ export const Navbar: React.FC = () => {
             </div>
           </form>
 
-          {/* Desktop Nav Links (Home, Categories, Deals, Profile) */}
+          {/* Desktop Nav Links (Home, Categories, Cart, Profile) */}
           <nav className="flex items-center gap-6 text-sm font-medium font-sans text-gray-300">
             <Link to="/" className="hover:text-white transition-colors">
               Home
@@ -135,8 +135,8 @@ export const Navbar: React.FC = () => {
             <Link to="/catalogue" className="transition-colors hover:text-white">
               Categories
             </Link>
-            <Link to="/deals" className="transition-colors hover:text-white">
-              Deals
+            <Link to="/cart" className="transition-colors hover:text-white">
+              Cart
             </Link>
             <button
               type="button"

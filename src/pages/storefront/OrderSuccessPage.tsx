@@ -47,8 +47,8 @@ export const OrderSuccessPage: React.FC = () => {
           </Link>
         </div>
 
-        {/* Main Success Card (Exact Design & Alignment from Reference) */}
-        <div className={`p-6 sm:p-8 rounded-3xl border text-center space-y-6 shadow-sm relative overflow-hidden ${
+        {/* Main Success Card (Reduced border radius) */}
+        <div className={`p-6 sm:p-8 rounded-xl border text-center space-y-6 shadow-sm relative overflow-hidden ${
           isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2]'
         }`}>
 
@@ -61,9 +61,9 @@ export const OrderSuccessPage: React.FC = () => {
             <span className="w-2 h-2 rounded-full bg-emerald-400 translate-y-6 translate-x-8" />
           </div>
 
-          {/* Big Circular Red Badge with White Checkmark (Exact Reference) */}
+          {/* Deep Solid Crimson Checkmark Badge (Authoritative, rich, not light or washed-out) */}
           <div className="relative pt-4 flex justify-center">
-            <div className="w-24 h-24 rounded-full bg-[#FF000E] flex items-center justify-center shadow-lg shadow-[#FF000E]/20 text-white animate-scale-up">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#C4000A] to-[#800006] border border-[#E0000C]/50 flex items-center justify-center shadow-xl shadow-[#800006]/40 text-white animate-scale-up">
               <i className="bi bi-check2 text-5xl font-extrabold stroke-[2]" />
             </div>
           </div>
@@ -77,7 +77,7 @@ export const OrderSuccessPage: React.FC = () => {
               Thanks for your order, {customerName}
             </p>
             <div className="pt-1">
-              <span className={`inline-block px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold border ${
+              <span className={`inline-block px-3 py-1 rounded-md text-xs font-mono font-semibold border ${
                 isDark ? 'bg-[#181113] border-[#261619] text-[#F1EEEE]' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10]'
               }`}>
                 Order ID: {orderId}
@@ -87,12 +87,12 @@ export const OrderSuccessPage: React.FC = () => {
 
           {/* Order Snapshot details */}
           {order && (
-            <div className={`p-4 rounded-2xl border text-left text-xs space-y-2 ${
+            <div className={`p-4 rounded-lg border text-left text-xs space-y-2 ${
               isDark ? 'bg-[#0E0A0B] border-[#261619]' : 'bg-[#F5F3EE] border-[#E0DBD2]'
             }`}>
               <div className="flex justify-between">
                 <span className="text-gray-400">Total Paid</span>
-                <span className="font-bold text-[#FF000E]">{totalAmount}</span>
+                <span className="font-bold text-[#D0000B]">{totalAmount}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Payment Mode</span>
@@ -107,11 +107,11 @@ export const OrderSuccessPage: React.FC = () => {
             </div>
           )}
 
-          {/* Action Buttons (Exact Reference: Track Order [Red] + Back to Home [Soft]) */}
+          {/* Action Buttons (Reduced border radius to rounded-xl) */}
           <div className="space-y-3 pt-2">
             <Link
               to={`/track?orderId=${encodeURIComponent(orderId)}`}
-              className="w-full py-3.5 rounded-full bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-xl bg-[#D0000B] hover:bg-[#B0000A] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 flex items-center justify-center gap-2"
             >
               <span>Track Order</span>
               <i className="bi bi-arrow-right text-sm" />
@@ -119,7 +119,7 @@ export const OrderSuccessPage: React.FC = () => {
 
             <Link
               to="/"
-              className={`w-full py-3.5 rounded-full border font-bold text-sm tracking-wide transition-all active:scale-98 flex items-center justify-center ${
+              className={`w-full py-3.5 rounded-xl border font-bold text-sm tracking-wide transition-all active:scale-98 flex items-center justify-center ${
                 isDark
                   ? 'bg-[#181113] hover:bg-[#201518] border-[#261619] text-[#F1EEEE]'
                   : 'bg-[#FFE0E2] hover:bg-[#FFD2D5] border-[#FFB3B7] text-[#9A0008]'

@@ -272,13 +272,13 @@ export const CheckoutPage: React.FC = () => {
             {/* LEFT COLUMN: Shipping Address + Payment Methods List (Reference layout) */}
             <div className="md:col-span-7 space-y-6">
 
-              {/* 1. Delivery Address Card */}
-              <div className={`p-4 sm:p-5 rounded-2xl border space-y-4 ${
+              {/* 1. Delivery Address Card (Reduced border radius) */}
+              <div className={`p-4 sm:p-5 rounded-xl border space-y-4 ${
                 isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
               }`}>
                 <div className="flex items-center justify-between border-b pb-3 border-inherit/20">
                   <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-                    <i className="bi bi-geo-alt-fill text-[#FF000E]" />
+                    <i className="bi bi-geo-alt-fill text-[#D0000B]" />
                     <span>Shipping Address</span>
                   </h2>
                   <span className="text-[11px] text-gray-500">Step 1 of 2</span>
@@ -293,7 +293,7 @@ export const CheckoutPage: React.FC = () => {
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="e.g. Vikram Malhotra"
-                      className={`w-full rounded-xl px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                      className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
                         isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                       }`}
                     />
@@ -311,7 +311,7 @@ export const CheckoutPage: React.FC = () => {
                           value={phone}
                           onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
                           placeholder="9876543210"
-                          className={`w-full rounded-xl pl-12 pr-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                          className={`w-full rounded-lg pl-12 pr-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
                             isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                           }`}
                         />
@@ -327,7 +327,7 @@ export const CheckoutPage: React.FC = () => {
                         value={postalCode}
                         onChange={(e) => setPostalCode(e.target.value.replace(/[^0-9]/g, ''))}
                         placeholder="411001"
-                        className={`w-full rounded-xl px-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                        className={`w-full rounded-lg px-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
                           isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                         }`}
                       />
@@ -342,7 +342,7 @@ export const CheckoutPage: React.FC = () => {
                       value={addressLine1}
                       onChange={(e) => setAddressLine1(e.target.value)}
                       placeholder="Flat 402, Signature Residency, Baner Road"
-                      className={`w-full rounded-xl px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                      className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
                         isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                       }`}
                     />
@@ -356,7 +356,7 @@ export const CheckoutPage: React.FC = () => {
                         value={addressLine2}
                         onChange={(e) => setAddressLine2(e.target.value)}
                         placeholder="Near Metro Station"
-                        className={`w-full rounded-xl px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                        className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
                           isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                         }`}
                       />
@@ -369,7 +369,7 @@ export const CheckoutPage: React.FC = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="vikram@example.com"
-                        className={`w-full rounded-xl px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                        className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
                           isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                         }`}
                       />
@@ -383,7 +383,7 @@ export const CheckoutPage: React.FC = () => {
                       value={deliveryInstructions}
                       onChange={(e) => setDeliveryInstructions(e.target.value)}
                       placeholder="e.g. Leave with security / Call upon arrival"
-                      className={`w-full rounded-xl px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                      className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
                         isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                       }`}
                     />
@@ -398,7 +398,7 @@ export const CheckoutPage: React.FC = () => {
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
                         placeholder="Pune"
-                        className={`w-full rounded-xl px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                        className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
                           isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                         }`}
                       />
@@ -409,7 +409,7 @@ export const CheckoutPage: React.FC = () => {
                       <select
                         value={state}
                         onChange={(e) => setState(e.target.value)}
-                        className={`w-full rounded-xl px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                        className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
                           isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                         }`}
                       >
@@ -441,11 +441,11 @@ export const CheckoutPage: React.FC = () => {
                       <div
                         key={opt.id}
                         onClick={() => setSelectedMethod(opt.id)}
-                        className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer select-none ${
+                        className={`p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer select-none ${
                           isSelected
                             ? isDark
-                              ? 'bg-[#1A1214] border-[#FF000E] ring-1 ring-[#FF000E]'
-                              : 'bg-white border-[#FF000E] ring-1 ring-[#FF000E] shadow-sm'
+                              ? 'bg-[#1A1214] border-[#D0000B] ring-1 ring-[#D0000B]'
+                              : 'bg-white border-[#D0000B] ring-1 ring-[#D0000B] shadow-sm'
                             : isDark
                               ? 'bg-[#120E0F] hover:bg-[#161012] border-[#261619]'
                               : 'bg-white hover:bg-[#FDFCFA] border-[#E0DBD2]'
@@ -455,7 +455,7 @@ export const CheckoutPage: React.FC = () => {
                           <div className="flex items-center gap-3.5 min-w-0">
                             <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 border ${
                               isSelected
-                                ? 'bg-[#FF000E] text-white border-[#FF000E]'
+                                ? 'bg-[#D0000B] text-white border-[#D0000B]'
                                 : isDark
                                   ? 'bg-[#181113] text-gray-300 border-[#261619]'
                                   : 'bg-[#F5F3EE] text-gray-700 border-[#E0DBD2]'
@@ -472,7 +472,7 @@ export const CheckoutPage: React.FC = () => {
 
                           <div className="flex items-center gap-2 shrink-0">
                             <i className={`bi bi-chevron-right text-xs transition-transform ${
-                              isSelected ? 'text-[#FF000E] translate-x-0.5' : 'text-gray-400'
+                              isSelected ? 'text-[#D0000B] translate-x-0.5' : 'text-gray-400'
                             }`} />
                           </div>
                         </div>
@@ -480,7 +480,7 @@ export const CheckoutPage: React.FC = () => {
                         {/* UPI Expanded Sub-Section */}
                         {isSelected && opt.id === 'MANUAL_UPI' && (
                           <div className={`mt-3.5 pt-3.5 border-t space-y-3 ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`} onClick={(e) => e.stopPropagation()}>
-                            <div className={`p-3 rounded-xl border space-y-2 text-xs ${
+                            <div className={`p-3 rounded-lg border space-y-2 text-xs ${
                               isDark ? 'bg-[#0E0A0B] border-[#261619]' : 'bg-[#F5F3EE] border-[#E0DBD2]'
                             }`}>
                               <div className="flex items-center justify-between">
@@ -488,13 +488,13 @@ export const CheckoutPage: React.FC = () => {
                                 <button
                                   type="button"
                                   onClick={handleCopyUpi}
-                                  className="text-[11px] font-bold text-[#FF000E] hover:underline flex items-center gap-1 cursor-pointer"
+                                  className="text-[11px] font-bold text-[#D0000B] hover:underline flex items-center gap-1 cursor-pointer"
                                 >
                                   <i className="bi bi-clipboard" />
                                   <span>{copiedUpi ? 'Copied!' : 'Copy UPI ID'}</span>
                                 </button>
                               </div>
-                              <div className="font-mono text-sm font-bold text-[#FF000E]">
+                              <div className="font-mono text-sm font-bold text-[#D0000B]">
                                 {storeUpiId}
                               </div>
                               <p className="text-[11px] text-gray-400">
@@ -513,7 +513,7 @@ export const CheckoutPage: React.FC = () => {
                                 value={utrNumber}
                                 onChange={(e) => setUtrNumber(e.target.value.trim())}
                                 placeholder="e.g. 431209874521"
-                                className={`w-full rounded-xl px-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                                className={`w-full rounded-lg px-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
                                   isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                                 }`}
                               />
@@ -542,21 +542,21 @@ export const CheckoutPage: React.FC = () => {
 
               {/* Error Message */}
               {errorMessage && (
-                <div className="p-3.5 rounded-xl bg-rose-950/70 border border-rose-800 text-rose-300 text-xs font-medium flex items-center gap-2">
+                <div className="p-3.5 rounded-lg bg-rose-950/70 border border-rose-800 text-rose-300 text-xs font-medium flex items-center gap-2">
                   <i className="bi bi-exclamation-triangle-fill text-rose-400 shrink-0" />
                   <span>{errorMessage}</span>
                 </div>
               )}
             </div>
 
-            {/* RIGHT COLUMN: Order Items Snapshot & Price Summary (Desktop Sticky) */}
+            {/* RIGHT COLUMN: Order Items Snapshot & Price Summary (Desktop Sticky, Reduced Radius) */}
             <div className="md:col-span-5 space-y-4">
-              <div className={`p-4 sm:p-5 rounded-2xl border space-y-4 md:sticky md:top-24 ${
+              <div className={`p-4 sm:p-5 rounded-xl border space-y-4 md:sticky md:top-24 ${
                 isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
               }`}>
                 <div className="flex items-center justify-between border-b pb-3 border-inherit/20">
                   <h3 className="font-bold text-sm">Order Summary ({cart.items.length})</h3>
-                  <Link to="/cart" className="text-xs text-[#FF000E] hover:underline font-semibold">
+                  <Link to="/cart" className="text-xs text-[#D0000B] hover:underline font-semibold">
                     Edit Cart
                   </Link>
                 </div>
@@ -601,17 +601,17 @@ export const CheckoutPage: React.FC = () => {
                 {/* Total */}
                 <div className={`pt-3 border-t flex justify-between items-center ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
                   <span className="font-bold text-base">Total Payable</span>
-                  <span className="font-extrabold text-xl font-tight text-[#FF000E]">
+                  <span className="font-extrabold text-xl font-tight text-[#D0000B]">
                     {formatINR(cart.totalPaisa)}
                   </span>
                 </div>
 
-                {/* Desktop Submit Button */}
+                {/* Desktop Submit Button (Reduced Radius) */}
                 <div className="hidden md:block pt-2">
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3.5 rounded-full bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full py-3.5 rounded-xl bg-[#D0000B] hover:bg-[#B0000A] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {isSubmitting ? (
                       <div className="flex items-center gap-2">
@@ -637,12 +637,12 @@ export const CheckoutPage: React.FC = () => {
             <div className="max-w-md mx-auto space-y-2">
               <div className="flex items-center justify-between text-xs px-1">
                 <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>Total Payable</span>
-                <span className="font-extrabold text-base text-[#FF000E] font-tight">{formatINR(cart.totalPaisa)}</span>
+                <span className="font-extrabold text-base text-[#D0000B] font-tight">{formatINR(cart.totalPaisa)}</span>
               </div>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 rounded-full bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-3.5 rounded-xl bg-[#D0000B] hover:bg-[#B0000A] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">

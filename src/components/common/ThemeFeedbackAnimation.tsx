@@ -44,21 +44,21 @@ export const ThemeSuccessAnimation: React.FC<FeedbackAnimationProps> = ({
         >
           <defs>
             <linearGradient id={gradId} x1="14" y1="14" x2="110" y2="110" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#FF000E" />
-              <stop offset="45%" stopColor="#E0000C" />
-              <stop offset="100%" stopColor="#B0000A" />
+              <stop offset="0%" stopColor="#D0000B" />
+              <stop offset="50%" stopColor="#A80008" />
+              <stop offset="100%" stopColor="#750005" />
             </linearGradient>
           </defs>
 
-          {/* Soft fill blooming inside ring */}
+          {/* Deep crimson fill blooming inside ring */}
           <circle
             cx={62}
             cy={62}
             r={56}
-            fill="#650008"
+            fill="#850009"
             style={{
               opacity: 0,
-              fillOpacity: 0.22,
+              fillOpacity: 0.85,
               transformOrigin: 'center',
               animation: 'shrellBloom 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both',
             }}

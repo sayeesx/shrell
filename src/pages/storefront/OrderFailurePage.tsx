@@ -40,15 +40,15 @@ export const OrderFailurePage: React.FC = () => {
           </Link>
         </div>
 
-        {/* Main Failure Card */}
-        <div className={`p-6 sm:p-8 rounded-3xl border text-center space-y-6 shadow-sm relative overflow-hidden ${
+        {/* Main Failure Card (Reduced border radius) */}
+        <div className={`p-6 sm:p-8 rounded-xl border text-center space-y-6 shadow-sm relative overflow-hidden ${
           isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2]'
         }`}>
 
           {/* Big Circular Warning Badge */}
           <div className="pt-4 flex justify-center">
-            <div className={`w-24 h-24 rounded-full flex items-center justify-center border-2 border-[#FF000E] shadow-lg shadow-[#FF000E]/10 ${
-              isDark ? 'bg-[#2A0E12] text-[#FF000E]' : 'bg-[#FFF0F1] text-[#FF000E]'
+            <div className={`w-24 h-24 rounded-full flex items-center justify-center border-2 border-[#C4000A] shadow-lg shadow-[#800006]/30 ${
+              isDark ? 'bg-[#22070A] text-[#FF2E3A]' : 'bg-[#FFF0F1] text-[#D0000B]'
             }`}>
               <i className="bi bi-x-lg text-4xl font-bold" />
             </div>
@@ -65,7 +65,7 @@ export const OrderFailurePage: React.FC = () => {
           </div>
 
           {/* Help box */}
-          <div className={`p-4 rounded-2xl border text-left text-xs space-y-1.5 ${
+          <div className={`p-4 rounded-lg border text-left text-xs space-y-1.5 ${
             isDark ? 'bg-[#0E0A0B] border-[#261619] text-gray-400' : 'bg-[#F5F3EE] border-[#E0DBD2] text-gray-600'
           }`}>
             <div className="font-semibold text-gray-300">Common solutions:</div>
@@ -79,7 +79,7 @@ export const OrderFailurePage: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/checkout')}
-              className="w-full py-3.5 rounded-full bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-xl bg-[#D0000B] hover:bg-[#B0000A] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2"
             >
               <span>Retry Payment</span>
               <i className="bi bi-arrow-clockwise text-sm" />
@@ -87,7 +87,7 @@ export const OrderFailurePage: React.FC = () => {
 
             <Link
               to="/cart"
-              className={`w-full py-3.5 rounded-full border font-bold text-sm tracking-wide transition-all active:scale-98 flex items-center justify-center ${
+              className={`w-full py-3.5 rounded-xl border font-bold text-sm tracking-wide transition-all active:scale-98 flex items-center justify-center ${
                 isDark
                   ? 'bg-[#181113] hover:bg-[#201518] border-[#261619] text-[#F1EEEE]'
                   : 'bg-[#F5F3EE] hover:bg-[#EDE9E1] border-[#E0DBD2] text-[#140E10]'

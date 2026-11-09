@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Product } from '../../domain/types';
 import { formatINR } from '../../domain/services/CurrencyService';
 import { productRepository } from '../../infrastructure/repositories';
@@ -11,7 +11,8 @@ import { useNavigationLoading } from '../../application/NavigationLoadingContext
 
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { addItem, openCheckout } = useCart();
+  const navigate = useNavigate();
+  const { addItem } = useCart();
   const { finishPageLoad } = useNavigationLoading();
   const { isDark } = useTheme();
 
@@ -128,7 +129,7 @@ export const ProductDetailPage: React.FC = () => {
     setTimeout(() => {
       const res = addItem(product, quantity);
       setIsBuyingNow(false);
-      if (res.success) openCheckout();
+      if (res.success) navigate('/checkout');
     }, 600);
   };
 

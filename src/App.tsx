@@ -12,6 +12,9 @@ import { HomePage } from './pages/storefront/HomePage';
 import { CataloguePage } from './pages/storefront/CataloguePage';
 import { ProductDetailPage } from './pages/storefront/ProductDetailPage';
 import { CartPage } from './pages/storefront/CartPage';
+import { CheckoutPage } from './pages/storefront/CheckoutPage';
+import { OrderSuccessPage } from './pages/storefront/OrderSuccessPage';
+import { OrderFailurePage } from './pages/storefront/OrderFailurePage';
 import { OrderTrackingPage } from './pages/storefront/OrderTrackingPage';
 import { PoliciesPage } from './pages/storefront/PoliciesPage';
 import { ProfilePage } from './pages/storefront/ProfilePage';
@@ -110,7 +113,9 @@ export const App: React.FC = () => {
           <Route path="/deals" element={<Navigate to="/cart" replace />} />
           <Route path="/product/:slug" element={<ProductDetailPage />} />
           <Route path="/cart" element={<CartPage />} />
-          <Route path="/checkout" element={<Navigate to="/cart" replace />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/order-success" element={<OrderSuccessPage />} />
+          <Route path="/order-failure" element={<OrderFailurePage />} />
           <Route path="/track" element={<OrderTrackingPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/pre-book" element={<PreBookPage />} />

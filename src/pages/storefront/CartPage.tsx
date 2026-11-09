@@ -66,45 +66,52 @@ export const CartPage: React.FC = () => {
   // If cart is empty
   if (cart.items.length === 0) {
     return (
-      <div className={`min-h-[85vh] flex flex-col items-center justify-center px-4 py-16 text-center space-y-5 pb-36 ${
+      <div className={`min-h-screen flex flex-col transition-colors duration-300 ${
         isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'
       }`}>
-        {/* Mobile Header Bar */}
-        <div className="w-full max-w-md flex items-center justify-between pb-3 mb-2 md:hidden">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-colors cursor-pointer active:scale-95 ${
-              isDark ? 'bg-[#130E10] border-[#2D161A] text-[#F1EEEE]' : 'bg-[#F5F3EE] border-[#D0C9BE] text-[#140E10]'
-            }`}
-            aria-label="Go back"
-          >
-            <i className="bi bi-arrow-left text-sm" />
-          </button>
-          <h1 className="text-base font-bold tracking-tight">My Cart</h1>
-          <ThemeToggle compact />
+        {/* Top Header - Fixed/pinned at top without compression */}
+        <div className="w-full border-b border-inherit/20 shrink-0">
+          <div className="max-w-md md:max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className={`w-9 h-9 rounded-full border flex items-center justify-center transition-colors cursor-pointer active:scale-95 ${
+                isDark ? 'bg-[#130E10] border-[#2D161A] text-[#F1EEEE]' : 'bg-[#F5F3EE] border-[#D0C9BE] text-[#140E10]'
+              }`}
+              aria-label="Go back"
+            >
+              <i className="bi bi-arrow-left text-sm" />
+            </button>
+            <h1 className="text-base sm:text-lg font-bold tracking-tight">My Cart</h1>
+            <div className="flex items-center">
+              <ThemeToggle compact />
+            </div>
+          </div>
         </div>
 
-        <div className={`w-20 h-20 rounded-xl border flex items-center justify-center mx-auto shadow-inner ${
-          isDark ? 'bg-[#130E10] border-[#2D161A] text-[#8E8587]' : 'bg-[#F5F3EE] border-[#D0C9BE] text-[#8E8587]'
-        }`}>
-          <i className="bi bi-bag-x text-3xl" aria-hidden="true" />
+        {/* Empty Cart Body - Centered in remaining viewport space */}
+        <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 text-center space-y-5 pb-44">
+          <div className={`w-20 h-20 rounded-full border flex items-center justify-center mx-auto shadow-inner ${
+            isDark ? 'bg-[#130E10] border-[#2D161A] text-[#8E8587]' : 'bg-[#F5F3EE] border-[#D0C9BE] text-[#8E8587]'
+          }`}>
+            <i className="bi bi-bag-x text-3xl" aria-hidden="true" />
+          </div>
+          <div className="space-y-1.5 max-w-sm">
+            <h2 className="text-xl font-bold tracking-tight">Your Cart is Empty</h2>
+            <p className={`text-xs ${isDark ? 'text-[#8E8587]' : 'text-[#706869]'}`}>
+              Explore precision-fit automotive equipment and accessories engineered for Indian terrain.
+            </p>
+          </div>
+          <Link
+            to="/catalogue"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white font-semibold text-xs uppercase tracking-wider transition-colors shadow-sm active:scale-95 cursor-pointer"
+          >
+            <span>Explore Equipment Catalogue</span>
+            <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+              <i className="bi bi-arrow-right text-[10px]" aria-hidden="true" />
+            </span>
+          </Link>
         </div>
-        <div className="space-y-1.5 max-w-sm">
-          <h2 className="text-xl font-bold tracking-tight">Your Cart is Empty</h2>
-          <p className={`text-xs ${isDark ? 'text-[#8E8587]' : 'text-[#706869]'}`}>
-            Explore precision-fit automotive equipment and accessories engineered for Indian terrain.
-          </p>
-        </div>
-        <Link
-          to="/catalogue"
-          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white font-semibold text-xs uppercase tracking-wider transition-colors shadow-sm active:scale-95 cursor-pointer"
-        >
-          <span>Explore Equipment Catalogue</span>
-          <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-            <i className="bi bi-arrow-right text-[10px]" aria-hidden="true" />
-          </span>
-        </Link>
       </div>
     );
   }
@@ -139,24 +146,24 @@ export const CartPage: React.FC = () => {
           </div>
         </div>
 
-        {/* 2. Cart Items List (Tighter padding & gap for enhanced contrast and density) */}
+        {/* 2. Cart Items List (Compact size, top-right delete, stepper on right) */}
         <div className="space-y-2">
           {cart.items.map((item) => {
             const rawImg = item.product.images?.[0]?.url || '';
             const cleanImg = rawImg.startsWith('http://res.cloudinary.com/')
               ? rawImg.replace('http://res.cloudinary.com/', 'https://res.cloudinary.com/')
               : rawImg;
-            const hasRealImg = Boolean(cleanImg && !cleanImg.includes('shrell-full_white-text_black-logo.png'));
+            const hasRealImg = Boolean(cleanImg && !cleanImg.includes('shrell-full_white-text_black-logo.png') && !cleanImg.includes('shrell-blacktext-redlogo.png') && !cleanImg.includes('shrell-logo-white.png'));
 
             return (
               <div
                 key={item.productId}
-                className={`p-2.5 rounded-xl border transition-all duration-200 flex items-center gap-2.5 ${
+                className={`p-2 rounded-xl border transition-all duration-200 flex items-center gap-2.5 ${
                   isDark ? 'bg-[#130E10] border-[#2D161A]' : 'bg-white border-[#D0C9BE] shadow-xs'
                 }`}
               >
-                {/* Product image (clean rounded-lg frame) */}
-                <div className={`w-16 h-16 shrink-0 rounded-lg flex items-center justify-center p-1 overflow-hidden border ${
+                {/* Product image (clean compact frame) */}
+                <div className={`w-13 h-13 shrink-0 rounded-lg flex items-center justify-center p-1 overflow-hidden border ${
                   isDark ? 'bg-[#181113] border-[#2D161A]' : 'bg-[#F5F3EE] border-[#D0C9BE]'
                 }`}>
                   {hasRealImg ? (
@@ -167,36 +174,47 @@ export const CartPage: React.FC = () => {
                       className="w-full h-full object-contain"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center opacity-40">
+                    <div className="w-full h-full flex items-center justify-center">
                       <img
-                        src="/logos/shrell-brandicon_no-bg.png"
+                        src={isDark ? '/logos/shrell-brandicon_no-bg.png' : '/logos/shrell-blacktext-redlogo.png'}
                         alt="SHRELL"
-                        className="w-7 h-7 object-contain"
+                        className="w-full h-full object-contain p-0.5"
                       />
                     </div>
                   )}
                 </div>
 
                 {/* Details */}
-                <div className="flex-1 min-w-0">
-                  <Link
-                    to={`/product/${item.product.slug}`}
-                    className="font-bold text-xs leading-snug line-clamp-1 block hover:text-[#FF000E] transition-colors"
-                  >
-                    {item.product.name}
-                  </Link>
+                <div className="flex-1 min-w-0 pr-0.5">
+                  {/* Title & Top-Right Delete Button */}
+                  <div className="flex items-start justify-between gap-1">
+                    <Link
+                      to={`/product/${item.product.slug}`}
+                      className="font-bold text-xs leading-snug line-clamp-1 block hover:text-[#FF000E] transition-colors flex-1 min-w-0"
+                    >
+                      {item.product.name}
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => removeItem(item.productId)}
+                      className="w-5 h-5 -mr-0.5 -mt-0.5 rounded-full flex items-center justify-center text-gray-400 hover:text-[#FF000E] hover:bg-[#FF000E]/10 transition-colors cursor-pointer shrink-0 active:scale-90"
+                      aria-label={`Remove ${item.product.name} from cart`}
+                    >
+                      <i className="bi bi-trash3 text-[11px]" />
+                    </button>
+                  </div>
 
-                  <p className="text-[10.5px] text-gray-400 dark:text-[#8E8587] truncate mt-0.5">
-                    {item.product.categoryName || 'OEM Automotive Equipment'} {item.product.sku ? `| ${item.product.sku}` : ''}
+                  <p className="text-[10px] text-gray-400 dark:text-[#8E8587] truncate mt-0.5">
+                    {item.product.categoryName || 'OEM Automotive'} {item.product.sku ? `| ${item.product.sku}` : ''}
                   </p>
 
-                  <p className="font-extrabold text-xs sm:text-sm text-[#FF000E] mt-0.5">
-                    {formatINR(item.unitPricePaisa)}
-                  </p>
-
-                  {/* Quantity Stepper & Remove Row */}
+                  {/* Price on Left, Quantity Stepper at Position of Remove (Right) */}
                   <div className="flex items-center justify-between pt-1 mt-0.5">
-                    {/* Quantity Selector: Crisp reduced-radius pill */}
+                    <p className="font-extrabold text-xs sm:text-sm text-[#FF000E]">
+                      {formatINR(item.unitPricePaisa)}
+                    </p>
+
+                    {/* Stepper placed at the position where Remove used to be */}
                     <div className="flex items-center gap-1">
                       <button
                         type="button"
@@ -227,15 +245,6 @@ export const CartPage: React.FC = () => {
                         +
                       </button>
                     </div>
-
-                    {/* Remove text button */}
-                    <button
-                      type="button"
-                      onClick={() => removeItem(item.productId)}
-                      className="text-[11px] font-medium text-gray-400 hover:text-[#FF000E] hover:underline cursor-pointer active:scale-95 transition-colors"
-                    >
-                      Remove
-                    </button>
                   </div>
                 </div>
               </div>
@@ -431,15 +440,15 @@ export const CartPage: React.FC = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* MOBILE FIXED BOTTOM CTA BUTTON (Fixed directly on top of dock nav bar)   */}
+      {/* MOBILE FIXED BOTTOM CTA BUTTON (Fixed on top of text carousel)            */}
       {/* ========================================================================= */}
       <div
-        className={`fixed left-0 right-0 z-30 md:hidden p-3 border-t backdrop-blur-xl transition-all ${
+        className={`fixed left-0 right-0 z-50 md:hidden p-2.5 border-t backdrop-blur-xl transition-all ${
           isDark
             ? 'bg-[#0A0808]/95 border-[#2D161A] shadow-[0_-8px_25px_rgba(0,0,0,0.85)]'
             : 'bg-white/95 border-[#D0C9BE] shadow-[0_-4px_18px_rgba(0,0,0,0.1)]'
         }`}
-        style={{ bottom: 'calc(78px + env(safe-area-inset-bottom, 0px))' }}
+        style={{ bottom: 'calc(58px + env(safe-area-inset-bottom, 0px))' }}
       >
         <div className="max-w-md mx-auto flex items-center justify-between gap-3">
           <div className="min-w-0">
@@ -451,7 +460,7 @@ export const CartPage: React.FC = () => {
           <button
             type="button"
             onClick={() => navigate('/checkout')}
-            className="flex-1 py-3 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
+            className="flex-1 py-2.5 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
           >
             <span>Select address at next step</span>
             <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">

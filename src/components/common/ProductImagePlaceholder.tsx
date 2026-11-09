@@ -30,7 +30,10 @@ export const ProductImagePlaceholder: React.FC<ProductImagePlaceholderProps> = (
   const isRealImage = Boolean(
     cleanSrc &&
     !hasError &&
-    !cleanSrc.includes('shrell-full_white-text_black-logo.png')
+    !cleanSrc.includes('shrell-full_white-text_black-logo.png') &&
+    !cleanSrc.includes('shrell-blacktext-redlogo.png') &&
+    !cleanSrc.includes('shrell-logo-white.png') &&
+    !cleanSrc.includes('shrell-brandicon')
   );
 
   return (
@@ -51,11 +54,11 @@ export const ProductImagePlaceholder: React.FC<ProductImagePlaceholderProps> = (
           onError={() => setHasError(true)}
         />
       ) : (
-        /* SHRELL Reduced-Opacity Grey Brand Logo Placeholder */
+        /* SHRELL Brand Logo Placeholder (red icon black text for light theme, white logo for dark theme) */
         <img
-          src="/logos/shrell-full_white-text_black-logo.png"
+          src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
           alt={alt}
-          className={`w-[88%] h-[78%] max-w-[92%] max-h-[82%] object-contain pointer-events-none ${isDark ? 'opacity-40 grayscale brightness-125' : 'opacity-20 grayscale brightness-50'}`}
+          className={`w-[84%] h-[74%] max-w-[88%] max-h-[78%] object-contain pointer-events-none ${isDark ? 'opacity-70' : 'opacity-90'}`}
           loading="lazy"
         />
       )}

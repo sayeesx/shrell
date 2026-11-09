@@ -346,14 +346,12 @@ export const CheckoutPage: React.FC = () => {
         )}
 
         {/* ========================================================================= */}
-        {/* STEP 1: DELIVERY ADDRESS TAB                                              */}
+        {/* STEP 1: DELIVERY ADDRESS TAB (No card container, direct form fields)       */}
         {/* ========================================================================= */}
         {currentStep === 'address' && (
           <form onSubmit={handleProceedToPayment} className="space-y-4">
-            <div className={`p-4 sm:p-5 rounded-xl border space-y-3.5 ${
-              isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
-            }`}>
-              <div className="border-b pb-2.5 border-inherit/20">
+            <div className="space-y-3.5">
+              <div className="border-b pb-2 border-inherit/20">
                 <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2">
                   <i className="bi bi-geo-alt-fill text-[#FF000E]" />
                   <span>Consignee &amp; Delivery Details</span>
@@ -508,19 +506,19 @@ export const CheckoutPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Mobile Fixed Bottom CTA Button (Fixed on top of dock nav bar and text carousel) */}
+            {/* Mobile Fixed Bottom CTA Button (Fixed on top of text carousel) */}
             <div
-              className={`fixed left-0 right-0 z-30 md:hidden p-3 border-t backdrop-blur-xl transition-all ${
+              className={`fixed left-0 right-0 z-50 md:hidden p-2.5 border-t backdrop-blur-xl transition-all ${
                 isDark
                   ? 'bg-[#0A0808]/95 border-[#2D161A] shadow-[0_-8px_25px_rgba(0,0,0,0.85)]'
                   : 'bg-white/95 border-[#D0C9BE] shadow-[0_-4px_18px_rgba(0,0,0,0.1)]'
               }`}
-              style={{ bottom: 'calc(78px + env(safe-area-inset-bottom, 0px))' }}
+              style={{ bottom: 'calc(58px + env(safe-area-inset-bottom, 0px))' }}
             >
               <div className="max-w-xl mx-auto">
                 <button
                   type="submit"
-                  className="w-full py-3 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full py-2.5 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <span>Proceed to Payment Method</span>
                   <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
@@ -689,20 +687,20 @@ export const CheckoutPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Mobile Fixed Bottom CTA Button (Fixed on top of dock nav bar and text carousel) */}
+            {/* Mobile Fixed Bottom CTA Button (Fixed on top of text carousel) */}
             <div
-              className={`fixed left-0 right-0 z-30 md:hidden p-3 border-t backdrop-blur-xl transition-all ${
+              className={`fixed left-0 right-0 z-50 md:hidden p-2.5 border-t backdrop-blur-xl transition-all ${
                 isDark
                   ? 'bg-[#0A0808]/95 border-[#2D161A] shadow-[0_-8px_25px_rgba(0,0,0,0.85)]'
                   : 'bg-white/95 border-[#D0C9BE] shadow-[0_-4px_18px_rgba(0,0,0,0.1)]'
               }`}
-              style={{ bottom: 'calc(78px + env(safe-area-inset-bottom, 0px))' }}
+              style={{ bottom: 'calc(58px + env(safe-area-inset-bottom, 0px))' }}
             >
               <div className="max-w-xl mx-auto">
                 <button
                   type="button"
                   onClick={() => handleProceedToSummary()}
-                  className="w-full py-3 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full py-2.5 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <span>Add Payment Method</span>
                   <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
@@ -786,7 +784,13 @@ export const CheckoutPage: React.FC = () => {
                         isDark ? 'bg-[#181113] border-[#261619]' : 'bg-[#F5F3EE] border-[#E0DBD2]'
                       }`}>
                         <img
-                          src={it.product.images[0]?.url || '/logos/shrell-full_white-text_black-logo.png'}
+                          src={
+                            it.product.images[0]?.url && !it.product.images[0].url.includes('shrell-')
+                              ? it.product.images[0].url
+                              : isDark
+                                ? '/logos/shrell-brandicon_no-bg.png'
+                                : '/logos/shrell-blacktext-redlogo.png'
+                          }
                           alt={it.product.name}
                           className="w-full h-full object-contain"
                         />
@@ -857,14 +861,14 @@ export const CheckoutPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Mobile Fixed Bottom CTA Button (Fixed on top of dock nav bar and text carousel) */}
+            {/* Mobile Fixed Bottom CTA Button (Fixed on top of text carousel) */}
             <div
-              className={`fixed left-0 right-0 z-30 md:hidden p-3 border-t backdrop-blur-xl transition-all ${
+              className={`fixed left-0 right-0 z-50 md:hidden p-2.5 border-t backdrop-blur-xl transition-all ${
                 isDark
                   ? 'bg-[#0A0808]/95 border-[#2D161A] shadow-[0_-8px_25px_rgba(0,0,0,0.85)]'
                   : 'bg-white/95 border-[#D0C9BE] shadow-[0_-4px_18px_rgba(0,0,0,0.1)]'
               }`}
-              style={{ bottom: 'calc(78px + env(safe-area-inset-bottom, 0px))' }}
+              style={{ bottom: 'calc(58px + env(safe-area-inset-bottom, 0px))' }}
             >
               <div className="max-w-xl mx-auto flex items-center justify-between gap-3">
                 <div className="min-w-0">
@@ -876,7 +880,7 @@ export const CheckoutPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 py-3 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <div className="flex items-center gap-1.5">

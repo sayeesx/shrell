@@ -177,11 +177,11 @@ export const ProductDetailPage: React.FC = () => {
                     onError={() => setImageError(true)}
                   />
                 ) : (
-                  <div className={`w-56 sm:w-72 max-h-60 flex items-center justify-center ${isDark ? 'opacity-40' : 'opacity-20'}`}>
+                  <div className={`w-56 sm:w-72 max-h-60 flex items-center justify-center ${isDark ? 'opacity-60' : 'opacity-85'}`}>
                     <img
-                      src="/logos/shrell-full_white-text_black-logo.png"
+                      src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
                       alt={`${product.name} - ${productViews[selectedImageIndex]?.label || 'Product View'}`}
-                      className={`w-full h-full object-contain transition-all duration-300 ${isDark ? 'grayscale brightness-125' : 'grayscale brightness-50'}`}
+                      className="w-full h-full object-contain transition-all duration-300"
                     />
                   </div>
                 );
@@ -217,7 +217,7 @@ export const ProductDetailPage: React.FC = () => {
                     {isThumbReal ? (
                       <img src={thumbClean} alt={view.label} referrerPolicy="no-referrer" className="w-full h-full object-contain" />
                     ) : (
-                      <img src="/logos/shrell-full_white-text_black-logo.png" alt={view.label} className={`w-full h-full object-contain ${isDark ? 'opacity-40 brightness-125 grayscale' : 'opacity-20 grayscale'}`} />
+                      <img src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'} alt={view.label} className={`w-full h-full object-contain ${isDark ? 'opacity-60' : 'opacity-85'}`} />
                     )}
                   </button>
                 );

@@ -72,30 +72,30 @@ export const MobileNavDock: React.FC = () => {
       aria-label="Mobile Navigation Dock"
     >
       {/* Mobile Continuous Text Carousel Loop (Above the Dock Navbar) */}
-      <div className={`overflow-hidden border-b py-1 text-[11px] md:bg-black ${isDark ? 'bg-[#080000] border-[#221215]/80' : 'bg-[#F5F3EE] border-[#E0DBD2]/80'}`}>
-        <div className="animate-marquee-scroll flex items-center gap-8 whitespace-nowrap">
+      <div className={`overflow-hidden border-b h-5 flex items-center text-[10px] md:bg-black ${isDark ? 'bg-[#080000] border-[#221215]/80' : 'bg-[#F5F3EE] border-[#E0DBD2]/80'}`}>
+        <div className="animate-marquee-scroll flex items-center gap-6 whitespace-nowrap">
           {[...ANNOUNCEMENT_MESSAGES, ...ANNOUNCEMENT_MESSAGES].map((msg, i) => (
-            <div key={i} className={`flex items-center gap-2 font-medium font-sans ${isDark ? 'text-gray-300' : 'text-[#5C5456]'}`}>
-              <i className={`bi ${msg.icon} text-[#FF000E] text-[10px]`} aria-hidden="true" />
+            <div key={i} className={`flex items-center gap-1.5 font-medium font-sans leading-none ${isDark ? 'text-gray-300' : 'text-[#5C5456]'}`}>
+              <i className={`bi ${msg.icon} text-[#FF000E] text-[9px]`} aria-hidden="true" />
               <span className="tracking-tight">{msg.text}</span>
-              <span className={`ml-4 text-xs ${isDark ? 'text-[#3B1A1E]' : 'text-[#D6D0C7]'}`}>•</span>
+              <span className={`ml-3 text-[10px] ${isDark ? 'text-[#3B1A1E]' : 'text-[#D6D0C7]'}`}>•</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="px-3 pt-1.5 pb-[max(0.65rem,env(safe-area-inset-bottom))]">
+      <div className="px-3 pt-1 pb-[max(0.35rem,env(safe-area-inset-bottom))]">
         <div className="grid grid-cols-4 items-center gap-1 max-w-md mx-auto">
         {/* 1, 2, 3: Categories, Featured, Deals */}
         {navItems.map((item) => (
           <Link
             key={item.id}
             to={item.to}
-            className="group relative flex flex-col items-center justify-center py-1 transition-transform active:scale-95 duration-200 cursor-pointer"
+            className="group relative flex flex-col items-center justify-center py-0.5 transition-transform active:scale-95 duration-200 cursor-pointer"
           >
-            <div className="w-12 h-8 flex items-center justify-center transition-all duration-200 relative">
+            <div className="w-10 h-6 flex items-center justify-center transition-all duration-200 relative">
               <i
-                className={`bi ${item.isActive ? item.iconActive : item.iconInactive} text-[23px] leading-none transition-colors ${
+                className={`bi ${item.isActive ? item.iconActive : item.iconInactive} text-[18px] leading-none transition-colors ${
                   item.isActive
                     ? 'text-[#FF000E]'
                     : isDark
@@ -105,13 +105,13 @@ export const MobileNavDock: React.FC = () => {
                 aria-hidden="true"
               />
               {item.badge !== undefined && item.badge > 0 && (
-                <span className="absolute -top-1 right-1.5 bg-[#FF000E] text-white text-[9px] font-bold min-w-[15px] h-[15px] rounded-full flex items-center justify-center px-0.5 leading-none shadow-xs">
+                <span className="absolute -top-1 right-1 bg-[#FF000E] text-white text-[8.5px] font-bold min-w-[14px] h-[14px] rounded-full flex items-center justify-center px-0.5 leading-none shadow-xs">
                   {item.badge}
                 </span>
               )}
             </div>
             <span
-              className={`text-[10px] tracking-tight transition-all duration-200 ${
+              className={`text-[9.5px] tracking-tight leading-none mt-0.5 transition-all duration-200 ${
                 item.isActive
                   ? 'text-[#FF000E] font-semibold'
                   : isDark
@@ -128,12 +128,12 @@ export const MobileNavDock: React.FC = () => {
         <button
           type="button"
           onClick={handleProfileClick}
-          className="group relative flex flex-col items-center justify-center py-1 transition-transform active:scale-95 duration-200 cursor-pointer"
+          className="group relative flex flex-col items-center justify-center py-0.5 transition-transform active:scale-95 duration-200 cursor-pointer"
           aria-label="Account profile"
         >
-          <div className="w-12 h-8 flex items-center justify-center transition-all duration-200">
+          <div className="w-10 h-6 flex items-center justify-center transition-all duration-200">
             <i
-              className={`bi ${isProfileActive ? 'bi-person-fill' : 'bi-person'} text-[23px] leading-none transition-colors ${
+              className={`bi ${isProfileActive ? 'bi-person-fill' : 'bi-person'} text-[18px] leading-none transition-colors ${
                 isProfileActive
                   ? 'text-[#FF000E]'
                   : isDark
@@ -144,7 +144,7 @@ export const MobileNavDock: React.FC = () => {
             />
           </div>
           <span
-            className={`text-[10px] tracking-tight transition-all duration-200 ${
+            className={`text-[9.5px] tracking-tight leading-none mt-0.5 transition-all duration-200 ${
               isProfileActive
                 ? 'text-[#FF000E] font-semibold'
                 : isDark

@@ -135,16 +135,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             disabled={isOutOfStock || btnState === 'adding'}
             className={`shrell-cart-btn ${btnState === 'added' ? 'is-added' : ''} ${btnState === 'checkout' ? 'is-checkout' : ''} relative min-h-[32px] sm:min-h-[34px] px-3 py-1 rounded-lg text-xs font-semibold flex items-center justify-center transition-all flex-shrink-0 select-none outline-none focus:outline-none focus:ring-0 disabled:opacity-100 ${
               btnState === 'checkout'
-                ? 'bg-[#D0000B] hover:bg-[#B0000A] text-white w-full shadow-sm cursor-pointer'
+                ? 'bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white w-full shadow-sm cursor-pointer'
                 : btnState === 'added'
-                  ? 'bg-[#E0000C] text-white w-full'
+                  ? 'bg-[#FF000E] text-white w-full'
                   : btnState === 'adding'
                     ? 'bg-[#FF000E] text-white cursor-wait min-w-[70px] sm:min-w-[80px]'
                     : isOutOfStock
                       ? isDark
                         ? 'bg-[#1A1214] text-[#7A7575] cursor-not-allowed border border-[#261619] min-w-[70px] sm:min-w-[80px]'
                         : 'bg-[#F0EDE6] text-[#9E9898] cursor-not-allowed border border-[#E0DBD2] min-w-[70px] sm:min-w-[80px]'
-                      : 'bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#E0000C] text-white active:scale-95 min-w-[70px] sm:min-w-[80px]'
+                      : 'bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white active:scale-95 min-w-[70px] sm:min-w-[80px]'
             }`}
             aria-label={
               isOutOfStock
@@ -206,10 +206,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               <span>Added to cart</span>
             </span>
 
-            {/* Rotated Checkout / Order Now state */}
-            <span className="btn-checkout-content">
-              <i className="bi bi-arrow-right-circle-fill text-xs leading-none" aria-hidden="true"></i>
-              <span>Checkout &rarr;</span>
+            {/* Rotated Checkout / Order Now state with single arrow */}
+            <span className="btn-checkout-content flex items-center justify-center gap-1.5 font-bold">
+              <span>Checkout</span>
+              <i className="bi bi-arrow-right text-xs leading-none" aria-hidden="true"></i>
             </span>
           </button>
         </div>

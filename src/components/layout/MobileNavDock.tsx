@@ -12,17 +12,17 @@ export const MobileNavDock: React.FC = () => {
   const { isDark } = useTheme();
   const { itemCount } = useCart();
 
-  const isCheckout = location.pathname.startsWith('/checkout') || location.pathname.startsWith('/order-');
   const isAdmin = location.pathname.startsWith('/admin');
 
-  // Do not show on checkout, order status, or admin portal
-  if (isCheckout || isAdmin) {
+  // Show dock nav for storefront pages including checkout, cart, and delivery address.
+  // Only hide on the dedicated admin portal.
+  if (isAdmin) {
     return null;
   }
 
   const isHomeActive = location.pathname === '/';
   const isCategoriesActive = location.pathname.startsWith('/catalogue');
-  const isCartActive = location.pathname === '/cart';
+  const isCartActive = location.pathname === '/cart' || location.pathname.startsWith('/checkout');
   const isProfileActive = location.pathname === '/profile';
 
   const handleProfileClick = (e: React.MouseEvent) => {

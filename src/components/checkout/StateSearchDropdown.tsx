@@ -113,7 +113,7 @@ export const StateSearchDropdown: React.FC<StateSearchDropdownProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`w-full rounded-lg px-3.5 py-2.5 text-xs border text-left flex items-center justify-between transition-all focus:outline-none focus:ring-2 focus:ring-[#D0000B] cursor-pointer ${
+        className={`w-full rounded-lg px-3.5 py-2.5 text-xs border text-left flex items-center justify-between transition-all focus:outline-none focus:ring-2 focus:ring-[#FF000E] cursor-pointer ${
           isDark
             ? 'bg-[#181113] border-[#261619] text-white hover:border-[#3D2024]'
             : 'bg-[#F5F3EE] border-[#E0DBD2] text-black hover:border-gray-400'
@@ -126,7 +126,7 @@ export const StateSearchDropdown: React.FC<StateSearchDropdownProps> = ({
         </span>
         <i
           className={`bi bi-chevron-down text-[11px] text-gray-400 transition-transform duration-200 shrink-0 ml-2 ${
-            isOpen ? 'rotate-180 text-[#D0000B]' : ''
+            isOpen ? 'rotate-180 text-[#FF000E]' : ''
           }`}
         />
       </button>
@@ -151,7 +151,7 @@ export const StateSearchDropdown: React.FC<StateSearchDropdownProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search state or UT..."
-                className={`w-full rounded-lg pl-8 pr-7 py-2 text-xs border focus:outline-none focus:ring-1 focus:ring-[#D0000B] ${
+                className={`w-full rounded-lg pl-8 pr-7 py-2 text-xs border focus:outline-none focus:ring-1 focus:ring-[#FF000E] ${
                   isDark
                     ? 'bg-[#0E0A0B] border-[#261619] text-white placeholder-gray-500'
                     : 'bg-white border-[#E0DBD2] text-black placeholder-gray-400'
@@ -183,8 +183,8 @@ export const StateSearchDropdown: React.FC<StateSearchDropdownProps> = ({
                     className={`w-full px-3.5 py-2 text-left flex items-center justify-between transition-colors cursor-pointer ${
                       isSelected
                         ? isDark
-                          ? 'bg-[#D0000B]/15 text-[#D0000B] font-bold'
-                          : 'bg-[#D0000B]/10 text-[#D0000B] font-bold'
+                          ? 'bg-[#FF000E]/15 text-[#FF000E] font-bold'
+                          : 'bg-[#FF000E]/10 text-[#FF000E] font-bold'
                         : isDark
                           ? 'text-gray-300 hover:bg-[#1A1214] hover:text-white'
                           : 'text-gray-800 hover:bg-[#F5F3EE] hover:text-black'
@@ -193,7 +193,7 @@ export const StateSearchDropdown: React.FC<StateSearchDropdownProps> = ({
                     aria-selected={isSelected}
                   >
                     <span>{st}</span>
-                    {isSelected && <i className="bi bi-check2 text-sm text-[#D0000B]" />}
+                    {isSelected && <i className="bi bi-check2 text-sm text-[#FF000E]" />}
                   </button>
                 );
               })
@@ -209,3 +209,4 @@ export const StateSearchDropdown: React.FC<StateSearchDropdownProps> = ({
     </div>
   );
 };
+

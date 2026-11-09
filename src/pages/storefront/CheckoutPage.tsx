@@ -98,7 +98,7 @@ export const CheckoutPage: React.FC = () => {
         </p>
         <Link
           to="/cart"
-          className="px-6 py-2.5 rounded-lg bg-[#D0000B] hover:bg-[#B0000A] text-white text-xs font-semibold uppercase tracking-wider transition-colors"
+          className="px-6 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-semibold uppercase tracking-wider transition-colors"
         >
           Return to Cart
         </Link>
@@ -288,7 +288,7 @@ export const CheckoutPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'}`}>
-      <div className="max-w-xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-36 md:pb-16 space-y-5">
+      <div className="max-w-xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-44 md:pb-16 space-y-5">
 
         {/* Topbar Header (Matching Reference Screen 1 & 2 & 3) */}
         <div className="flex items-center justify-between pb-3 border-b border-inherit/20">
@@ -316,7 +316,7 @@ export const CheckoutPage: React.FC = () => {
           >
             <i className="bi bi-bag text-sm" />
             {cart.items.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-[#D0000B] text-white text-[9px] font-bold min-w-[16px] h-[16px] rounded-full flex items-center justify-center px-0.5 leading-none shadow-xs">
+              <span className="absolute -top-1 -right-1 bg-[#FF000E] text-white text-[9px] font-bold min-w-[16px] h-[16px] rounded-full flex items-center justify-center px-0.5 leading-none shadow-xs">
                 {cart.items.length}
               </span>
             )}
@@ -330,7 +330,7 @@ export const CheckoutPage: React.FC = () => {
             onClick={() => setSearchParams({ step: 'address' })}
             className={`px-3 py-1.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
               currentStep === 'address'
-                ? 'bg-[#D0000B] text-white border-[#D0000B]'
+                ? 'bg-[#FF000E] text-white border-[#FF000E]'
                 : isDark
                   ? 'bg-[#130E10] text-gray-400 border-[#261619] hover:text-white'
                   : 'bg-[#F5F3EE] text-gray-600 border-[#E0DBD2] hover:text-black'
@@ -351,7 +351,7 @@ export const CheckoutPage: React.FC = () => {
             }}
             className={`px-3 py-1.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
               currentStep === 'payment'
-                ? 'bg-[#D0000B] text-white border-[#D0000B]'
+                ? 'bg-[#FF000E] text-white border-[#FF000E]'
                 : isDark
                   ? 'bg-[#130E10] text-gray-400 border-[#261619] hover:text-white'
                   : 'bg-[#F5F3EE] text-gray-600 border-[#E0DBD2] hover:text-black'
@@ -371,7 +371,7 @@ export const CheckoutPage: React.FC = () => {
             }}
             className={`px-3 py-1.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
               currentStep === 'summary'
-                ? 'bg-[#D0000B] text-white border-[#D0000B]'
+                ? 'bg-[#FF000E] text-white border-[#FF000E]'
                 : isDark
                   ? 'bg-[#130E10] text-gray-500 border-[#261619]'
                   : 'bg-[#F5F3EE] text-gray-400 border-[#E0DBD2]'
@@ -400,7 +400,7 @@ export const CheckoutPage: React.FC = () => {
             }`}>
               <div className="flex items-center justify-between border-b pb-3 border-inherit/20">
                 <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-                  <i className="bi bi-geo-alt-fill text-[#D0000B]" />
+                  <i className="bi bi-geo-alt-fill text-[#FF000E]" />
                   <span>Consignee &amp; Delivery Details</span>
                 </h2>
                 <span className="text-[11px] text-gray-500">Step 1 of 3</span>
@@ -415,7 +415,7 @@ export const CheckoutPage: React.FC = () => {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder=""
-                    className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
+                    className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                       isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                     }`}
                   />
@@ -436,7 +436,7 @@ export const CheckoutPage: React.FC = () => {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
                         placeholder=""
-                        className={`w-full rounded-lg pl-12 pr-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
+                        className={`w-full rounded-lg pl-12 pr-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                           isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                         }`}
                       />
@@ -453,7 +453,7 @@ export const CheckoutPage: React.FC = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder=""
-                      className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
+                      className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                         isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                       }`}
                     />
@@ -470,7 +470,7 @@ export const CheckoutPage: React.FC = () => {
                       value={postalCode}
                       onChange={(e) => setPostalCode(e.target.value.replace(/[^0-9]/g, ''))}
                       placeholder=""
-                      className={`w-full rounded-lg px-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
+                      className={`w-full rounded-lg px-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                         isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                       }`}
                     />
@@ -484,7 +484,7 @@ export const CheckoutPage: React.FC = () => {
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
                       placeholder=""
-                      className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
+                      className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                         isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                       }`}
                     />
@@ -499,7 +499,7 @@ export const CheckoutPage: React.FC = () => {
                     value={addressLine1}
                     onChange={(e) => setAddressLine1(e.target.value)}
                     placeholder=""
-                    className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
+                    className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                       isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                     }`}
                   />
@@ -513,7 +513,7 @@ export const CheckoutPage: React.FC = () => {
                       value={addressLine2}
                       onChange={(e) => setAddressLine2(e.target.value)}
                       placeholder=""
-                      className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
+                      className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                         isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                       }`}
                     />
@@ -531,7 +531,7 @@ export const CheckoutPage: React.FC = () => {
                     value={deliveryInstructions}
                     onChange={(e) => setDeliveryInstructions(e.target.value)}
                     placeholder=""
-                    className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
+                    className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                       isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                     }`}
                   />
@@ -543,7 +543,7 @@ export const CheckoutPage: React.FC = () => {
             <div className="pt-2">
               <button
                 type="submit"
-                className="w-full py-4 rounded-xl bg-[#D0000B] hover:bg-[#B0000A] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2"
               >
                 <span>Proceed to Payment Method</span>
                 <i className="bi bi-arrow-right text-sm" />
@@ -563,7 +563,7 @@ export const CheckoutPage: React.FC = () => {
               isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2]'
             }`}>
               <div className="flex items-center gap-2.5 min-w-0">
-                <i className="bi bi-geo-alt-fill text-[#D0000B] shrink-0" />
+                <i className="bi bi-geo-alt-fill text-[#FF000E] shrink-0" />
                 <span className="truncate">
                   Deliver to: <strong>{fullName || 'Recipient'}</strong> {phone && `(${phone})`}{addressLine1 && `, ${addressLine1}`}
                 </span>
@@ -571,7 +571,7 @@ export const CheckoutPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSearchParams({ step: 'address' })}
-                className="text-xs font-semibold text-[#D0000B] hover:underline shrink-0 ml-2 cursor-pointer"
+                className="text-xs font-semibold text-[#FF000E] hover:underline shrink-0 ml-2 cursor-pointer"
               >
                 Change
               </button>
@@ -594,8 +594,8 @@ export const CheckoutPage: React.FC = () => {
                     className={`p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer select-none ${
                       isSelected
                         ? isDark
-                          ? 'bg-[#1A1214] border-[#D0000B] ring-1 ring-[#D0000B]'
-                          : 'bg-white border-[#D0000B] ring-1 ring-[#D0000B] shadow-sm'
+                          ? 'bg-[#1A1214] border-[#FF000E] ring-1 ring-[#FF000E]'
+                          : 'bg-white border-[#FF000E] ring-1 ring-[#FF000E] shadow-sm'
                         : isDark
                           ? 'bg-[#120E0F] hover:bg-[#161012] border-[#261619]'
                           : 'bg-white hover:bg-[#FDFCFA] border-[#E0DBD2]'
@@ -605,7 +605,7 @@ export const CheckoutPage: React.FC = () => {
                       <div className="flex items-center gap-3.5 min-w-0">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 border ${
                           isSelected
-                            ? 'bg-[#D0000B] text-white border-[#D0000B]'
+                            ? 'bg-[#FF000E] text-white border-[#FF000E]'
                             : isDark
                               ? 'bg-[#181113] text-gray-300 border-[#261619]'
                               : 'bg-[#F5F3EE] text-gray-700 border-[#E0DBD2]'
@@ -622,7 +622,7 @@ export const CheckoutPage: React.FC = () => {
 
                       <div className="flex items-center gap-2 shrink-0">
                         <i className={`bi bi-chevron-right text-xs transition-transform ${
-                          isSelected ? 'text-[#D0000B] translate-x-0.5' : 'text-gray-400'
+                          isSelected ? 'text-[#FF000E] translate-x-0.5' : 'text-gray-400'
                         }`} />
                       </div>
                     </div>
@@ -639,13 +639,13 @@ export const CheckoutPage: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={handleCopyUpi}
-                                className="text-[11px] font-bold text-[#D0000B] hover:underline flex items-center gap-1 cursor-pointer"
+                                className="text-[11px] font-bold text-[#FF000E] hover:underline flex items-center gap-1 cursor-pointer"
                               >
                                 <i className="bi bi-clipboard" />
                                 <span>{copiedUpi ? 'Copied!' : 'Copy'}</span>
                               </button>
                             </div>
-                            <div className="font-mono text-sm font-bold text-[#D0000B]">
+                            <div className="font-mono text-sm font-bold text-[#FF000E]">
                               {storeUpiId}
                             </div>
                           </div>
@@ -660,7 +660,7 @@ export const CheckoutPage: React.FC = () => {
                             value={customerUpiId}
                             onChange={(e) => setCustomerUpiId(e.target.value.trim())}
                             placeholder=""
-                            className={`w-full rounded-lg px-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
+                            className={`w-full rounded-lg px-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                               isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                             }`}
                           />
@@ -676,7 +676,7 @@ export const CheckoutPage: React.FC = () => {
                             value={utrNumber}
                             onChange={(e) => setUtrNumber(e.target.value.trim())}
                             placeholder=""
-                            className={`w-full rounded-lg px-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#D0000B] ${
+                            className={`w-full rounded-lg px-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                               isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                             }`}
                           />
@@ -693,7 +693,7 @@ export const CheckoutPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleProceedToSummary()}
-                className="w-full py-4 rounded-xl bg-[#D0000B] hover:bg-[#B0000A] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2"
               >
                 <span>Add Payment Method</span>
                 <i className="bi bi-arrow-right text-sm" />
@@ -713,7 +713,7 @@ export const CheckoutPage: React.FC = () => {
               isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2]'
             }`}>
               <div className="space-y-1 min-w-0 pr-3">
-                <div className="flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-[#D0000B]">
+                <div className="flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-[#FF000E]">
                   <i className="bi bi-geo-alt-fill" />
                   <span>Delivery Address</span>
                 </div>
@@ -723,7 +723,7 @@ export const CheckoutPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSearchParams({ step: 'address' })}
-                className="text-xs font-semibold text-[#D0000B] hover:underline shrink-0 cursor-pointer"
+                className="text-xs font-semibold text-[#FF000E] hover:underline shrink-0 cursor-pointer"
               >
                 Change
               </button>
@@ -734,7 +734,7 @@ export const CheckoutPage: React.FC = () => {
               isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2]'
             }`}>
               <div className="space-y-1 min-w-0 pr-3">
-                <div className="flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-[#D0000B]">
+                <div className="flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-[#FF000E]">
                   <i className="bi bi-credit-card-2-front" />
                   <span>Payment Method</span>
                 </div>
@@ -748,7 +748,7 @@ export const CheckoutPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSearchParams({ step: 'payment' })}
-                className="text-xs font-semibold text-[#D0000B] hover:underline shrink-0 cursor-pointer"
+                className="text-xs font-semibold text-[#FF000E] hover:underline shrink-0 cursor-pointer"
               >
                 Change
               </button>
@@ -760,7 +760,7 @@ export const CheckoutPage: React.FC = () => {
             }`}>
               <div className="flex items-center justify-between border-b pb-2.5 border-inherit/20">
                 <h3 className="font-bold text-sm">Order Summary ({cart.items.length} items)</h3>
-                <Link to="/cart" className="text-xs text-[#D0000B] hover:underline font-semibold">
+                <Link to="/cart" className="text-xs text-[#FF000E] hover:underline font-semibold">
                   Review Cart
                 </Link>
               </div>
@@ -816,7 +816,7 @@ export const CheckoutPage: React.FC = () => {
               {/* Total Payable */}
               <div className={`pt-3 border-t flex justify-between items-center ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
                 <span className="font-bold text-base">Total Payable</span>
-                <span className="font-extrabold text-xl text-[#D0000B]">
+                <span className="font-extrabold text-xl text-[#FF000E]">
                   {formatINR(cart.totalPaisa)}
                 </span>
               </div>
@@ -827,7 +827,7 @@ export const CheckoutPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-4 rounded-xl bg-[#D0000B] hover:bg-[#B0000A] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">

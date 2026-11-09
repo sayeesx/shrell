@@ -19,7 +19,7 @@ export const CartPage: React.FC = () => {
   const [isApplying, setIsApplying] = useState(false);
   const [suggestions, setSuggestions] = useState<Product[]>([]);
 
-  // Load product suggestions (Swiggy Instamart style)
+  // Load product suggestions
   useEffect(() => {
     async function loadData() {
       try {
@@ -66,16 +66,16 @@ export const CartPage: React.FC = () => {
   // If cart is empty
   if (cart.items.length === 0) {
     return (
-      <div className={`min-h-[85vh] flex flex-col items-center justify-center px-4 py-16 text-center space-y-6 ${
+      <div className={`min-h-[85vh] flex flex-col items-center justify-center px-4 py-16 text-center space-y-5 pb-36 ${
         isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'
       }`}>
         {/* Mobile Header Bar */}
-        <div className="w-full max-w-md flex items-center justify-between pb-4 mb-2 md:hidden">
+        <div className="w-full max-w-md flex items-center justify-between pb-3 mb-2 md:hidden">
           <button
             type="button"
             onClick={() => navigate(-1)}
             className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-colors cursor-pointer active:scale-95 ${
-              isDark ? 'bg-[#130E10] border-[#261619] text-[#F1EEEE]' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10]'
+              isDark ? 'bg-[#130E10] border-[#2D161A] text-[#F1EEEE]' : 'bg-[#F5F3EE] border-[#D0C9BE] text-[#140E10]'
             }`}
             aria-label="Go back"
           >
@@ -86,19 +86,19 @@ export const CartPage: React.FC = () => {
         </div>
 
         <div className={`w-20 h-20 rounded-xl border flex items-center justify-center mx-auto shadow-inner ${
-          isDark ? 'bg-[#130E10] border-[#261619] text-[#8E8587]' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#8E8587]'
+          isDark ? 'bg-[#130E10] border-[#2D161A] text-[#8E8587]' : 'bg-[#F5F3EE] border-[#D0C9BE] text-[#8E8587]'
         }`}>
           <i className="bi bi-bag-x text-3xl" aria-hidden="true" />
         </div>
-        <div className="space-y-2 max-w-sm">
+        <div className="space-y-1.5 max-w-sm">
           <h2 className="text-xl font-bold tracking-tight">Your Cart is Empty</h2>
           <p className={`text-xs ${isDark ? 'text-[#8E8587]' : 'text-[#706869]'}`}>
-            Explore our precision fit automotive accessories and equipment engineered for Indian terrain.
+            Explore precision-fit automotive equipment and accessories engineered for Indian terrain.
           </p>
         </div>
         <Link
           to="/catalogue"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#D0000B] hover:bg-[#B0000A] text-white font-semibold text-xs uppercase tracking-wider transition-colors shadow-sm active:scale-95"
+          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white font-semibold text-xs uppercase tracking-wider transition-colors shadow-sm active:scale-95"
         >
           <span>Explore Equipment Catalogue</span>
           <i className="bi bi-arrow-right text-xs" aria-hidden="true" />
@@ -115,15 +115,15 @@ export const CartPage: React.FC = () => {
       {/* ========================================================================= */}
       {/* MOBILE LAYOUT                                                             */}
       {/* ========================================================================= */}
-      <div className="block md:hidden max-w-md mx-auto px-4 py-4 pb-36 space-y-4">
+      <div className="block md:hidden max-w-md mx-auto px-3.5 py-3 pb-56 space-y-2">
 
         {/* 1. Mobile Header (Back button | My Cart | Theme toggle) */}
         <div className="flex items-center justify-between pb-2 border-b border-inherit/20">
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-colors cursor-pointer active:scale-95 ${
-              isDark ? 'bg-[#130E10] border-[#261619] text-[#F1EEEE]' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10]'
+            className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-colors cursor-pointer active:scale-95 ${
+              isDark ? 'bg-[#130E10] border-[#2D161A] text-[#F1EEEE]' : 'bg-[#F5F3EE] border-[#D0C9BE] text-[#140E10]'
             }`}
             aria-label="Go back"
           >
@@ -137,8 +137,8 @@ export const CartPage: React.FC = () => {
           </div>
         </div>
 
-        {/* 2. Cart Items List */}
-        <div className="space-y-3">
+        {/* 2. Cart Items List (Tighter padding & gap for enhanced contrast and density) */}
+        <div className="space-y-2">
           {cart.items.map((item) => {
             const rawImg = item.product.images?.[0]?.url || '';
             const cleanImg = rawImg.startsWith('http://res.cloudinary.com/')
@@ -149,13 +149,13 @@ export const CartPage: React.FC = () => {
             return (
               <div
                 key={item.productId}
-                className={`p-3.5 rounded-xl border transition-all duration-200 flex items-center gap-3.5 ${
-                  isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
+                className={`p-2.5 rounded-xl border transition-all duration-200 flex items-center gap-2.5 ${
+                  isDark ? 'bg-[#130E10] border-[#2D161A]' : 'bg-white border-[#D0C9BE] shadow-xs'
                 }`}
               >
                 {/* Product image (clean rounded-lg frame) */}
-                <div className={`w-18 h-18 shrink-0 rounded-lg flex items-center justify-center p-1.5 overflow-hidden border ${
-                  isDark ? 'bg-[#181113] border-[#261619]' : 'bg-[#F5F3EE] border-[#E0DBD2]'
+                <div className={`w-16 h-16 shrink-0 rounded-lg flex items-center justify-center p-1 overflow-hidden border ${
+                  isDark ? 'bg-[#181113] border-[#2D161A]' : 'bg-[#F5F3EE] border-[#D0C9BE]'
                 }`}>
                   {hasRealImg ? (
                     <img
@@ -169,7 +169,7 @@ export const CartPage: React.FC = () => {
                       <img
                         src="/logos/shrell-brandicon_no-bg.png"
                         alt="SHRELL"
-                        className="w-8 h-8 object-contain"
+                        className="w-7 h-7 object-contain"
                       />
                     </div>
                   )}
@@ -179,30 +179,30 @@ export const CartPage: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <Link
                     to={`/product/${item.product.slug}`}
-                    className="font-bold text-xs sm:text-sm leading-snug line-clamp-1 block hover:text-[#D0000B] transition-colors"
+                    className="font-bold text-xs leading-snug line-clamp-1 block hover:text-[#FF000E] transition-colors"
                   >
                     {item.product.name}
                   </Link>
 
-                  <p className="text-[11px] text-gray-500 dark:text-[#8E8587] truncate mt-0.5">
+                  <p className="text-[10.5px] text-gray-400 dark:text-[#8E8587] truncate mt-0.5">
                     {item.product.categoryName || 'OEM Automotive Equipment'} {item.product.sku ? `| ${item.product.sku}` : ''}
                   </p>
 
-                  <p className="font-extrabold text-sm text-[#D0000B] mt-1">
+                  <p className="font-extrabold text-xs sm:text-sm text-[#FF000E] mt-0.5">
                     {formatINR(item.unitPricePaisa)}
                   </p>
 
                   {/* Quantity Stepper & Remove Row */}
-                  <div className="flex items-center justify-between pt-1.5 mt-0.5">
+                  <div className="flex items-center justify-between pt-1 mt-0.5">
                     {/* Quantity Selector: Crisp reduced-radius pill */}
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1">
                       <button
                         type="button"
                         onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                        className={`w-6 h-6 rounded-md border flex items-center justify-center text-xs font-bold transition-all active:scale-90 cursor-pointer ${
+                        className={`w-5 h-5 rounded-md border flex items-center justify-center text-xs font-bold transition-all active:scale-90 cursor-pointer ${
                           isDark
-                            ? 'bg-[#181113] border-[#261619] text-[#F1EEEE] hover:border-[#D0000B]'
-                            : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10] hover:border-[#D0000B]'
+                            ? 'bg-[#181113] border-[#2D161A] text-[#F1EEEE] hover:border-[#FF000E]'
+                            : 'bg-[#F5F3EE] border-[#D0C9BE] text-[#140E10] hover:border-[#FF000E]'
                         }`}
                         aria-label="Decrease quantity"
                       >
@@ -215,10 +215,10 @@ export const CartPage: React.FC = () => {
                         type="button"
                         onClick={() => updateQuantity(item.productId, item.quantity + 1)}
                         disabled={item.quantity >= item.product.stockQuantity}
-                        className={`w-6 h-6 rounded-md border flex items-center justify-center text-xs font-bold transition-all active:scale-90 cursor-pointer disabled:opacity-30 ${
+                        className={`w-5 h-5 rounded-md border flex items-center justify-center text-xs font-bold transition-all active:scale-90 cursor-pointer disabled:opacity-30 ${
                           isDark
-                            ? 'bg-[#181113] border-[#261619] text-[#F1EEEE] hover:border-[#D0000B]'
-                            : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10] hover:border-[#D0000B]'
+                            ? 'bg-[#181113] border-[#2D161A] text-[#F1EEEE] hover:border-[#FF000E]'
+                            : 'bg-[#F5F3EE] border-[#D0C9BE] text-[#140E10] hover:border-[#FF000E]'
                         }`}
                         aria-label="Increase quantity"
                       >
@@ -230,7 +230,7 @@ export const CartPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => removeItem(item.productId)}
-                      className="text-xs font-medium text-gray-400 hover:text-[#D0000B] hover:underline cursor-pointer active:scale-95 transition-colors"
+                      className="text-[11px] font-medium text-gray-400 hover:text-[#FF000E] hover:underline cursor-pointer active:scale-95 transition-colors"
                     >
                       Remove
                     </button>
@@ -242,10 +242,10 @@ export const CartPage: React.FC = () => {
         </div>
 
         {/* 3. "+ Add more items" Link */}
-        <div className="pt-1 flex items-center justify-between">
+        <div className="py-0.5 flex items-center justify-between">
           <Link
             to="/catalogue"
-            className="inline-flex items-center gap-1 text-xs font-bold text-[#D0000B] hover:underline cursor-pointer py-1"
+            className="inline-flex items-center gap-1 text-xs font-bold text-[#FF000E] hover:underline cursor-pointer"
           >
             <i className="bi bi-plus-lg text-[10px]" />
             <span>Add more items</span>
@@ -261,19 +261,11 @@ export const CartPage: React.FC = () => {
         </div>
 
         {/* ========================================================================= */}
-        {/* 4. SWIGGY INSTAMART STYLE PRODUCT SUGGESTIONS (Mobile Horizontal Scroll) */}
+        {/* 4. PRODUCT SUGGESTIONS (Flush Left - No Title, No Left Margin Indent)   */}
         {/* ========================================================================= */}
         {displayedSuggestions.length > 0 && (
-          <div className="pt-2 space-y-2.5">
-            <div className="flex items-center justify-between px-0.5">
-              <h3 className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
-                <i className="bi bi-stars text-[#D0000B]" />
-                <span>You May Also Need</span>
-              </h3>
-              <span className="text-[10px] text-gray-500">Fast Add</span>
-            </div>
-
-            <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-none snap-x snap-mandatory -mx-4 px-4">
+          <div className="pt-1">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none snap-x snap-mandatory w-full">
               {displayedSuggestions.map((prod) => {
                 const inCartItem = cart.items.find((it) => it.productId === prod.id);
                 const currentQty = inCartItem?.quantity || 0;
@@ -281,13 +273,13 @@ export const CartPage: React.FC = () => {
                 return (
                   <div
                     key={prod.id}
-                    className={`w-36 shrink-0 snap-start p-2.5 rounded-xl border flex flex-col justify-between ${
-                      isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
+                    className={`w-32 shrink-0 snap-start p-2 rounded-xl border flex flex-col justify-between ${
+                      isDark ? 'bg-[#130E10] border-[#2D161A]' : 'bg-white border-[#D0C9BE] shadow-xs'
                     }`}
                   >
                     <div>
-                      <div className={`w-full h-22 rounded-lg flex items-center justify-center p-1 overflow-hidden border ${
-                        isDark ? 'bg-[#181113] border-[#261619]' : 'bg-[#F5F3EE] border-[#E0DBD2]'
+                      <div className={`w-full h-20 rounded-lg flex items-center justify-center p-1 overflow-hidden border ${
+                        isDark ? 'bg-[#181113] border-[#2D161A]' : 'bg-[#F5F3EE] border-[#D0C9BE]'
                       }`}>
                         <img
                           src={prod.images?.[0]?.url || '/logos/shrell-brandicon_no-bg.png'}
@@ -297,18 +289,18 @@ export const CartPage: React.FC = () => {
                       </div>
                       <Link
                         to={`/product/${prod.slug}`}
-                        className="font-bold text-[11px] line-clamp-2 leading-snug mt-2 block hover:text-[#D0000B] transition-colors"
+                        className="font-bold text-[11px] line-clamp-1 leading-snug mt-1.5 block hover:text-[#FF000E] transition-colors"
                       >
                         {prod.name}
                       </Link>
-                      <p className="font-extrabold text-xs text-[#D0000B] mt-1">
+                      <p className="font-extrabold text-xs text-[#FF000E] mt-0.5">
                         {formatINR(prod.pricePaisa)}
                       </p>
                     </div>
 
-                    <div className="mt-2 pt-1 border-t border-inherit/20">
+                    <div className="mt-1.5 pt-1 border-t border-inherit/20">
                       {currentQty > 0 ? (
-                        <div className="w-full flex items-center justify-between rounded-lg bg-[#D0000B] text-white py-1 px-2 font-bold text-xs">
+                        <div className="w-full flex items-center justify-between rounded-md bg-[#FF000E] text-white py-0.5 px-2 font-bold text-xs">
                           <button
                             type="button"
                             onClick={() => updateQuantity(prod.id, currentQty - 1)}
@@ -331,7 +323,7 @@ export const CartPage: React.FC = () => {
                           type="button"
                           onClick={() => addItem(prod, 1)}
                           disabled={prod.stockQuantity <= 0}
-                          className="w-full py-1.5 rounded-lg border border-[#D0000B] text-[#D0000B] hover:bg-[#D0000B] hover:text-white font-bold text-[11px] uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-40"
+                          className="w-full py-1 rounded-md border border-[#FF000E] text-[#FF000E] hover:bg-[#FF000E] hover:text-white font-bold text-[10px] uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-40"
                         >
                           + ADD
                         </button>
@@ -345,19 +337,19 @@ export const CartPage: React.FC = () => {
         )}
 
         {/* 5. Voucher Code Box */}
-        <div className={`p-3.5 rounded-xl border space-y-2.5 ${
-          isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
+        <div className={`p-2.5 rounded-xl border space-y-2 ${
+          isDark ? 'bg-[#130E10] border-[#2D161A]' : 'bg-white border-[#D0C9BE] shadow-xs'
         }`}>
           <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider">
             <span className="flex items-center gap-1.5">
-              <i className="bi bi-tag-fill text-[#D0000B]" />
+              <i className="bi bi-tag-fill text-[#FF000E]" />
               <span>Coupon Voucher</span>
             </span>
             {cart.appliedCoupon && (
               <button
                 type="button"
                 onClick={removeCoupon}
-                className="text-[#D0000B] hover:underline text-[11px] cursor-pointer"
+                className="text-[#FF000E] hover:underline text-[11px] cursor-pointer"
               >
                 Remove
               </button>
@@ -378,14 +370,14 @@ export const CartPage: React.FC = () => {
                 value={couponCode}
                 onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                 placeholder=""
-                className={`flex-1 rounded-lg px-3 py-2 text-xs font-mono uppercase focus:outline-none focus:ring-1 focus:ring-[#D0000B] border ${
-                  isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
+                className={`flex-1 rounded-lg px-3 py-1.5 text-xs font-mono uppercase focus:outline-none focus:ring-1 focus:ring-[#FF000E] border ${
+                  isDark ? 'bg-[#181113] border-[#2D161A] text-white' : 'bg-[#F5F3EE] border-[#D0C9BE] text-black'
                 }`}
               />
               <button
                 type="submit"
                 disabled={isApplying || !couponCode.trim()}
-                className="px-4 py-2 rounded-lg bg-[#D0000B] hover:bg-[#B0000A] disabled:opacity-40 text-white font-semibold text-xs transition-colors cursor-pointer shrink-0"
+                className="px-3.5 py-1.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] disabled:opacity-40 text-white font-semibold text-xs transition-colors cursor-pointer shrink-0"
               >
                 Apply
               </button>
@@ -400,8 +392,8 @@ export const CartPage: React.FC = () => {
         </div>
 
         {/* 6. Summary Breakdown */}
-        <div className={`p-3.5 rounded-xl border space-y-2.5 text-xs ${
-          isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
+        <div className={`p-2.5 rounded-xl border space-y-2 text-xs ${
+          isDark ? 'bg-[#130E10] border-[#2D161A]' : 'bg-white border-[#D0C9BE] shadow-xs'
         }`}>
           <div className="flex justify-between items-center text-gray-400">
             <span>Sub total</span>
@@ -426,26 +418,43 @@ export const CartPage: React.FC = () => {
             </div>
           )}
 
-          <div className="pt-2 border-t border-inherit/20 flex justify-between items-center">
-            <span className="font-bold text-sm">Total</span>
-            <span className="font-extrabold text-base text-[#D0000B]">
+          <div className="pt-1.5 border-t border-inherit/20 flex justify-between items-center">
+            <span className="font-bold text-xs sm:text-sm">Total</span>
+            <span className="font-extrabold text-sm sm:text-base text-[#FF000E]">
               {formatINR(cart.totalPaisa)}
             </span>
           </div>
         </div>
 
-        {/* 7. Primary Action Button: "Select address at next step" */}
-        <div className="pt-2">
+      </div>
+
+      {/* ========================================================================= */}
+      {/* MOBILE FIXED BOTTOM CTA BUTTON (Fixed directly on top of dock nav bar)   */}
+      {/* ========================================================================= */}
+      <div
+        className={`fixed left-0 right-0 z-30 md:hidden p-3 border-t backdrop-blur-xl transition-all ${
+          isDark
+            ? 'bg-[#0A0808]/95 border-[#2D161A] shadow-[0_-8px_25px_rgba(0,0,0,0.85)]'
+            : 'bg-white/95 border-[#D0C9BE] shadow-[0_-4px_18px_rgba(0,0,0,0.1)]'
+        }`}
+        style={{ bottom: 'calc(78px + env(safe-area-inset-bottom, 0px))' }}
+      >
+        <div className="max-w-md mx-auto flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <span className="text-[10px] text-gray-400 block leading-tight">Total</span>
+            <span className="font-extrabold text-sm text-[#FF000E] font-tight block leading-tight">
+              {formatINR(cart.totalPaisa)}
+            </span>
+          </div>
           <button
             type="button"
             onClick={() => navigate('/checkout')}
-            className="w-full py-4 rounded-xl bg-[#D0000B] hover:bg-[#B0000A] text-white font-bold text-sm tracking-wide text-center shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
+            className="flex-1 py-3 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-1.5"
           >
             <span>Select address at next step</span>
-            <i className="bi bi-arrow-right text-sm" />
+            <i className="bi bi-arrow-right text-xs" />
           </button>
         </div>
-
       </div>
 
       {/* ========================================================================= */}
@@ -466,7 +475,7 @@ export const CartPage: React.FC = () => {
               type="button"
               onClick={clearCart}
               className={`text-xs font-medium transition-colors cursor-pointer ${
-                isDark ? 'text-[#8E8587] hover:text-[#D0000B]' : 'text-[#706869] hover:text-[#D0000B]'
+                isDark ? 'text-[#8E8587] hover:text-[#FF000E]' : 'text-[#706869] hover:text-[#FF000E]'
               }`}
             >
               Empty Cart
@@ -483,23 +492,23 @@ export const CartPage: React.FC = () => {
         </div>
 
         {/* Free Shipping Progress Indicator */}
-        <div className={`p-4 rounded-xl border text-xs space-y-2 ${
+        <div className={`p-3.5 rounded-xl border text-xs space-y-2 ${
           isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
         }`}>
           <div className="flex items-center justify-between font-medium">
             <span className="flex items-center gap-2">
-              <i className="bi bi-truck text-[#D0000B] text-base" />
+              <i className="bi bi-truck text-[#FF000E] text-base" />
               {remainingForFreeShipping === 0
                 ? 'Unlocked: Free Express Surface Shipping across India!'
                 : `Add ${formatINR(remainingForFreeShipping)} more for Free Express Shipping`}
             </span>
-            <span className="text-[#D0000B] font-bold">
+            <span className="text-[#FF000E] font-bold">
               {remainingForFreeShipping === 0 ? 'FREE' : 'Threshold ₹4,999'}
             </span>
           </div>
           <div className="w-full bg-black/10 dark:bg-white/10 h-1.5 rounded-full overflow-hidden">
             <div
-              className="bg-[#D0000B] h-full transition-all duration-500 rounded-full"
+              className="bg-[#FF000E] h-full transition-all duration-500 rounded-full"
               style={{ width: `${Math.min(100, Math.round((cart.subtotalPaisa / freeThreshold) * 100))}%` }}
             />
           </div>
@@ -508,8 +517,8 @@ export const CartPage: React.FC = () => {
         {/* 2-Column Desktop Grid */}
         <div className="grid grid-cols-12 gap-6 items-start">
 
-          {/* Left Column (8 cols): Items list + Swiggy Instamart Recommendations */}
-          <div className="col-span-7 lg:col-span-8 space-y-4">
+          {/* Left Column (8 cols): Items list + Instamart Recommendations */}
+          <div className="col-span-7 lg:col-span-8 space-y-3.5">
             {cart.items.map((item) => {
               const rawImg = item.product.images?.[0]?.url || '';
               const cleanImg = rawImg.startsWith('http://res.cloudinary.com/')
@@ -520,7 +529,7 @@ export const CartPage: React.FC = () => {
               return (
                 <div
                   key={item.productId}
-                  className={`p-4 rounded-xl border transition-all duration-200 flex items-center gap-4 ${
+                  className={`p-3.5 rounded-xl border transition-all duration-200 flex items-center gap-4 ${
                     isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
                   }`}
                 >
@@ -552,7 +561,7 @@ export const CartPage: React.FC = () => {
                       <div>
                         <Link
                           to={`/product/${item.product.slug}`}
-                          className="font-bold text-sm leading-snug line-clamp-1 hover:text-[#D0000B] transition-colors"
+                          className="font-bold text-sm leading-snug line-clamp-1 hover:text-[#FF000E] transition-colors"
                         >
                           {item.product.name}
                         </Link>
@@ -561,7 +570,7 @@ export const CartPage: React.FC = () => {
                         </p>
                       </div>
 
-                      <span className="font-extrabold text-base text-[#D0000B] shrink-0">
+                      <span className="font-extrabold text-base text-[#FF000E] shrink-0">
                         {formatINR(item.unitPricePaisa)}
                       </span>
                     </div>
@@ -574,8 +583,8 @@ export const CartPage: React.FC = () => {
                           onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                           className={`w-7 h-7 rounded-md border flex items-center justify-center text-xs font-bold transition-all active:scale-90 cursor-pointer ${
                             isDark
-                              ? 'bg-[#181113] border-[#261619] text-[#F1EEEE] hover:border-[#D0000B]'
-                              : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10] hover:border-[#D0000B]'
+                              ? 'bg-[#181113] border-[#261619] text-[#F1EEEE] hover:border-[#FF000E]'
+                              : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10] hover:border-[#FF000E]'
                           }`}
                           aria-label="Decrease quantity"
                         >
@@ -590,8 +599,8 @@ export const CartPage: React.FC = () => {
                           disabled={item.quantity >= item.product.stockQuantity}
                           className={`w-7 h-7 rounded-md border flex items-center justify-center text-xs font-bold transition-all active:scale-90 cursor-pointer disabled:opacity-30 ${
                             isDark
-                              ? 'bg-[#181113] border-[#261619] text-[#F1EEEE] hover:border-[#D0000B]'
-                              : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10] hover:border-[#D0000B]'
+                              ? 'bg-[#181113] border-[#261619] text-[#F1EEEE] hover:border-[#FF000E]'
+                              : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10] hover:border-[#FF000E]'
                           }`}
                           aria-label="Increase quantity"
                         >
@@ -602,7 +611,7 @@ export const CartPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => removeItem(item.productId)}
-                        className="text-xs font-medium text-gray-400 hover:text-[#D0000B] hover:underline cursor-pointer transition-colors"
+                        className="text-xs font-medium text-gray-400 hover:text-[#FF000E] hover:underline cursor-pointer transition-colors"
                       >
                         Remove
                       </button>
@@ -612,22 +621,12 @@ export const CartPage: React.FC = () => {
               );
             })}
 
-            {/* ========================================================================= */}
-            {/* SWIGGY INSTAMART STYLE SUGGESTIONS GRID (Desktop)                         */}
-            {/* ========================================================================= */}
+            {/* Suggestions Grid (Desktop) */}
             {displayedSuggestions.length > 0 && (
-              <div className={`p-5 rounded-xl border space-y-3.5 ${
+              <div className={`p-4 rounded-xl border space-y-3 ${
                 isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
               }`}>
-                <div className="flex items-center justify-between border-b pb-2.5 border-inherit/20">
-                  <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-                    <i className="bi bi-stars text-[#D0000B]" />
-                    <span>Frequently Added Automotive Accessories</span>
-                  </h3>
-                  <span className="text-xs text-gray-400">Instamart Fast-Add</span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-3.5">
+                <div className="grid grid-cols-3 gap-3">
                   {displayedSuggestions.slice(0, 3).map((prod) => {
                     const inCartItem = cart.items.find((it) => it.productId === prod.id);
                     const currentQty = inCartItem?.quantity || 0;
@@ -635,12 +634,12 @@ export const CartPage: React.FC = () => {
                     return (
                       <div
                         key={prod.id}
-                        className={`p-3 rounded-lg border flex flex-col justify-between ${
+                        className={`p-2.5 rounded-lg border flex flex-col justify-between ${
                           isDark ? 'bg-[#181113] border-[#261619]' : 'bg-[#FAF8F5] border-[#E0DBD2]'
                         }`}
                       >
                         <div>
-                          <div className={`w-full h-28 rounded-md flex items-center justify-center p-2 overflow-hidden border ${
+                          <div className={`w-full h-24 rounded-md flex items-center justify-center p-1.5 overflow-hidden border ${
                             isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2]'
                           }`}>
                             <img
@@ -651,18 +650,18 @@ export const CartPage: React.FC = () => {
                           </div>
                           <Link
                             to={`/product/${prod.slug}`}
-                            className="font-bold text-xs line-clamp-2 leading-snug mt-2 block hover:text-[#D0000B] transition-colors"
+                            className="font-bold text-xs line-clamp-1 leading-snug mt-1.5 block hover:text-[#FF000E] transition-colors"
                           >
                             {prod.name}
                           </Link>
-                          <p className="font-extrabold text-xs text-[#D0000B] mt-1">
+                          <p className="font-extrabold text-xs text-[#FF000E] mt-0.5">
                             {formatINR(prod.pricePaisa)}
                           </p>
                         </div>
 
-                        <div className="mt-2.5 pt-2 border-t border-inherit/20">
+                        <div className="mt-2 pt-1.5 border-t border-inherit/20">
                           {currentQty > 0 ? (
-                            <div className="w-full flex items-center justify-between rounded-md bg-[#D0000B] text-white py-1 px-2.5 font-bold text-xs">
+                            <div className="w-full flex items-center justify-between rounded-md bg-[#FF000E] text-white py-1 px-2 font-bold text-xs">
                               <button
                                 type="button"
                                 onClick={() => updateQuantity(prod.id, currentQty - 1)}
@@ -670,7 +669,7 @@ export const CartPage: React.FC = () => {
                               >
                                 −
                               </button>
-                              <span className="font-mono text-xs">{currentQty} in cart</span>
+                              <span className="font-mono text-xs">{currentQty}</span>
                               <button
                                 type="button"
                                 onClick={() => updateQuantity(prod.id, currentQty + 1)}
@@ -685,7 +684,7 @@ export const CartPage: React.FC = () => {
                               type="button"
                               onClick={() => addItem(prod, 1)}
                               disabled={prod.stockQuantity <= 0}
-                              className="w-full py-1.5 rounded-md border border-[#D0000B] text-[#D0000B] hover:bg-[#D0000B] hover:text-white font-bold text-xs uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-40"
+                              className="w-full py-1.5 rounded-md border border-[#FF000E] text-[#FF000E] hover:bg-[#FF000E] hover:text-white font-bold text-xs uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-40"
                             >
                               + ADD
                             </button>
@@ -700,21 +699,21 @@ export const CartPage: React.FC = () => {
           </div>
 
           {/* Right Column (4 cols, sticky): Order Summary Card */}
-          <div className="col-span-5 lg:col-span-4 space-y-4 sticky top-24">
+          <div className="col-span-5 lg:col-span-4 space-y-3.5 sticky top-24">
             {/* Voucher Coupon Section */}
-            <div className={`p-4 rounded-xl border space-y-3 ${
+            <div className={`p-3.5 rounded-xl border space-y-2.5 ${
               isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
             }`}>
               <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider">
                 <span className="flex items-center gap-1.5">
-                  <i className="bi bi-tag-fill text-[#D0000B]" />
+                  <i className="bi bi-tag-fill text-[#FF000E]" />
                   <span>Promotion Voucher</span>
                 </span>
                 {cart.appliedCoupon && (
                   <button
                     type="button"
                     onClick={removeCoupon}
-                    className="text-[#D0000B] hover:underline text-[11px] cursor-pointer"
+                    className="text-[#FF000E] hover:underline text-[11px] cursor-pointer"
                   >
                     Remove
                   </button>
@@ -722,7 +721,7 @@ export const CartPage: React.FC = () => {
               </div>
 
               {cart.appliedCoupon ? (
-                <div className={`p-2.5 rounded-lg flex items-center justify-between text-xs font-mono font-bold ${
+                <div className={`p-2 rounded-lg flex items-center justify-between text-xs font-mono font-bold ${
                   isDark ? 'bg-[#181113] text-emerald-400 border border-emerald-900/40' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                 }`}>
                   <span>{cart.appliedCoupon.code}</span>
@@ -735,14 +734,14 @@ export const CartPage: React.FC = () => {
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                     placeholder=""
-                    className={`flex-1 rounded-lg px-3 py-2 text-xs font-mono uppercase focus:outline-none focus:ring-1 focus:ring-[#D0000B] border ${
+                    className={`flex-1 rounded-lg px-3 py-1.5 text-xs font-mono uppercase focus:outline-none focus:ring-1 focus:ring-[#FF000E] border ${
                       isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                     }`}
                   />
                   <button
                     type="submit"
                     disabled={isApplying || !couponCode.trim()}
-                    className="px-4 py-2 rounded-lg bg-[#D0000B] hover:bg-[#B0000A] disabled:opacity-40 text-white font-semibold text-xs transition-colors cursor-pointer shrink-0"
+                    className="px-3.5 py-1.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] disabled:opacity-40 text-white font-semibold text-xs transition-colors cursor-pointer shrink-0"
                   >
                     {isApplying ? 'Applying...' : 'Apply'}
                   </button>
@@ -757,14 +756,14 @@ export const CartPage: React.FC = () => {
             </div>
 
             {/* Price Breakdown Card */}
-            <div className={`p-5 rounded-xl border space-y-4 ${
+            <div className={`p-4 rounded-xl border space-y-3 ${
               isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
             }`}>
-              <h2 className="font-bold text-sm uppercase tracking-wider border-b pb-2.5 border-inherit/20">
+              <h2 className="font-bold text-xs uppercase tracking-wider border-b pb-2 border-inherit/20">
                 Order Summary
               </h2>
 
-              <div className="space-y-2.5 text-xs">
+              <div className="space-y-2 text-xs">
                 <div className="flex justify-between items-center text-gray-400">
                   <span>Sub total</span>
                   <span className="font-semibold text-inherit">{formatINR(cart.subtotalPaisa)}</span>
@@ -794,27 +793,27 @@ export const CartPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-inherit/20 flex justify-between items-center">
+              <div className="pt-2 border-t border-inherit/20 flex justify-between items-center">
                 <span className="font-bold text-sm">Total</span>
-                <span className="font-extrabold text-xl text-[#D0000B]">
+                <span className="font-extrabold text-lg text-[#FF000E]">
                   {formatINR(cart.totalPaisa)}
                 </span>
               </div>
 
               {/* Desktop CTA Button */}
-              <div className="pt-2">
+              <div className="pt-1">
                 <button
                   type="button"
                   onClick={() => navigate('/checkout')}
-                  className="w-full py-3.5 rounded-xl bg-[#D0000B] hover:bg-[#B0000A] text-white font-bold text-sm tracking-wide text-center shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-xs uppercase tracking-wider text-center shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-1.5"
                 >
                   <span>Select address at next step</span>
-                  <i className="bi bi-arrow-right text-sm" />
+                  <i className="bi bi-arrow-right text-xs" />
                 </button>
               </div>
 
               {/* Payment badges */}
-              <div className="pt-2 flex items-center justify-center gap-3 text-[11px] text-gray-400 border-t border-inherit/20">
+              <div className="pt-2 flex items-center justify-center gap-3 text-[10.5px] text-gray-400 border-t border-inherit/20">
                 <span className="flex items-center gap-1">
                   <i className="bi bi-shield-lock-fill text-emerald-500" /> Secure Checkout
                 </span>

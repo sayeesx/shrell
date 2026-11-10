@@ -506,14 +506,14 @@ export const CheckoutPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Mobile Fixed Bottom CTA Button (Fixed on top of text carousel) */}
+            {/* Mobile Fixed Bottom CTA Button (Fixed above dock text carousel) */}
             <div
-              className={`fixed left-0 right-0 z-50 md:hidden p-2.5 border-t backdrop-blur-xl transition-all ${
+              className={`fixed left-0 right-0 z-50 md:hidden py-2 px-3 border-t backdrop-blur-xl transition-all ${
                 isDark
                   ? 'bg-[#0A0808]/95 border-[#2D161A] shadow-[0_-8px_25px_rgba(0,0,0,0.85)]'
                   : 'bg-white/95 border-[#D0C9BE] shadow-[0_-4px_18px_rgba(0,0,0,0.1)]'
               }`}
-              style={{ bottom: 'calc(58px + env(safe-area-inset-bottom, 0px))' }}
+              style={{ bottom: 'calc(73px + env(safe-area-inset-bottom, 0px))' }}
             >
               <div className="max-w-xl mx-auto">
                 <button
@@ -687,14 +687,14 @@ export const CheckoutPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Mobile Fixed Bottom CTA Button (Fixed on top of text carousel) */}
+            {/* Mobile Fixed Bottom CTA Button (Fixed above dock text carousel) */}
             <div
-              className={`fixed left-0 right-0 z-50 md:hidden p-2.5 border-t backdrop-blur-xl transition-all ${
+              className={`fixed left-0 right-0 z-50 md:hidden py-2 px-3 border-t backdrop-blur-xl transition-all ${
                 isDark
                   ? 'bg-[#0A0808]/95 border-[#2D161A] shadow-[0_-8px_25px_rgba(0,0,0,0.85)]'
                   : 'bg-white/95 border-[#D0C9BE] shadow-[0_-4px_18px_rgba(0,0,0,0.1)]'
               }`}
-              style={{ bottom: 'calc(58px + env(safe-area-inset-bottom, 0px))' }}
+              style={{ bottom: 'calc(73px + env(safe-area-inset-bottom, 0px))' }}
             >
               <div className="max-w-xl mx-auto">
                 <button
@@ -787,12 +787,12 @@ export const CheckoutPage: React.FC = () => {
                           src={
                             it.product.images[0]?.url && !it.product.images[0].url.includes('shrell-')
                               ? it.product.images[0].url
-                              : isDark
-                                ? '/logos/shrell-brandicon_no-bg.png'
-                                : '/logos/shrell-blacktext-redlogo.png'
+                              : '/logos/shrell-brandicon_no-bg.png'
                           }
                           alt={it.product.name}
-                          className="w-full h-full object-contain"
+                          className={`w-full h-full object-contain ${
+                            it.product.images[0]?.url && !it.product.images[0].url.includes('shrell-') ? '' : 'opacity-40 p-0.5'
+                          }`}
                         />
                       </div>
                       <div className="min-w-0">
@@ -861,14 +861,14 @@ export const CheckoutPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Mobile Fixed Bottom CTA Button (Fixed on top of text carousel) */}
+            {/* Mobile Fixed Bottom CTA Button (Fixed above dock text carousel) */}
             <div
-              className={`fixed left-0 right-0 z-50 md:hidden p-2.5 border-t backdrop-blur-xl transition-all ${
+              className={`fixed left-0 right-0 z-50 md:hidden py-2 px-3 border-t backdrop-blur-xl transition-all ${
                 isDark
                   ? 'bg-[#0A0808]/95 border-[#2D161A] shadow-[0_-8px_25px_rgba(0,0,0,0.85)]'
                   : 'bg-white/95 border-[#D0C9BE] shadow-[0_-4px_18px_rgba(0,0,0,0.1)]'
               }`}
-              style={{ bottom: 'calc(58px + env(safe-area-inset-bottom, 0px))' }}
+              style={{ bottom: 'calc(73px + env(safe-area-inset-bottom, 0px))' }}
             >
               <div className="max-w-xl mx-auto flex items-center justify-between gap-3">
                 <div className="min-w-0">

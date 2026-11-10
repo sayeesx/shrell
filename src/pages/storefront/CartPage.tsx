@@ -18,6 +18,11 @@ export const CartPage: React.FC = () => {
   const [couponMessage, setCouponMessage] = useState<{ text: string; isError: boolean } | null>(null);
   const [isApplying, setIsApplying] = useState(false);
   const [suggestions, setSuggestions] = useState<Product[]>([]);
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+
+  const handleImageError = (id: string) => {
+    setFailedImages((prev) => ({ ...prev, [id]: true }));
+  };
 
   // Load product suggestions
   useEffect(() => {
@@ -153,7 +158,14 @@ export const CartPage: React.FC = () => {
             const cleanImg = rawImg.startsWith('http://res.cloudinary.com/')
               ? rawImg.replace('http://res.cloudinary.com/', 'https://res.cloudinary.com/')
               : rawImg;
-            const hasRealImg = Boolean(cleanImg && !cleanImg.includes('shrell-full_white-text_black-logo.png') && !cleanImg.includes('shrell-blacktext-redlogo.png') && !cleanImg.includes('shrell-logo-white.png'));
+            const hasRealImg = Boolean(
+              cleanImg &&
+              !cleanImg.includes('shrell-full_white-text_black-logo.png') &&
+              !cleanImg.includes('shrell-blacktext-redlogo.png') &&
+              !cleanImg.includes('shrell-logo-white.png') &&
+              !cleanImg.includes('shrell-brandicon')
+            );
+            const isImageAvailable = hasRealImg && !failedImages[item.productId];
 
             return (
               <div
@@ -166,19 +178,20 @@ export const CartPage: React.FC = () => {
                 <div className={`w-13 h-13 shrink-0 rounded-lg flex items-center justify-center p-1 overflow-hidden border ${
                   isDark ? 'bg-[#181113] border-[#2D161A]' : 'bg-[#F5F3EE] border-[#D0C9BE]'
                 }`}>
-                  {hasRealImg ? (
+                  {isImageAvailable ? (
                     <img
                       src={cleanImg}
                       alt={item.product.name}
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-contain"
+                      onError={() => handleImageError(item.productId)}
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-full h-full flex items-center justify-center opacity-40">
                       <img
-                        src={isDark ? '/logos/shrell-brandicon_no-bg.png' : '/logos/shrell-blacktext-redlogo.png'}
+                        src="/logos/shrell-brandicon_no-bg.png"
                         alt="SHRELL"
-                        className="w-full h-full object-contain p-0.5"
+                        className="w-7 h-7 object-contain"
                       />
                     </div>
                   )}
@@ -292,11 +305,22 @@ export const CartPage: React.FC = () => {
                       <div className={`w-full h-20 rounded-lg flex items-center justify-center p-1 overflow-hidden border ${
                         isDark ? 'bg-[#181113] border-[#2D161A]' : 'bg-[#F5F3EE] border-[#D0C9BE]'
                       }`}>
-                        <img
-                          src={prod.images?.[0]?.url || '/logos/shrell-brandicon_no-bg.png'}
-                          alt={prod.name}
-                          className="w-full h-full object-contain"
-                        />
+                        {prod.images?.[0]?.url && !prod.images[0].url.includes('shrell-') && !failedImages[`sug-${prod.id}`] ? (
+                          <img
+                            src={prod.images[0].url}
+                            alt={prod.name}
+                            className="w-full h-full object-contain"
+                            onError={() => handleImageError(`sug-${prod.id}`)}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center opacity-40">
+                            <img
+                              src="/logos/shrell-brandicon_no-bg.png"
+                              alt="SHRELL"
+                              className="w-8 h-8 object-contain"
+                            />
+                          </div>
+                        )}
                       </div>
                       <Link
                         to={`/product/${prod.slug}`}
@@ -440,15 +464,15 @@ export const CartPage: React.FC = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* MOBILE FIXED BOTTOM CTA BUTTON (Fixed on top of text carousel)            */}
+      {/* MOBILE FIXED BOTTOM CTA BUTTON (Fixed above dock text carousel)           */}
       {/* ========================================================================= */}
       <div
-        className={`fixed left-0 right-0 z-50 md:hidden p-2.5 border-t backdrop-blur-xl transition-all ${
+        className={`fixed left-0 right-0 z-50 md:hidden py-2 px-3 border-t backdrop-blur-xl transition-all ${
           isDark
             ? 'bg-[#0A0808]/95 border-[#2D161A] shadow-[0_-8px_25px_rgba(0,0,0,0.85)]'
             : 'bg-white/95 border-[#D0C9BE] shadow-[0_-4px_18px_rgba(0,0,0,0.1)]'
         }`}
-        style={{ bottom: 'calc(58px + env(safe-area-inset-bottom, 0px))' }}
+        style={{ bottom: 'calc(73px + env(safe-area-inset-bottom, 0px))' }}
       >
         <div className="max-w-md mx-auto flex items-center justify-between gap-3">
           <div className="min-w-0">
@@ -537,7 +561,14 @@ export const CartPage: React.FC = () => {
               const cleanImg = rawImg.startsWith('http://res.cloudinary.com/')
                 ? rawImg.replace('http://res.cloudinary.com/', 'https://res.cloudinary.com/')
                 : rawImg;
-              const hasRealImg = Boolean(cleanImg && !cleanImg.includes('shrell-full_white-text_black-logo.png'));
+              const hasRealImg = Boolean(
+                cleanImg &&
+                !cleanImg.includes('shrell-full_white-text_black-logo.png') &&
+                !cleanImg.includes('shrell-blacktext-redlogo.png') &&
+                !cleanImg.includes('shrell-logo-white.png') &&
+                !cleanImg.includes('shrell-brandicon')
+              );
+              const isImageAvailable = hasRealImg && !failedImages[`desk-${item.productId}`];
 
               return (
                 <div
@@ -550,12 +581,13 @@ export const CartPage: React.FC = () => {
                   <div className={`w-20 h-20 shrink-0 rounded-lg flex items-center justify-center p-2 overflow-hidden border ${
                     isDark ? 'bg-[#181113] border-[#261619]' : 'bg-[#F5F3EE] border-[#E0DBD2]'
                   }`}>
-                    {hasRealImg ? (
+                    {isImageAvailable ? (
                       <img
                         src={cleanImg}
                         alt={item.product.name}
                         referrerPolicy="no-referrer"
                         className="w-full h-full object-contain"
+                        onError={() => handleImageError(`desk-${item.productId}`)}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center opacity-40">
@@ -655,11 +687,22 @@ export const CartPage: React.FC = () => {
                           <div className={`w-full h-24 rounded-md flex items-center justify-center p-1.5 overflow-hidden border ${
                             isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2]'
                           }`}>
-                            <img
-                              src={prod.images?.[0]?.url || '/logos/shrell-brandicon_no-bg.png'}
-                              alt={prod.name}
-                              className="w-full h-full object-contain"
-                            />
+                            {prod.images?.[0]?.url && !prod.images[0].url.includes('shrell-') && !failedImages[`desk-sug-${prod.id}`] ? (
+                              <img
+                                src={prod.images[0].url}
+                                alt={prod.name}
+                                className="w-full h-full object-contain"
+                                onError={() => handleImageError(`desk-sug-${prod.id}`)}
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center opacity-40">
+                                <img
+                                  src="/logos/shrell-brandicon_no-bg.png"
+                                  alt="SHRELL"
+                                  className="w-10 h-10 object-contain"
+                                />
+                              </div>
+                            )}
                           </div>
                           <Link
                             to={`/product/${prod.slug}`}

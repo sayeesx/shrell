@@ -24,7 +24,7 @@ export const OrderFailurePage: React.FC = () => {
             }`}
             aria-label="Back to Cart"
           >
-            <i className="bi bi-arrow-left text-sm" />
+            <i className="bi bi-chevron-left text-sm" />
           </button>
 
           <h1 className="text-lg font-bold tracking-tight">Checkout</h1>

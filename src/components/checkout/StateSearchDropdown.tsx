@@ -53,6 +53,7 @@ export const StateSearchDropdown: React.FC<StateSearchDropdownProps> = ({
   const { isDark } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [openUpward, setOpenUpward] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -77,10 +78,20 @@ export const StateSearchDropdown: React.FC<StateSearchDropdownProps> = ({
     };
   }, [isOpen]);
 
-  // Focus search input on open
+  // Focus search input on open and check space to open upward or downward
   useEffect(() => {
     if (isOpen) {
       setSearchQuery('');
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - rect.bottom;
+        // If space below is constrained (especially above fixed bottom checkout bar), open upward
+        if (spaceBelow < 280 && rect.top > 250) {
+          setOpenUpward(true);
+        } else {
+          setOpenUpward(false);
+        }
+      }
       setTimeout(() => {
         searchInputRef.current?.focus();
       }, 50);
@@ -104,7 +115,7 @@ export const StateSearchDropdown: React.FC<StateSearchDropdownProps> = ({
   };
 
   return (
-    <div ref={containerRef} className="relative w-full" onKeyDown={handleKeyDown}>
+    <div ref={containerRef} className={`relative w-full ${isOpen ? 'z-[65]' : ''}`} onKeyDown={handleKeyDown}>
       <label className="block text-[11px] font-semibold mb-1 opacity-80">
         State / Union Territory {required ? '*' : ''}
       </label>
@@ -134,10 +145,12 @@ export const StateSearchDropdown: React.FC<StateSearchDropdownProps> = ({
       {/* Popover Dropdown with Search */}
       {isOpen && (
         <div
-          className={`absolute z-50 left-0 right-0 mt-1.5 rounded-xl border shadow-xl backdrop-blur-xl overflow-hidden transition-all duration-150 ${
+          className={`absolute z-[70] left-0 right-0 ${
+            openUpward ? 'bottom-full mb-1.5' : 'top-full mt-1.5'
+          } rounded-xl border shadow-2xl backdrop-blur-xl overflow-hidden transition-all duration-150 ${
             isDark
               ? 'bg-[#120E0F] border-[#261619] shadow-black/80'
-              : 'bg-white border-[#E0DBD2] shadow-xl'
+              : 'bg-white border-[#E0DBD2] shadow-2xl'
           }`}
           role="listbox"
         >

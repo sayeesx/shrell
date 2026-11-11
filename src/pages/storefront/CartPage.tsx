@@ -85,7 +85,7 @@ export const CartPage: React.FC = () => {
               }`}
               aria-label="Go back"
             >
-              <i className="bi bi-arrow-left text-sm" />
+              <i className="bi bi-chevron-left text-sm" />
             </button>
             <h1 className="text-base sm:text-lg font-bold tracking-tight">My Cart</h1>
             <div className="flex items-center">
@@ -95,7 +95,7 @@ export const CartPage: React.FC = () => {
         </div>
 
         {/* Empty Cart Body - Centered in remaining viewport space */}
-        <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 text-center space-y-5 pb-44">
+        <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 text-center space-y-5 pb-20">
           <div className={`w-20 h-20 rounded-full border flex items-center justify-center mx-auto shadow-inner ${
             isDark ? 'bg-[#130E10] border-[#2D161A] text-[#8E8587]' : 'bg-[#F5F3EE] border-[#D0C9BE] text-[#8E8587]'
           }`}>
@@ -129,7 +129,7 @@ export const CartPage: React.FC = () => {
       {/* ========================================================================= */}
       {/* MOBILE LAYOUT                                                             */}
       {/* ========================================================================= */}
-      <div className="block md:hidden max-w-md mx-auto px-3.5 py-3 pb-56 space-y-2">
+      <div className="block md:hidden max-w-md mx-auto px-3.5 py-3 pb-32 sm:pb-36 space-y-2">
 
         {/* 1. Mobile Header (Back button | My Cart | Theme toggle) */}
         <div className="flex items-center justify-between pb-2 border-b border-inherit/20">
@@ -141,7 +141,7 @@ export const CartPage: React.FC = () => {
             }`}
             aria-label="Go back"
           >
-            <i className="bi bi-arrow-left text-sm" />
+            <i className="bi bi-chevron-left text-sm" />
           </button>
 
           <h1 className="text-base font-bold tracking-tight">My Cart</h1>
@@ -223,7 +223,7 @@ export const CartPage: React.FC = () => {
 
                   {/* Price on Left, Quantity Stepper at Position of Remove (Right) */}
                   <div className="flex items-center justify-between pt-1 mt-0.5">
-                    <p className="font-extrabold text-xs sm:text-sm text-[#FF000E]">
+                    <p className={`font-extrabold text-xs sm:text-sm ${isDark ? 'text-white' : 'text-black'}`}>
                       {formatINR(item.unitPricePaisa)}
                     </p>
 
@@ -328,7 +328,7 @@ export const CartPage: React.FC = () => {
                       >
                         {prod.name}
                       </Link>
-                      <p className="font-extrabold text-xs text-[#FF000E] mt-0.5">
+                      <p className={`font-extrabold text-xs mt-0.5 ${isDark ? 'text-white' : 'text-black'}`}>
                         {formatINR(prod.pricePaisa)}
                       </p>
                     </div>
@@ -455,7 +455,7 @@ export const CartPage: React.FC = () => {
 
           <div className="pt-1.5 border-t border-inherit/20 flex justify-between items-center">
             <span className="font-bold text-xs sm:text-sm">Total</span>
-            <span className="font-extrabold text-sm sm:text-base text-[#FF000E]">
+            <span className={`font-extrabold text-sm sm:text-base ${isDark ? 'text-white' : 'text-black'}`}>
               {formatINR(cart.totalPaisa)}
             </span>
           </div>
@@ -475,20 +475,20 @@ export const CartPage: React.FC = () => {
         style={{ bottom: 'calc(73px + env(safe-area-inset-bottom, 0px))' }}
       >
         <div className="max-w-md mx-auto flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <span className="text-[10px] text-gray-400 block leading-tight">Total</span>
-            <span className="font-extrabold text-sm text-[#FF000E] font-tight block leading-tight">
+          <div className="shrink-0 min-w-0 pr-1">
+            <span className="text-[11px] text-gray-400 block leading-tight">Total</span>
+            <span className={`font-extrabold text-base sm:text-lg font-mono tracking-tight block leading-tight ${isDark ? 'text-white' : 'text-black'}`}>
               {formatINR(cart.totalPaisa)}
             </span>
           </div>
           <button
             type="button"
             onClick={() => navigate('/checkout')}
-            className="flex-1 py-2.5 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
+            className="shrink-0 py-2.5 px-3.5 sm:px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-[11px] sm:text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-1.5"
           >
             <span>Select address at next step</span>
-            <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-              <i className="bi bi-arrow-right text-[10px]" />
+            <span className="w-4.5 h-4.5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+              <i className="bi bi-arrow-right text-[9px]" />
             </span>
           </button>
         </div>
@@ -615,7 +615,7 @@ export const CartPage: React.FC = () => {
                         </p>
                       </div>
 
-                      <span className="font-extrabold text-base text-[#FF000E] shrink-0">
+                      <span className={`font-extrabold text-base shrink-0 ${isDark ? 'text-white' : 'text-black'}`}>
                         {formatINR(item.unitPricePaisa)}
                       </span>
                     </div>
@@ -710,7 +710,7 @@ export const CartPage: React.FC = () => {
                           >
                             {prod.name}
                           </Link>
-                          <p className="font-extrabold text-xs text-[#FF000E] mt-0.5">
+                          <p className={`font-extrabold text-xs mt-0.5 ${isDark ? 'text-white' : 'text-black'}`}>
                             {formatINR(prod.pricePaisa)}
                           </p>
                         </div>
@@ -851,7 +851,7 @@ export const CartPage: React.FC = () => {
 
               <div className="pt-2 border-t border-inherit/20 flex justify-between items-center">
                 <span className="font-bold text-sm">Total</span>
-                <span className="font-extrabold text-lg text-[#FF000E]">
+                <span className={`font-extrabold text-lg ${isDark ? 'text-white' : 'text-black'}`}>
                   {formatINR(cart.totalPaisa)}
                 </span>
               </div>

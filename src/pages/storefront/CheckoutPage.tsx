@@ -95,7 +95,7 @@ export const CheckoutPage: React.FC = () => {
   // If cart is empty, redirect to cart
   if (cart.items.length === 0) {
     return (
-      <div className={`min-h-[80vh] flex flex-col items-center justify-center p-6 text-center space-y-6 pb-36 ${
+      <div className={`min-h-[80vh] flex flex-col items-center justify-center p-6 text-center space-y-6 pb-20 ${
         isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'
       }`}>
         <div className={`w-20 h-20 rounded-full border flex items-center justify-center mx-auto ${
@@ -302,7 +302,7 @@ export const CheckoutPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'}`}>
-      <div className="max-w-xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-56 md:pb-16 space-y-4">
+      <div className="max-w-xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-32 sm:pb-36 md:pb-12 space-y-4">
 
         {/* Topbar Header (Pure clean navigation matching exact reference images) */}
         <div className="flex items-center justify-between pb-3 border-b border-inherit/20">
@@ -314,7 +314,7 @@ export const CheckoutPage: React.FC = () => {
             }`}
             aria-label="Back"
           >
-            <i className="bi bi-arrow-left text-sm" />
+            <i className="bi bi-chevron-left text-sm" />
           </button>
 
           <h1 className="text-base sm:text-lg font-bold tracking-tight">
@@ -800,7 +800,7 @@ export const CheckoutPage: React.FC = () => {
                         <span className="text-[10.5px] text-gray-500 font-mono">Qty: {it.quantity}</span>
                       </div>
                     </div>
-                    <span className="font-mono font-semibold shrink-0">{formatINR(it.subtotalPaisa)}</span>
+                    <span className={`font-mono font-semibold shrink-0 ${isDark ? 'text-white' : 'text-black'}`}>{formatINR(it.subtotalPaisa)}</span>
                   </div>
                 ))}
               </div>
@@ -809,7 +809,7 @@ export const CheckoutPage: React.FC = () => {
               <div className={`pt-2.5 border-t space-y-1.5 text-xs ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Sub total</span>
-                  <span className="font-semibold">{formatINR(cart.subtotalPaisa)}</span>
+                  <span className={`font-semibold ${isDark ? 'text-white' : 'text-black'}`}>{formatINR(cart.subtotalPaisa)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Delivery Fee</span>
@@ -832,7 +832,7 @@ export const CheckoutPage: React.FC = () => {
               {/* Total Payable */}
               <div className={`pt-2.5 border-t flex justify-between items-center ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
                 <span className="font-bold text-xs sm:text-sm">Total Payable</span>
-                <span className="font-extrabold text-base sm:text-lg text-[#FF000E]">
+                <span className={`font-extrabold text-base sm:text-lg ${isDark ? 'text-white' : 'text-black'}`}>
                   {formatINR(cart.totalPaisa)}
                 </span>
               </div>
@@ -873,7 +873,7 @@ export const CheckoutPage: React.FC = () => {
               <div className="max-w-xl mx-auto flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <span className="text-[10px] text-gray-400 block leading-tight">Total</span>
-                  <span className="font-extrabold text-sm text-[#FF000E] font-tight block leading-tight">
+                  <span className={`font-extrabold text-sm font-tight block leading-tight ${isDark ? 'text-white' : 'text-black'}`}>
                     {formatINR(cart.totalPaisa)}
                   </span>
                 </div>

@@ -110,7 +110,7 @@ export const OrderTrackingPage: React.FC = () => {
             {[
               { label: 'Customer Name', primary: order.customerName, secondary: order.customerPhone },
               { label: 'Payment Mode', primary: order.paymentMethod, secondary: order.paymentStatus, secondaryClass: 'text-emerald-400 font-semibold' },
-              { label: 'Total Consignment Value', primary: formatINR(order.totalPaisa), primaryClass: 'text-brand-400 font-bold text-base', secondary: `${order.items.length} accessory items` },
+              { label: 'Total Consignment Value', primary: formatINR(order.totalPaisa), primaryClass: `${isDark ? 'text-white' : 'text-black'} font-bold text-base`, secondary: `${order.items.length} accessory items` },
             ].map((card) => (
               <div key={card.label} className={`p-4 rounded-lg border space-y-1 ${isDark ? 'bg-[#0D0F14] border-surface-800' : 'bg-[#F5F3EE] border-[#E0DBD2]'}`}>
                 <div className={`font-medium ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>{card.label}</div>

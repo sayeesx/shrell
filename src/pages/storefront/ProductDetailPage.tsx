@@ -147,7 +147,7 @@ export const ProductDetailPage: React.FC = () => {
             }`}
             aria-label="Go back"
           >
-            <i className="bi bi-arrow-left text-sm" aria-hidden="true" />
+            <i className="bi bi-chevron-left text-sm" aria-hidden="true" />
             <span>Back</span>
           </button>
         </div>

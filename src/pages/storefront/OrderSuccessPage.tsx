@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
+import confetti from 'canvas-confetti';
 import { Order } from '../../domain/types';
 import { formatINR } from '../../domain/services/CurrencyService';
 import { whatsAppService } from '../../features/whatsapp/WhatsAppService';
@@ -17,6 +18,43 @@ export const OrderSuccessPage: React.FC = () => {
   const customerName = order?.customerName || 'Valued Customer';
   const totalAmount = order ? formatINR(order.totalPaisa) : '₹4,999.00';
 
+  // Trigger celebratory confetti animation on page load
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
+    // Center burst
+    confetti({
+      particleCount: 90,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#FF000E', '#FF3B30', '#34C759', '#007AFF', '#FF9500', '#FFCC00'],
+      disableForReducedMotion: true,
+    });
+
+    // Secondary side bursts
+    const timer = setTimeout(() => {
+      confetti({
+        particleCount: 50,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.7 },
+        colors: ['#FF000E', '#FF4D4D', '#FFD700', '#00C853'],
+        disableForReducedMotion: true,
+      });
+      confetti({
+        particleCount: 50,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.7 },
+        colors: ['#FF000E', '#FF4D4D', '#FFD700', '#00C853'],
+        disableForReducedMotion: true,
+      });
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'}`}>
       <div className="max-w-md mx-auto px-4 py-4 sm:py-8 space-y-6">
@@ -31,7 +69,7 @@ export const OrderSuccessPage: React.FC = () => {
             }`}
             aria-label="Back to Home"
           >
-            <i className="bi bi-arrow-left text-sm" />
+            <i className="bi bi-chevron-left text-sm" />
           </button>
 
           <h1 className="text-lg font-bold tracking-tight">Checkout</h1>
@@ -92,7 +130,7 @@ export const OrderSuccessPage: React.FC = () => {
             }`}>
               <div className="flex justify-between">
                 <span className="text-gray-400">Total Paid</span>
-                <span className="font-bold text-[#FF000E]">{totalAmount}</span>
+                <span className={`font-bold ${isDark ? 'text-white' : 'text-black'}`}>{totalAmount}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Payment Mode</span>

@@ -163,19 +163,21 @@ export const AuthModal: React.FC = () => {
 
   return createPortal(
     <div
-      className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[9999] w-screen h-screen min-h-screen flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
-      style={{ top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', margin: 0, zIndex: 9999 }}
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
+      style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 top-0 left-0 right-0 bottom-0 w-screen h-screen min-h-screen bg-black/75 backdrop-blur-md transition-opacity duration-300 pointer-events-auto"
-        style={{ top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', margin: 0 }}
+        className="fixed inset-0 modal-backdrop-solid"
         onClick={closeAuthModal}
         aria-hidden="true"
       />
 
       {/* Modal Container: Elevated above virtual keyboard on mobile */}
       <div
+        onClick={(e) => e.stopPropagation()}
         className={`relative w-full max-w-sm sm:max-w-md rounded-3xl p-6 sm:p-8 z-10 transition-all duration-300 ease-out my-auto max-h-[calc(100dvh-2rem)] overflow-y-auto ${
           isDark
             ? 'bg-[#0E0A0B] text-[#F1EEEE] border border-[#261619] shadow-[0_25px_60px_rgba(0,0,0,0.9)]'

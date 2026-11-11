@@ -6,6 +6,8 @@ import {
   InventoryMovement,
   Order,
   Product,
+  ProductRatingSummary,
+  ProductReview,
   StoreSettings,
   VehicleCompatibility,
   VehicleMake,
@@ -97,4 +99,10 @@ export interface IHomeSectionRepository {
   update(id: string, updates: Partial<HomeSection>): Promise<HomeSection>;
   delete(id: string): Promise<boolean>;
   reorder(sectionIds: string[]): Promise<void>;
+}
+
+export interface IReviewRepository {
+  getByProductId(productId: string): Promise<ProductReview[]>;
+  addReview(review: Omit<ProductReview, 'id' | 'createdAt'>): Promise<ProductReview>;
+  getRatingSummary(productId: string): Promise<ProductRatingSummary>;
 }

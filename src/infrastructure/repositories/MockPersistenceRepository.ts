@@ -6,6 +6,8 @@ import {
   InventoryMovement,
   Order,
   Product,
+  ProductRatingSummary,
+  ProductReview,
   StoreSettings,
   VehicleCompatibility,
   VehicleMake,
@@ -20,6 +22,7 @@ import {
   IInventoryRepository,
   IOrderRepository,
   IProductRepository,
+  IReviewRepository,
   ISettingsRepository,
   IVehicleRepository,
   ProductFilterParams,
@@ -45,6 +48,7 @@ const STORAGE_KEYS = {
   SETTINGS: 'shrell_settings_v1',
   COUPONS: 'shrell_coupons_v2',
   COMPATIBILITY: 'shrell_compatibility_v2',
+  REVIEWS: 'shrell_reviews_v1',
 };
 
 function loadFromStorage<T>(key: string, fallback: T): T {
@@ -710,5 +714,114 @@ export class MockHomeSectionRepository implements IHomeSectionRepository {
       }
     });
     saveToStorage('shrell_home_sections_v1', this.sections);
+  }
+}
+
+// ===================== REVIEWS & RATINGS REPOSITORY =====================
+
+export const INITIAL_REVIEWS: ProductReview[] = [
+  {
+    id: 'rev-wing-01',
+    productId: 'prod-stealth-wing',
+    authorName: 'Vikramaditya S.',
+    rating: 5,
+    title: 'Perfect fit on Scorpio-N, completely silent on highways',
+    comment: 'Installed these crossbars before my Ladakh expedition. Zero wind whistle up to 120 km/h. Carried a 65kg rooftop tent without any flex. Build quality is exceptional.',
+    isVerifiedPurchase: true,
+    createdAt: new Date(Date.now() - 7 * 86400000).toISOString(),
+  },
+  {
+    id: 'rev-wing-02',
+    productId: 'prod-stealth-wing',
+    authorName: 'Rohan Mehta',
+    rating: 5,
+    title: 'Precision engineering at its best',
+    comment: 'T-track mounting works seamlessly with my Thule bike carrier. Powder coating finish is rugged and matches the factory roof rails perfectly.',
+    isVerifiedPurchase: true,
+    createdAt: new Date(Date.now() - 14 * 86400000).toISOString(),
+  },
+  {
+    id: 'rev-wing-03',
+    productId: 'prod-stealth-wing',
+    authorName: 'Col. R. S. Negi',
+    rating: 4,
+    title: 'Solid hardware, quick delivery',
+    comment: 'Delivery was prompt via BlueDart in 3 days to Dehradun. Heavy gauge aluminium extrusion and secure tamper-proof lock barrels.',
+    isVerifiedPurchase: true,
+    createdAt: new Date(Date.now() - 25 * 86400000).toISOString(),
+  },
+  {
+    id: 'rev-light-01',
+    productId: 'prod-night-raider',
+    authorName: 'Arun Kumar',
+    rating: 5,
+    title: 'Insane light throw on dark ghat roads',
+    comment: 'The amber DRL halo looks stunning and the high-output Osram chips turn pitch black mountain trails into daylight. IP67 waterproof passed pressure washer test.',
+    isVerifiedPurchase: true,
+    createdAt: new Date(Date.now() - 5 * 86400000).toISOString(),
+  },
+  {
+    id: 'rev-light-02',
+    productId: 'prod-night-raider',
+    authorName: 'Deepak Joshi',
+    rating: 5,
+    title: 'Best auxiliary lights in this price range',
+    comment: 'Wiring harness provided is heavy-gauge and automotive grade. No flickering even on rough off-road terrain. Highly recommended.',
+    isVerifiedPurchase: true,
+    createdAt: new Date(Date.now() - 18 * 86400000).toISOString(),
+  },
+];
+
+export class MockReviewRepository implements IReviewRepository {
+  private reviews: ProductReview[];
+
+  constructor() {
+    this.reviews = loadFromStorage(STORAGE_KEYS.REVIEWS, INITIAL_REVIEWS);
+  }
+
+  async getByProductId(productId: string): Promise<ProductReview[]> {
+    this.reviews = loadFromStorage(STORAGE_KEYS.REVIEWS, INITIAL_REVIEWS);
+    return this.reviews
+      .filter((r) => r.productId === productId || r.productId.toLowerCase() === productId.toLowerCase())
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async addReview(review: Omit<ProductReview, 'id' | 'createdAt'>): Promise<ProductReview> {
+    this.reviews = loadFromStorage(STORAGE_KEYS.REVIEWS, INITIAL_REVIEWS);
+    const newRev: ProductReview = {
+      ...review,
+      id: `rev-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+      createdAt: new Date().toISOString(),
+      isVerifiedPurchase: review.isVerifiedPurchase ?? true,
+    };
+    this.reviews.unshift(newRev);
+    saveToStorage(STORAGE_KEYS.REVIEWS, this.reviews);
+    return newRev;
+  }
+
+  async getRatingSummary(productId: string): Promise<ProductRatingSummary> {
+    const list = await this.getByProductId(productId);
+    if (list.length === 0) {
+      return {
+        averageRating: 5.0,
+        totalReviews: 0,
+        ratingBreakdown: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+      };
+    }
+
+    const breakdown: Record<number, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    let sum = 0;
+    list.forEach((r) => {
+      const star = Math.min(5, Math.max(1, Math.round(r.rating)));
+      breakdown[star] = (breakdown[star] || 0) + 1;
+      sum += r.rating;
+    });
+
+    const averageRating = Number((sum / list.length).toFixed(1));
+    return {
+      averageRating,
+      totalReviews: list.length,
+      ratingBreakdown: breakdown,
+    };
   }
 }

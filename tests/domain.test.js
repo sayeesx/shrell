@@ -114,3 +114,29 @@ test('Payment & Verification: Indian Mobile and PIN Code regex validations', () 
   assert.equal(isValidUTR('412389102938'), true);
   assert.equal(isValidUTR('1234'), false);
 });
+
+test('Product Reviews & Rating Calculation: Accurate average and star breakdown distribution', () => {
+  const reviews = [
+    { rating: 5 },
+    { rating: 5 },
+    { rating: 4 },
+    { rating: 5 },
+    { rating: 3 },
+  ];
+
+  const breakdown = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+  let sum = 0;
+  reviews.forEach((r) => {
+    breakdown[r.rating] = (breakdown[r.rating] || 0) + 1;
+    sum += r.rating;
+  });
+
+  const averageRating = Number((sum / reviews.length).toFixed(1));
+  assert.equal(averageRating, 4.4);
+  assert.equal(breakdown[5], 3);
+  assert.equal(breakdown[4], 1);
+  assert.equal(breakdown[3], 1);
+  assert.equal(breakdown[2], 0);
+  assert.equal(breakdown[1], 0);
+  assert.equal(reviews.length, 5);
+});

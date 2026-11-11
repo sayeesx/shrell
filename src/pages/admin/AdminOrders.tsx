@@ -234,10 +234,21 @@ export const AdminOrders: React.FC = () => {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[9999] w-screen h-screen min-h-screen bg-black/75 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
-          style={{ top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', margin: 0, zIndex: 9999 }}
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
+          style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
         >
-          <div className={`relative w-full max-w-3xl border rounded-xl overflow-hidden max-h-[90vh] flex flex-col shadow-2xl ${isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}`}>
+          {/* Dedicated Fullscreen Frosted Backdrop Layer (zero background bleed) */}
+          <div
+            className="fixed inset-0 modal-backdrop-solid"
+            onClick={() => setSelectedOrder(null)}
+            aria-hidden="true"
+          />
+
+          {/* Centered Modal Card */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`relative z-10 w-full max-w-3xl border rounded-xl overflow-hidden max-h-[90vh] flex flex-col shadow-2xl my-auto ${isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}`}
+          >
             {/* Header */}
             <div className={`px-6 py-4 border-b flex items-center justify-between ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
               <div>

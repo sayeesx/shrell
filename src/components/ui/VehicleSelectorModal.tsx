@@ -65,10 +65,20 @@ export const VehicleSelectorModal: React.FC<VehicleSelectorModalProps> = ({ isOp
       role="dialog"
       aria-modal="true"
       aria-labelledby="vehicle-selector-title"
-      className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[9999] w-screen h-screen min-h-screen flex items-center justify-center p-4 bg-black/75 backdrop-blur-md overflow-y-auto"
-      style={{ top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', margin: 0, zIndex: 9999 }}
+      className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
+      style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
     >
-      <div className="relative w-full max-w-lg bg-white border border-gray-200/90 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      {/* Dedicated Fullscreen Frosted Backdrop Layer (zero background bleed) */}
+      <div
+        className="fixed inset-0 modal-backdrop-solid"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative z-10 w-full max-w-lg bg-white border border-gray-200/90 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto"
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
           <div className="flex items-center gap-3">

@@ -177,19 +177,21 @@ export const CheckoutModal: React.FC = () => {
 
   return createPortal(
     <div
-      className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[9999] w-screen h-screen min-h-screen flex items-stretch md:items-center justify-end md:justify-center md:p-6 overflow-hidden"
-      style={{ top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', margin: 0, zIndex: 9999 }}
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-[99999] flex items-stretch md:items-center justify-end md:justify-center md:p-6 overflow-hidden"
+      style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 top-0 left-0 right-0 bottom-0 w-screen h-screen min-h-screen bg-black/75 backdrop-blur-md transition-opacity duration-300 pointer-events-auto"
-        style={{ top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', margin: 0 }}
+        className="fixed inset-0 modal-backdrop-solid"
         onClick={closeCheckout}
         aria-hidden="true"
       />
 
       {/* Modal / Drawer */}
       <div
+        onClick={(e) => e.stopPropagation()}
         className={`relative z-10 w-[92%] sm:w-[85%] md:w-full max-w-md md:max-w-2xl h-[100dvh] md:h-auto md:max-h-[90vh] border-l md:border flex flex-col md:rounded-2xl animate-slide-right-drawer md:animate-none overflow-hidden ${isDark ? 'bg-[#0E0A0B] text-[#F1EEEE] border-[#261619]' : 'bg-white text-[#140E10] border-[#E0DBD2]'}`}
         role="dialog"
         aria-modal="true"

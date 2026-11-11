@@ -8,12 +8,14 @@ import {
   categoryRepository,
 } from '../../infrastructure/repositories';
 import { ProductCard } from '../../components/ui/ProductCard';
+import { HomePageSkeleton } from '../../components/common/ShimmerSkeleton';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 import { useTheme } from '../../application/ThemeContext';
 
 export const HomePage: React.FC = () => {
   const { finishPageLoad } = useNavigationLoading();
   const { isDark } = useTheme();
+  const [loading, setLoading] = useState<boolean>(true);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [homeSections, setHomeSections] = useState<HomeSection[]>([]);
@@ -63,6 +65,7 @@ export const HomePage: React.FC = () => {
       } catch (err) {
         console.error('Failed to load home page catalogue data:', err);
       } finally {
+        setLoading(false);
         finishPageLoad();
       }
     }
@@ -123,6 +126,10 @@ export const HomePage: React.FC = () => {
   const activeSections = homeSections
     .filter((sec) => sec.isActive)
     .sort((a, b) => a.displayOrder - b.displayOrder);
+
+  if (loading) {
+    return <HomePageSkeleton />;
+  }
 
   return (
     <div className="space-y-8 sm:space-y-12 pb-20">

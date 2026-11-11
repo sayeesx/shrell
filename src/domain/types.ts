@@ -99,6 +99,8 @@ export interface Product {
   images: ProductImage[];
   stockQuantity: number;
   compatibleVehicleCount?: number;
+  rating?: number;
+  reviewCount?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -280,4 +282,22 @@ export interface HomeSection {
   };
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface ProductReview {
+  id: string;
+  productId: string;
+  customerId?: string;
+  authorName: string;
+  rating: number; // 1 to 5 integer
+  title?: string;
+  comment: string;
+  isVerifiedPurchase: boolean;
+  createdAt: string;
+}
+
+export interface ProductRatingSummary {
+  averageRating: number;
+  totalReviews: number;
+  ratingBreakdown: Record<number, number>; // { 5: count, 4: count, 3: count, 2: count, 1: count }
 }

@@ -6,6 +6,8 @@ import {
   InventoryMovement,
   Order,
   Product,
+  ProductRatingSummary,
+  ProductReview,
   StoreSettings,
   VehicleCompatibility,
   VehicleMake,
@@ -21,6 +23,7 @@ import {
   IInventoryRepository,
   IOrderRepository,
   IProductRepository,
+  IReviewRepository,
   ISettingsRepository,
   IVehicleRepository,
   ProductFilterParams,
@@ -33,6 +36,7 @@ import {
   MockInventoryRepository,
   MockOrderRepository,
   MockProductRepository,
+  MockReviewRepository,
   MockSettingsRepository,
   MockVehicleRepository,
 } from './MockPersistenceRepository';
@@ -1319,5 +1323,109 @@ export class SupabaseHomeSectionRepository implements IHomeSectionRepository {
     } catch {
       return this.fallback.reorder(sectionIds);
     }
+  }
+}
+
+// ==============================================================================
+// 12. REVIEWS & RATINGS REPOSITORY
+// ==============================================================================
+export class SupabaseReviewRepository implements IReviewRepository {
+  private fallback = new MockReviewRepository();
+
+  async getByProductId(productId: string): Promise<ProductReview[]> {
+    if (!isSupabaseConfigured) return this.fallback.getByProductId(productId);
+    try {
+      const { data, error } = await supabase
+        .from('product_reviews')
+        .select('*')
+        .eq('product_id', productId)
+        .order('created_at', { ascending: false });
+
+      if (error || !data || data.length === 0) {
+        return this.fallback.getByProductId(productId);
+      }
+
+      return data.map((r: any) => ({
+        id: r.id,
+        productId: r.product_id,
+        customerId: r.customer_id,
+        authorName: r.author_name,
+        rating: r.rating,
+        title: r.title,
+        comment: r.comment,
+        isVerifiedPurchase: r.is_verified_purchase ?? true,
+        createdAt: r.created_at,
+      }));
+    } catch {
+      return this.fallback.getByProductId(productId);
+    }
+  }
+
+  async addReview(review: Omit<ProductReview, 'id' | 'createdAt'>): Promise<ProductReview> {
+    if (!isSupabaseConfigured) return this.fallback.addReview(review);
+    try {
+      const newId = `rev-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+      const { data, error } = await supabase
+        .from('product_reviews')
+        .insert([
+          {
+            id: newId,
+            product_id: review.productId,
+            customer_id: review.customerId || null,
+            author_name: review.authorName,
+            rating: review.rating,
+            title: review.title || null,
+            comment: review.comment,
+            is_verified_purchase: review.isVerifiedPurchase ?? true,
+            is_approved: true,
+          },
+        ])
+        .select()
+        .single();
+
+      if (error || !data) {
+        return this.fallback.addReview(review);
+      }
+
+      return {
+        id: data.id,
+        productId: data.product_id,
+        customerId: data.customer_id,
+        authorName: data.author_name,
+        rating: data.rating,
+        title: data.title,
+        comment: data.comment,
+        isVerifiedPurchase: data.is_verified_purchase,
+        createdAt: data.created_at,
+      };
+    } catch {
+      return this.fallback.addReview(review);
+    }
+  }
+
+  async getRatingSummary(productId: string): Promise<ProductRatingSummary> {
+    const list = await this.getByProductId(productId);
+    if (list.length === 0) {
+      return {
+        averageRating: 5.0,
+        totalReviews: 0,
+        ratingBreakdown: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+      };
+    }
+
+    const breakdown: Record<number, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    let sum = 0;
+    list.forEach((r) => {
+      const star = Math.min(5, Math.max(1, Math.round(r.rating)));
+      breakdown[star] = (breakdown[star] || 0) + 1;
+      sum += r.rating;
+    });
+
+    const averageRating = Number((sum / list.length).toFixed(1));
+    return {
+      averageRating,
+      totalReviews: list.length,
+      ratingBreakdown: breakdown,
+    };
   }
 }

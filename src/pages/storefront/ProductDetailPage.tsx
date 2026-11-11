@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Product } from '../../domain/types';
+import { Product, ProductReview, ProductRatingSummary } from '../../domain/types';
 import { formatINR } from '../../domain/services/CurrencyService';
-import { productRepository } from '../../infrastructure/repositories';
+import { productRepository, reviewRepository } from '../../infrastructure/repositories';
 import { useCart } from '../../application/CartContext';
+import { useAuth } from '../../application/AuthContext';
 import { useTheme } from '../../application/ThemeContext';
 import { ProductCard } from '../../components/ui/ProductCard';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
+import { ProductDetailSkeleton } from '../../components/common/ShimmerSkeleton';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { addItem } = useCart();
+  const { user } = useAuth();
   const { finishPageLoad } = useNavigationLoading();
   const { isDark } = useTheme();
 
@@ -25,6 +29,24 @@ export const ProductDetailPage: React.FC = () => {
   const [imageError, setImageError] = useState<boolean>(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
+
+  // Reviews & Rating states
+  const [reviews, setReviews] = useState<ProductReview[]>([]);
+  const [ratingSummary, setRatingSummary] = useState<ProductRatingSummary>({
+    averageRating: 5.0,
+    totalReviews: 0,
+    ratingBreakdown: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+  });
+
+  // Review Modal State
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewAuthor, setReviewAuthor] = useState('');
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewHoverRating, setReviewHoverRating] = useState(0);
+  const [reviewTitle, setReviewTitle] = useState('');
+  const [reviewComment, setReviewComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [reviewSuccessMsg, setReviewSuccessMsg] = useState('');
 
   const productViews = [
     { id: 1, label: '' },
@@ -61,8 +83,14 @@ export const ProductDetailPage: React.FC = () => {
           setProduct(p);
           setQuantity(1);
 
-          const relatedRes = await productRepository.getAll({ categorySlug: p.categoryId, limit: 4 });
+          const [relatedRes, revList, rSummary] = await Promise.all([
+            productRepository.getAll({ categorySlug: p.categoryId, limit: 4 }),
+            reviewRepository.getByProductId(p.id),
+            reviewRepository.getRatingSummary(p.id),
+          ]);
           setRelatedProducts(relatedRes.products.filter((item) => item.id !== p.id));
+          setReviews(revList);
+          setRatingSummary(rSummary);
         }
       } catch (err) {
         console.error('Failed to load product detail:', err);
@@ -83,11 +111,7 @@ export const ProductDetailPage: React.FC = () => {
   }, [slug, finishPageLoad]);
 
   if (loading) {
-    return (
-      <div className={`min-h-[70vh] flex items-center justify-center p-6 ${isDark ? 'bg-[#0A0808] bg-atmospheric-red text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'}`}>
-        <ShrellLoader size={84} />
-      </div>
-    );
+    return <ProductDetailSkeleton />;
   }
 
   if (!product) {
@@ -131,6 +155,58 @@ export const ProductDetailPage: React.FC = () => {
       setIsBuyingNow(false);
       if (res.success) navigate('/cart');
     }, 400);
+  };
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!product || !reviewComment.trim()) return;
+
+    setIsSubmittingReview(true);
+    try {
+      const author = reviewAuthor.trim() || user?.name || 'Verified Customer';
+      await reviewRepository.addReview({
+        productId: product.id,
+        authorName: author,
+        rating: reviewRating,
+        title: reviewTitle.trim() || undefined,
+        comment: reviewComment.trim(),
+        isVerifiedPurchase: true,
+        customerId: user?.id,
+      });
+
+      const [updatedList, updatedSummary] = await Promise.all([
+        reviewRepository.getByProductId(product.id),
+        reviewRepository.getRatingSummary(product.id),
+      ]);
+      setReviews(updatedList);
+      setRatingSummary(updatedSummary);
+      setReviewSuccessMsg('Thank you! Your verified review and rating has been submitted.');
+      setReviewTitle('');
+      setReviewComment('');
+      setTimeout(() => {
+        setIsReviewModalOpen(false);
+        setReviewSuccessMsg('');
+      }, 1600);
+    } catch (err: any) {
+      console.error('Failed to submit review:', err);
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
+  const renderStars = (score: number, size = 'text-xs') => {
+    const stars = [];
+    const rounded = Math.round(score * 2) / 2;
+    for (let i = 1; i <= 5; i++) {
+      if (i <= rounded) {
+        stars.push(<i key={i} className={`bi bi-star-fill text-amber-400 ${size}`} aria-hidden="true" />);
+      } else if (i - 0.5 === rounded) {
+        stars.push(<i key={i} className={`bi bi-star-half text-amber-400 ${size}`} aria-hidden="true" />);
+      } else {
+        stars.push(<i key={i} className={`bi bi-star text-slate-400 ${size}`} aria-hidden="true" />);
+      }
+    }
+    return <div className="inline-flex items-center gap-0.5">{stars}</div>;
   };
 
 
@@ -227,11 +303,32 @@ export const ProductDetailPage: React.FC = () => {
 
           {/* RIGHT: Buy Box */}
           <div className="space-y-4 sm:space-y-5">
-            {/* Title */}
-            <div>
+            {/* Title & Rating */}
+            <div className="space-y-1.5">
               <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight leading-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
                 {product.name}
               </h1>
+
+              {/* Dynamic Rating Link */}
+              <div className="flex items-center gap-2 text-xs pt-0.5">
+                {renderStars(ratingSummary.averageRating, 'text-sm')}
+                <span className={`font-bold font-tight ${isDark ? 'text-white' : 'text-[#140E10]'}`}>
+                  {ratingSummary.averageRating.toFixed(1)}
+                </span>
+                <a
+                  href="#reviews-section"
+                  className={`underline hover:text-[#FF000E] transition-colors ${
+                    isDark ? 'text-slate-400' : 'text-[#5C5456]'
+                  }`}
+                >
+                  ({ratingSummary.totalReviews} {ratingSummary.totalReviews === 1 ? 'review' : 'reviews'})
+                </a>
+                <span className="text-slate-400">•</span>
+                <span className={`text-[11px] font-medium inline-flex items-center gap-1 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                  <i className="bi bi-patch-check-fill" />
+                  Verified Overland Fitment
+                </span>
+              </div>
             </div>
 
             {/* Price Row */}
@@ -418,6 +515,339 @@ export const ProductDetailPage: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* ========================================================= */}
+        {/* REVIEWS & RATINGS SECTION                                 */}
+        {/* ========================================================= */}
+        <section id="reviews-section" className={`pt-8 border-t space-y-6 scroll-mt-6 ${
+          isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'
+        }`}>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className={`text-xl sm:text-2xl font-bold tracking-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
+                Customer Reviews &amp; Ratings
+              </h2>
+              <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
+                Verified feedback from Indian automotive expeditioners and touring enthusiasts
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setReviewRating(5);
+                setReviewHoverRating(0);
+                setReviewAuthor(user?.name || '');
+                setReviewTitle('');
+                setReviewComment('');
+                setIsReviewModalOpen(true);
+              }}
+              className="px-4 py-2.5 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-semibold text-xs tracking-wide transition-all cursor-pointer flex items-center gap-2 active:scale-95 shadow-sm"
+            >
+              <i className="bi bi-pencil-square" />
+              <span>Write a Review</span>
+            </button>
+          </div>
+
+          {/* Rating Summary Breakdown Box */}
+          <div className={`p-5 sm:p-6 rounded-2xl border ${
+            isDark ? 'bg-[#0E0A0B] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
+          }`}>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+              {/* Overall Score */}
+              <div className="md:col-span-4 text-center md:text-left md:border-r border-black/10 dark:border-white/10 md:pr-6 space-y-2">
+                <div className={`text-4xl sm:text-5xl font-extrabold tracking-tight font-tight ${
+                  isDark ? 'text-white' : 'text-[#140E10]'
+                }`}>
+                  {ratingSummary.averageRating.toFixed(1)}
+                  <span className="text-xl font-normal text-slate-400"> / 5.0</span>
+                </div>
+                <div>{renderStars(ratingSummary.averageRating, 'text-lg')}</div>
+                <div className={`text-xs font-mono ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
+                  Based on {ratingSummary.totalReviews} verified {ratingSummary.totalReviews === 1 ? 'rating' : 'ratings'}
+                </div>
+              </div>
+
+              {/* Star Breakdown Bars */}
+              <div className="md:col-span-8 space-y-2">
+                {[5, 4, 3, 2, 1].map((star) => {
+                  const count = ratingSummary.ratingBreakdown[star] || 0;
+                  const percent = ratingSummary.totalReviews > 0
+                    ? Math.round((count / ratingSummary.totalReviews) * 100)
+                    : 0;
+
+                  return (
+                    <div key={star} className="flex items-center gap-3 text-xs">
+                      <span className="w-12 font-mono flex items-center gap-1 shrink-0 font-medium">
+                        <span>{star}</span>
+                        <i className="bi bi-star-fill text-amber-400 text-[10px]" />
+                      </span>
+                      <div className="flex-1 bg-black/10 dark:bg-white/10 h-2.5 rounded-full overflow-hidden">
+                        <div
+                          className="bg-amber-400 h-full rounded-full transition-all duration-500"
+                          style={{ width: `${percent}%` }}
+                        />
+                      </div>
+                      <span className="w-16 text-right font-mono text-[11px] text-slate-400 shrink-0">
+                        {count} ({percent}%)
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Reviews List */}
+          <div className="space-y-4">
+            {reviews.length === 0 ? (
+              <div className={`p-8 rounded-2xl border text-center space-y-3 ${
+                isDark ? 'bg-[#0E0A0B] border-[#261619]' : 'bg-white border-[#E0DBD2]'
+              }`}>
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto ${
+                  isDark ? 'bg-slate-900 text-slate-400' : 'bg-slate-100 text-slate-500'
+                }`}>
+                  <i className="bi bi-chat-heart text-xl" />
+                </div>
+                <h3 className={`text-sm font-bold ${isDark ? 'text-white' : 'text-[#140E10]'}`}>
+                  No Customer Reviews Yet
+                </h3>
+                <p className={`text-xs max-w-sm mx-auto ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
+                  Be the first to review this {product.name} and help fellow Indian overland enthusiasts.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setIsReviewModalOpen(true)}
+                  className="px-4 py-2 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-semibold cursor-pointer transition-colors"
+                >
+                  Rate &amp; Review First
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {reviews.map((rev) => (
+                  <div
+                    key={rev.id}
+                    className={`rounded-2xl border p-5 space-y-2.5 transition-colors ${
+                      isDark ? 'bg-[#0E0A0B] border-[#261619]' : 'bg-white border-[#E0DBD2]'
+                    }`}
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-8 h-8 rounded-full border flex items-center justify-center font-bold text-xs ${
+                          isDark ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
+                        }`}>
+                          {rev.authorName.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className={`text-xs font-bold ${isDark ? 'text-white' : 'text-[#140E10]'}`}>
+                              {rev.authorName}
+                            </span>
+                            {rev.isVerifiedPurchase && (
+                              <span className="inline-flex items-center gap-1 text-[10px] text-emerald-500 font-medium">
+                                <i className="bi bi-patch-check-fill" /> Verified Owner
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-[10px] text-slate-400 font-mono">
+                            {new Date(rev.createdAt).toLocaleDateString('en-IN', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>{renderStars(rev.rating, 'text-xs')}</div>
+                    </div>
+
+                    {rev.title && (
+                      <h4 className={`text-xs font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                        {rev.title}
+                      </h4>
+                    )}
+
+                    <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-[#3A3030]'}`}>
+                      {rev.comment}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* REVIEW & RATING SUBMISSION MODAL */}
+        {isReviewModalOpen && createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
+            style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
+          >
+            {/* Dedicated Fullscreen Frosted Backdrop Layer (zero background bleed) */}
+            <div
+              className="fixed inset-0 modal-backdrop-solid"
+              onClick={() => setIsReviewModalOpen(false)}
+              aria-hidden="true"
+            />
+
+            {/* Centered Modal Card */}
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className={`relative z-10 w-full max-w-lg border rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col p-6 space-y-4 my-auto ${
+                isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+              }`}
+            >
+              <div className={`flex items-center justify-between border-b pb-3 ${
+                isDark ? 'border-slate-800' : 'border-slate-200'
+              }`}>
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-wider font-mono">
+                    Write a Customer Review
+                  </h3>
+                  <p className={`text-[11px] truncate mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    {product.name}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsReviewModalOpen(false)}
+                  className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                    isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
+                  }`}
+                  aria-label="Close review dialog"
+                >
+                  <i className="bi bi-x-lg text-xs" />
+                </button>
+              </div>
+
+              {reviewSuccessMsg ? (
+                <div className="py-8 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center mx-auto text-2xl">
+                    <i className="bi bi-check-lg" />
+                  </div>
+                  <div className="text-sm font-bold text-emerald-400 font-mono">
+                    {reviewSuccessMsg}
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmitReview} className="space-y-4 text-xs font-mono">
+                  {/* Star Rating Selector */}
+                  <div>
+                    <label className={`block uppercase font-bold mb-1.5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                      Overall Rating *
+                    </label>
+                    <div className="flex items-center gap-2">
+                      {[1, 2, 3, 4, 5].map((star) => {
+                        const active = (reviewHoverRating || reviewRating) >= star;
+                        return (
+                          <button
+                            key={star}
+                            type="button"
+                            onMouseEnter={() => setReviewHoverRating(star)}
+                            onMouseLeave={() => setReviewHoverRating(0)}
+                            onClick={() => setReviewRating(star)}
+                            className="text-2xl transition-transform hover:scale-110 cursor-pointer p-0.5"
+                            aria-label={`${star} star rating`}
+                          >
+                            <i className={`bi ${active ? 'bi-star-fill text-amber-400' : 'bi-star text-slate-500'}`} />
+                          </button>
+                        );
+                      })}
+                      <span className="text-xs font-semibold text-amber-400 ml-2">
+                        {reviewRating === 5 && '5 Stars - Outstanding'}
+                        {reviewRating === 4 && '4 Stars - Very Good'}
+                        {reviewRating === 3 && '3 Stars - Average'}
+                        {reviewRating === 2 && '2 Stars - Needs Improvement'}
+                        {reviewRating === 1 && '1 Star - Poor'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Reviewer Name */}
+                  <div>
+                    <label className={`block uppercase font-bold mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                      Your Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={reviewAuthor}
+                      onChange={(e) => setReviewAuthor(e.target.value)}
+                      placeholder="e.g. Rahul Sharma"
+                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                        isDark
+                          ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                          : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                      }`}
+                    />
+                  </div>
+
+                  {/* Review Headline */}
+                  <div>
+                    <label className={`block uppercase font-bold mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                      Review Headline (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={reviewTitle}
+                      onChange={(e) => setReviewTitle(e.target.value)}
+                      placeholder="e.g. Perfect fit on Scorpio-N, rugged build quality"
+                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                        isDark
+                          ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                          : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                      }`}
+                    />
+                  </div>
+
+                  {/* Detailed Comment */}
+                  <div>
+                    <label className={`block uppercase font-bold mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                      Detailed Feedback *
+                    </label>
+                    <textarea
+                      rows={4}
+                      required
+                      value={reviewComment}
+                      onChange={(e) => setReviewComment(e.target.value)}
+                      placeholder="Describe ease of installation, finish quality, highway performance, fitment precision..."
+                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                        isDark
+                          ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                          : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                      }`}
+                    />
+                  </div>
+
+                  {/* Actions */}
+                  <div className={`pt-3 border-t flex justify-end gap-3 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+                    <button
+                      type="button"
+                      onClick={() => setIsReviewModalOpen(false)}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer ${
+                        isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmittingReview}
+                      className="px-5 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-sm disabled:opacity-50"
+                    >
+                      {isSubmittingReview ? 'Submitting...' : 'Submit Verified Review'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>,
+          document.body
+        )}
 
         {/* Complementary Products */}
         {relatedProducts.length > 0 && (

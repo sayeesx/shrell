@@ -450,3 +450,75 @@ html.light {
   }
 }
 
+/* ============================================================
+   ENTERPRISE-GRADE MODAL BACKDROP (Zero Background Bleed)
+   ============================================================ */
+.modal-backdrop-solid {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  min-height: 100dvh;
+  background-color: rgba(0, 0, 0, 0.88) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  pointer-events: auto;
+}
+
+/* ============================================================
+   DYNAMIC SHIMMER SKELETON EFFECT (Dark & Light Themes)
+   ============================================================ */
+@keyframes shimmerWave {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.shimmer-box {
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+html.light .shimmer-box {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.shimmer-box::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.06) 20%,
+    rgba(255, 255, 255, 0.16) 50%,
+    rgba(255, 255, 255, 0.06) 80%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmerWave 1.6s infinite ease-in-out;
+  content: '';
+  pointer-events: none;
+}
+
+html.light .shimmer-box::after {
+  background-image: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.04) 20%,
+    rgba(0, 0, 0, 0.10) 50%,
+    rgba(0, 0, 0, 0.04) 80%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+

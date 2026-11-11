@@ -204,10 +204,21 @@ export const AdminInventory: React.FC = () => {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[9999] w-screen h-screen min-h-screen bg-black/75 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
-          style={{ top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', margin: 0, zIndex: 9999 }}
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
+          style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
         >
-          <div className={`relative w-full max-w-md border rounded-xl shadow-2xl p-6 space-y-4 ${isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-900'}`}>
+          {/* Dedicated Fullscreen Frosted Backdrop Layer (zero background bleed) */}
+          <div
+            className="fixed inset-0 modal-backdrop-solid"
+            onClick={() => setSelectedProduct(null)}
+            aria-hidden="true"
+          />
+
+          {/* Centered Modal Card */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`relative z-10 w-full max-w-md border rounded-xl shadow-2xl p-6 space-y-4 my-auto ${isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-900'}`}
+          >
             <h2 className={`text-sm font-bold font-mono uppercase tracking-wider border-b pb-2 ${isDark ? 'text-white border-slate-800' : 'text-slate-900 border-slate-200'}`}>
               Adjust Inventory: {selectedProduct.name}
             </h2>

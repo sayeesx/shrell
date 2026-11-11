@@ -44,7 +44,7 @@ export const PoliciesPage: React.FC = () => {
               <li>Eastern & North-Eastern States, Jammu & Kashmir: 5 to 7 Business Days.</li>
             </ul>
             <h2 className={headingCls}>Free Express Shipping Threshold</h2>
-            <p className={bodyCls}>Orders exceeding ₹4,999.00 qualify for 100% Free Express Shipping. Standard surface freight for orders below this threshold is calculated at a flat ₹250.00 across India.</p>
+            <p className={bodyCls}>Orders exceeding ₹300.00 qualify for 100% Free Express Shipping. Standard surface freight for orders below this threshold is calculated at a flat ₹60.00 across India.</p>
           </div>
         </section>
       )}

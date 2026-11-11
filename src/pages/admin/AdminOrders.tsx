@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Order, OrderStatus } from '../../domain/types';
 import { formatINR } from '../../domain/services/CurrencyService';
 import { orderRepository } from '../../infrastructure/repositories';
@@ -229,11 +230,12 @@ export const AdminOrders: React.FC = () => {
       </div>
 
       {/* Inspect & Dispatch Modal */}
-      {selectedOrder && (
+      {selectedOrder && createPortal(
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md"
+          className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[9999] w-screen h-screen min-h-screen bg-black/75 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
+          style={{ top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', margin: 0, zIndex: 9999 }}
         >
           <div className={`relative w-full max-w-3xl border rounded-xl overflow-hidden max-h-[90vh] flex flex-col shadow-2xl ${isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}`}>
             {/* Header */}
@@ -383,7 +385,8 @@ export const AdminOrders: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

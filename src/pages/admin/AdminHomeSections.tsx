@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Category, HomeSection, HomeSectionType } from '../../domain/types';
 import {
   categoryRepository,
@@ -372,8 +373,11 @@ export const AdminHomeSections: React.FC = () => {
       </div>
 
       {/* CREATE / EDIT MODAL */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+      {isModalOpen && createPortal(
+        <div
+          className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[9999] w-screen h-screen min-h-screen bg-black/75 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
+          style={{ top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', margin: 0, zIndex: 9999 }}
+        >
           <div className={`w-full max-w-xl rounded-xl border p-6 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl ${
             isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
           }`}>
@@ -581,7 +585,8 @@ export const AdminHomeSections: React.FC = () => {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

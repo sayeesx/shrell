@@ -9,7 +9,7 @@ import { useTheme } from '../../application/ThemeContext';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
 
 export const CartPage: React.FC = () => {
-  const { cart, updateQuantity, removeItem, clearCart, applyCoupon, removeCoupon, addItem } = useCart();
+  const { cart, settings, updateQuantity, removeItem, clearCart, applyCoupon, removeCoupon, addItem } = useCart();
   const { finishPageLoad } = useNavigationLoading();
   const { isDark } = useTheme();
   const navigate = useNavigate();
@@ -58,9 +58,131 @@ export const CartPage: React.FC = () => {
     }
   };
 
-  // Free shipping threshold (₹4,999 = 499900 Paisa)
-  const freeThreshold = 499900;
+  // Free shipping threshold (₹300 = 30000 Paisa)
+  const freeThreshold = settings?.freeShippingThresholdPaisa || 30000;
+  const standardFee = settings?.standardShippingPaisa || 6000;
   const remainingForFreeShipping = Math.max(0, freeThreshold - cart.subtotalPaisa);
+  const progressPercent = Math.min(100, Math.round((cart.subtotalPaisa / freeThreshold) * 100));
+  const isFreeDeliveryUnlocked = remainingForFreeShipping === 0;
+
+  const renderDeliveryTimeline = (compact = false) => (
+    <div
+      className={`rounded-2xl border transition-all duration-300 ${
+        compact ? 'p-3 space-y-2.5 my-2' : 'p-4 space-y-3'
+      } ${
+        isFreeDeliveryUnlocked
+          ? isDark
+            ? 'bg-gradient-to-r from-emerald-950/40 via-[#120E0F] to-[#120E0F] border-emerald-500/30 shadow-sm'
+            : 'bg-gradient-to-r from-emerald-50/70 via-white to-white border-emerald-200 shadow-xs'
+          : isDark
+            ? 'bg-[#120E0F] border-[#261619]'
+            : 'bg-white border-[#E0DBD2] shadow-xs'
+      }`}
+    >
+      {/* Top Banner Row */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="relative shrink-0 flex items-center justify-center">
+            <img
+              src="/images/shrell-delivery.webp"
+              alt="Express Delivery"
+              className={`${compact ? 'w-7 h-7' : 'w-8 h-8'} object-contain drop-shadow-sm transition-transform duration-500 ${
+                isFreeDeliveryUnlocked ? 'scale-105' : 'hover:scale-105'
+              }`}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/shrell-delivery.webp';
+              }}
+            />
+            {isFreeDeliveryUnlocked && (
+              <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+            )}
+          </div>
+          <div className="min-w-0">
+            {isFreeDeliveryUnlocked ? (
+              <div className="text-xs sm:text-sm font-semibold tracking-tight text-emerald-600 dark:text-emerald-400 truncate">
+                Unlocked: Free Express Surface Shipping across India!
+              </div>
+            ) : (
+              <div className="text-xs font-medium truncate">
+                Add <span className="font-bold text-[#FF000E]">{formatINR(remainingForFreeShipping)}</span> more to gain Free Delivery!
+              </div>
+            )}
+            <div className={`text-[10px] font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'} truncate`}>
+              {isFreeDeliveryUnlocked
+                ? 'Zero delivery charge • Express logistics dispatch'
+                : `Delivery charge: ${formatINR(standardFee)} for orders under ${formatINR(freeThreshold)}`}
+            </div>
+          </div>
+        </div>
+
+        <div className="shrink-0">
+          {isFreeDeliveryUnlocked ? (
+            <span className="px-2.5 py-1 rounded-full text-[11px] font-mono font-extrabold uppercase tracking-wider bg-emerald-500 text-white shadow-xs">
+              FREE
+            </span>
+          ) : (
+            <span className={`px-2.5 py-1 rounded-full text-[11px] font-mono font-semibold uppercase tracking-wider border ${
+              isDark ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
+            }`}>
+              Threshold ₹300
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Dynamic Animated Timeline Track */}
+      <div className="space-y-1">
+        <div className="relative w-full bg-black/10 dark:bg-white/10 h-2 rounded-full overflow-visible">
+          <div
+            className={`h-full rounded-full transition-all duration-700 ease-out ${
+              isFreeDeliveryUnlocked
+                ? 'bg-gradient-to-r from-emerald-500 to-emerald-400'
+                : 'bg-gradient-to-r from-[#FF000E] via-[#FF3342] to-rose-400'
+            }`}
+            style={{ width: `${progressPercent}%` }}
+          />
+
+          {/* Smooth Moving Delivery Van Indicator along the timeline */}
+          <div
+            className="absolute top-1/2 -translate-y-1/2 transition-all duration-700 ease-out pointer-events-none"
+            style={{
+              left: `calc(${progressPercent}% - 14px)`,
+              opacity: progressPercent > 5 ? 1 : 0,
+            }}
+          >
+            <div className={`w-7 h-7 -mt-0.5 rounded-full p-0.5 border flex items-center justify-center shadow-md transition-transform duration-500 ${
+              isFreeDeliveryUnlocked
+                ? 'bg-emerald-500 border-white text-white scale-110'
+                : isDark
+                  ? 'bg-slate-900 border-rose-500/50'
+                  : 'bg-white border-rose-300'
+            }`}>
+              <img
+                src="/images/shrell-delivery.webp"
+                alt="Express"
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/shrell-delivery.webp';
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Milestone Steps Markers */}
+        <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-0.5">
+          <span>₹0</span>
+          <span>{formatINR(Math.round(freeThreshold / 2))}</span>
+          <span className={isFreeDeliveryUnlocked ? 'text-emerald-500 font-bold' : 'font-medium'}>
+            {formatINR(freeThreshold)} (Free Delivery)
+          </span>
+        </div>
+      </div>
+    </div>
+  );
 
   // Suggestions excluding items already at maximum quantity
   const displayedSuggestions = suggestions.filter((p) => {
@@ -150,6 +272,9 @@ export const CartPage: React.FC = () => {
             <ThemeToggle compact />
           </div>
         </div>
+
+        {/* Dynamic Delivery Timeline (Mobile) */}
+        {renderDeliveryTimeline(true)}
 
         {/* 2. Cart Items List (Compact size, top-right delete, stepper on right) */}
         <div className="space-y-2">
@@ -528,28 +653,8 @@ export const CartPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Free Shipping Progress Indicator */}
-        <div className={`p-3.5 rounded-xl border text-xs space-y-2 ${
-          isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
-        }`}>
-          <div className="flex items-center justify-between font-medium">
-            <span className="flex items-center gap-2">
-              <i className="bi bi-truck text-[#FF000E] text-base" />
-              {remainingForFreeShipping === 0
-                ? 'Unlocked: Free Express Surface Shipping across India!'
-                : `Add ${formatINR(remainingForFreeShipping)} more for Free Express Shipping`}
-            </span>
-            <span className="text-[#FF000E] font-bold">
-              {remainingForFreeShipping === 0 ? 'FREE' : 'Threshold ₹4,999'}
-            </span>
-          </div>
-          <div className="w-full bg-black/10 dark:bg-white/10 h-1.5 rounded-full overflow-hidden">
-            <div
-              className="bg-[#FF000E] h-full transition-all duration-500 rounded-full"
-              style={{ width: `${Math.min(100, Math.round((cart.subtotalPaisa / freeThreshold) * 100))}%` }}
-            />
-          </div>
-        </div>
+        {/* Dynamic Delivery Timeline (Desktop) */}
+        {renderDeliveryTimeline(false)}
 
         {/* 2-Column Desktop Grid */}
         <div className="grid grid-cols-12 gap-6 items-start">

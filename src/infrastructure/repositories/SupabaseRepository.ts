@@ -1130,8 +1130,8 @@ export class SupabaseSettingsRepository implements ISettingsRepository {
         whatsappSupportNumber: storeInfo.whatsappSupportNumber || '919876543210',
         storeUpiId: storeInfo.storeUpiId || '',
         storeUpiName: storeInfo.storeUpiName || '',
-        freeShippingThresholdPaisa: shippingRules.freeShippingThresholdPaisa || 499900,
-        standardShippingPaisa: shippingRules.standardShippingPaisa || 25000,
+        freeShippingThresholdPaisa: shippingRules.freeShippingThresholdPaisa || 30000,
+        standardShippingPaisa: shippingRules.standardShippingPaisa || 6000,
         gstRatePercent: shippingRules.gstRatePercent || 18,
         currency: 'INR',
       };

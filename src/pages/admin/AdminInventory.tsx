@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { InventoryMovement, Product } from '../../domain/types';
 import { inventoryRepository, productRepository } from '../../infrastructure/repositories';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
@@ -199,11 +200,12 @@ export const AdminInventory: React.FC = () => {
       </div>
 
       {/* Adjust Stock Modal */}
-      {selectedProduct && (
+      {selectedProduct && createPortal(
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md"
+          className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[9999] w-screen h-screen min-h-screen bg-black/75 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
+          style={{ top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', margin: 0, zIndex: 9999 }}
         >
           <div className={`relative w-full max-w-md border rounded-xl shadow-2xl p-6 space-y-4 ${isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-900'}`}>
             <h2 className={`text-sm font-bold font-mono uppercase tracking-wider border-b pb-2 ${isDark ? 'text-white border-slate-800' : 'text-slate-900 border-slate-200'}`}>
@@ -274,7 +276,8 @@ export const AdminInventory: React.FC = () => {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

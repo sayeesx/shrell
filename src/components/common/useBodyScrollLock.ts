@@ -13,6 +13,13 @@ export function useBodyScrollLock(isLocked: boolean): void {
     const originalHtmlOverflow = document.documentElement.style.overflow;
     const originalPaddingRight = document.body.style.paddingRight;
 
+    // Lock main content scroll containers if present (e.g. admin layout)
+    const mains = Array.from(document.querySelectorAll('main')) as HTMLElement[];
+    const mainOverflows = mains.map((m) => m.style.overflow);
+    mains.forEach((m) => {
+      m.style.overflow = 'hidden';
+    });
+
     // Calculate scrollbar width to prevent horizontal layout jerk
     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
 
@@ -27,6 +34,9 @@ export function useBodyScrollLock(isLocked: boolean): void {
       document.body.style.overflow = originalBodyOverflow;
       document.documentElement.style.overflow = originalHtmlOverflow;
       document.body.style.paddingRight = originalPaddingRight;
+      mains.forEach((m, idx) => {
+        m.style.overflow = mainOverflows[idx] || '';
+      });
     };
   }, [isLocked]);
 }

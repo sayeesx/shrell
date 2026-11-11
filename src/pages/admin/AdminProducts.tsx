@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Brand, Category, Product } from '../../domain/types';
 import { formatINR, paisaToRupees, rupeesToPaisa } from '../../domain/services/CurrencyService';
 import {
@@ -6,6 +7,7 @@ import {
   categoryRepository,
   productRepository,
 } from '../../infrastructure/repositories';
+import { cloudinaryService } from '../../infrastructure/cloudinary/cloudinaryService';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 import { useTheme } from '../../application/ThemeContext';
 
@@ -33,9 +35,32 @@ export const AdminProducts: React.FC = () => {
   const [shortDesc, setShortDesc] = useState('');
   const [desc, setDesc] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadError, setUploadError] = useState('');
   const [isUniversal, setIsUniversal] = useState(false);
   const [weightGrams, setWeightGrams] = useState('2000');
   const [dimensions, setDimensions] = useState('50x30x10');
+
+  const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    setUploadError('');
+    try {
+      const result = await cloudinaryService.uploadImage(file, {
+        maxSizeBytes: 8 * 1024 * 1024,
+      });
+      if (result && result.url) {
+        setImageUrl(result.url);
+      }
+    } catch (err: any) {
+      setUploadError(err.message || 'Image upload failed. Please try a different image or enter URL manually.');
+    } finally {
+      setUploadingImage(false);
+      e.target.value = '';
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -68,6 +93,8 @@ export const AdminProducts: React.FC = () => {
     setShortDesc('');
     setDesc('');
     setImageUrl('/logos/shrell-full_white-text_black-logo.png');
+    setUploadingImage(false);
+    setUploadError('');
     setIsUniversal(true);
     setWeightGrams('3000');
     setDimensions('80x25x15');
@@ -86,6 +113,8 @@ export const AdminProducts: React.FC = () => {
     setShortDesc(p.shortDescription);
     setDesc(p.description);
     setImageUrl(p.images[0]?.url || '');
+    setUploadingImage(false);
+    setUploadError('');
     setIsUniversal(p.isUniversalFit);
     setWeightGrams(p.weightGrams.toString());
     setDimensions(p.dimensionsCm);
@@ -293,11 +322,12 @@ export const AdminProducts: React.FC = () => {
       </div>
 
       {/* Product Create / Edit Modal */}
-      {isModalOpen && (
+      {isModalOpen && createPortal(
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md"
+          className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[9999] w-screen h-screen min-h-screen bg-black/75 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
+          style={{ top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', margin: 0, zIndex: 9999 }}
         >
           <div className={`relative w-full max-w-2xl border rounded-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col ${
             isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
@@ -433,19 +463,114 @@ export const AdminProducts: React.FC = () => {
                 </div>
               </div>
 
-              <div>
-                <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Image URL</label>
-                <input
-                  type="url"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="/logos/shrell-full_white-text_black-logo.png"
-                  className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
-                    isDark
-                      ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
-                      : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
-                  }`}
-                />
+              {/* Product Image Upload & URL */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className={`block uppercase font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                    Product Image (Manual Upload or URL)
+                  </label>
+                  {imageUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setImageUrl('')}
+                      className="text-[11px] text-rose-500 hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <i className="bi bi-trash text-xs" />
+                      <span>Remove</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Upload dropzone / trigger */}
+                <div className={`p-3 rounded-lg border-2 border-dashed transition-colors flex flex-col items-center justify-center gap-2 ${
+                  isDark ? 'border-slate-700 bg-slate-950/70 hover:border-slate-500' : 'border-slate-300 bg-slate-50 hover:border-slate-400'
+                }`}>
+                  {uploadingImage ? (
+                    <div className="py-4 flex flex-col items-center justify-center gap-2">
+                      <div className="w-6 h-6 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                      <span className="text-xs text-slate-400 font-mono">Uploading image to CDN...</span>
+                    </div>
+                  ) : imageUrl ? (
+                    <div className="flex items-center gap-4 w-full">
+                      <div className={`w-16 h-16 shrink-0 rounded-lg border overflow-hidden flex items-center justify-center p-1 ${
+                        isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
+                      }`}>
+                        <img
+                          src={imageUrl}
+                          alt="Product Preview"
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/logos/shrell-brandicon_no-bg.png';
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className={`text-xs font-semibold truncate ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                          Image Uploaded
+                        </div>
+                        <div className="text-[11px] text-slate-400 truncate font-mono">
+                          {imageUrl}
+                        </div>
+                        <div className="mt-1 flex items-center gap-3">
+                          <label className={`text-xs font-medium cursor-pointer hover:underline flex items-center gap-1 ${
+                            isDark ? 'text-slate-300' : 'text-slate-700'
+                          }`}>
+                            <i className="bi bi-arrow-repeat text-xs" />
+                            <span>Replace with another file</span>
+                            <input
+                              type="file"
+                              accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
+                              onChange={handleImageFileChange}
+                              className="hidden"
+                            />
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <label className="py-3 flex flex-col items-center justify-center cursor-pointer w-full group">
+                      <i className={`bi bi-cloud-arrow-up text-2xl mb-1 transition-transform group-hover:-translate-y-0.5 ${
+                        isDark ? 'text-slate-400 group-hover:text-white' : 'text-slate-500 group-hover:text-slate-900'
+                      }`} />
+                      <span className={`text-xs font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                        Click to upload image file
+                      </span>
+                      <span className="text-[10px] text-slate-400 mt-0.5 font-mono">
+                        Supports WebP, PNG, JPG, SVG up to 8MB (Cloudinary CDN)
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
+                        onChange={handleImageFileChange}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
+                </div>
+
+                {uploadError && (
+                  <div className="text-[11px] font-mono text-rose-500 p-2 rounded bg-rose-500/10 border border-rose-500/30">
+                    {uploadError}
+                  </div>
+                )}
+
+                {/* Direct URL input */}
+                <div>
+                  <div className={`text-[10px] uppercase font-bold mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                    Or enter image URL manually:
+                  </div>
+                  <input
+                    type="url"
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    placeholder="https://res.cloudinary.com/... or /images/..."
+                    className={`w-full border rounded-lg px-3 py-1.5 text-xs transition-colors focus:outline-none ${
+                      isDark
+                        ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                        : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                    }`}
+                  />
+                </div>
               </div>
 
               <div>
@@ -510,7 +635,8 @@ export const AdminProducts: React.FC = () => {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

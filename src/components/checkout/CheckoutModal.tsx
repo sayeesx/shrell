@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../application/CartContext';
 import { Order, PaymentMethod } from '../../domain/types';
@@ -174,11 +175,15 @@ export const CheckoutModal: React.FC = () => {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-stretch md:items-center justify-end md:justify-center md:p-6 overflow-hidden">
+  return createPortal(
+    <div
+      className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[9999] w-screen h-screen min-h-screen flex items-stretch md:items-center justify-end md:justify-center md:p-6 overflow-hidden"
+      style={{ top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', margin: 0, zIndex: 9999 }}
+    >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 w-screen h-screen min-h-screen bg-black/75 backdrop-blur-md transition-opacity duration-300 pointer-events-auto"
+        className="fixed inset-0 top-0 left-0 right-0 bottom-0 w-screen h-screen min-h-screen bg-black/75 backdrop-blur-md transition-opacity duration-300 pointer-events-auto"
+        style={{ top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh', margin: 0 }}
         onClick={closeCheckout}
         aria-hidden="true"
       />
@@ -424,6 +429,7 @@ export const CheckoutModal: React.FC = () => {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

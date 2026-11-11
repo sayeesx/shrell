@@ -6,6 +6,7 @@ import { INITIAL_SETTINGS } from '../infrastructure/repositories/seedData';
 
 interface CartContextType {
   cart: Cart;
+  settings: StoreSettings;
   addItem: (product: Product, quantity?: number) => { success: boolean; message?: string };
   updateQuantity: (productId: string, quantity: number) => void;
   removeItem: (productId: string) => void;
@@ -188,6 +189,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <CartContext.Provider
       value={{
         cart,
+        settings,
         addItem,
         updateQuantity,
         removeItem,

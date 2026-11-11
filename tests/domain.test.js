@@ -46,32 +46,32 @@ test('Currency Service: Integer Paisa to Rupee conversions avoid precision loss'
   assert.equal(rupeesToPaisa(250.5), 25050);
 });
 
-test('Cart Calculation: Free Shipping Threshold applies correctly above ₹4,999', () => {
+test('Cart Calculation: Free Shipping Threshold applies correctly above ₹300', () => {
   const settings = {
-    freeShippingThresholdPaisa: 499900, // ₹4,999.00
-    standardShippingPaisa: 25000, // ₹250.00
+    freeShippingThresholdPaisa: 30000, // ₹300.00
+    standardShippingPaisa: 6000, // ₹60.00
     gstRatePercent: 18,
   };
 
-  // Case 1: Order below threshold (₹2,500)
-  const itemsBelow = [{ unitPricePaisa: 250000, quantity: 1 }];
+  // Case 1: Order below threshold (₹250)
+  const itemsBelow = [{ unitPricePaisa: 25000, quantity: 1 }];
   const cartBelow = calculateCart(itemsBelow, null, settings);
-  assert.equal(cartBelow.subtotalPaisa, 250000);
-  assert.equal(cartBelow.shippingPaisa, 25000, 'Orders under ₹4,999 should incur standard ₹250 shipping');
-  assert.equal(cartBelow.totalPaisa, 275000);
+  assert.equal(cartBelow.subtotalPaisa, 25000);
+  assert.equal(cartBelow.shippingPaisa, 6000, 'Orders under ₹300 should incur standard ₹60 shipping');
+  assert.equal(cartBelow.totalPaisa, 31000);
 
-  // Case 2: Order above threshold (₹14,999)
-  const itemsAbove = [{ unitPricePaisa: 1499900, quantity: 1 }];
+  // Case 2: Order above threshold (₹500)
+  const itemsAbove = [{ unitPricePaisa: 50000, quantity: 1 }];
   const cartAbove = calculateCart(itemsAbove, null, settings);
-  assert.equal(cartAbove.subtotalPaisa, 1499900);
-  assert.equal(cartAbove.shippingPaisa, 0, 'Orders over ₹4,999 should have FREE shipping');
-  assert.equal(cartAbove.totalPaisa, 1499900);
+  assert.equal(cartAbove.subtotalPaisa, 50000);
+  assert.equal(cartAbove.shippingPaisa, 0, 'Orders over ₹300 should have FREE shipping');
+  assert.equal(cartAbove.totalPaisa, 50000);
 });
 
 test('Coupon Validation: Percentage discount with cap calculates accurately', () => {
   const settings = {
-    freeShippingThresholdPaisa: 499900,
-    standardShippingPaisa: 25000,
+    freeShippingThresholdPaisa: 30000,
+    standardShippingPaisa: 6000,
     gstRatePercent: 18,
   };
 

@@ -17,8 +17,8 @@ export const INITIAL_SETTINGS: StoreSettings = {
   whatsappSupportNumber: '919876543210',
   storeUpiId: '',
   storeUpiName: '',
-  freeShippingThresholdPaisa: 499900, // ₹4,999.00
-  standardShippingPaisa: 25000, // ₹250.00
+  freeShippingThresholdPaisa: 30000, // ₹300.00
+  standardShippingPaisa: 6000, // ₹60.00
   gstRatePercent: 18,
   currency: 'INR',
 };

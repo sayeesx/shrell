@@ -7,7 +7,7 @@ export const ANNOUNCEMENT_MESSAGES = [
   { text: 'Fast Surface Dispatch via BlueDart & Delhivery Express Logistics', icon: 'bi-box-seam-fill' },
   { text: 'Verified OEM Equipment Guaranteed', icon: 'bi-patch-check-fill' },
   { text: 'Secure Checkout with UPI & Cards', icon: 'bi-shield-lock-fill' },
-  { text: 'Free express courier across India on orders over ₹4,999', icon: 'bi-truck' },
+  { text: 'Free express courier across India on orders over ₹300', icon: 'bi-truck' },
 ];
 
 export const Navbar: React.FC = () => {

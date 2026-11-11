@@ -410,7 +410,7 @@ export const ProductDetailPage: React.FC = () => {
             </button>
             {openAccordions.shipping && (
               <div className={`pb-6 space-y-2 text-xs leading-relaxed text-left ${isDark ? 'text-[#D8D1D1]' : 'text-[#3A3030]'}`}>
-                <p>• <strong className={isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}>Free Express Courier:</strong> Across India on all orders over ₹4,999 via BlueDart &amp; Delhivery Express.</p>
+                <p>• <strong className={isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}>Free Express Courier:</strong> Across India on all orders over ₹300 via BlueDart &amp; Delhivery Express.</p>
                 <p>• <strong className={isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}>Dispatch Guarantee:</strong> Dispatched within 24 hours from Pune logistics facility.</p>
                 <p>• <strong className={isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}>Manufacturer Warranty:</strong> {product.warrantyMonths} months comprehensive warranty coverage.</p>
                 <p>• <strong className={isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}>7-Day Returns:</strong> Rapid replacement guarantee for transit or manufacturing issues.</p>

@@ -2,18 +2,25 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { PostHogProvider } from '@posthog/react';
 import { AuthProvider } from './application/AuthContext';
 import { VehicleProvider } from './application/VehicleContext';
 import { CartProvider } from './application/CartContext';
 import { NavigationLoadingProvider } from './application/NavigationLoadingContext';
 import { ThemeProvider } from './application/ThemeContext';
 import { App } from './App';
-import { initPostHog } from './infrastructure/analytics/posthog';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './styles/index.css';
 
-// Initialize PostHog client analytics
-initPostHog();
+const posthogOptions = {
+  api_host: import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.com',
+  defaults: '2026-08-30',
+} as const;
+
+const posthogToken =
+  import.meta.env.VITE_POSTHOG_PROJECT_TOKEN ||
+  import.meta.env.VITE_POSTHOG_KEY ||
+  '';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,20 +33,22 @@ const queryClient = new QueryClient({
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ThemeProvider>
-          <NavigationLoadingProvider>
-            <AuthProvider>
-              <VehicleProvider>
-                <CartProvider>
-                  <App />
-                </CartProvider>
-              </VehicleProvider>
-            </AuthProvider>
-          </NavigationLoadingProvider>
-        </ThemeProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <PostHogProvider apiKey={posthogToken} options={posthogOptions}>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <ThemeProvider>
+            <NavigationLoadingProvider>
+              <AuthProvider>
+                <VehicleProvider>
+                  <CartProvider>
+                    <App />
+                  </CartProvider>
+                </VehicleProvider>
+              </AuthProvider>
+            </NavigationLoadingProvider>
+          </ThemeProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </PostHogProvider>
   </React.StrictMode>
 );

@@ -9,7 +9,7 @@ const safeEnv =
     : {};
 
 export const POSTHOG_CONFIG = {
-  apiKey: safeEnv.VITE_POSTHOG_KEY || '',
+  apiKey: safeEnv.VITE_POSTHOG_PROJECT_TOKEN || safeEnv.VITE_POSTHOG_KEY || '',
   apiHost: safeEnv.VITE_POSTHOG_HOST || 'https://us.i.posthog.com',
 };
 

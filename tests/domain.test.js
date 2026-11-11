@@ -140,3 +140,166 @@ test('Product Reviews & Rating Calculation: Accurate average and star breakdown 
   assert.equal(breakdown[1], 0);
   assert.equal(reviews.length, 5);
 });
+
+test('Postal PIN Code: 6-digit validation and non-blocking fallback mapping', async () => {
+  const { getFallbackFromPin, INDIAN_PIN_PREFIX_FALLBACK } = await import('../src/hooks/usePostalPincode.ts');
+
+  // Verify prefix mapping for key Indian regions
+  assert.equal(INDIAN_PIN_PREFIX_FALLBACK['11'].state, 'Delhi');
+  assert.equal(INDIAN_PIN_PREFIX_FALLBACK['40'].state, 'Maharashtra');
+  assert.equal(INDIAN_PIN_PREFIX_FALLBACK['56'].state, 'Karnataka');
+  assert.equal(INDIAN_PIN_PREFIX_FALLBACK['60'].state, 'Tamil Nadu');
+  assert.equal(INDIAN_PIN_PREFIX_FALLBACK['70'].state, 'West Bengal');
+
+  // Test getFallbackFromPin helper
+  const pune = getFallbackFromPin('411001');
+  assert.ok(pune);
+  assert.equal(pune.state, 'Maharashtra');
+  assert.equal(pune.city, 'Pune');
+
+  const bengaluru = getFallbackFromPin('560001');
+  assert.ok(bengaluru);
+  assert.equal(bengaluru.state, 'Karnataka');
+  assert.equal(bengaluru.city, 'Bengaluru');
+
+  const invalid = getFallbackFromPin('9');
+  assert.equal(invalid, null);
+});
+
+test('Fuse.js Search: Typo-tolerant matching on automotive parts', async () => {
+  const { searchProductsWithFuse } = await import('../src/infrastructure/search/searchService.ts');
+
+  const mockProducts = [
+    {
+      id: 'prod-1',
+      name: 'All-Weather 3D TPE Floor Mats',
+      slug: 'all-weather-3d-tpe-floor-mats',
+      sku: 'SHR-MAT-001',
+      categoryName: 'Floor Mats',
+      brandName: 'SHRELL Precision',
+      shortDescription: 'Laser-measured deeply grooved all-weather TPE floor protection mats.',
+      pricePaisa: 399900,
+    },
+    {
+      id: 'prod-2',
+      name: 'Solar Kinetic Turbine Fragrance Diffuser',
+      slug: 'solar-kinetic-turbine-diffuser',
+      sku: 'SHR-DIF-002',
+      categoryName: 'Interior Care',
+      brandName: 'SHRELL Luxe',
+      shortDescription: 'Dual-ring levitating solar air freshener diffuser.',
+      pricePaisa: 149900,
+    },
+    {
+      id: 'prod-3',
+      name: 'Braided Heavy-Duty 60W USB-C Cable',
+      slug: 'braided-60w-usb-c-cable',
+      sku: 'SHR-CAB-003',
+      categoryName: 'Electronics',
+      brandName: 'SHRELL Power',
+      shortDescription: 'Fast charging high durability cable for automotive charging docks.',
+      pricePaisa: 69900,
+    },
+  ];
+
+  // 1. Typo in "Floor Mats": "matts"
+  const matsMatches = searchProductsWithFuse(mockProducts, 'matts');
+  assert.ok(matsMatches.length > 0);
+  assert.equal(matsMatches[0].id, 'prod-1');
+
+  // 2. Typo in "Diffuser": "difuser"
+  const diffuserMatches = searchProductsWithFuse(mockProducts, 'difuser');
+  assert.ok(diffuserMatches.length > 0);
+  assert.equal(diffuserMatches[0].id, 'prod-2');
+
+  // 3. Typo in "Cable": "cabl"
+  const cableMatches = searchProductsWithFuse(mockProducts, 'cabl');
+  assert.ok(cableMatches.length > 0);
+  assert.equal(cableMatches[0].id, 'prod-3');
+
+  // 4. Empty query returns all items
+  const allMatches = searchProductsWithFuse(mockProducts, '');
+  assert.equal(allMatches.length, 3);
+});
+
+test('PostHog Analytics: Safe telemetry client initializes and shapes standard funnel payloads', async () => {
+  const {
+    trackProductViewed,
+    trackProductAddedToCart,
+    trackCartViewed,
+    trackOrderCompleted,
+    trackSearchPerformed,
+  } = await import('../src/infrastructure/analytics/posthog.ts');
+
+  // Ensure functions can be called safely without throwing even when VITE_POSTHOG_KEY is empty
+  assert.doesNotThrow(() => {
+    trackProductViewed({
+      id: 'p-1',
+      name: 'Floor Mats',
+      slug: 'floor-mats',
+      sku: 'SKU-1',
+      categoryId: 'cat-1',
+      categoryName: 'Interior',
+      brandName: 'SHRELL',
+      pricePaisa: 299900,
+      stockQuantity: 15,
+      warrantyMonths: 12,
+    });
+  });
+
+  assert.doesNotThrow(() => {
+    trackProductAddedToCart(
+      {
+        id: 'p-1',
+        name: 'Floor Mats',
+        slug: 'floor-mats',
+        sku: 'SKU-1',
+        pricePaisa: 299900,
+      },
+      2
+    );
+  });
+
+  assert.doesNotThrow(() => {
+    trackCartViewed({
+      items: [{ productId: 'p-1', quantity: 2, unitPricePaisa: 299900, subtotalPaisa: 599800 }],
+      subtotalPaisa: 599800,
+      discountPaisa: 0,
+      shippingPaisa: 0,
+      totalPaisa: 599800,
+    });
+  });
+
+  assert.doesNotThrow(() => {
+    trackSearchPerformed('matts', 1, 'navbar');
+  });
+
+  assert.doesNotThrow(() => {
+    trackOrderCompleted({
+      id: 'ord-1001',
+      customerName: 'Aarav Sharma',
+      customerPhone: '9876543210',
+      customerEmail: 'aarav@example.com',
+      paymentMethod: 'MANUAL_UPI',
+      paymentStatus: 'PENDING',
+      subtotalPaisa: 599800,
+      shippingPaisa: 0,
+      discountPaisa: 0,
+      totalPaisa: 599800,
+      items: [
+        {
+          productId: 'p-1',
+          productName: 'Floor Mats',
+          unitPricePaisa: 299900,
+          quantity: 2,
+          lineTotalPaisa: 599800,
+        },
+      ],
+      shippingAddress: {
+        city: 'Pune',
+        state: 'Maharashtra',
+        postalCode: '411001',
+      },
+    });
+  });
+});

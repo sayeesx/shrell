@@ -7,6 +7,8 @@ import { formatINR } from '../../domain/services/CurrencyService';
 import { orderRepository } from '../../infrastructure/repositories';
 import { whatsAppService } from '../../features/whatsapp/WhatsAppService';
 import { useBodyScrollLock } from '../common/useBodyScrollLock';
+import { usePostalPincode } from '../../hooks/usePostalPincode';
+import { trackPaymentAttempted, trackOrderCompleted } from '../../infrastructure/analytics/posthog';
 import { ThemeSuccessAnimation } from '../common/ThemeFeedbackAnimation';
 import { useTheme } from '../../application/ThemeContext';
 import { ShrellLoader } from '../common/ShrellLoader';
@@ -54,6 +56,18 @@ export const CheckoutModal: React.FC = () => {
   const [state, setState] = useState('Maharashtra');
   const [postalCode, setPostalCode] = useState('');
   const [deliveryInstructions, setDeliveryInstructions] = useState('');
+
+  // Non-blocking Postal PIN autofill hook for Indian PIN codes
+  const { loading: isPinLoading, data: pinData } = usePostalPincode(postalCode, {
+    onLookupSuccess: ({ city: autoCity, state: autoState }) => {
+      if (autoCity && (!city || city === pinData?.city)) {
+        setCity(autoCity);
+      }
+      if (autoState) {
+        setState(autoState);
+      }
+    },
+  });
 
   // Payment Selection
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('MANUAL_UPI');
@@ -115,6 +129,7 @@ export const CheckoutModal: React.FC = () => {
     }
 
     setIsSubmitting(true);
+    trackPaymentAttempted(paymentMethod, cart.totalPaisa);
 
     try {
       const idempotencyKey = `ord-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
@@ -165,6 +180,7 @@ export const CheckoutModal: React.FC = () => {
         idempotencyKey,
       });
 
+      trackOrderCompleted(newOrder);
       clearCart();
       setCreatedOrder(newOrder);
     } catch (err: any) {
@@ -351,7 +367,21 @@ export const CheckoutModal: React.FC = () => {
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className={`block mb-1 ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>PIN Code (6 digits) *</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className={`block ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>PIN Code (6 digits) *</label>
+                      {isPinLoading && (
+                        <span className="text-[10px] text-amber-500 font-normal inline-flex items-center gap-1">
+                          <i className="bi bi-arrow-repeat animate-spin text-[9px]" aria-hidden="true" />
+                          <span>Locating...</span>
+                        </span>
+                      )}
+                      {pinData && !isPinLoading && (
+                        <span className="text-[10px] text-emerald-500 font-normal inline-flex items-center gap-1">
+                          <i className="bi bi-check2-circle text-[10px]" aria-hidden="true" />
+                          <span>Autofilled ({pinData.city})</span>
+                        </span>
+                      )}
+                    </div>
                     <input type="text" required placeholder="e.g. 411001" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} maxLength={6}
                       className={`w-full border rounded-lg px-3 py-2 placeholder-[#5C5456] focus:outline-none focus:border-[#FF000E] ${isDark ? 'bg-[#0A0808] border-[#261619] text-[#F1EEEE]' : 'bg-white border-[#E0DBD2] text-[#140E10]'}`} />
                   </div>

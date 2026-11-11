@@ -8,8 +8,12 @@ import { CartProvider } from './application/CartContext';
 import { NavigationLoadingProvider } from './application/NavigationLoadingContext';
 import { ThemeProvider } from './application/ThemeContext';
 import { App } from './App';
+import { initPostHog } from './infrastructure/analytics/posthog';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './styles/index.css';
+
+// Initialize PostHog client analytics
+initPostHog();
 
 const queryClient = new QueryClient({
   defaultOptions: {

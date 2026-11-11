@@ -9,6 +9,13 @@ import { useNavigationLoading } from '../../application/NavigationLoadingContext
 import { useTheme } from '../../application/ThemeContext';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { StateSearchDropdown } from '../../components/checkout/StateSearchDropdown';
+import { usePostalPincode } from '../../hooks/usePostalPincode';
+import {
+  trackCheckoutStarted,
+  trackCheckoutStepCompleted,
+  trackPaymentAttempted,
+  trackOrderCompleted,
+} from '../../infrastructure/analytics/posthog';
 
 type CheckoutStep = 'address' | 'payment' | 'summary';
 
@@ -28,6 +35,7 @@ export const CheckoutPage: React.FC = () => {
   useEffect(() => {
     finishPageLoad();
     window.scrollTo(0, 0);
+    trackCheckoutStarted(cart, currentStep);
   }, [finishPageLoad, currentStep]);
 
   // Check if an email is a legitimate user email (not an auto-generated internal string)
@@ -57,6 +65,18 @@ export const CheckoutPage: React.FC = () => {
   const [state, setState] = useState('Maharashtra');
   const [postalCode, setPostalCode] = useState('');
   const [deliveryInstructions, setDeliveryInstructions] = useState('');
+
+  // Non-blocking Postal PIN autofill hook for Indian PIN codes
+  const { loading: isPinLoading, data: pinData } = usePostalPincode(postalCode, {
+    onLookupSuccess: ({ city: autoCity, state: autoState }) => {
+      if (autoCity && (!city || city === pinData?.city)) {
+        setCity(autoCity);
+      }
+      if (autoState) {
+        setState(autoState);
+      }
+    },
+  });
 
   // Auto-sync when user session updates asynchronously
   useEffect(() => {
@@ -148,6 +168,7 @@ export const CheckoutPage: React.FC = () => {
   const handleProceedToPayment = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!validateAddress()) return;
+    trackCheckoutStepCompleted('address', { city: city.trim(), state, postalCode: postalCode.trim() });
     setSearchParams({ step: 'payment' });
   };
 
@@ -158,6 +179,7 @@ export const CheckoutPage: React.FC = () => {
       setSearchParams({ step: 'address' });
       return;
     }
+    trackCheckoutStepCompleted('payment', { paymentMethod: selectedMethod });
     setSearchParams({ step: 'summary' });
   };
 
@@ -174,6 +196,7 @@ export const CheckoutPage: React.FC = () => {
     const cleanPhone = phone.replace(/[^0-9]/g, '');
     const cleanPin = postalCode.replace(/[^0-9]/g, '');
 
+    trackPaymentAttempted(selectedMethod, cart.totalPaisa);
     setIsSubmitting(true);
 
     try {
@@ -229,6 +252,7 @@ export const CheckoutPage: React.FC = () => {
         idempotencyKey,
       });
 
+      trackOrderCompleted(newOrder);
       clearCart();
       navigate('/order-success', { state: { order: newOrder } });
     } catch (err: any) {
@@ -416,7 +440,21 @@ export const CheckoutPage: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] font-semibold mb-1 opacity-80">Postal PIN Code (6 Digits) *</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-[11px] font-semibold opacity-80">Postal PIN Code (6 Digits) *</label>
+                      {isPinLoading && (
+                        <span className="text-[10px] text-amber-500 font-normal inline-flex items-center gap-1">
+                          <i className="bi bi-arrow-repeat animate-spin text-[9px]" aria-hidden="true" />
+                          <span>Locating...</span>
+                        </span>
+                      )}
+                      {pinData && !isPinLoading && (
+                        <span className="text-[10px] text-emerald-500 font-normal inline-flex items-center gap-1">
+                          <i className="bi bi-check2-circle text-[10px]" aria-hidden="true" />
+                          <span>Autofilled ({pinData.city})</span>
+                        </span>
+                      )}
+                    </div>
                     <input
                       type="text"
                       required

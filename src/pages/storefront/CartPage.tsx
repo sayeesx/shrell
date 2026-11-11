@@ -7,6 +7,7 @@ import { productRepository } from '../../infrastructure/repositories';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 import { useTheme } from '../../application/ThemeContext';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
+import { trackCartViewed } from '../../infrastructure/analytics/posthog';
 
 export const CartPage: React.FC = () => {
   const { cart, settings, updateQuantity, removeItem, clearCart, applyCoupon, removeCoupon, addItem } = useCart();
@@ -39,6 +40,10 @@ export const CartPage: React.FC = () => {
     loadData();
     window.scrollTo(0, 0);
   }, [finishPageLoad]);
+
+  useEffect(() => {
+    trackCartViewed(cart);
+  }, []);
 
   const handleApplyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();

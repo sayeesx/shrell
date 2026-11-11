@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { account, isAppwriteConfigured } from '../infrastructure/appwrite/client';
 import { supabase, isSupabaseConfigured } from '../infrastructure/supabase/client';
+import { identifyUser, resetUser } from '../infrastructure/analytics/posthog';
 
 export interface UserSession {
   id: string;
@@ -34,7 +35,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserSession | null>(() => {
     try {
       const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : null;
+      const parsed = stored ? JSON.parse(stored) : null;
+      if (parsed) {
+        identifyUser(parsed.id, { name: parsed.name, email: parsed.email, phone: parsed.phone, role: parsed.role });
+      }
+      return parsed;
     } catch {
       return null;
     }
@@ -148,6 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     setUser(session);
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
+    identifyUser(session.id, { name: session.name, phone: session.phone, role: session.role });
   };
 
   const loginAsCustomer = async (name: string, email: string, phone: string) => {
@@ -171,6 +177,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     setUser(session);
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
+    identifyUser(session.id, { name: session.name, phone: session.phone, role: session.role });
   };
 
   const loginAsAdmin = async (password: string): Promise<boolean> => {
@@ -229,6 +236,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
+    resetUser();
     setUser(null);
     localStorage.removeItem(AUTH_STORAGE_KEY);
     if (isSupabaseConfigured) {

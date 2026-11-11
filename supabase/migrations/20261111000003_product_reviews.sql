@@ -50,3 +50,4 @@ VALUES
   ('rev-light-01', 'prod-night-raider', 'Arun Kumar', 5, 'Insane light throw on dark ghat roads', 'The amber DRL halo looks stunning and the high-output Osram chips turn pitch black mountain trails into daylight. IP67 waterproof passed pressure washer test.', true),
   ('rev-light-02', 'prod-night-raider', 'Deepak Joshi', 5, 'Best auxiliary lights in this price range', 'Wiring harness provided is heavy-gauge and automotive grade. No flickering even on rough off-road terrain. Highly recommended.', true)
 ON CONFLICT (id) DO NOTHING;
+

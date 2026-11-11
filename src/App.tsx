@@ -36,12 +36,17 @@ import { AdminHomeSections } from './pages/admin/AdminHomeSections';
 import { AdminCategories } from './pages/admin/AdminCategories';
 
 import { ScrollToTop } from './components/common/ScrollToTop';
+import { trackPageView } from './infrastructure/analytics/posthog';
 export const App: React.FC = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isHomePage = location.pathname === '/';
   const isCataloguePage = location.pathname.startsWith('/catalogue');
   const { isDark } = useTheme();
+
+  React.useEffect(() => {
+    trackPageView(location.pathname + location.search);
+  }, [location.pathname, location.search]);
 
   // Network offline state listener
   const [isOnline, setIsOnline] = React.useState<boolean>(

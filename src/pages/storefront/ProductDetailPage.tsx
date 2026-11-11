@@ -11,6 +11,7 @@ import { ProductCard } from '../../components/ui/ProductCard';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { ProductDetailSkeleton } from '../../components/common/ShimmerSkeleton';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
+import { trackProductViewed } from '../../infrastructure/analytics/posthog';
 
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -82,6 +83,7 @@ export const ProductDetailPage: React.FC = () => {
         if (p) {
           setProduct(p);
           setQuantity(1);
+          trackProductViewed(p);
 
           const [relatedRes, revList, rSummary] = await Promise.all([
             productRepository.getAll({ categorySlug: p.categoryId, limit: 4 }),

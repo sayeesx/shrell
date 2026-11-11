@@ -3,6 +3,7 @@ import { calculateCart } from '../domain/services/CartCalculationService';
 import { Cart, CartItem, Coupon, Product, StoreSettings } from '../domain/types';
 import { couponRepository, settingsRepository } from '../infrastructure/repositories';
 import { INITIAL_SETTINGS } from '../infrastructure/repositories/seedData';
+import { trackProductAddedToCart, trackProductRemovedFromCart, trackCouponApplied } from '../infrastructure/analytics/posthog';
 
 interface CartContextType {
   cart: Cart;
@@ -118,6 +119,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     setItems(newItems);
+    trackProductAddedToCart(product, quantity);
     return { success: true };
   };
 
@@ -143,6 +145,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const removeItem = (productId: string) => {
+    const itemToRemove = items.find((i) => i.productId === productId);
+    if (itemToRemove) {
+      trackProductRemovedFromCart(
+        itemToRemove.productId,
+        itemToRemove.product.name,
+        itemToRemove.unitPricePaisa,
+        itemToRemove.quantity
+      );
+    }
     setItems((prev) => prev.filter((i) => i.productId !== productId));
   };
 
@@ -160,12 +171,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const validCoupon = await couponRepository.getByCode(cleanCode);
       if (!validCoupon) {
+        trackCouponApplied(cleanCode, 0, false, 'Invalid or expired');
         return { success: false, message: `Coupon "${cleanCode}" is invalid or expired.` };
       }
 
       const currentSubtotal = items.reduce((acc, i) => acc + i.unitPricePaisa * i.quantity, 0);
       if (currentSubtotal < validCoupon.minOrderPaisa) {
         const requiredRupees = validCoupon.minOrderPaisa / 100;
+        trackCouponApplied(cleanCode, 0, false, 'Below minimum order');
         return {
           success: false,
           message: `Coupon requires a minimum order value of ₹${requiredRupees.toLocaleString('en-IN')}.`,
@@ -173,8 +186,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       setCoupon(validCoupon);
+      trackCouponApplied(cleanCode, validCoupon.discountType === 'PERCENTAGE' ? (currentSubtotal * validCoupon.discountValue) / 100 : validCoupon.discountValue, true);
       return { success: true, message: `Coupon "${validCoupon.code}" applied successfully.` };
     } catch {
+      trackCouponApplied(cleanCode, 0, false, 'Validation error');
       return { success: false, message: 'Could not validate coupon at this time.' };
     }
   };

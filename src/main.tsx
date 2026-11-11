@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PostHogProvider } from '@posthog/react';
+import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './application/AuthContext';
 import { VehicleProvider } from './application/VehicleContext';
 import { CartProvider } from './application/CartContext';
@@ -15,6 +16,7 @@ import './styles/index.css';
 const posthogOptions = {
   api_host: import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.com',
   defaults: '2026-08-30',
+  capture_performance: true,
 } as const;
 
 const posthogToken =
@@ -33,22 +35,24 @@ const queryClient = new QueryClient({
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <PostHogProvider apiKey={posthogToken} options={posthogOptions}>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <ThemeProvider>
-            <NavigationLoadingProvider>
-              <AuthProvider>
-                <VehicleProvider>
-                  <CartProvider>
-                    <App />
-                  </CartProvider>
-                </VehicleProvider>
-              </AuthProvider>
-            </NavigationLoadingProvider>
-          </ThemeProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-    </PostHogProvider>
+    <HelmetProvider>
+      <PostHogProvider apiKey={posthogToken} options={posthogOptions}>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <ThemeProvider>
+              <NavigationLoadingProvider>
+                <AuthProvider>
+                  <VehicleProvider>
+                    <CartProvider>
+                      <App />
+                    </CartProvider>
+                  </VehicleProvider>
+                </AuthProvider>
+              </NavigationLoadingProvider>
+            </ThemeProvider>
+          </BrowserRouter>
+        </QueryClientProvider>
+      </PostHogProvider>
+    </HelmetProvider>
   </React.StrictMode>
 );

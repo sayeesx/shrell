@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Disallow administrative, checkout and customer account routes
+Disallow: /admin
+Disallow: /admin/
+Disallow: /checkout
+Disallow: /cart
+Disallow: /profile
+Disallow: /orders
+Disallow: /track
+Disallow: /order-success
+Disallow: /order-failure
+Disallow: /offline
+
+# XML Sitemap
+Sitemap: https://shrell.vercel.app/sitemap.xml
+

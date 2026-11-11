@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTheme } from '../../application/ThemeContext';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
+import { SEOHead } from '../../infrastructure/seo/SEOHead';
 
 export const PoliciesPage: React.FC = () => {
   const location = useLocation();
@@ -13,12 +14,31 @@ export const PoliciesPage: React.FC = () => {
     finishPageLoad();
   }, [finishPageLoad]);
 
+  let policyTitle = 'Policies & Operations | SHRELL Automotive';
+  let policyDesc = 'Customer operations, surface dispatch standards, returns, and privacy policies for SHRELL Automotive India.';
+
+  if (path === '/shipping-policy') {
+    policyTitle = 'Shipping & Surface Freight Policy | SHRELL Automotive';
+    policyDesc = 'All orders dispatched via BlueDart and Delhivery Express logistics from Pune. Free shipping across India on orders over ₹300.';
+  } else if (path === '/returns-policy') {
+    policyTitle = '7-Day Fitment Guarantee & Returns Policy | SHRELL Automotive';
+    policyDesc = 'Review SHRELL Automotive 7-day fitment guarantee, hassle-free returns, replacement terms, and vehicle compatibility verification.';
+  } else if (path === '/privacy-policy') {
+    policyTitle = 'Privacy & Data Protection Policy | SHRELL Automotive';
+    policyDesc = 'Information on data privacy, transaction encryption, and customer confidentiality at SHRELL Automotive India.';
+  }
+
   const sectionCls = `p-6 rounded-lg border space-y-4 ${isDark ? 'bg-surface-900 border-surface-700' : 'bg-white border-[#E0DBD2]'}`;
   const headingCls = `text-base font-bold ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`;
   const bodyCls = isDark ? 'text-slate-300' : 'text-[#3A3030]';
 
   return (
     <div className={`max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12 text-sm leading-relaxed ${isDark ? 'text-slate-300' : 'text-[#3A3030]'}`}>
+      <SEOHead
+        title={policyTitle}
+        description={policyDesc}
+        canonicalPath={path}
+      />
       {/* 1. Shipping Policy */}
       {(path === '/shipping-policy' || path === '/policies') && (
         <section className="space-y-4">

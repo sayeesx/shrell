@@ -51,6 +51,8 @@ export const ProductImagePlaceholder: React.FC<ProductImagePlaceholderProps> = (
           referrerPolicy="no-referrer"
           className="w-full h-full object-contain pointer-events-none"
           loading="lazy"
+          width="400"
+          height="300"
           onError={() => setHasError(true)}
         />
       ) : (
@@ -60,6 +62,8 @@ export const ProductImagePlaceholder: React.FC<ProductImagePlaceholderProps> = (
           alt={alt}
           className={`w-[84%] h-[74%] max-w-[88%] max-h-[78%] object-contain pointer-events-none ${isDark ? 'opacity-70' : 'opacity-90'}`}
           loading="lazy"
+          width="320"
+          height="120"
         />
       )}
 

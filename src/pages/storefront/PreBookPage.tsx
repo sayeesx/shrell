@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../../application/ThemeContext';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
+import { SEOHead } from '../../infrastructure/seo/SEOHead';
 
 export const PreBookPage: React.FC = () => {
   const { isDark } = useTheme();
@@ -14,6 +15,11 @@ export const PreBookPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen flex items-center justify-center p-6 ${isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'}`}>
+      <SEOHead
+        title="Pre-Book Coming Soon | SHRELL Automotive"
+        description="Exclusive automotive equipment pre-booking."
+        noIndex={true}
+      />
       <div className="max-w-md w-full text-center space-y-6 -mt-20">
         <div className="space-y-3">
           <div className={`w-16 h-16 mx-auto rounded-2xl flex items-center justify-center border shadow-xs ${

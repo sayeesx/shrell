@@ -8,6 +8,8 @@ import { searchProductsWithFuse } from '../../infrastructure/search/searchServic
 import { trackSearchPerformed } from '../../infrastructure/analytics/posthog';
 import { useTheme } from '../../application/ThemeContext';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
+import { SEOHead } from '../../infrastructure/seo/SEOHead';
+import { generateBreadcrumbSchema } from '../../infrastructure/seo/schemaGenerators';
 
 type SortOption = 'relevance' | 'price-asc' | 'price-desc' | 'rating-desc';
 
@@ -128,10 +130,48 @@ export const CataloguePage: React.FC = () => {
     setSearchParams({}, { replace: true });
   };
 
+  const matchedCategory = useMemo(() => {
+    if (!urlCategory) return null;
+    const catLower = urlCategory.toLowerCase();
+    return categories.find(
+      (c) => c.slug.toLowerCase() === catLower || c.id.toLowerCase() === catLower
+    );
+  }, [categories, urlCategory]);
+
+  const pageTitle = matchedCategory
+    ? `${matchedCategory.name} | Buy Online at SHRELL`
+    : 'Car Accessories & Touring Equipment Catalogue | SHRELL Automotive';
+
+  const pageDescription = matchedCategory
+    ? (matchedCategory.description || `Browse high-performance ${matchedCategory.name} engineered for Indian vehicles. Buy online at SHRELL.`)
+    : 'Explore the complete SHRELL Automotive equipment catalogue: auxiliary lighting, aerodynamic crossbars, 7D floor liners, and heavy-duty 12V tyre inflators.';
+
+  const canonicalPath = matchedCategory
+    ? `/catalogue?category=${encodeURIComponent(matchedCategory.slug)}`
+    : '/catalogue';
+
+  const breadcrumbItems = matchedCategory
+    ? [
+        { name: 'Home', url: '/' },
+        { name: 'Catalogue', url: '/catalogue' },
+        { name: matchedCategory.name, url: canonicalPath },
+      ]
+    : [
+        { name: 'Home', url: '/' },
+        { name: 'Catalogue', url: '/catalogue' },
+      ];
+
   return (
     <div className={`min-h-screen py-6 px-4 sm:px-6 lg:px-8 transition-colors ${
       isDark ? 'bg-[#000000] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'
     }`}>
+      <SEOHead
+        title={pageTitle}
+        description={pageDescription}
+        canonicalPath={canonicalPath}
+        noIndex={Boolean(urlQuery.trim())}
+        structuredData={generateBreadcrumbSchema(breadcrumbItems)}
+      />
       <div className="max-w-7xl mx-auto space-y-5">
         {/* Search Bar & Themed Controls Bar */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">

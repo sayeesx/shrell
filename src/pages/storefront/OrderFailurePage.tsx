@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useTheme } from '../../application/ThemeContext';
+import { SEOHead } from '../../infrastructure/seo/SEOHead';
 
 export const OrderFailurePage: React.FC = () => {
   const location = useLocation();
@@ -12,6 +13,11 @@ export const OrderFailurePage: React.FC = () => {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'}`}>
+      <SEOHead
+        title="Payment Interrupted | SHRELL Automotive"
+        description="The transaction was declined or interrupted."
+        noIndex={true}
+      />
       <div className="max-w-md mx-auto px-4 py-4 sm:py-8 space-y-6">
 
         {/* Topbar */}

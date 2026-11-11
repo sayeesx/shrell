@@ -10,6 +10,7 @@ import { useTheme } from '../../application/ThemeContext';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { StateSearchDropdown } from '../../components/checkout/StateSearchDropdown';
 import { usePostalPincode } from '../../hooks/usePostalPincode';
+import { SEOHead } from '../../infrastructure/seo/SEOHead';
 import {
   trackCheckoutStarted,
   trackCheckoutStepCompleted,
@@ -326,6 +327,11 @@ export const CheckoutPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'}`}>
+      <SEOHead
+        title="Secure Checkout | SHRELL Automotive"
+        description="Complete your order securely with UPI, Cards, Netbanking or Cash on Delivery."
+        noIndex={true}
+      />
       <div className="max-w-xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-32 sm:pb-36 md:pb-12 space-y-4">
 
         {/* Topbar Header (Pure clean navigation matching exact reference images) */}

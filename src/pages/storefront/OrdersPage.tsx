@@ -8,6 +8,7 @@ import { orderRepository } from '../../infrastructure/repositories';
 import { formatINR } from '../../domain/services/CurrencyService';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
 import { ProfileOrdersSkeleton } from '../../components/common/ShimmerSkeleton';
+import { SEOHead } from '../../infrastructure/seo/SEOHead';
 
 export const OrdersPage: React.FC = () => {
   const { user, openAuthModal } = useAuth();
@@ -52,6 +53,11 @@ export const OrdersPage: React.FC = () => {
       <div className={`min-h-screen flex items-center justify-center px-4 py-16 transition-colors ${
         isDark ? 'bg-[#000000] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'
       }`}>
+        <SEOHead
+          title="My Orders | SHRELL Automotive"
+          description="Log in to view your orders and shipments."
+          noIndex={true}
+        />
         <div className={`max-w-md w-full rounded-2xl border p-8 text-center space-y-6 ${
           isDark ? 'bg-surface-900 border-surface-800' : 'bg-white border-[#E0DBD2] shadow-sm'
         }`}>
@@ -94,6 +100,11 @@ export const OrdersPage: React.FC = () => {
     <div className={`min-h-screen py-6 sm:py-10 px-4 sm:px-6 lg:px-8 transition-colors ${
       isDark ? 'bg-[#000000] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'
     }`}>
+      <SEOHead
+        title="My Orders & Shipments | SHRELL Automotive"
+        description="View past orders and live tracking."
+        noIndex={true}
+      />
       <div className="max-w-4xl mx-auto space-y-6">
 
         {/* Top Header Row */}

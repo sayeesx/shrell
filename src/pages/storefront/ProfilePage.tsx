@@ -6,6 +6,7 @@ import { useTheme } from '../../application/ThemeContext';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 import { Order } from '../../domain/types';
 import { orderRepository } from '../../infrastructure/repositories';
+import { SEOHead } from '../../infrastructure/seo/SEOHead';
 
 export const ProfilePage: React.FC = () => {
   const { user, logout, openAuthModal } = useAuth();
@@ -43,6 +44,11 @@ export const ProfilePage: React.FC = () => {
   if (!user) {
     return (
       <div className={`min-h-[75vh] flex items-center justify-center px-4 py-16 ${isDark ? 'bg-[#0D0F14]' : 'bg-[#FFFEFA]'}`}>
+        <SEOHead
+          title="Account Login | SHRELL Automotive"
+          description="Log in to view orders, saved addresses, and profile."
+          noIndex={true}
+        />
         <div className={`max-w-md w-full rounded-2xl border p-8 text-center space-y-6 ${isDark ? 'bg-surface-900 border-surface-800' : 'bg-white border-[#E0DBD2]'}`}>
           <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto ${isDark ? 'bg-surface-800 border-surface-700 border text-slate-400' : 'bg-[#F5F3EE] border-[#E0DBD2] border text-[#8E8587]'}`}>
             <i className="bi bi-person text-3xl" aria-hidden="true" />
@@ -76,6 +82,11 @@ export const ProfilePage: React.FC = () => {
 
   return (
     <div className={`min-h-screen py-6 sm:py-10 px-4 sm:px-6 ${isDark ? 'bg-[#0D0F14]' : 'bg-[#FFFEFA]'}`}>
+      <SEOHead
+        title="My Account | SHRELL Automotive"
+        description="Customer profile and order history."
+        noIndex={true}
+      />
       <div className="max-w-3xl mx-auto space-y-6">
 
         {/* Navigation Breadcrumb / Home Link */}

@@ -9,6 +9,7 @@ import { useNavigationLoading } from '../../application/NavigationLoadingContext
 import { useTheme } from '../../application/ThemeContext';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
 import { trackCartViewed } from '../../infrastructure/analytics/posthog';
+import { SEOHead } from '../../infrastructure/seo/SEOHead';
 
 export const CartPage: React.FC = () => {
   const { cart, settings, updateQuantity, removeItem, clearCart, applyCoupon, removeCoupon, addItem } = useCart();
@@ -301,6 +302,11 @@ export const CartPage: React.FC = () => {
       <div className={`min-h-screen flex flex-col transition-colors duration-300 ${
         isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'
       }`}>
+        <SEOHead
+          title="Shopping Cart | SHRELL Automotive"
+          description="Review your selected automotive accessories and equipment before checkout."
+          noIndex={true}
+        />
         {/* Top Header - Fixed/pinned at top without compression */}
         <div className={`w-full border-b shrink-0 ${isDark ? 'border-[#2D161A]' : 'border-[#D0C9BE]'}`}>
           <div className="max-w-md md:max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -352,6 +358,11 @@ export const CartPage: React.FC = () => {
     <div className={`min-h-screen transition-colors duration-300 ${
       isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'
     }`}>
+      <SEOHead
+        title="Shopping Cart | SHRELL Automotive"
+        description="Review your selected automotive accessories and equipment before checkout."
+        noIndex={true}
+      />
 
       {/* ========================================================================= */}
       {/* MOBILE LAYOUT                                                             */}

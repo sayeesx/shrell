@@ -5,6 +5,7 @@ import { Order } from '../../domain/types';
 import { formatINR } from '../../domain/services/CurrencyService';
 import { whatsAppService } from '../../features/whatsapp/WhatsAppService';
 import { useTheme } from '../../application/ThemeContext';
+import { SEOHead } from '../../infrastructure/seo/SEOHead';
 
 export const OrderSuccessPage: React.FC = () => {
   const location = useLocation();
@@ -57,6 +58,11 @@ export const OrderSuccessPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'}`}>
+      <SEOHead
+        title="Order Confirmed | SHRELL Automotive"
+        description="Your order has been confirmed successfully."
+        noIndex={true}
+      />
       <div className="max-w-md mx-auto px-4 py-4 sm:py-8 space-y-6">
 
         {/* Topbar (Matching Reference Screen 3: Back | Checkout | Bag) */}

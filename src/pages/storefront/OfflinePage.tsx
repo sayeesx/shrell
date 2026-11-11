@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { useTheme } from '../../application/ThemeContext';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
+import { SEOHead } from '../../infrastructure/seo/SEOHead';
 
 interface OfflinePageProps {
   onRetry?: () => void;
@@ -52,6 +53,11 @@ export const OfflinePage: React.FC<OfflinePageProps> = ({ onRetry }) => {
       role="alert"
       aria-live="polite"
     >
+      <SEOHead
+        title="Network Offline | SHRELL Automotive"
+        description="Check your network connection."
+        noIndex={true}
+      />
       <div className="max-w-md w-full flex flex-col items-center gap-7">
         <div className="relative w-36 h-36 sm:w-44 sm:h-44 flex items-center justify-center">
           <ShrellLoader size={120} />

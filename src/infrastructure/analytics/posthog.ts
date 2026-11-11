@@ -33,6 +33,7 @@ export function initPostHog(): void {
         capture_pageleave: true,
         autocapture: false, // Explicit, clean funnel tracking
         disable_session_recording: false,
+        capture_performance: true, // Native Core Web Vitals capture (LCP, INP, CLS)
         persistence: 'localStorage+cookie',
       });
       isPostHogInitialized = true;

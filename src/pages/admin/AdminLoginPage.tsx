@@ -4,6 +4,7 @@ import { useAuth } from '../../application/AuthContext';
 import { useTheme } from '../../application/ThemeContext';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
+import { SEOHead } from '../../infrastructure/seo/SEOHead';
 
 export const AdminLoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -30,6 +31,11 @@ export const AdminLoginPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-200 ${isDark ? 'bg-slate-950' : 'bg-slate-50'}`}>
+      <SEOHead
+        title="Admin Sign In | SHRELL Automotive"
+        description="Administrative authentication portal."
+        noIndex={true}
+      />
       {/* Theme toggle top-right */}
       <div className="fixed top-4 right-4">
         <ThemeToggle />

@@ -5,6 +5,7 @@ import { formatINR } from '../../domain/services/CurrencyService';
 import { useTheme } from '../../application/ThemeContext';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
+import { SEOHead } from '../../infrastructure/seo/SEOHead';
 
 export const OrderTrackingPage: React.FC = () => {
   const [orderQuery, setOrderQuery] = useState('');
@@ -46,6 +47,11 @@ export const OrderTrackingPage: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+      <SEOHead
+        title="Track Your Consignment | SHRELL Automotive"
+        description="Track your domestic surface courier shipment and delivery status."
+        noIndex={true}
+      />
       {/* Page Title */}
       <div className="text-center space-y-2">
         <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-[#140E10]'}`}>

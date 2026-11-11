@@ -4,6 +4,7 @@ import { useAuth } from '../../application/AuthContext';
 import { useTheme } from '../../application/ThemeContext';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
 import { getRepositoryMode } from '../../infrastructure/repositories';
+import { SEOHead } from '../../infrastructure/seo/SEOHead';
 
 export const AdminLayout: React.FC = () => {
   const { user, isAdmin, logout } = useAuth();
@@ -31,6 +32,11 @@ export const AdminLayout: React.FC = () => {
 
   return (
     <div className={`min-h-screen flex flex-col md:flex-row transition-colors duration-200 ${isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
+      <SEOHead
+        title="Admin Console | SHRELL Automotive"
+        description="Internal administration dashboard."
+        noIndex={true}
+      />
       {/* Sidebar */}
       <aside className={`w-full md:w-64 flex flex-col flex-shrink-0 transition-colors duration-200 ${isDark ? 'bg-slate-900 border-r border-slate-800' : 'bg-white border-r border-slate-200'}`}>
         {/* Brand Header */}

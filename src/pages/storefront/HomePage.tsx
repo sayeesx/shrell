@@ -11,6 +11,8 @@ import { ProductCard } from '../../components/ui/ProductCard';
 import { HomePageSkeleton } from '../../components/common/ShimmerSkeleton';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 import { useTheme } from '../../application/ThemeContext';
+import { SEOHead } from '../../infrastructure/seo/SEOHead';
+import { generateOrganizationSchema, generateWebSiteSchema } from '../../infrastructure/seo/schemaGenerators';
 
 export const HomePage: React.FC = () => {
   const { finishPageLoad } = useNavigationLoading();
@@ -133,6 +135,16 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="space-y-8 sm:space-y-12 pb-20">
+      <SEOHead
+        title="SHRELL Automotive | Premium Car Accessories in India"
+        description="Shop premium car accessories and touring equipment for Indian vehicles. OSRAM auxiliary lighting, aerodynamic crossbars, 7D floor liners, and heavy-duty 12V tyre inflators."
+        canonicalPath="/"
+        ogType="website"
+        ogImage="/shrell-opengraph.png"
+        ogImageAlt="SHRELL Automotive - Premium Car Accessories & Touring Equipment"
+        structuredData={[generateOrganizationSchema(), generateWebSiteSchema()]}
+      />
+      <h1 className="sr-only">SHRELL Automotive | Premium Car Accessories in India</h1>
       {/* 
         ================================================================
         Hero Banner Section (No Background)

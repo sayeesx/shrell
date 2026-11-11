@@ -1,6 +1,17 @@
 {
   "rewrites": [
     {
+      "source": "/product/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Facebot|Twitterbot|LinkedInBot|WhatsApp|TelegramBot|Slackbot|Discordbot|Pinterest|SkypeUriPreview).*"
+        }
+      ],
+      "destination": "/api/crawler-handler?slug=:slug"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

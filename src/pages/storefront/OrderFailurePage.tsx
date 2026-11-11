@@ -15,7 +15,7 @@ export const OrderFailurePage: React.FC = () => {
       <div className="max-w-md mx-auto px-4 py-4 sm:py-8 space-y-6">
 
         {/* Topbar */}
-        <div className="flex items-center justify-between pb-3 border-b border-inherit/20">
+        <div className={`flex items-center justify-between pb-3 border-b ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
           <button
             type="button"
             onClick={() => navigate('/cart')}

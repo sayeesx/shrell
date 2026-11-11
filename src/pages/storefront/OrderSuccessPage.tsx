@@ -60,7 +60,7 @@ export const OrderSuccessPage: React.FC = () => {
       <div className="max-w-md mx-auto px-4 py-4 sm:py-8 space-y-6">
 
         {/* Topbar (Matching Reference Screen 3: Back | Checkout | Bag) */}
-        <div className="flex items-center justify-between pb-3 border-b border-inherit/20">
+        <div className={`flex items-center justify-between pb-3 border-b ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
           <button
             type="button"
             onClick={() => navigate('/')}
@@ -136,7 +136,7 @@ export const OrderSuccessPage: React.FC = () => {
                 <span className="text-gray-400">Payment Mode</span>
                 <span className="font-semibold">{order.paymentMethod === 'MANUAL_UPI' ? 'Direct UPI' : order.paymentMethod}</span>
               </div>
-              <div className="flex justify-between pt-1 border-t border-inherit/20">
+              <div className={`flex justify-between pt-1 border-t ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
                 <span className="text-gray-400">Shipment</span>
                 <span className="text-right truncate max-w-[200px]">
                   {order.shippingAddress.city}, {order.shippingAddress.state}

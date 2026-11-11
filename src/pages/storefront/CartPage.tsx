@@ -75,7 +75,7 @@ export const CartPage: React.FC = () => {
         isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'
       }`}>
         {/* Top Header - Fixed/pinned at top without compression */}
-        <div className="w-full border-b border-inherit/20 shrink-0">
+        <div className={`w-full border-b shrink-0 ${isDark ? 'border-[#2D161A]' : 'border-[#D0C9BE]'}`}>
           <div className="max-w-md md:max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
             <button
               type="button"
@@ -132,7 +132,7 @@ export const CartPage: React.FC = () => {
       <div className="block md:hidden max-w-md mx-auto px-3.5 py-3 pb-32 sm:pb-36 space-y-2">
 
         {/* 1. Mobile Header (Back button | My Cart | Theme toggle) */}
-        <div className="flex items-center justify-between pb-2 border-b border-inherit/20">
+        <div className={`flex items-center justify-between pb-2 border-b ${isDark ? 'border-[#2D161A]' : 'border-[#D0C9BE]'}`}>
           <button
             type="button"
             onClick={() => navigate(-1)}
@@ -333,7 +333,7 @@ export const CartPage: React.FC = () => {
                       </p>
                     </div>
 
-                    <div className="mt-1.5 pt-1 border-t border-inherit/20">
+                    <div className={`mt-1.5 pt-1 border-t ${isDark ? 'border-[#2D161A]' : 'border-[#D0C9BE]'}`}>
                       {currentQty > 0 ? (
                         <div className="w-full flex items-center justify-between rounded-md bg-[#FF000E] text-white py-0.5 px-2 font-bold text-xs">
                           <button
@@ -453,7 +453,7 @@ export const CartPage: React.FC = () => {
             </div>
           )}
 
-          <div className="pt-1.5 border-t border-inherit/20 flex justify-between items-center">
+          <div className={`pt-1.5 border-t flex justify-between items-center ${isDark ? 'border-[#2D161A]' : 'border-[#D0C9BE]'}`}>
             <span className="font-bold text-xs sm:text-sm">Total</span>
             <span className={`font-extrabold text-sm sm:text-base ${isDark ? 'text-white' : 'text-black'}`}>
               {formatINR(cart.totalPaisa)}
@@ -500,7 +500,7 @@ export const CartPage: React.FC = () => {
       <div className="hidden md:block max-w-6xl mx-auto px-6 lg:px-8 py-8 space-y-6">
 
         {/* Desktop Header */}
-        <div className="flex items-center justify-between border-b pb-4 border-inherit/20">
+        <div className={`flex items-center justify-between border-b pb-4 ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
           <div>
             <h1 className="text-2xl lg:text-3xl font-extrabold tracking-tight">My Shopping Cart</h1>
             <p className={`text-xs mt-1 ${isDark ? 'text-[#8E8587]' : 'text-[#706869]'}`}>
@@ -621,7 +621,7 @@ export const CartPage: React.FC = () => {
                     </div>
 
                     {/* Quantity Stepper & Remove */}
-                    <div className="flex items-center justify-between pt-2 border-t border-inherit/20">
+                    <div className={`flex items-center justify-between pt-2 border-t ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
                       <div className="flex items-center gap-1.5">
                         <button
                           type="button"
@@ -715,7 +715,7 @@ export const CartPage: React.FC = () => {
                           </p>
                         </div>
 
-                        <div className="mt-2 pt-1.5 border-t border-inherit/20">
+                        <div className={`mt-2 pt-1.5 border-t ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
                           {currentQty > 0 ? (
                             <div className="w-full flex items-center justify-between rounded-md bg-[#FF000E] text-white py-1 px-2 font-bold text-xs">
                               <button
@@ -815,7 +815,7 @@ export const CartPage: React.FC = () => {
             <div className={`p-4 rounded-xl border space-y-3 ${
               isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
             }`}>
-              <h2 className="font-bold text-xs uppercase tracking-wider border-b pb-2 border-inherit/20">
+              <h2 className={`font-bold text-xs uppercase tracking-wider border-b pb-2 ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
                 Order Summary
               </h2>
 
@@ -849,7 +849,7 @@ export const CartPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-inherit/20 flex justify-between items-center">
+              <div className={`pt-2 border-t flex justify-between items-center ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
                 <span className="font-bold text-sm">Total</span>
                 <span className={`font-extrabold text-lg ${isDark ? 'text-white' : 'text-black'}`}>
                   {formatINR(cart.totalPaisa)}
@@ -871,7 +871,7 @@ export const CartPage: React.FC = () => {
               </div>
 
               {/* Payment badges */}
-              <div className="pt-2 flex items-center justify-center gap-3 text-[10.5px] text-gray-400 border-t border-inherit/20">
+              <div className={`pt-2 flex items-center justify-center gap-3 text-[10.5px] text-gray-400 border-t ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
                 <span className="flex items-center gap-1">
                   <i className="bi bi-shield-lock-fill text-emerald-500" /> Secure Checkout
                 </span>

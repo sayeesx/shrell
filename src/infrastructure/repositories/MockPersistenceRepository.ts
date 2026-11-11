@@ -566,6 +566,10 @@ export class MockCouponRepository implements ICouponRepository {
     return [...this.coupons];
   }
 
+  async getAllCoupons(): Promise<Coupon[]> {
+    return this.getAll();
+  }
+
   async create(coupon: Omit<Coupon, 'id' | 'usedCount'>): Promise<Coupon> {
     this.coupons = loadFromStorage(STORAGE_KEYS.COUPONS, INITIAL_COUPONS);
     const newCoupon: Coupon = {

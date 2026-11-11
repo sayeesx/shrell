@@ -1,10 +1,21 @@
 import { isAppwriteConfigured } from '../appwrite/client';
+import { isSupabaseConfigured } from '../supabase/client';
 import {
   AppwriteCategoryRepository,
   AppwriteOrderRepository,
   AppwriteProductRepository,
   AppwriteSettingsRepository,
 } from './AppwriteRepository';
+import {
+  SupabaseBrandRepository,
+  SupabaseCategoryRepository,
+  SupabaseCouponRepository,
+  SupabaseInventoryRepository,
+  SupabaseOrderRepository,
+  SupabaseProductRepository,
+  SupabaseSettingsRepository,
+  SupabaseVehicleRepository,
+} from './SupabaseRepository';
 import {
   MockBrandRepository,
   MockCategoryRepository,
@@ -42,12 +53,23 @@ const appwriteCategoryRepo = new AppwriteCategoryRepository();
 const appwriteOrderRepo = new AppwriteOrderRepository();
 const appwriteSettingsRepo = new AppwriteSettingsRepository();
 
+// Supabase instances
+const supabaseProductRepo = new SupabaseProductRepository();
+const supabaseCategoryRepo = new SupabaseCategoryRepository();
+const supabaseBrandRepo = new SupabaseBrandRepository();
+const supabaseVehicleRepo = new SupabaseVehicleRepository();
+const supabaseInventoryRepo = new SupabaseInventoryRepository();
+const supabaseOrderRepo = new SupabaseOrderRepository();
+const supabaseCouponRepo = new SupabaseCouponRepository();
+const supabaseSettingsRepo = new SupabaseSettingsRepository();
+
 import { sanityProductRepository, sanityBannerRepository } from '../sanity/SanityRepository';
 import { isSanityConfigured } from '../sanity/sanityConfig';
 
-// Unified Product Repository supporting Sanity CMS, Appwrite, and local persistence
+// Unified Product Repository supporting Sanity CMS, Supabase, Appwrite, and local persistence
 class UnifiedProductRepository implements IProductRepository {
   private getBaseRepo(): IProductRepository {
+    if (isSupabaseConfigured) return supabaseProductRepo;
     return isAppwriteConfigured ? appwriteProductRepo : mockProductRepo;
   }
 
@@ -93,7 +115,7 @@ class UnifiedProductRepository implements IProductRepository {
       } catch (_) {}
     }
     const all = await this.getBaseRepo().getAll();
-    return all.products.filter((p) => p.isFeatured);
+    return all.products.filter((p: any) => p.isFeatured);
   }
 
   create(product: any): Promise<any> {
@@ -111,29 +133,45 @@ class UnifiedProductRepository implements IProductRepository {
 
 export const productRepository: IProductRepository = new UnifiedProductRepository();
 
-export const categoryRepository: ICategoryRepository = isAppwriteConfigured
-  ? appwriteCategoryRepo
-  : mockCategoryRepo;
+export const categoryRepository: ICategoryRepository = isSupabaseConfigured
+  ? supabaseCategoryRepo
+  : isAppwriteConfigured
+    ? appwriteCategoryRepo
+    : mockCategoryRepo;
 
-export const brandRepository: IBrandRepository = mockBrandRepo;
-export const vehicleRepository: IVehicleRepository = mockVehicleRepo;
-export const inventoryRepository: IInventoryRepository = mockInventoryRepo;
+export const brandRepository: IBrandRepository = isSupabaseConfigured
+  ? supabaseBrandRepo
+  : mockBrandRepo;
 
-export const orderRepository: IOrderRepository = isAppwriteConfigured
-  ? appwriteOrderRepo
-  : mockOrderRepo;
+export const vehicleRepository: IVehicleRepository = isSupabaseConfigured
+  ? supabaseVehicleRepo
+  : mockVehicleRepo;
 
-export const couponRepository: ICouponRepository = mockCouponRepo;
+export const inventoryRepository: IInventoryRepository = isSupabaseConfigured
+  ? supabaseInventoryRepo
+  : mockInventoryRepo;
 
-export const settingsRepository: ISettingsRepository = isAppwriteConfigured
-  ? appwriteSettingsRepo
-  : mockSettingsRepo;
+export const orderRepository: IOrderRepository = isSupabaseConfigured
+  ? supabaseOrderRepo
+  : isAppwriteConfigured
+    ? appwriteOrderRepo
+    : mockOrderRepo;
 
-export function getRepositoryMode(): 'SANITY_CMS' | 'APPWRITE_CLOUD' | 'PERSISTENT_LOCAL_STORAGE' {
+export const couponRepository: ICouponRepository = isSupabaseConfigured
+  ? supabaseCouponRepo
+  : mockCouponRepo;
+
+export const settingsRepository: ISettingsRepository = isSupabaseConfigured
+  ? supabaseSettingsRepo
+  : isAppwriteConfigured
+    ? appwriteSettingsRepo
+    : mockSettingsRepo;
+
+export function getRepositoryMode(): 'SUPABASE_POSTGRES' | 'SANITY_CMS' | 'APPWRITE_CLOUD' | 'PERSISTENT_LOCAL_STORAGE' {
+  if (isSupabaseConfigured) return 'SUPABASE_POSTGRES';
   if (isSanityConfigured()) return 'SANITY_CMS';
   return isAppwriteConfigured ? 'APPWRITE_CLOUD' : 'PERSISTENT_LOCAL_STORAGE';
 }
 
 export { bannerRepository } from './bannerRepository';
 export { sanityProductRepository, sanityBannerRepository };
-

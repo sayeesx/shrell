@@ -12,13 +12,30 @@ export interface CloudinaryUploadResult {
   height?: number;
 }
 
+export interface CloudinaryUploadOptions {
+  maxSizeBytes?: number;
+  allowedTypes?: string[];
+}
+
+const DEFAULT_ALLOWED_TYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/svg+xml',
+  'image/avif',
+  'image/gif',
+];
+
+const DEFAULT_MAX_SIZE = 10 * 1024 * 1024; // 10 MB
+
 class CloudinaryService {
   private cloudName: string;
   private uploadPreset: string;
 
   constructor() {
-    this.cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dy1i55fut';
-    this.uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'ECOMMERCE';
+    this.cloudName = (import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '').trim();
+    this.uploadPreset = (import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || '').trim();
   }
 
   public isConfigured(): boolean {
@@ -26,14 +43,35 @@ class CloudinaryService {
       this.cloudName &&
       this.uploadPreset &&
       this.cloudName !== 'your_cloud_name' &&
-      this.uploadPreset !== 'your_upload_preset'
+      this.uploadPreset !== 'your_upload_preset' &&
+      !this.cloudName.includes('placeholder')
     );
   }
 
   /**
-   * Upload an image file without compression or background alteration.
+   * Upload an image file with strict validation and HTTPS enforcement.
    */
-  public async uploadImage(file: File): Promise<CloudinaryUploadResult> {
+  public async uploadImage(
+    file: File,
+    options?: CloudinaryUploadOptions
+  ): Promise<CloudinaryUploadResult> {
+    const allowedTypes = options?.allowedTypes || DEFAULT_ALLOWED_TYPES;
+    const maxSizeBytes = options?.maxSizeBytes || DEFAULT_MAX_SIZE;
+
+    // Validate mime type
+    if (file.type && !allowedTypes.includes(file.type.toLowerCase())) {
+      throw new Error(
+        `Unsupported image format: ${file.type}. Allowed formats: JPEG, PNG, WebP, SVG, AVIF, GIF.`
+      );
+    }
+
+    // Validate file size
+    if (file.size > maxSizeBytes) {
+      const maxMb = (maxSizeBytes / (1024 * 1024)).toFixed(0);
+      const actualMb = (file.size / (1024 * 1024)).toFixed(2);
+      throw new Error(`File size (${actualMb} MB) exceeds maximum allowed size of ${maxMb} MB.`);
+    }
+
     // If Cloudinary is configured with real credentials, perform unsigned direct upload
     if (this.isConfigured()) {
       const formData = new FormData();
@@ -55,9 +93,8 @@ class CloudinaryService {
 
         const data = await response.json();
         const rawUrl = data.secure_url || data.url || '';
-        const secureUrl = rawUrl.startsWith('http://')
-          ? rawUrl.replace(/^http:\/\//, 'https://')
-          : rawUrl;
+        const secureUrl = rawUrl.replace(/^http:\/\//i, 'https://');
+
         return {
           url: secureUrl,
           publicId: data.public_id,
@@ -71,7 +108,7 @@ class CloudinaryService {
       }
     }
 
-    // Fallback: Read file as Data URL (instant local preview & persistence while credentials are added)
+    // Fallback: Read file as Data URL (instant preview & local persistence while credentials are added)
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {

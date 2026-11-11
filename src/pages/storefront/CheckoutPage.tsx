@@ -305,7 +305,7 @@ export const CheckoutPage: React.FC = () => {
       <div className="max-w-xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-32 sm:pb-36 md:pb-12 space-y-4">
 
         {/* Topbar Header (Pure clean navigation matching exact reference images) */}
-        <div className="flex items-center justify-between pb-3 border-b border-inherit/20">
+        <div className={`flex items-center justify-between pb-3 border-b ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
           <button
             type="button"
             onClick={handleBackNavigation}
@@ -351,7 +351,7 @@ export const CheckoutPage: React.FC = () => {
         {currentStep === 'address' && (
           <form onSubmit={handleProceedToPayment} className="space-y-4">
             <div className="space-y-3.5">
-              <div className="border-b pb-2 border-inherit/20">
+              <div className={`border-b pb-2 ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
                 <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2">
                   <i className="bi bi-geo-alt-fill text-[#FF000E]" />
                   <span>Consignee &amp; Delivery Details</span>
@@ -768,7 +768,7 @@ export const CheckoutPage: React.FC = () => {
             <div className={`p-3.5 sm:p-4 rounded-xl border space-y-3 ${
               isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
             }`}>
-              <div className="flex items-center justify-between border-b pb-2 border-inherit/20">
+              <div className={`flex items-center justify-between border-b pb-2 ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
                 <h3 className="font-bold text-xs sm:text-sm">Order Summary ({cart.items.length} items)</h3>
                 <Link to="/cart" className="text-xs text-[#FF000E] hover:underline font-semibold">
                   Review Cart

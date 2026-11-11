@@ -21,7 +21,7 @@ export const AdminCoupons: React.FC = () => {
 
   const loadCoupons = async () => {
     try {
-      const list = await (couponRepository as any).getAllCoupons();
+      const list = await (couponRepository.getAll ? couponRepository.getAll() : (couponRepository as any).getAllCoupons());
       setCoupons(list);
     } catch (err) {
       console.error('Failed to load coupons:', err);

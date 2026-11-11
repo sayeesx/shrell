@@ -12,6 +12,8 @@ import {
   Image,
   Database,
   Sparkles,
+  LayoutTemplate,
+  FolderTree,
 } from 'lucide-react';
 import { useAuth } from '../../application/AuthContext';
 import { useTheme } from '../../application/ThemeContext';
@@ -31,12 +33,14 @@ export const AdminLayout: React.FC = () => {
 
   const navItems = [
     { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+    { name: 'Home Sections (CMS)', path: '/admin/sections', icon: LayoutTemplate },
+    { name: 'Categories (CMS)', path: '/admin/categories', icon: FolderTree },
     { name: 'Hero Banners', path: '/admin/banners', icon: Image },
-    { name: 'Sanity CMS', path: '/admin/sanity', icon: Sparkles },
     { name: 'Products', path: '/admin/products', icon: Package },
     { name: 'Inventory & Movements', path: '/admin/inventory', icon: Layers },
     { name: 'Orders & Fulfilment', path: '/admin/orders', icon: ShoppingBag },
     { name: 'Coupons & Promos', path: '/admin/coupons', icon: Tag },
+    { name: 'Sanity CMS', path: '/admin/sanity', icon: Sparkles },
     { name: 'Settings', path: '/admin/settings', icon: Settings },
   ];
 

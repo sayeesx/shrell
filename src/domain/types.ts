@@ -252,3 +252,32 @@ export interface HeroBanner {
   order: number;
   createdAt: string;
 }
+
+export type HomeSectionType =
+  | 'PRODUCTS_GRID'
+  | 'PRODUCTS_CAROUSEL'
+  | 'CATEGORIES_GRID'
+  | 'EDITORIAL_BENTO'
+  | 'BANNER_PROMO';
+
+export interface HomeSection {
+  id: string;
+  title: string;
+  subtitle?: string;
+  sectionType: HomeSectionType;
+  displayOrder: number;
+  isActive: boolean;
+  categorySlug?: string;
+  limit?: number;
+  viewAllUrl?: string;
+  customBannerUrl?: string;
+  customBannerTargetUrl?: string;
+  bentoConfig?: {
+    highlightTitle?: string;
+    highlightBadge?: string;
+    card1Text?: string;
+    card2Text?: string;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+}

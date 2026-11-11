@@ -2,6 +2,7 @@ import {
   Brand,
   Category,
   Coupon,
+  HomeSection,
   InventoryMovement,
   Order,
   Product,
@@ -15,6 +16,7 @@ import {
   IBrandRepository,
   ICategoryRepository,
   ICouponRepository,
+  IHomeSectionRepository,
   IInventoryRepository,
   IOrderRepository,
   IProductRepository,
@@ -611,5 +613,102 @@ export class MockSettingsRepository implements ISettingsRepository {
     this.settings = { ...this.settings, ...updates };
     saveToStorage(STORAGE_KEYS.SETTINGS, this.settings);
     return { ...this.settings };
+  }
+}
+
+// ===================== HOME SECTIONS REPOSITORY =====================
+
+export const INITIAL_HOME_SECTIONS: HomeSection[] = [
+  {
+    id: 'sec-crazy-finds',
+    title: 'Crazy Finds',
+    subtitle: "Blink and you'll miss it",
+    sectionType: 'PRODUCTS_GRID',
+    displayOrder: 1,
+    isActive: true,
+    limit: 4,
+    viewAllUrl: '/catalogue',
+  },
+  {
+    id: 'sec-festival-deals',
+    title: 'Festival Declutter Deals 🪔',
+    subtitle: 'Verified genuine equipment with up to ₹15,000 instant festival discounts',
+    sectionType: 'PRODUCTS_GRID',
+    displayOrder: 2,
+    isActive: true,
+    limit: 4,
+    viewAllUrl: '/catalogue',
+  },
+  {
+    id: 'sec-editorial-bento',
+    title: 'Engineering & Precision',
+    subtitle: 'High-performance automotive hardware overview',
+    sectionType: 'EDITORIAL_BENTO',
+    displayOrder: 3,
+    isActive: true,
+    limit: 0,
+    viewAllUrl: '/catalogue',
+  },
+];
+
+export class MockHomeSectionRepository implements IHomeSectionRepository {
+  private sections: HomeSection[];
+
+  constructor() {
+    this.sections = loadFromStorage('shrell_home_sections_v1', INITIAL_HOME_SECTIONS);
+  }
+
+  async getAll(): Promise<HomeSection[]> {
+    this.sections = loadFromStorage('shrell_home_sections_v1', INITIAL_HOME_SECTIONS);
+    return [...this.sections].sort((a, b) => a.displayOrder - b.displayOrder);
+  }
+
+  async getById(id: string): Promise<HomeSection | null> {
+    const list = await this.getAll();
+    return list.find((s) => s.id === id) || null;
+  }
+
+  async create(section: Omit<HomeSection, 'id' | 'createdAt' | 'updatedAt'>): Promise<HomeSection> {
+    this.sections = loadFromStorage('shrell_home_sections_v1', INITIAL_HOME_SECTIONS);
+    const newSec: HomeSection = {
+      ...section,
+      id: `sec-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    this.sections.push(newSec);
+    saveToStorage('shrell_home_sections_v1', this.sections);
+    return newSec;
+  }
+
+  async update(id: string, updates: Partial<HomeSection>): Promise<HomeSection> {
+    this.sections = loadFromStorage('shrell_home_sections_v1', INITIAL_HOME_SECTIONS);
+    const idx = this.sections.findIndex((s) => s.id === id);
+    if (idx === -1) throw new Error(`Home section not found: ${id}`);
+    this.sections[idx] = {
+      ...this.sections[idx],
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    };
+    saveToStorage('shrell_home_sections_v1', this.sections);
+    return this.sections[idx];
+  }
+
+  async delete(id: string): Promise<boolean> {
+    this.sections = loadFromStorage('shrell_home_sections_v1', INITIAL_HOME_SECTIONS);
+    this.sections = this.sections.filter((s) => s.id !== id);
+    saveToStorage('shrell_home_sections_v1', this.sections);
+    return true;
+  }
+
+  async reorder(sectionIds: string[]): Promise<void> {
+    this.sections = loadFromStorage('shrell_home_sections_v1', INITIAL_HOME_SECTIONS);
+    this.sections.forEach((sec) => {
+      const idx = sectionIds.indexOf(sec.id);
+      if (idx !== -1) {
+        sec.displayOrder = idx + 1;
+      }
+    });
+    saveToStorage('shrell_home_sections_v1', this.sections);
   }
 }

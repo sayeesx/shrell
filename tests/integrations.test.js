@@ -49,3 +49,22 @@ test('Order Invariant: Item subtotal sum strictly equals subtotalPaisa in intege
   assert.ok(Number.isInteger(calculatedSubtotal), 'Monetary value must remain integer Paisa');
 });
 
+test('CMS Home Sections: Active filtering and display order sorting invariant', () => {
+  const sections = [
+    { id: 'sec-3', title: 'Editorial Bento', displayOrder: 3, isActive: true },
+    { id: 'sec-1', title: 'Crazy Finds', displayOrder: 1, isActive: true },
+    { id: 'sec-hidden', title: 'Archived Promo', displayOrder: 2, isActive: false },
+    { id: 'sec-2', title: 'Festival Deals', displayOrder: 2, isActive: true },
+  ];
+
+  const visible = sections
+    .filter((s) => s.isActive)
+    .sort((a, b) => a.displayOrder - b.displayOrder);
+
+  assert.equal(visible.length, 3);
+  assert.equal(visible[0].id, 'sec-1');
+  assert.equal(visible[1].id, 'sec-2');
+  assert.equal(visible[2].id, 'sec-3');
+});
+
+

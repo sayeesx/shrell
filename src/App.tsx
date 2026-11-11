@@ -32,6 +32,8 @@ import { AdminInventory } from './pages/admin/AdminInventory';
 import { AdminCoupons } from './pages/admin/AdminCoupons';
 import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminSanity } from './pages/admin/AdminSanity';
+import { AdminHomeSections } from './pages/admin/AdminHomeSections';
+import { AdminCategories } from './pages/admin/AdminCategories';
 
 import { ScrollToTop } from './components/common/ScrollToTop';
 import { ShrellLoader } from './components/common/ShrellLoader';
@@ -128,6 +130,8 @@ export const App: React.FC = () => {
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboardOverview />} />
+            <Route path="sections" element={<AdminHomeSections />} />
+            <Route path="categories" element={<AdminCategories />} />
             <Route path="banners" element={<AdminBanners />} />
             <Route path="sanity" element={<AdminSanity />} />
             <Route path="products" element={<AdminProducts />} />

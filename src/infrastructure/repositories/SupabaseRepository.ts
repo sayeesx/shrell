@@ -2,6 +2,7 @@ import {
   Brand,
   Category,
   Coupon,
+  HomeSection,
   InventoryMovement,
   Order,
   Product,
@@ -16,6 +17,7 @@ import {
   IBrandRepository,
   ICategoryRepository,
   ICouponRepository,
+  IHomeSectionRepository,
   IInventoryRepository,
   IOrderRepository,
   IProductRepository,
@@ -27,6 +29,7 @@ import {
   MockBrandRepository,
   MockCategoryRepository,
   MockCouponRepository,
+  MockHomeSectionRepository,
   MockInventoryRepository,
   MockOrderRepository,
   MockProductRepository,
@@ -1168,6 +1171,153 @@ export class SupabaseSettingsRepository implements ISettingsRepository {
       return updated;
     } catch {
       return this.fallback.updateSettings(settings);
+    }
+  }
+}
+
+// ==============================================================================
+// 9. HOME SECTIONS CMS REPOSITORY
+// ==============================================================================
+export class SupabaseHomeSectionRepository implements IHomeSectionRepository {
+  private fallback = new MockHomeSectionRepository();
+
+  private mapRowToSection(row: Record<string, any>): HomeSection {
+    return {
+      id: row.id,
+      title: row.title,
+      subtitle: row.subtitle || undefined,
+      sectionType: row.section_type,
+      displayOrder: row.display_order ?? 0,
+      isActive: Boolean(row.is_active),
+      categorySlug: row.category_slug || undefined,
+      limit: row.item_limit ?? 4,
+      viewAllUrl: row.view_all_url || undefined,
+      customBannerUrl: row.custom_banner_url || undefined,
+      customBannerTargetUrl: row.custom_banner_target_url || undefined,
+      bentoConfig: row.bento_config ? (typeof row.bento_config === 'string' ? JSON.parse(row.bento_config) : row.bento_config) : undefined,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    };
+  }
+
+  async getAll(): Promise<HomeSection[]> {
+    if (!isSupabaseConfigured) return this.fallback.getAll();
+    try {
+      const { data, error } = await supabase
+        .from('home_sections')
+        .select('*')
+        .order('display_order', { ascending: true });
+
+      if (error || !data) {
+        return this.fallback.getAll();
+      }
+
+      return data.map((r) => this.mapRowToSection(r));
+    } catch {
+      return this.fallback.getAll();
+    }
+  }
+
+  async getById(id: string): Promise<HomeSection | null> {
+    if (!isSupabaseConfigured) return this.fallback.getById(id);
+    try {
+      const { data, error } = await supabase
+        .from('home_sections')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (error || !data) return this.fallback.getById(id);
+      return this.mapRowToSection(data);
+    } catch {
+      return this.fallback.getById(id);
+    }
+  }
+
+  async create(section: Omit<HomeSection, 'id' | 'createdAt' | 'updatedAt'>): Promise<HomeSection> {
+    if (!isSupabaseConfigured) return this.fallback.create(section);
+    try {
+      const id = `sec-${Date.now()}`;
+      const payload = {
+        id,
+        title: section.title,
+        subtitle: section.subtitle || null,
+        section_type: section.sectionType,
+        display_order: section.displayOrder,
+        is_active: section.isActive,
+        category_slug: section.categorySlug || null,
+        item_limit: section.limit ?? 4,
+        view_all_url: section.viewAllUrl || null,
+        custom_banner_url: section.customBannerUrl || null,
+        custom_banner_target_url: section.customBannerTargetUrl || null,
+        bento_config: section.bentoConfig || null,
+      };
+
+      const { data, error } = await supabase
+        .from('home_sections')
+        .insert(payload)
+        .select()
+        .single();
+
+      if (error || !data) return this.fallback.create(section);
+      return this.mapRowToSection(data);
+    } catch {
+      return this.fallback.create(section);
+    }
+  }
+
+  async update(id: string, updates: Partial<HomeSection>): Promise<HomeSection> {
+    if (!isSupabaseConfigured) return this.fallback.update(id, updates);
+    try {
+      const payload: Record<string, any> = {};
+      if (updates.title !== undefined) payload.title = updates.title;
+      if (updates.subtitle !== undefined) payload.subtitle = updates.subtitle;
+      if (updates.sectionType !== undefined) payload.section_type = updates.sectionType;
+      if (updates.displayOrder !== undefined) payload.display_order = updates.displayOrder;
+      if (updates.isActive !== undefined) payload.is_active = updates.isActive;
+      if (updates.categorySlug !== undefined) payload.category_slug = updates.categorySlug;
+      if (updates.limit !== undefined) payload.item_limit = updates.limit;
+      if (updates.viewAllUrl !== undefined) payload.view_all_url = updates.viewAllUrl;
+      if (updates.customBannerUrl !== undefined) payload.custom_banner_url = updates.customBannerUrl;
+      if (updates.customBannerTargetUrl !== undefined) payload.custom_banner_target_url = updates.customBannerTargetUrl;
+      if (updates.bentoConfig !== undefined) payload.bento_config = updates.bentoConfig;
+
+      const { data, error } = await supabase
+        .from('home_sections')
+        .update(payload)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error || !data) return this.fallback.update(id, updates);
+      return this.mapRowToSection(data);
+    } catch {
+      return this.fallback.update(id, updates);
+    }
+  }
+
+  async delete(id: string): Promise<boolean> {
+    if (!isSupabaseConfigured) return this.fallback.delete(id);
+    try {
+      const { error } = await supabase.from('home_sections').delete().eq('id', id);
+      if (error) return this.fallback.delete(id);
+      return true;
+    } catch {
+      return this.fallback.delete(id);
+    }
+  }
+
+  async reorder(sectionIds: string[]): Promise<void> {
+    if (!isSupabaseConfigured) return this.fallback.reorder(sectionIds);
+    try {
+      for (let i = 0; i < sectionIds.length; i++) {
+        await supabase
+          .from('home_sections')
+          .update({ display_order: i + 1 })
+          .eq('id', sectionIds[i]);
+      }
+    } catch {
+      return this.fallback.reorder(sectionIds);
     }
   }
 }

@@ -2,6 +2,7 @@ import {
   Brand,
   Category,
   Coupon,
+  HomeSection,
   InventoryMovement,
   Order,
   Product,
@@ -87,4 +88,13 @@ export interface ICouponRepository {
 export interface ISettingsRepository {
   getSettings(): Promise<StoreSettings>;
   updateSettings(settings: Partial<StoreSettings>): Promise<StoreSettings>;
+}
+
+export interface IHomeSectionRepository {
+  getAll(): Promise<HomeSection[]>;
+  getById(id: string): Promise<HomeSection | null>;
+  create(section: Omit<HomeSection, 'id' | 'createdAt' | 'updatedAt'>): Promise<HomeSection>;
+  update(id: string, updates: Partial<HomeSection>): Promise<HomeSection>;
+  delete(id: string): Promise<boolean>;
+  reorder(sectionIds: string[]): Promise<void>;
 }

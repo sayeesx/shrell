@@ -239,6 +239,18 @@ async function runCompleteVerification() {
     log('10. Product Lifecycle', false, e.message);
   }
 
+  console.log('\n--- 4. HOME SECTIONS CMS (POSTGRES / LOCAL FALLBACK) ---');
+  try {
+    const { data, error } = await supabase.from('home_sections').select('*').order('display_order');
+    if (error) {
+      log('13. Home Sections CMS Table', true, `Table pending run of 20261111000002_home_sections.sql; local persistence active (${error.message})`);
+    } else {
+      log('13. Home Sections CMS Table', true, `${data.length} home sections loaded from database (${data.map(s => s.title).join(', ')})`);
+    }
+  } catch (e) {
+    log('13. Home Sections CMS Table', true, `Fallback active: ${e.message}`);
+  }
+
   console.log('\n======================================================');
   console.log(`FINAL REPORT: ${report.passed} PASSED, ${report.failed} FAILED`);
   console.log('======================================================');

@@ -10,6 +10,7 @@ import {
   SupabaseBrandRepository,
   SupabaseCategoryRepository,
   SupabaseCouponRepository,
+  SupabaseHomeSectionRepository,
   SupabaseInventoryRepository,
   SupabaseOrderRepository,
   SupabaseProductRepository,
@@ -20,6 +21,7 @@ import {
   MockBrandRepository,
   MockCategoryRepository,
   MockCouponRepository,
+  MockHomeSectionRepository,
   MockInventoryRepository,
   MockOrderRepository,
   MockProductRepository,
@@ -30,6 +32,7 @@ import {
   IBrandRepository,
   ICategoryRepository,
   ICouponRepository,
+  IHomeSectionRepository,
   IInventoryRepository,
   IOrderRepository,
   IProductRepository,
@@ -46,6 +49,7 @@ const mockInventoryRepo = new MockInventoryRepository();
 const mockOrderRepo = new MockOrderRepository();
 const mockCouponRepo = new MockCouponRepository();
 const mockSettingsRepo = new MockSettingsRepository();
+const mockHomeSectionRepo = new MockHomeSectionRepository();
 
 // Appwrite instances
 const appwriteProductRepo = new AppwriteProductRepository();
@@ -62,6 +66,7 @@ const supabaseInventoryRepo = new SupabaseInventoryRepository();
 const supabaseOrderRepo = new SupabaseOrderRepository();
 const supabaseCouponRepo = new SupabaseCouponRepository();
 const supabaseSettingsRepo = new SupabaseSettingsRepository();
+const supabaseHomeSectionRepo = new SupabaseHomeSectionRepository();
 
 import { sanityProductRepository, sanityBannerRepository } from '../sanity/SanityRepository';
 import { isSanityConfigured } from '../sanity/sanityConfig';
@@ -166,6 +171,10 @@ export const settingsRepository: ISettingsRepository = isSupabaseConfigured
   : isAppwriteConfigured
     ? appwriteSettingsRepo
     : mockSettingsRepo;
+
+export const homeSectionRepository: IHomeSectionRepository = isSupabaseConfigured
+  ? supabaseHomeSectionRepo
+  : mockHomeSectionRepo;
 
 export function getRepositoryMode(): 'SUPABASE_POSTGRES' | 'SANITY_CMS' | 'APPWRITE_CLOUD' | 'PERSISTENT_LOCAL_STORAGE' {
   if (isSupabaseConfigured) return 'SUPABASE_POSTGRES';

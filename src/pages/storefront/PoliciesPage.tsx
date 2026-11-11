@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Truck, RefreshCw, ShieldCheck } from 'lucide-react';
 import { useTheme } from '../../application/ThemeContext';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 
@@ -25,7 +24,7 @@ export const PoliciesPage: React.FC = () => {
         <section className="space-y-4">
           <div className={`flex items-center gap-3 border-b pb-3 ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
             <div className={`p-2 rounded border text-brand-500 ${isDark ? 'bg-surface-900 border-surface-700' : 'bg-[#F5F3EE] border-[#E0DBD2]'}`}>
-              <Truck className="w-5 h-5" />
+              <i className="bi bi-truck text-base" aria-hidden="true" />
             </div>
             <div>
               <h1 className={`text-xl font-bold font-mono ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
@@ -55,7 +54,7 @@ export const PoliciesPage: React.FC = () => {
         <section className="space-y-4">
           <div className={`flex items-center gap-3 border-b pb-3 ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
             <div className={`p-2 rounded border text-brand-500 ${isDark ? 'bg-surface-900 border-surface-700' : 'bg-[#F5F3EE] border-[#E0DBD2]'}`}>
-              <RefreshCw className="w-5 h-5" />
+              <i className="bi bi-arrow-repeat text-base" aria-hidden="true" />
             </div>
             <div>
               <h1 className={`text-xl font-bold font-mono ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
@@ -78,7 +77,7 @@ export const PoliciesPage: React.FC = () => {
         <section className="space-y-4">
           <div className={`flex items-center gap-3 border-b pb-3 ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
             <div className={`p-2 rounded border text-brand-500 ${isDark ? 'bg-surface-900 border-surface-700' : 'bg-[#F5F3EE] border-[#E0DBD2]'}`}>
-              <ShieldCheck className="w-5 h-5" />
+              <i className="bi bi-shield-check text-base" aria-hidden="true" />
             </div>
             <div>
               <h1 className={`text-xl font-bold font-mono ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>

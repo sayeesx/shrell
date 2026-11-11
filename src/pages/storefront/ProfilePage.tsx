@@ -34,7 +34,7 @@ export const ProfilePage: React.FC = () => {
           <button
             type="button"
             onClick={openAuthModal}
-            className="w-full py-3.5 px-6 rounded-full bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm transition-all cursor-pointer"
+            className="w-full py-3.5 px-6 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm transition-all cursor-pointer"
           >
             Login with Phone
           </button>
@@ -155,7 +155,7 @@ export const ProfilePage: React.FC = () => {
           <button
             type="button"
             onClick={logout}
-            className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-full border text-xs font-semibold transition-all cursor-pointer ${isDark ? 'border-surface-700 bg-surface-900 hover:bg-rose-950/60 hover:text-rose-400 hover:border-rose-800 text-slate-300' : 'border-[#E0DBD2] bg-white hover:bg-rose-50 hover:text-rose-500 hover:border-rose-200 text-[#5C5456]'}`}
+            className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${isDark ? 'border-surface-700 bg-surface-900 hover:bg-rose-950/60 hover:text-rose-400 hover:border-rose-800 text-slate-300' : 'border-[#E0DBD2] bg-white hover:bg-rose-50 hover:text-rose-500 hover:border-rose-200 text-[#5C5456]'}`}
           >
             <i className="bi bi-box-arrow-right text-sm" /> Sign Out
           </button>

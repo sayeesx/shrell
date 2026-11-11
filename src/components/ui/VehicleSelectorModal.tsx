@@ -64,7 +64,7 @@ export const VehicleSelectorModal: React.FC<VehicleSelectorModalProps> = ({ isOp
       role="dialog"
       aria-modal="true"
       aria-labelledby="vehicle-selector-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md"
     >
       <div className="relative w-full max-w-lg bg-white border border-gray-200/90 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
@@ -212,7 +212,7 @@ export const VehicleSelectorModal: React.FC<VehicleSelectorModalProps> = ({ isOp
             type="button"
             onClick={handleConfirmVehicle}
             disabled={!selectedMakeId || !selectedModelId}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-200 disabled:text-gray-400 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-sm active:scale-95"
+            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:bg-gray-200 disabled:text-gray-400 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-sm active:scale-95"
           >
             <i className="bi bi-check-lg text-sm" aria-hidden="true"></i>
             <span>Apply Fitment Filter</span>

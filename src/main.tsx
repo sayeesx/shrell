@@ -8,6 +8,7 @@ import { CartProvider } from './application/CartContext';
 import { NavigationLoadingProvider } from './application/NavigationLoadingContext';
 import { ThemeProvider } from './application/ThemeContext';
 import { App } from './App';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import './styles/index.css';
 
 const queryClient = new QueryClient({

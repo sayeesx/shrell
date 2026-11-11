@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Tag, Plus } from 'lucide-react';
 import { Coupon } from '../../domain/types';
 import { couponRepository } from '../../infrastructure/repositories';
 import { formatINR, rupeesToPaisa } from '../../domain/services/CurrencyService';
@@ -68,51 +67,52 @@ export const AdminCoupons: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
         <div>
-          <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
+          <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
             PROMOTIONAL COUPONS &amp; OFFERS
           </h1>
-          <p className={`text-xs font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
+          <p className={`text-xs font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             Configure percentage and fixed discount vouchers with minimum order thresholds
           </p>
         </div>
         <button
           type="button"
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2.5 rounded bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-1.5 transition-colors self-start sm:self-auto"
+          className="px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-1.5 transition-colors self-start sm:self-auto cursor-pointer shadow-sm"
         >
-          <Plus className="w-4 h-4" />
+          <i className="bi bi-plus-lg text-sm" aria-hidden="true" />
           <span>Create Coupon</span>
         </button>
       </div>
 
       {/* Coupons Table */}
-      <div className={`border rounded-lg overflow-x-auto ${isDark ? 'bg-surface-900 border-surface-700' : 'bg-white border-[#E0DBD2]'}`}>
+      <div className={`border rounded-xl overflow-x-auto shadow-xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
         <table className="w-full text-left text-xs font-mono min-w-[650px]">
-          <thead className={`border-b ${isDark ? 'bg-surface-950/60 border-surface-800 text-slate-400' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#5C5456]'}`}>
+          <thead className={`border-b ${isDark ? 'bg-slate-950/70 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
             <tr>
               {['Coupon Code','Discount Type','Value','Min Order','Usage Count','Status'].map(h => (
-                <th key={h} className="px-4 py-3">{h}</th>
+                <th key={h} className="px-4 py-3 font-semibold">{h}</th>
               ))}
             </tr>
           </thead>
-          <tbody className={`divide-y ${isDark ? 'divide-surface-800' : 'divide-[#E0DBD2]'}`}>
+          <tbody className={`divide-y ${isDark ? 'divide-slate-800' : 'divide-slate-200'}`}>
             {coupons.map((c) => (
-              <tr key={c.id} className={isDark ? 'hover:bg-surface-850/50' : 'hover:bg-[#F5F3EE]'}>
-                <td className="px-4 py-3 font-bold text-brand-400 flex items-center gap-2">
-                  <Tag className="w-3.5 h-3.5" /><span>{c.code}</span>
+              <tr key={c.id} className={isDark ? 'hover:bg-slate-850/50' : 'hover:bg-slate-50'}>
+                <td className={`px-4 py-3 font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  <i className="bi bi-tag text-xs text-slate-400" aria-hidden="true" />
+                  <span>{c.code}</span>
                 </td>
-                <td className={`px-4 py-3 ${isDark ? 'text-slate-300' : 'text-[#3A3030]'}`}>{c.discountType}</td>
-                <td className={`px-4 py-3 font-semibold ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
+                <td className={`px-4 py-3 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>{c.discountType}</td>
+                <td className={`px-4 py-3 font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   {c.discountType === 'PERCENTAGE'
                     ? `${c.discountValue}% (Max ${c.maxDiscountPaisa ? formatINR(c.maxDiscountPaisa) : 'None'})`
                     : formatINR(c.discountValue)}
                 </td>
-                <td className={`px-4 py-3 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>{formatINR(c.minOrderPaisa)}</td>
-                <td className={`px-4 py-3 ${isDark ? 'text-slate-300' : 'text-[#3A3030]'}`}>{c.usedCount} / {c.maxUses}</td>
+                <td className={`px-4 py-3 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{formatINR(c.minOrderPaisa)}</td>
+                <td className={`px-4 py-3 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>{c.usedCount} / {c.maxUses}</td>
                 <td className="px-4 py-3">
-                  <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-950/80 text-emerald-300 border border-emerald-800 font-bold">ACTIVE</span>
+                  <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-bold">ACTIVE</span>
                 </td>
               </tr>
             ))}
@@ -122,40 +122,40 @@ export const AdminCoupons: React.FC = () => {
 
       {/* Create Coupon Modal */}
       {isModalOpen && (
-        <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className={`relative w-full max-w-md border rounded-lg p-6 space-y-4 ${isDark ? 'bg-surface-900 border-surface-700' : 'bg-white border-[#E0DBD2]'}`}>
-            <h2 className={`text-sm font-bold font-mono uppercase tracking-wider border-b pb-2 ${isDark ? 'text-slate-100 border-surface-800' : 'text-[#140E10] border-[#E0DBD2]'}`}>
+        <div role="dialog" aria-modal="true" className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+          <div className={`relative w-full max-w-md border rounded-xl shadow-2xl p-6 space-y-4 ${isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-900'}`}>
+            <h2 className={`text-sm font-bold font-mono uppercase tracking-wider border-b pb-2 ${isDark ? 'text-white border-slate-800' : 'text-slate-900 border-slate-200'}`}>
               Create New Promotion Coupon
             </h2>
             <form onSubmit={handleCreateCoupon} className="space-y-4 text-xs font-mono">
               <div>
-                <label className={`block uppercase mb-1 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>Coupon Code *</label>
+                <label className={`block uppercase mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Coupon Code *</label>
                 <input type="text" required value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="e.g. MONSOON15"
-                  className={`w-full border rounded px-3 py-2 uppercase focus:outline-none focus:border-brand-500 ${isDark ? 'bg-surface-950 border-surface-700 text-slate-100' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10]'}`} />
+                  className={`w-full border rounded-lg px-3 py-2 uppercase transition-colors focus:outline-none ${isDark ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400' : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'}`} />
               </div>
               <div>
-                <label className={`block uppercase mb-1 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>Discount Type</label>
+                <label className={`block uppercase mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Discount Type</label>
                 <select value={discountType} onChange={(e) => setDiscountType(e.target.value as any)}
-                  className={`w-full border rounded px-3 py-2 focus:outline-none focus:border-brand-500 ${isDark ? 'bg-surface-950 border-surface-700 text-slate-100' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10]'}`}>
+                  className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${isDark ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400' : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'}`}>
                   <option value="PERCENTAGE">Percentage (%)</option>
                   <option value="FIXED_AMOUNT">Fixed INR Amount (₹)</option>
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={`block uppercase mb-1 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>{discountType === 'PERCENTAGE' ? 'Percentage Value' : 'Rupees Value'} *</label>
+                  <label className={`block uppercase mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{discountType === 'PERCENTAGE' ? 'Percentage Value' : 'Rupees Value'} *</label>
                   <input type="number" required min="1" value={discountValue} onChange={(e) => setDiscountValue(e.target.value)}
-                    className={`w-full border rounded px-3 py-2 focus:outline-none focus:border-brand-500 ${isDark ? 'bg-surface-950 border-surface-700 text-slate-100' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10]'}`} />
+                    className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${isDark ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400' : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'}`} />
                 </div>
                 <div>
-                  <label className={`block uppercase mb-1 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>Min Order (INR) *</label>
+                  <label className={`block uppercase mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Min Order (INR) *</label>
                   <input type="number" required value={minOrderRupees} onChange={(e) => setMinOrderRupees(e.target.value)}
-                    className={`w-full border rounded px-3 py-2 focus:outline-none focus:border-brand-500 ${isDark ? 'bg-surface-950 border-surface-700 text-slate-100' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10]'}`} />
+                    className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${isDark ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400' : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'}`} />
                 </div>
               </div>
-              <div className={`pt-2 flex justify-end gap-3 border-t ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
-                <button type="button" onClick={() => setIsModalOpen(false)} className={`px-4 py-2 ${isDark ? 'text-slate-400 hover:text-slate-200' : 'text-[#5C5456] hover:text-[#140E10]'}`}>Cancel</button>
-                <button type="submit" className="px-4 py-2 rounded bg-brand-500 hover:bg-brand-600 text-white font-bold uppercase tracking-wider">Save Coupon</button>
+              <div className={`pt-2 flex justify-end gap-3 border-t ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+                <button type="button" onClick={() => setIsModalOpen(false)} className={`px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'}`}>Cancel</button>
+                <button type="submit" className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-sm">Save Coupon</button>
               </div>
             </form>
           </div>

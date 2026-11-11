@@ -55,6 +55,9 @@ export default {
       boxShadow: {
         none: 'none',
       },
+      backdropBlur: {
+        xs: '2px',
+      },
     },
   },
   plugins: [],

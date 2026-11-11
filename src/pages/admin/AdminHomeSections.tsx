@@ -1,20 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Layers,
-  Plus,
-  Edit2,
-  Trash2,
-  X,
-  MoveUp,
-  MoveDown,
-  Eye,
-  EyeOff,
-  Grid,
-  Sliders,
-  Image as ImageIcon,
-  Layout,
-  ExternalLink,
-} from 'lucide-react';
 import { Category, HomeSection, HomeSectionType } from '../../domain/types';
 import {
   categoryRepository,
@@ -195,92 +179,91 @@ export const AdminHomeSections: React.FC = () => {
   const getSectionTypeBadge = (type: HomeSectionType) => {
     switch (type) {
       case 'PRODUCTS_GRID':
-        return { label: 'Product Grid', icon: Grid, color: 'text-brand-400 bg-brand-950/40 border-brand-800' };
+        return { label: 'Product Grid', icon: 'bi-grid-3x3-gap', color: 'text-slate-200 bg-slate-800 border-slate-700' };
       case 'PRODUCTS_CAROUSEL':
-        return { label: 'Carousel', icon: Sliders, color: 'text-amber-400 bg-amber-950/40 border-amber-800' };
+        return { label: 'Carousel', icon: 'bi-sliders', color: 'text-amber-500 bg-amber-500/10 border-amber-500/30' };
       case 'CATEGORIES_GRID':
-        return { label: 'Categories Grid', icon: Layout, color: 'text-blue-400 bg-blue-950/40 border-blue-800' };
+        return { label: 'Categories Grid', icon: 'bi-layout-text-window', color: 'text-blue-500 bg-blue-500/10 border-blue-500/30' };
       case 'EDITORIAL_BENTO':
-        return { label: 'Bento Feature', icon: Layers, color: 'text-purple-400 bg-purple-950/40 border-purple-800' };
+        return { label: 'Bento Feature', icon: 'bi-stack', color: 'text-purple-500 bg-purple-500/10 border-purple-500/30' };
       case 'BANNER_PROMO':
-        return { label: 'Promo Banner', icon: ImageIcon, color: 'text-emerald-400 bg-emerald-950/40 border-emerald-800' };
+        return { label: 'Promo Banner', icon: 'bi-image', color: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/30' };
       default:
-        return { label: type, icon: Grid, color: 'text-slate-400 bg-slate-900 border-slate-700' };
+        return { label: type, icon: 'bi-grid', color: 'text-slate-400 bg-slate-800 border-slate-700' };
     }
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
         <div>
-          <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
+          <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
             HOME SCREEN CMS &amp; SECTIONS
           </h1>
-          <p className={`text-xs font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
+          <p className={`text-xs font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             Add, reorder, toggle and configure dynamic sections across the customer storefront
           </p>
         </div>
         <button
           type="button"
           onClick={openCreateModal}
-          className="px-4 py-2.5 rounded bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-1.5 transition-colors self-start sm:self-auto cursor-pointer"
+          className="px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-1.5 transition-colors self-start sm:self-auto cursor-pointer shadow-sm"
         >
-          <Plus className="w-4 h-4" />
+          <i className="bi bi-plus-lg text-sm" aria-hidden="true" />
           <span>Add Section</span>
         </button>
       </div>
 
       {/* Summary Banner */}
-      <div className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono ${
-        isDark ? 'bg-surface-900 border-surface-700 text-slate-300' : 'bg-white border-[#E0DBD2] text-[#5C5456]'
+      <div className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono shadow-xs ${
+        isDark ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-600'
       }`}>
         <div className="flex items-center gap-2">
-          <Layers className="w-4 h-4 text-brand-500" />
-          <span>Active Sections Displayed on Storefront: <b className="text-brand-500">{sections.filter(s => s.isActive).length}</b> / {sections.length}</span>
+          <i className="bi bi-stack text-sm text-slate-400" aria-hidden="true" />
+          <span>Active Sections Displayed on Storefront: <b className={isDark ? 'text-white' : 'text-slate-900'}>{sections.filter(s => s.isActive).length}</b> / {sections.length}</span>
         </div>
         <a
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-brand-500 hover:underline flex items-center gap-1 font-semibold"
+          className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5 font-semibold transition-colors"
         >
           <span>Preview Live Home Screen</span>
-          <ExternalLink className="w-3.5 h-3.5" />
+          <i className="bi bi-box-arrow-up-right text-xs" aria-hidden="true" />
         </a>
       </div>
 
       {/* Table */}
-      <div className={`border rounded-lg overflow-x-auto ${isDark ? 'bg-surface-900 border-surface-700' : 'bg-white border-[#E0DBD2]'}`}>
+      <div className={`border rounded-xl overflow-x-auto shadow-xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
         {loading ? (
           <div className="py-20 flex items-center justify-center">
             <ShrellLoader size={48} />
           </div>
         ) : (
           <table className="w-full text-left text-xs font-mono min-w-[750px]">
-            <thead className={`border-b ${isDark ? 'bg-surface-950/60 border-surface-800 text-slate-400' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#5C5456]'}`}>
+            <thead className={`border-b ${isDark ? 'bg-slate-950/70 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
               <tr>
-                <th className="px-4 py-3 text-center">Order</th>
-                <th className="px-4 py-3">Section Title &amp; Subtitle</th>
-                <th className="px-4 py-3">Layout Type</th>
-                <th className="px-4 py-3">Category Filter / Limit</th>
-                <th className="px-4 py-3 text-center">Visibility</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-4 py-3 text-center font-semibold">Order</th>
+                <th className="px-4 py-3 font-semibold">Section Title &amp; Subtitle</th>
+                <th className="px-4 py-3 font-semibold">Layout Type</th>
+                <th className="px-4 py-3 font-semibold">Category Filter / Limit</th>
+                <th className="px-4 py-3 text-center font-semibold">Visibility</th>
+                <th className="px-4 py-3 text-right font-semibold">Actions</th>
               </tr>
             </thead>
-            <tbody className={`divide-y ${isDark ? 'divide-surface-800' : 'divide-[#E0DBD2]'}`}>
+            <tbody className={`divide-y ${isDark ? 'divide-slate-800' : 'divide-slate-200'}`}>
               {sections.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-slate-500">
+                  <td colSpan={6} className={`px-4 py-12 text-center ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                     No home sections configured. Click "Add Section" to create your first dynamic section.
                   </td>
                 </tr>
               ) : (
                 sections.map((sec, idx) => {
                   const badge = getSectionTypeBadge(sec.sectionType);
-                  const BadgeIcon = badge.icon;
                   return (
-                    <tr key={sec.id} className={`transition-colors ${isDark ? 'hover:bg-surface-800/40' : 'hover:bg-[#FAF8F5]'}`}>
+                    <tr key={sec.id} className={`transition-colors ${isDark ? 'hover:bg-slate-850/50' : 'hover:bg-slate-50'}`}>
                       {/* Order Controls */}
                       <td className="px-4 py-3.5 text-center">
                         <div className="flex items-center justify-center gap-1">
@@ -288,33 +271,33 @@ export const AdminHomeSections: React.FC = () => {
                             type="button"
                             disabled={idx === 0}
                             onClick={() => handleMove(idx, 'UP')}
-                            className="p-1 rounded hover:bg-surface-800 disabled:opacity-20 cursor-pointer text-slate-400"
+                            className="p-1 rounded-lg hover:bg-slate-800 disabled:opacity-20 cursor-pointer text-slate-400 transition-colors"
                             title="Move Up"
                           >
-                            <MoveUp className="w-3.5 h-3.5" />
+                            <i className="bi bi-arrow-up text-xs" aria-hidden="true" />
                           </button>
-                          <span className="font-bold text-brand-500 w-5 text-center">
+                          <span className={`font-bold w-5 text-center ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                             {idx + 1}
                           </span>
                           <button
                             type="button"
                             disabled={idx === sections.length - 1}
                             onClick={() => handleMove(idx, 'DOWN')}
-                            className="p-1 rounded hover:bg-surface-800 disabled:opacity-20 cursor-pointer text-slate-400"
+                            className="p-1 rounded-lg hover:bg-slate-800 disabled:opacity-20 cursor-pointer text-slate-400 transition-colors"
                             title="Move Down"
                           >
-                            <MoveDown className="w-3.5 h-3.5" />
+                            <i className="bi bi-arrow-down text-xs" aria-hidden="true" />
                           </button>
                         </div>
                       </td>
 
                       {/* Title & Subtitle */}
                       <td className="px-4 py-3.5">
-                        <div className={`font-bold ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
+                        <div className={`font-bold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
                           {sec.title}
                         </div>
                         {sec.subtitle && (
-                          <div className={`text-[11px] truncate max-w-xs ${isDark ? 'text-slate-400' : 'text-[#8E8587]'}`}>
+                          <div className={`text-[11px] truncate max-w-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                             {sec.subtitle}
                           </div>
                         )}
@@ -323,7 +306,7 @@ export const AdminHomeSections: React.FC = () => {
                       {/* Layout Type */}
                       <td className="px-4 py-3.5">
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold border ${badge.color}`}>
-                          <BadgeIcon className="w-3 h-3" />
+                          <i className={`bi ${badge.icon} text-xs`} aria-hidden="true" />
                           <span>{badge.label}</span>
                         </span>
                       </td>
@@ -331,11 +314,11 @@ export const AdminHomeSections: React.FC = () => {
                       {/* Filter / Limit */}
                       <td className="px-4 py-3.5">
                         <div>
-                          <span className="font-semibold text-brand-400">
+                          <span className={`font-semibold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                             {sec.categorySlug ? `Category: ${sec.categorySlug}` : 'All Featured Products'}
                           </span>
                           {sec.sectionType.startsWith('PRODUCTS') && (
-                            <div className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`}>
+                            <div className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                               Limit: {sec.limit || 4} items
                             </div>
                           )}
@@ -349,34 +332,34 @@ export const AdminHomeSections: React.FC = () => {
                           onClick={() => handleToggleActive(sec)}
                           className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold border transition-colors cursor-pointer ${
                             sec.isActive
-                              ? isDark ? 'bg-emerald-950/60 text-emerald-300 border-emerald-800 hover:bg-emerald-900/60' : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
-                              : isDark ? 'bg-surface-800 text-slate-400 border-surface-700 hover:bg-surface-700' : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'
+                              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20'
+                              : 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/30 hover:bg-slate-500/20'
                           }`}
                         >
-                          {sec.isActive ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                          <i className={`bi ${sec.isActive ? 'bi-eye' : 'bi-eye-slash'} text-xs`} aria-hidden="true" />
                           <span>{sec.isActive ? 'Visible' : 'Hidden'}</span>
                         </button>
                       </td>
 
                       {/* Actions */}
-                      <td className="px-4 py-3.5 text-right space-x-2">
+                      <td className="px-4 py-3.5 text-right space-x-1">
                         <button
                           type="button"
                           onClick={() => openEditModal(sec)}
-                          className={`p-1.5 rounded transition-colors cursor-pointer ${
-                            isDark ? 'hover:bg-surface-800 text-slate-300 hover:text-brand-400' : 'hover:bg-[#EDE9E1] text-[#5C5456] hover:text-[#FF000E]'
+                          className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                            isDark ? 'hover:bg-slate-800 text-slate-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'
                           }`}
                           title="Edit Section"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          <i className="bi bi-pencil text-xs" aria-hidden="true" />
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDeleteSection(sec.id, sec.title)}
-                          className="p-1.5 rounded hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg hover:bg-rose-500/10 text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
                           title="Delete Section"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <i className="bi bi-trash text-xs" aria-hidden="true" />
                         </button>
                       </td>
                     </tr>
@@ -390,26 +373,27 @@ export const AdminHomeSections: React.FC = () => {
 
       {/* CREATE / EDIT MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className={`w-full max-w-xl rounded-xl border p-6 space-y-4 max-h-[90vh] overflow-y-auto ${
-            isDark ? 'bg-surface-900 border-surface-700 text-slate-100' : 'bg-white border-[#E0DBD2] text-[#140E10]'
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+          <div className={`w-full max-w-xl rounded-xl border p-6 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl ${
+            isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
           }`}>
-            <div className="flex items-center justify-between border-b pb-3">
+            <div className={`flex items-center justify-between border-b pb-3 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
               <h2 className="text-sm font-bold font-mono uppercase tracking-wider flex items-center gap-2">
-                <Layers className="w-4 h-4 text-brand-500" />
+                <i className="bi bi-stack text-base text-slate-400" aria-hidden="true" />
                 <span>{editingSection ? 'Edit Home Section' : 'Create Dynamic Section'}</span>
               </h2>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-slate-200 cursor-pointer"
+                className={`p-1 rounded-lg transition-colors cursor-pointer ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
+                aria-label="Close modal"
               >
-                <X className="w-5 h-5" />
+                <i className="bi bi-x-lg text-xs" aria-hidden="true" />
               </button>
             </div>
 
             {errorMsg && (
-              <div className="p-2.5 rounded bg-rose-950/60 border border-rose-800 text-rose-300 text-xs font-mono">
+              <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-500 text-xs font-mono">
                 {errorMsg}
               </div>
             )}
@@ -417,12 +401,12 @@ export const AdminHomeSections: React.FC = () => {
             <form onSubmit={handleSaveSection} className="space-y-4 text-xs font-mono">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block mb-1 font-bold">Section Layout Type *</label>
+                  <label className={`block mb-1 font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Section Layout Type *</label>
                   <select
                     value={sectionType}
                     onChange={(e) => setSectionType(e.target.value as HomeSectionType)}
-                    className={`w-full border rounded px-3 py-2 focus:outline-none focus:border-brand-500 ${
-                      isDark ? 'bg-surface-950 border-surface-700 text-slate-100' : 'bg-white border-[#E0DBD2] text-[#140E10]'
+                    className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                      isDark ? 'bg-slate-950 border-slate-700 text-slate-100 focus:border-slate-400' : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
                     }`}
                   >
                     <option value="PRODUCTS_GRID">Product Card Grid (Responsive 2 to 4 cols)</option>
@@ -434,42 +418,42 @@ export const AdminHomeSections: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block mb-1 font-bold">Display Order Position</label>
+                  <label className={`block mb-1 font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Display Order Position</label>
                   <input
                     type="number"
                     min="1"
                     value={displayOrder}
                     onChange={(e) => setDisplayOrder(e.target.value)}
-                    className={`w-full border rounded px-3 py-2 focus:outline-none focus:border-brand-500 ${
-                      isDark ? 'bg-surface-950 border-surface-700 text-slate-100' : 'bg-white border-[#E0DBD2] text-[#140E10]'
+                    className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                      isDark ? 'bg-slate-950 border-slate-700 text-slate-100 focus:border-slate-400' : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
                     }`}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block mb-1 font-bold">Section Title *</label>
+                <label className={`block mb-1 font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Section Title *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Crazy Finds, Best in Lighting, New Releases"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className={`w-full border rounded px-3 py-2 focus:outline-none focus:border-brand-500 ${
-                    isDark ? 'bg-surface-950 border-surface-700 text-slate-100' : 'bg-white border-[#E0DBD2] text-[#140E10]'
+                  className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                    isDark ? 'bg-slate-950 border-slate-700 text-slate-100 focus:border-slate-400' : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
                   }`}
                 />
               </div>
 
               <div>
-                <label className="block mb-1 font-bold">Subtitle / Tagline (Optional)</label>
+                <label className={`block mb-1 font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Subtitle / Tagline (Optional)</label>
                 <input
                   type="text"
                   placeholder="e.g. Blink and you'll miss it, Handcrafted automotive gear"
                   value={subtitle}
                   onChange={(e) => setSubtitle(e.target.value)}
-                  className={`w-full border rounded px-3 py-2 focus:outline-none focus:border-brand-500 ${
-                    isDark ? 'bg-surface-950 border-surface-700 text-slate-100' : 'bg-white border-[#E0DBD2] text-[#140E10]'
+                  className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                    isDark ? 'bg-slate-950 border-slate-700 text-slate-100 focus:border-slate-400' : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
                   }`}
                 />
               </div>
@@ -477,17 +461,17 @@ export const AdminHomeSections: React.FC = () => {
               {/* Product Filtering options */}
               {sectionType.startsWith('PRODUCTS') && (
                 <div className={`p-3.5 rounded-lg border space-y-3 ${
-                  isDark ? 'bg-surface-950/60 border-surface-800' : 'bg-[#F9F7F4] border-[#E0DBD2]'
+                  isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'
                 }`}>
-                  <div className="font-bold text-brand-500">Product Selection &amp; Filters:</div>
+                  <div className={`font-bold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Product Selection &amp; Filters:</div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block mb-1 font-bold">Filter By Category</label>
+                      <label className={`block mb-1 font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Filter By Category</label>
                       <select
                         value={categorySlug}
                         onChange={(e) => setCategorySlug(e.target.value)}
-                        className={`w-full border rounded px-3 py-2 focus:outline-none focus:border-brand-500 ${
-                          isDark ? 'bg-surface-900 border-surface-700 text-slate-100' : 'bg-white border-[#E0DBD2] text-[#140E10]'
+                        className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                          isDark ? 'bg-slate-900 border-slate-700 text-slate-100 focus:border-slate-400' : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
                         }`}
                       >
                         <option value="">All Categories (General Showcase)</option>
@@ -500,12 +484,12 @@ export const AdminHomeSections: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block mb-1 font-bold">Number of Products to Show</label>
+                      <label className={`block mb-1 font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Number of Products to Show</label>
                       <select
                         value={itemLimit}
                         onChange={(e) => setItemLimit(e.target.value)}
-                        className={`w-full border rounded px-3 py-2 focus:outline-none focus:border-brand-500 ${
-                          isDark ? 'bg-surface-900 border-surface-700 text-slate-100' : 'bg-white border-[#E0DBD2] text-[#140E10]'
+                        className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                          isDark ? 'bg-slate-900 border-slate-700 text-slate-100 focus:border-slate-400' : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
                         }`}
                       >
                         <option value="4">4 Products (1 row on desktop)</option>
@@ -517,14 +501,14 @@ export const AdminHomeSections: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block mb-1 font-bold">"See All" Destination Link</label>
+                    <label className={`block mb-1 font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>"See All" Destination Link</label>
                     <input
                       type="text"
                       placeholder="/catalogue or /catalogue?category=roof-racks"
                       value={viewAllUrl}
                       onChange={(e) => setViewAllUrl(e.target.value)}
-                      className={`w-full border rounded px-3 py-2 focus:outline-none focus:border-brand-500 ${
-                        isDark ? 'bg-surface-900 border-surface-700 text-slate-100' : 'bg-white border-[#E0DBD2] text-[#140E10]'
+                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                        isDark ? 'bg-slate-900 border-slate-700 text-slate-100 focus:border-slate-400' : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
                       }`}
                     />
                   </div>
@@ -534,31 +518,31 @@ export const AdminHomeSections: React.FC = () => {
               {/* Promo Banner settings */}
               {sectionType === 'BANNER_PROMO' && (
                 <div className={`p-3.5 rounded-lg border space-y-3 ${
-                  isDark ? 'bg-surface-950/60 border-surface-800' : 'bg-[#F9F7F4] border-[#E0DBD2]'
+                  isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'
                 }`}>
-                  <div className="font-bold text-brand-500">Banner Asset Configuration:</div>
+                  <div className={`font-bold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Banner Asset Configuration:</div>
                   <div>
-                    <label className="block mb-1 font-bold">Image URL *</label>
+                    <label className={`block mb-1 font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Image URL *</label>
                     <input
                       type="text"
                       required
                       placeholder="https://res.cloudinary.com/... or /images/..."
                       value={customBannerUrl}
                       onChange={(e) => setCustomBannerUrl(e.target.value)}
-                      className={`w-full border rounded px-3 py-2 focus:outline-none focus:border-brand-500 ${
-                        isDark ? 'bg-surface-900 border-surface-700 text-slate-100' : 'bg-white border-[#E0DBD2] text-[#140E10]'
+                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                        isDark ? 'bg-slate-900 border-slate-700 text-slate-100 focus:border-slate-400' : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
                       }`}
                     />
                   </div>
                   <div>
-                    <label className="block mb-1 font-bold">Target Click Destination</label>
+                    <label className={`block mb-1 font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Target Click Destination</label>
                     <input
                       type="text"
                       placeholder="/catalogue?category=... or /pre-book"
                       value={customBannerTargetUrl}
                       onChange={(e) => setCustomBannerTargetUrl(e.target.value)}
-                      className={`w-full border rounded px-3 py-2 focus:outline-none focus:border-brand-500 ${
-                        isDark ? 'bg-surface-900 border-surface-700 text-slate-100' : 'bg-white border-[#E0DBD2] text-[#140E10]'
+                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                        isDark ? 'bg-slate-900 border-slate-700 text-slate-100 focus:border-slate-400' : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
                       }`}
                     />
                   </div>
@@ -571,18 +555,18 @@ export const AdminHomeSections: React.FC = () => {
                     type="checkbox"
                     checked={isActive}
                     onChange={(e) => setIsActive(e.target.checked)}
-                    className="rounded accent-brand-500 w-4 h-4 cursor-pointer"
+                    className="rounded accent-slate-900 dark:accent-white w-4 h-4 cursor-pointer"
                   />
                   <span className="font-bold">Active &amp; Visible on Storefront</span>
                 </label>
               </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t">
+              <div className={`flex justify-end gap-3 pt-3 border-t ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className={`px-4 py-2 rounded border font-mono transition-colors cursor-pointer ${
-                    isDark ? 'border-surface-700 hover:bg-surface-800 text-slate-300' : 'border-[#E0DBD2] hover:bg-[#EDE9E1] text-[#5C5456]'
+                  className={`px-4 py-2 rounded-lg font-mono transition-colors cursor-pointer ${
+                    isDark ? 'border-slate-700 hover:bg-slate-800 text-slate-300' : 'border-slate-200 hover:bg-slate-100 text-slate-600'
                   }`}
                 >
                   Cancel
@@ -590,7 +574,7 @@ export const AdminHomeSections: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-5 py-2 rounded bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-bold font-mono uppercase tracking-wider transition-colors cursor-pointer"
+                  className="px-5 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 disabled:opacity-50 font-bold font-mono uppercase tracking-wider transition-colors cursor-pointer shadow-sm"
                 >
                   {isSaving ? 'Saving...' : editingSection ? 'Update Section' : 'Create Section'}
                 </button>
@@ -602,3 +586,4 @@ export const AdminHomeSections: React.FC = () => {
     </div>
   );
 };
+

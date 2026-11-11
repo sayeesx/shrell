@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Search, Edit2, Trash2, X } from 'lucide-react';
 import { Brand, Category, Product } from '../../domain/types';
 import { formatINR, paisaToRupees, rupeesToPaisa } from '../../domain/services/CurrencyService';
 import {
@@ -190,94 +189,100 @@ export const AdminProducts: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
         <div>
-          <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
+          <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
             PRODUCT MANAGEMENT
           </h1>
-          <p className={`text-xs font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
+          <p className={`text-xs font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             Create, edit catalogue inventory, pricing and technical metadata
           </p>
         </div>
         <button
           type="button"
           onClick={openCreateModal}
-          className="px-4 py-2.5 rounded bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-1.5 transition-colors self-start sm:self-auto"
+          className="px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-1.5 transition-colors self-start sm:self-auto cursor-pointer shadow-sm"
         >
-          <Plus className="w-4 h-4" />
+          <i className="bi bi-plus-lg text-sm" aria-hidden="true" />
           <span>Add New Product</span>
         </button>
       </div>
 
       {/* Search Input */}
       <div className="max-w-md relative">
-        <Search className={`w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`} />
+        <i className={`bi bi-search text-xs absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${isDark ? 'text-slate-500' : 'text-slate-400'}`} aria-hidden="true" />
         <input
           type="text"
           placeholder="Filter by part name or SKU..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-surface-900 border border-surface-700 rounded pl-9 pr-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-brand-500 font-mono"
+          className={`w-full border rounded-lg pl-9 pr-3 py-2 text-xs font-mono transition-colors focus:outline-none ${
+            isDark
+              ? 'bg-slate-900 border-slate-800 text-white placeholder:text-slate-500 focus:border-slate-500'
+              : 'bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-slate-800'
+          }`}
         />
       </div>
 
       {/* Table */}
-      <div className="bg-surface-900 border border-surface-700 rounded-lg overflow-x-auto shadow-elevation">
+      <div className={`border rounded-xl overflow-x-auto shadow-xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
         <table className="w-full text-left text-xs font-mono min-w-[700px]">
-          <thead className="bg-surface-950/60 border-b border-surface-800 text-slate-400">
+          <thead className={`border-b ${isDark ? 'bg-slate-950/70 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
             <tr>
-              <th className="px-4 py-3">Product Name & SKU</th>
-              <th className="px-4 py-3">Category</th>
-              <th className="px-4 py-3">Selling Price</th>
-              <th className="px-4 py-3">Stock Units</th>
-              <th className="px-4 py-3">Fitment</th>
-              <th className="px-4 py-3 text-right">Actions</th>
+              <th className="px-4 py-3 font-semibold">Product Name & SKU</th>
+              <th className="px-4 py-3 font-semibold">Category</th>
+              <th className="px-4 py-3 font-semibold">Selling Price</th>
+              <th className="px-4 py-3 font-semibold">Stock Units</th>
+              <th className="px-4 py-3 font-semibold">Fitment</th>
+              <th className="px-4 py-3 font-semibold text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-surface-800">
+          <tbody className={`divide-y ${isDark ? 'divide-slate-800' : 'divide-slate-200'}`}>
             {filtered.map((prod) => (
-              <tr key={prod.id} className="hover:bg-surface-850/50">
+              <tr key={prod.id} className={isDark ? 'hover:bg-slate-850/50' : 'hover:bg-slate-50'}>
                 <td className="px-4 py-3">
-                  <div className="font-semibold text-slate-100 line-clamp-1">{prod.name}</div>
-                  <div className="text-[11px] text-slate-500">{prod.sku}</div>
+                  <div className={`font-semibold line-clamp-1 ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{prod.name}</div>
+                  <div className={`text-[11px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{prod.sku}</div>
                 </td>
-                <td className="px-4 py-3 text-slate-300">
+                <td className={`px-4 py-3 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                   {prod.categoryName || 'Automotive'}
                 </td>
-                <td className="px-4 py-3 font-semibold text-slate-100">
+                <td className={`px-4 py-3 font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   {formatINR(prod.pricePaisa)}
                 </td>
                 <td className="px-4 py-3">
                   <span
                     className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                       prod.stockQuantity <= 5
-                        ? 'bg-rose-950/80 text-rose-300 border border-rose-800'
-                        : 'bg-emerald-950/80 text-emerald-300 border border-emerald-800'
+                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30'
+                        : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
                     }`}
                   >
                     {prod.stockQuantity} in stock
                   </span>
                 </td>
-                <td className="px-4 py-3 text-slate-400">
+                <td className={`px-4 py-3 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                   {prod.isUniversalFit ? 'Universal' : 'Vehicle Specific'}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <div className="flex items-center justify-end gap-2">
+                  <div className="flex items-center justify-end gap-1">
                     <button
                       type="button"
                       onClick={() => openEditModal(prod)}
-                      className="p-1.5 rounded hover:bg-surface-800 text-slate-300 hover:text-brand-400 transition-colors"
+                      className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                        isDark ? 'hover:bg-slate-800 text-slate-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'
+                      }`}
                       aria-label={`Edit ${prod.name}`}
                     >
-                      <Edit2 className="w-3.5 h-3.5" />
+                      <i className="bi bi-pencil text-xs" aria-hidden="true" />
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDeleteProduct(prod.id, prod.name)}
-                      className="p-1.5 rounded hover:bg-surface-800 text-slate-300 hover:text-rose-400 transition-colors"
+                      className="p-1.5 rounded-lg hover:bg-rose-500/10 text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
                       aria-label={`Delete ${prod.name}`}
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <i className="bi bi-trash text-xs" aria-hidden="true" />
                     </button>
                   </div>
                 </td>
@@ -292,86 +297,113 @@ export const AdminProducts: React.FC = () => {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md"
         >
-          <div className="relative w-full max-w-2xl bg-surface-900 border border-surface-700 rounded-lg shadow-elevation overflow-hidden max-h-[90vh] flex flex-col">
-            <div className="px-6 py-4 border-b border-surface-800 flex items-center justify-between">
-              <h2 className="text-base font-bold text-slate-100 font-mono">
-                {editingProduct ? 'EDIT PRODUCT DETAILS' : 'CREATE NEW CATALOGUE PRODUCT'}
+          <div className={`relative w-full max-w-2xl border rounded-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col ${
+            isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+          }`}>
+            <div className={`px-6 py-4 border-b flex items-center justify-between ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+              <h2 className="text-sm font-bold font-mono uppercase tracking-wider">
+                {editingProduct ? 'Edit Product Details' : 'Create New Product'}
               </h2>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-slate-100"
+                className={`p-1 rounded-lg transition-colors cursor-pointer ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
+                aria-label="Close modal"
               >
-                <X className="w-5 h-5" />
+                <i className="bi bi-x-lg text-xs" aria-hidden="true" />
               </button>
             </div>
 
             <form onSubmit={handleSaveProduct} className="p-6 overflow-y-auto space-y-4 text-xs font-mono">
               <div>
-                <label className="block uppercase text-slate-400 mb-1">Product Title *</label>
+                <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Product Title *</label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. SHRELL Stealth Wing Aerodynamic Crossbars"
-                  className="w-full bg-surface-950 border border-surface-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-brand-500"
+                  className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                    isDark
+                      ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                      : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                  }`}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block uppercase text-slate-400 mb-1">SKU Code *</label>
+                  <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>SKU Code *</label>
                   <input
                     type="text"
                     required
                     value={sku}
                     onChange={(e) => setSku(e.target.value)}
-                    className="w-full bg-surface-950 border border-surface-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-brand-500"
+                    className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                      isDark
+                        ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                        : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                    }`}
                   />
                 </div>
 
                 <div>
-                  <label className="block uppercase text-slate-400 mb-1">Stock Quantity *</label>
+                  <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Stock Quantity *</label>
                   <input
                     type="number"
                     required
                     min="0"
                     value={stockQuantity}
                     onChange={(e) => setStockQuantity(e.target.value)}
-                    className="w-full bg-surface-950 border border-surface-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-brand-500"
+                    className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                      isDark
+                        ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                        : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                    }`}
                   />
                 </div>
 
                 <div>
-                  <label className="block uppercase text-slate-400 mb-1">Selling Price (INR) *</label>
+                  <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Selling Price (INR) *</label>
                   <input
                     type="number"
                     required
                     value={priceRupees}
                     onChange={(e) => setPriceRupees(e.target.value)}
-                    className="w-full bg-surface-950 border border-surface-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-brand-500"
+                    className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                      isDark
+                        ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                        : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                    }`}
                   />
                 </div>
 
                 <div>
-                  <label className="block uppercase text-slate-400 mb-1">Cost Price (INR)</label>
+                  <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Cost Price (INR)</label>
                   <input
                     type="number"
                     value={costPriceRupees}
                     onChange={(e) => setCostPriceRupees(e.target.value)}
-                    className="w-full bg-surface-950 border border-surface-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-brand-500"
+                    className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                      isDark
+                        ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                        : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                    }`}
                   />
                 </div>
 
                 <div>
-                  <label className="block uppercase text-slate-400 mb-1">Category</label>
+                  <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Category</label>
                   <select
                     value={categoryId}
                     onChange={(e) => setCategoryId(e.target.value)}
-                    className="w-full bg-surface-950 border border-surface-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-brand-500"
+                    className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                      isDark
+                        ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                        : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                    }`}
                   >
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -382,11 +414,15 @@ export const AdminProducts: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block uppercase text-slate-400 mb-1">Brand</label>
+                  <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Brand</label>
                   <select
                     value={brandId}
                     onChange={(e) => setBrandId(e.target.value)}
-                    className="w-full bg-surface-950 border border-surface-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-brand-500"
+                    className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                      isDark
+                        ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                        : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                    }`}
                   >
                     {brands.map((b) => (
                       <option key={b.id} value={b.id}>
@@ -398,35 +434,47 @@ export const AdminProducts: React.FC = () => {
               </div>
 
               <div>
-                <label className="block uppercase text-slate-400 mb-1">Image URL</label>
+                <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Image URL</label>
                 <input
                   type="url"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
                   placeholder="/logos/shrell-full_white-text_black-logo.png"
-                  className="w-full bg-surface-950 border border-surface-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-brand-500"
+                  className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                    isDark
+                      ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                      : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                  }`}
                 />
               </div>
 
               <div>
-                <label className="block uppercase text-slate-400 mb-1">Short Description</label>
+                <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Short Description</label>
                 <input
                   type="text"
                   value={shortDesc}
                   onChange={(e) => setShortDesc(e.target.value)}
                   placeholder="Brief 1-sentence product summary"
-                  className="w-full bg-surface-950 border border-surface-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-brand-500"
+                  className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                    isDark
+                      ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                      : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                  }`}
                 />
               </div>
 
               <div>
-                <label className="block uppercase text-slate-400 mb-1">Detailed Technical Markdown</label>
+                <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Detailed Technical Markdown</label>
                 <textarea
                   rows={4}
                   value={desc}
                   onChange={(e) => setDesc(e.target.value)}
                   placeholder="Detailed engineering specifications and features..."
-                  className="w-full bg-surface-950 border border-surface-700 rounded px-3 py-2 text-slate-100 focus:outline-none focus:border-brand-500"
+                  className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                    isDark
+                      ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                      : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                  }`}
                 />
               </div>
 
@@ -436,24 +484,26 @@ export const AdminProducts: React.FC = () => {
                   type="checkbox"
                   checked={isUniversal}
                   onChange={(e) => setIsUniversal(e.target.checked)}
-                  className="w-4 h-4 rounded border-surface-700 bg-surface-950 text-brand-500"
+                  className="w-4 h-4 rounded border-slate-700 text-slate-900"
                 />
-                <label htmlFor="modal-univ-fit" className="text-slate-300">
+                <label htmlFor="modal-univ-fit" className={isDark ? 'text-slate-300' : 'text-slate-700'}>
                   Universal Fit (Fits all standard vehicles)
                 </label>
               </div>
 
-              <div className="pt-4 border-t border-surface-800 flex justify-end gap-3">
+              <div className={`pt-4 border-t flex justify-end gap-3 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded text-slate-400 hover:text-slate-200"
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer ${
+                    isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  }`}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded bg-brand-500 hover:bg-brand-600 text-white font-bold uppercase tracking-wider"
+                  className="px-5 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-sm"
                 >
                   Save Product
                 </button>

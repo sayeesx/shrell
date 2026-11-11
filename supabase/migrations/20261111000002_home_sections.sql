@@ -46,3 +46,4 @@ VALUES
   ('sec-editorial-bento', 'Engineering & Precision', 'High-performance automotive hardware overview', 'EDITORIAL_BENTO', 3, true, NULL, 0, '/catalogue')
 ON CONFLICT (id) DO UPDATE 
 SET title = EXCLUDED.title, subtitle = EXCLUDED.subtitle, is_active = EXCLUDED.is_active;
+

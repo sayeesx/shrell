@@ -36,22 +36,12 @@ import { AdminHomeSections } from './pages/admin/AdminHomeSections';
 import { AdminCategories } from './pages/admin/AdminCategories';
 
 import { ScrollToTop } from './components/common/ScrollToTop';
-import { ShrellLoader } from './components/common/ShrellLoader';
-import { useNavigationLoading } from './application/NavigationLoadingContext';
-
 export const App: React.FC = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isHomePage = location.pathname === '/';
   const isCataloguePage = location.pathname.startsWith('/catalogue');
   const { isDark } = useTheme();
-
-  const { isNavigating, startPageLoad } = useNavigationLoading();
-
-  // Route change notification: only triggers loader if page load is slow (> 320ms)
-  React.useEffect(() => {
-    startPageLoad();
-  }, [location.pathname, location.search, startPageLoad]);
 
   // Network offline state listener
   const [isOnline, setIsOnline] = React.useState<boolean>(
@@ -85,23 +75,7 @@ export const App: React.FC = () => {
         isDark ? 'bg-[#000000] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'
       }`}
     >
-      {/* Clean Floating Shrell Loader (No background, shows only when taking time, plays full cycle) */}
-      {isNavigating && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none transition-opacity duration-300"
-          aria-live="polite"
-        >
-          <ShrellLoader size={64} />
-        </div>
-      )}
-
       <ScrollToTop />
-
-      {/* Global Phone & 4-Digit Verification Modal */}
-      <AuthModal />
-
-      {/* Global Checkout Modal */}
-      <CheckoutModal />
 
       {/* Storefront Navigation: Only on Home and Category pages */}
       {shouldShowHeader && <Navbar />}
@@ -151,6 +125,12 @@ export const App: React.FC = () => {
 
       {/* Mobile Floating Bottom Navigation Dock */}
       {!isAdminRoute && <MobileNavDock />}
+
+      {/* Global Phone & 4-Digit Verification Modal */}
+      <AuthModal />
+
+      {/* Global Checkout Modal */}
+      <CheckoutModal />
     </div>
   );
 };

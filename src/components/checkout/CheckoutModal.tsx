@@ -175,10 +175,10 @@ export const CheckoutModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-stretch md:items-center justify-end md:justify-center md:p-6 overflow-hidden">
+    <div className="fixed inset-0 z-[100] flex items-stretch md:items-center justify-end md:justify-center md:p-6 overflow-hidden">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/75 backdrop-blur-xs transition-opacity duration-300"
+        className="fixed inset-0 w-screen h-screen min-h-screen bg-black/75 backdrop-blur-md transition-opacity duration-300 pointer-events-auto"
         onClick={closeCheckout}
         aria-hidden="true"
       />
@@ -267,7 +267,7 @@ export const CheckoutModal: React.FC = () => {
                 Add automotive equipment or accessories to your cart before proceeding to checkout.
               </p>
               <button type="button" onClick={closeCheckout}
-                className="px-6 py-2.5 rounded-full bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-medium uppercase tracking-wider transition-colors cursor-pointer">
+                className="px-6 py-2.5 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-medium uppercase tracking-wider transition-colors cursor-pointer">
                 Browse Catalogue
               </button>
             </div>

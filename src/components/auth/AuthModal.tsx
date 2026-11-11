@@ -161,10 +161,10 @@ export const AuthModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto overscroll-contain">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto overscroll-contain">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+        className="fixed inset-0 w-screen h-screen min-h-screen bg-black/75 backdrop-blur-md transition-opacity duration-300 pointer-events-auto"
         onClick={closeAuthModal}
         aria-hidden="true"
       />
@@ -227,7 +227,7 @@ export const AuthModal: React.FC = () => {
                 <label htmlFor="auth-phone-input" className={`block text-xs font-medium mb-1.5 font-sans ${isDark ? 'text-[#D8D1D1]' : 'text-[#3A3030]'}`}>
                   Phone Number
                 </label>
-                <div className={`flex rounded-full border overflow-hidden focus-within:ring-2 focus-within:ring-[#FF000E] focus-within:border-[#FF000E] transition-all ${
+                <div className={`flex rounded-xl border overflow-hidden focus-within:ring-2 focus-within:ring-[#FF000E] focus-within:border-[#FF000E] transition-all ${
                   isDark ? 'border-[#261619] bg-[#130E10]' : 'border-[#E0DBD2] bg-[#FFFFFF]'
                 }`}>
                   <div className={`flex items-center px-4 text-xs font-medium border-r select-none ${
@@ -256,7 +256,7 @@ export const AuthModal: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full py-3.5 px-6 rounded-full bg-[#FF000E] hover:bg-[#E0000C] text-white font-medium text-sm transition-all active:scale-98 cursor-pointer font-sans"
+                className="w-full py-3.5 px-6 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-medium text-sm transition-all active:scale-98 cursor-pointer font-sans"
               >
                 Send Verification Code
               </button>
@@ -382,7 +382,7 @@ export const AuthModal: React.FC = () => {
             <button
               type="button"
               onClick={handleDone}
-              className="w-full py-3.5 px-6 rounded-full bg-[#FF000E] hover:bg-[#E0000C] text-white font-medium text-sm transition-all cursor-pointer font-sans"
+              className="w-full py-3.5 px-6 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-medium text-sm transition-all cursor-pointer font-sans"
             >
               Done
             </button>
@@ -413,7 +413,7 @@ export const AuthModal: React.FC = () => {
                 setOtp(['', '', '', '']);
                 setStep('otp');
               }}
-              className="w-full py-3.5 px-6 rounded-full bg-[#FF000E] hover:bg-[#E0000C] text-white font-medium text-sm transition-all cursor-pointer font-sans"
+              className="w-full py-3.5 px-6 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-medium text-sm transition-all cursor-pointer font-sans"
             >
               Try Again
             </button>

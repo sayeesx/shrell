@@ -1,20 +1,5 @@
 import React from 'react';
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
-import {
-  LayoutDashboard,
-  Package,
-  Layers,
-  ShoppingBag,
-  Tag,
-  Settings,
-  LogOut,
-  ExternalLink,
-  Image,
-  Database,
-  Sparkles,
-  LayoutTemplate,
-  FolderTree,
-} from 'lucide-react';
 import { useAuth } from '../../application/AuthContext';
 import { useTheme } from '../../application/ThemeContext';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
@@ -32,62 +17,60 @@ export const AdminLayout: React.FC = () => {
   }
 
   const navItems = [
-    { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
-    { name: 'Home Sections (CMS)', path: '/admin/sections', icon: LayoutTemplate },
-    { name: 'Categories (CMS)', path: '/admin/categories', icon: FolderTree },
-    { name: 'Hero Banners', path: '/admin/banners', icon: Image },
-    { name: 'Products', path: '/admin/products', icon: Package },
-    { name: 'Inventory & Movements', path: '/admin/inventory', icon: Layers },
-    { name: 'Orders & Fulfilment', path: '/admin/orders', icon: ShoppingBag },
-    { name: 'Coupons & Promos', path: '/admin/coupons', icon: Tag },
-    { name: 'Sanity CMS', path: '/admin/sanity', icon: Sparkles },
-    { name: 'Settings', path: '/admin/settings', icon: Settings },
+    { name: 'Dashboard', path: '/admin', icon: 'bi-speedometer2' },
+    { name: 'Home Sections (CMS)', path: '/admin/sections', icon: 'bi-layout-text-window-reverse' },
+    { name: 'Categories (CMS)', path: '/admin/categories', icon: 'bi-folder2-open' },
+    { name: 'Hero Banners', path: '/admin/banners', icon: 'bi-images' },
+    { name: 'Products', path: '/admin/products', icon: 'bi-box-seam' },
+    { name: 'Inventory & Movements', path: '/admin/inventory', icon: 'bi-stack' },
+    { name: 'Orders & Fulfilment', path: '/admin/orders', icon: 'bi-bag-check' },
+    { name: 'Coupons & Promos', path: '/admin/coupons', icon: 'bi-tag' },
+    { name: 'Sanity CMS', path: '/admin/sanity', icon: 'bi-magic' },
+    { name: 'Settings', path: '/admin/settings', icon: 'bi-gear' },
   ];
 
   return (
-    <div className={`min-h-screen flex flex-col md:flex-row transition-colors duration-300 ${isDark ? 'bg-surface-950 text-slate-100' : 'bg-[#FFFEFA] text-[#140E10]'}`}>
+    <div className={`min-h-screen flex flex-col md:flex-row transition-colors duration-200 ${isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
       {/* Sidebar */}
-      <aside className={`w-full md:w-64 flex flex-col flex-shrink-0 transition-colors duration-300 ${isDark ? 'bg-surface-900 border-r border-surface-800' : 'bg-[#F5F3EE] border-r border-[#E0DBD2]'}`}>
+      <aside className={`w-full md:w-64 flex flex-col flex-shrink-0 transition-colors duration-200 ${isDark ? 'bg-slate-900 border-r border-slate-800' : 'bg-white border-r border-slate-200'}`}>
         {/* Brand Header */}
-        <div className={`p-5 flex items-center justify-between border-b ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
-          <div className="flex items-center gap-2.5">
-            <div className={`w-8 h-8 rounded-lg border p-1 flex items-center justify-center flex-shrink-0 shadow-xs ${isDark ? 'bg-surface-950 border-surface-700/80' : 'bg-white border-[#E0DBD2]'}`}>
-              <img
-                src="/logos/shrell-brandicon_no-bg.png"
-                alt="SHRELL"
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <div>
-              <span className={`text-sm font-bold font-mono tracking-wider ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
+        <div className={`p-4 md:p-5 flex items-center justify-between border-b ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+          <div className="flex items-center gap-2.5 min-w-0">
+            <img
+              src="/logos/shrell-brandicon_no-bg.png"
+              alt="SHRELL"
+              className="w-8 h-8 object-contain shrink-0"
+            />
+            <div className="min-w-0">
+              <span className={`text-sm font-bold font-mono tracking-wider whitespace-nowrap block ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
                 SHRELL ADMIN
               </span>
-              <div className={`text-[10px] font-mono ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>Operations Portal</div>
+              <div className={`text-[10px] font-mono whitespace-nowrap ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Operations Portal</div>
             </div>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 shrink-0 ml-2">
             <ThemeToggle compact />
             <Link
               to="/"
               target="_blank"
               rel="noopener noreferrer"
-              className={`p-1.5 rounded transition-colors ${isDark ? 'hover:bg-surface-800 text-slate-400 hover:text-brand-400' : 'hover:bg-[#EDE9E1] text-[#5C5456] hover:text-[#FF000E]'}`}
+              className={`p-1.5 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-800 text-slate-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'}`}
               title="Open Customer Storefront"
             >
-              <ExternalLink className="w-4 h-4" />
+              <i className="bi bi-box-arrow-up-right text-xs" aria-hidden="true" />
             </Link>
           </div>
         </div>
 
         {/* Database Mode Badge */}
-        <div className={`px-5 py-2.5 flex items-center gap-2 text-[11px] font-mono border-b ${isDark ? 'bg-surface-950/60 border-surface-800/80' : 'bg-[#EDE9E1] border-[#E0DBD2]/80'}`}>
-          <Database className="w-3.5 h-3.5 text-brand-500" />
-          <span className={isDark ? 'text-slate-400' : 'text-[#5C5456]'}>Database:</span>
-          <span className={`font-semibold ${isDark ? 'text-slate-200' : 'text-[#140E10]'}`}>{repoMode}</span>
+        <div className={`px-4 py-2.5 flex items-center gap-2 text-[11px] font-mono border-b ${isDark ? 'bg-slate-950/50 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
+          <i className="bi bi-database text-xs text-slate-400" aria-hidden="true" />
+          <span>Database:</span>
+          <span className={`font-semibold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{repoMode}</span>
         </div>
 
         {/* Nav Links */}
-        <nav className="p-3 space-y-1 flex-1">
+        <nav className="p-3 space-y-1 flex-1 overflow-y-auto">
           {navItems.map((item) => {
             const isActive =
               item.path === '/admin'
@@ -98,47 +81,47 @@ export const AdminLayout: React.FC = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-xs font-mono font-medium transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-mono font-medium transition-colors ${
                   isActive
                     ? isDark
-                      ? 'bg-brand-950/40 text-brand-300 border border-brand-800/60'
-                      : 'bg-[#FFE0E2] text-[#B0000A] border border-[#FFB3B7]'
+                      ? 'bg-slate-800 text-white font-semibold border border-slate-700 shadow-sm'
+                      : 'bg-slate-100 text-slate-900 font-semibold border border-slate-200 shadow-xs'
                     : isDark
-                      ? 'text-slate-400 hover:text-slate-200 hover:bg-surface-850'
-                      : 'text-[#5C5456] hover:text-[#140E10] hover:bg-[#EDE9E1]'
+                      ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
-                <item.icon className="w-4 h-4 text-brand-400 flex-shrink-0" />
-                <span>{item.name}</span>
+                <i className={`bi ${item.icon} text-sm flex-shrink-0`} aria-hidden="true" />
+                <span className="truncate">{item.name}</span>
               </Link>
             );
           })}
         </nav>
 
         {/* User Footer */}
-        <div className={`p-4 border-t flex items-center justify-between ${isDark ? 'border-surface-800 bg-surface-950/40' : 'border-[#E0DBD2] bg-[#EDE9E1]/40'}`}>
+        <div className={`p-4 border-t flex items-center justify-between ${isDark ? 'border-slate-800 bg-slate-950/40' : 'border-slate-200 bg-slate-50'}`}>
           <div className="flex items-center gap-2 overflow-hidden">
-            <div className={`w-7 h-7 rounded flex items-center justify-center text-brand-400 text-xs font-mono font-bold flex-shrink-0 ${isDark ? 'bg-surface-800' : 'bg-[#EDE9E1] border border-[#E0DBD2]'}`}>
+            <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-mono font-bold flex-shrink-0 ${isDark ? 'bg-slate-800 text-slate-200' : 'bg-slate-200 text-slate-800 border border-slate-300'}`}>
               AD
             </div>
             <div className="truncate">
-              <div className={`text-xs font-semibold truncate ${isDark ? 'text-slate-200' : 'text-[#140E10]'}`}>{user?.name}</div>
-              <div className={`text-[10px] font-mono truncate ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`}>{user?.email}</div>
+              <div className={`text-xs font-semibold truncate ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{user?.name || 'Administrator'}</div>
+              <div className={`text-[10px] font-mono truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{user?.email || 'admin@shrell.com'}</div>
             </div>
           </div>
           <button
             type="button"
             onClick={logout}
-            className={`p-1.5 rounded transition-colors ${isDark ? 'hover:bg-surface-800 text-slate-400 hover:text-rose-400' : 'hover:bg-[#EDE9E1] text-[#5C5456] hover:text-rose-500'}`}
+            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${isDark ? 'hover:bg-slate-800 text-slate-400 hover:text-rose-400' : 'hover:bg-slate-200 text-slate-500 hover:text-rose-600'}`}
             title="Sign Out"
           >
-            <LogOut className="w-4 h-4" />
+            <i className="bi bi-box-arrow-right text-sm" aria-hidden="true" />
           </button>
         </div>
       </aside>
 
       {/* Main Administrative View Area */}
-      <main className="flex-1 overflow-y-auto p-6 md:p-8">
+      <main className={`flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 transition-colors duration-200 ${isDark ? 'bg-slate-950' : 'bg-slate-50'}`}>
         <Outlet />
       </main>
     </div>

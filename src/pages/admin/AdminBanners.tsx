@@ -351,12 +351,12 @@ export const AdminBanners: React.FC = () => {
   return (
     <div className="space-y-6 max-w-5xl">
       {/* Header */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
         <div>
-          <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
+          <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
             Hero Carousel Banners
           </h1>
-          <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
+          <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             Upload custom cropped banners for desktop &amp; mobile with page navigation links. Background transparency preserved.
           </p>
         </div>
@@ -367,7 +367,11 @@ export const AdminBanners: React.FC = () => {
             setIsAdding(!isAdding);
             setStatusMessage(null);
           }}
-          className="px-4 py-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors self-start sm:self-auto"
+          className={`px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors self-start sm:self-auto ${
+            isDark
+              ? 'bg-slate-100 hover:bg-white text-slate-950'
+              : 'bg-slate-900 hover:bg-slate-800 text-white'
+          }`}
         >
           <i className={`bi ${isAdding ? 'bi-x-lg' : 'bi-plus-lg'} text-sm`}></i>
           <span>{isAdding ? 'Close Uploader' : 'Add New Banner'}</span>
@@ -375,26 +379,26 @@ export const AdminBanners: React.FC = () => {
       </div>
 
       {/* Cloudinary Status Banner */}
-      <div className="p-4 rounded-lg bg-surface-900 border border-surface-700 flex items-center justify-between text-xs">
+      <div className={`p-4 rounded-xl border flex items-center justify-between text-xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-xs'}`}>
         <div className="flex items-center gap-2.5">
-          <i className="bi bi-cloud-arrow-up text-brand-400 text-lg"></i>
+          <i className="bi bi-cloud-arrow-up text-lg text-slate-400"></i>
           <div>
-            <div className="text-slate-200 font-semibold">
+            <div className={`font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
               Cloudinary Media Storage:{' '}
               {isCloudinaryActive ? (
-                <span className="text-emerald-400">Connected &amp; Active</span>
+                <span className="text-emerald-500 font-bold">Connected &amp; Active</span>
               ) : (
-                <span className="text-amber-400">Ready for credentials in .env</span>
+                <span className="text-amber-500 font-bold">Ready for credentials in .env</span>
               )}
             </div>
-            <p className="text-[11px] text-slate-400 mt-0.5">
+            <p className={`text-[11px] mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
               Images will be stored exactly as uploaded without background removal or lossy compression.
             </p>
           </div>
         </div>
 
         {!isCloudinaryActive && (
-          <span className="text-[10px] font-mono bg-surface-950 px-2.5 py-1 rounded-md border border-surface-800 text-slate-300">
+          <span className={`text-[10px] font-mono px-2.5 py-1 rounded-md border ${isDark ? 'bg-slate-950 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
             VITE_CLOUDINARY_CLOUD_NAME in .env
           </span>
         )}
@@ -403,10 +407,14 @@ export const AdminBanners: React.FC = () => {
       {/* Status Feedback Message */}
       {statusMessage && (
         <div
-          className={`p-3.5 rounded-lg text-xs font-medium ${
+          className={`p-3.5 rounded-lg text-xs font-medium border ${
             statusMessage.isError
-              ? 'bg-rose-950/60 border border-rose-800 text-rose-300'
-              : 'bg-emerald-950/60 border border-emerald-800 text-emerald-300'
+              ? isDark
+                ? 'bg-rose-950/60 border-rose-800 text-rose-300'
+                : 'bg-rose-50 border-rose-200 text-rose-700'
+              : isDark
+                ? 'bg-emerald-950/60 border-emerald-800 text-emerald-300'
+                : 'bg-emerald-50 border-emerald-200 text-emerald-700'
           }`}
         >
           {statusMessage.text}
@@ -415,30 +423,30 @@ export const AdminBanners: React.FC = () => {
 
       {/* Add New Banner Form Drawer */}
       {isAdding && (
-        <form onSubmit={handleCreateBanner} className="p-6 rounded-lg bg-surface-900 border border-surface-700 space-y-6">
-          <h2 className="text-sm font-bold text-slate-100 uppercase tracking-wider font-mono border-b border-surface-800 pb-2">
+        <form onSubmit={handleCreateBanner} className={`p-6 rounded-xl border space-y-6 ${isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900 shadow-xs'}`}>
+          <h2 className={`text-sm font-bold uppercase tracking-wider font-mono border-b pb-2 ${isDark ? 'text-white border-slate-800' : 'text-slate-900 border-slate-200'}`}>
             Upload &amp; Custom Crop Hero Banner
           </h2>
 
           {/* Banner Upload Dimensions Specifications */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl bg-surface-950 border border-surface-750">
+          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl border ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
             <div className="space-y-1">
-              <div className="flex items-center gap-2 text-xs font-bold text-brand-400 font-mono">
+              <div className={`flex items-center gap-2 text-xs font-bold font-mono ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                 <i className="bi bi-display text-sm"></i>
                 <span>Desktop Banner Size Specs</span>
               </div>
-              <ul className="text-[11px] text-slate-300 space-y-0.5">
+              <ul className={`text-[11px] space-y-0.5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                 <li>• <strong>Recommended:</strong> 1920 × 600 px (or 1600 × 500 px)</li>
                 <li>• <strong>Aspect Ratio:</strong> 16:5 (~3.2:1)</li>
                 <li>• <strong>Storefront Display:</strong> Max height 320px</li>
               </ul>
             </div>
             <div className="space-y-1">
-              <div className="flex items-center gap-2 text-xs font-bold text-brand-400 font-mono">
+              <div className={`flex items-center gap-2 text-xs font-bold font-mono ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                 <i className="bi bi-phone text-sm"></i>
                 <span>Mobile Banner Size Specs</span>
               </div>
-              <ul className="text-[11px] text-slate-300 space-y-0.5">
+              <ul className={`text-[11px] space-y-0.5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                 <li>• <strong>Recommended:</strong> 800 × 450 px (or 750 × 420 px)</li>
                 <li>• <strong>Aspect Ratio:</strong> 16:9 (~1.78:1)</li>
                 <li>• <strong>Storefront Display:</strong> Max height 180px</li>
@@ -450,21 +458,21 @@ export const AdminBanners: React.FC = () => {
             {/* Desktop Banner Upload */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="block text-xs font-semibold text-slate-300">
+                <label className={`block text-xs font-semibold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                   1. Desktop Banner Image *
                 </label>
                 {desktopPreview && (
                   <button
                     type="button"
                     onClick={() => openCropper('desktop')}
-                    className="text-[11px] font-semibold text-brand-400 hover:text-brand-300 flex items-center gap-1"
+                    className={`text-[11px] font-semibold flex items-center gap-1 hover:underline ${isDark ? 'text-slate-300' : 'text-slate-700'}`}
                   >
                     <i className="bi bi-crop"></i>
                     <span>Crop for Desktop</span>
                   </button>
                 )}
               </div>
-              <div className="border-2 border-dashed border-surface-700 hover:border-brand-500 rounded-lg p-4 text-center bg-surface-950 transition-colors">
+              <div className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${isDark ? 'border-slate-700 hover:border-slate-500 bg-slate-950' : 'border-slate-300 hover:border-slate-400 bg-slate-50'}`}>
                 {desktopPreview ? (
                   <div className="space-y-2.5">
                     <img
@@ -473,7 +481,7 @@ export const AdminBanners: React.FC = () => {
                       className="max-h-36 mx-auto object-contain rounded-md"
                     />
                     <div className="flex items-center justify-center gap-3">
-                      <label className="text-xs text-brand-400 hover:underline cursor-pointer">
+                      <label className={`text-xs hover:underline cursor-pointer font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                         Change File
                         <input
                           type="file"
@@ -485,18 +493,22 @@ export const AdminBanners: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => openCropper('desktop')}
-                        className="px-2.5 py-1 text-xs font-semibold rounded-md bg-surface-800 hover:bg-surface-700 text-slate-200 flex items-center gap-1"
+                        className={`px-2.5 py-1 text-xs font-semibold rounded-md border flex items-center gap-1 transition-colors ${
+                          isDark
+                            ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+                            : 'bg-slate-200 hover:bg-slate-300 text-slate-800 border-slate-300'
+                        }`}
                       >
-                        <i className="bi bi-crop text-brand-400"></i>
+                        <i className="bi bi-crop"></i>
                         <span>Crop Banner</span>
                       </button>
                     </div>
                   </div>
                 ) : (
                   <label className="cursor-pointer block space-y-2">
-                    <i className="bi bi-display text-2xl text-slate-400"></i>
-                    <div className="text-xs text-slate-300 font-medium">Click to select Desktop Banner</div>
-                    <div className="text-[10px] text-slate-500">PNG / WebP with transparency supported</div>
+                    <i className={`bi bi-display text-2xl ${isDark ? 'text-slate-500' : 'text-slate-400'}`}></i>
+                    <div className={`text-xs font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Click to select Desktop Banner</div>
+                    <div className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>PNG / WebP with transparency supported</div>
                     <input
                       type="file"
                       accept="image/*"
@@ -508,7 +520,7 @@ export const AdminBanners: React.FC = () => {
               </div>
               {/* Direct URL Input Fallback */}
               <div className="pt-1">
-                <label className="block text-[11px] font-mono text-slate-400 mb-1">
+                <label className={`block text-[11px] font-mono mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                   Or Paste Direct Cloudinary / Image URL:
                 </label>
                 <input
@@ -519,7 +531,11 @@ export const AdminBanners: React.FC = () => {
                     setDesktopPreview(e.target.value);
                     setDesktopFile(null);
                   }}
-                  className="w-full px-3 py-1.5 bg-surface-950 border border-surface-700 rounded-md text-xs font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-brand-500"
+                  className={`w-full px-3 py-1.5 border rounded-md text-xs font-mono focus:outline-none transition-colors ${
+                    isDark
+                      ? 'bg-slate-950 border-slate-700 text-white placeholder-slate-500 focus:border-slate-500'
+                      : 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-slate-500'
+                  }`}
                 />
               </div>
             </div>
@@ -527,21 +543,21 @@ export const AdminBanners: React.FC = () => {
             {/* Mobile Banner Upload */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="block text-xs font-semibold text-slate-300">
+                <label className={`block text-xs font-semibold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                   2. Mobile Banner Image (Optional)
                 </label>
                 {mobilePreview && (
                   <button
                     type="button"
                     onClick={() => openCropper('mobile')}
-                    className="text-[11px] font-semibold text-brand-400 hover:text-brand-300 flex items-center gap-1"
+                    className={`text-[11px] font-semibold flex items-center gap-1 hover:underline ${isDark ? 'text-slate-300' : 'text-slate-700'}`}
                   >
                     <i className="bi bi-crop"></i>
                     <span>Crop for Mobile</span>
                   </button>
                 )}
               </div>
-              <div className="border-2 border-dashed border-surface-700 hover:border-brand-500 rounded-lg p-4 text-center bg-surface-950 transition-colors">
+              <div className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${isDark ? 'border-slate-700 hover:border-slate-500 bg-slate-950' : 'border-slate-300 hover:border-slate-400 bg-slate-50'}`}>
                 {mobilePreview ? (
                   <div className="space-y-2.5">
                     <img
@@ -550,7 +566,7 @@ export const AdminBanners: React.FC = () => {
                       className="max-h-36 mx-auto object-contain rounded-md"
                     />
                     <div className="flex items-center justify-center gap-3">
-                      <label className="text-xs text-brand-400 hover:underline cursor-pointer">
+                      <label className={`text-xs hover:underline cursor-pointer font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                         Change File
                         <input
                           type="file"
@@ -562,18 +578,22 @@ export const AdminBanners: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => openCropper('mobile')}
-                        className="px-2.5 py-1 text-xs font-semibold rounded-md bg-surface-800 hover:bg-surface-700 text-slate-200 flex items-center gap-1"
+                        className={`px-2.5 py-1 text-xs font-semibold rounded-md border flex items-center gap-1 transition-colors ${
+                          isDark
+                            ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+                            : 'bg-slate-200 hover:bg-slate-300 text-slate-800 border-slate-300'
+                        }`}
                       >
-                        <i className="bi bi-crop text-brand-400"></i>
+                        <i className="bi bi-crop"></i>
                         <span>Crop Banner</span>
                       </button>
                     </div>
                   </div>
                 ) : (
                   <label className="cursor-pointer block space-y-2">
-                    <i className="bi bi-phone text-2xl text-slate-400"></i>
-                    <div className="text-xs text-slate-300 font-medium">Click to select Mobile Banner</div>
-                    <div className="text-[10px] text-slate-500">Falls back to desktop banner if not provided</div>
+                    <i className={`bi bi-phone text-2xl ${isDark ? 'text-slate-500' : 'text-slate-400'}`}></i>
+                    <div className={`text-xs font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Click to select Mobile Banner</div>
+                    <div className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Falls back to desktop banner if not provided</div>
                     <input
                       type="file"
                       accept="image/*"
@@ -585,7 +605,7 @@ export const AdminBanners: React.FC = () => {
               </div>
               {/* Direct Mobile URL Input */}
               <div className="pt-1">
-                <label className="block text-[11px] font-mono text-slate-400 mb-1">
+                <label className={`block text-[11px] font-mono mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                   Or Paste Direct Mobile Cloudinary / Image URL:
                 </label>
                 <input
@@ -596,7 +616,11 @@ export const AdminBanners: React.FC = () => {
                     setMobilePreview(e.target.value);
                     setMobileFile(null);
                   }}
-                  className="w-full px-3 py-1.5 bg-surface-950 border border-surface-700 rounded-md text-xs font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-brand-500"
+                  className={`w-full px-3 py-1.5 border rounded-md text-xs font-mono focus:outline-none transition-colors ${
+                    isDark
+                      ? 'bg-slate-950 border-slate-700 text-white placeholder-slate-500 focus:border-slate-500'
+                      : 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-slate-500'
+                  }`}
                 />
               </div>
             </div>
@@ -605,7 +629,7 @@ export const AdminBanners: React.FC = () => {
           {/* Navigation Link & Properties */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
             <div className="sm:col-span-2">
-              <label htmlFor="banner-target-url" className="block text-xs font-semibold text-slate-300 mb-1">
+              <label htmlFor="banner-target-url" className={`block text-xs font-semibold mb-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                 Target Page Navigation URL (where clicking this banner will navigate) *
               </label>
               <input
@@ -615,12 +639,16 @@ export const AdminBanners: React.FC = () => {
                 placeholder="e.g. /catalogue or /catalogue?category=roof-racks-cargo"
                 value={targetUrl}
                 onChange={(e) => setTargetUrl(e.target.value)}
-                className="w-full bg-surface-950 border border-surface-700 rounded-lg px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500"
+                className={`w-full border rounded-lg px-3.5 py-2 text-xs focus:outline-none transition-colors ${
+                  isDark
+                    ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-500'
+                    : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-slate-500'
+                }`}
               />
             </div>
 
             <div>
-              <label htmlFor="banner-order" className="block text-xs font-semibold text-slate-300 mb-1">
+              <label htmlFor="banner-order" className={`block text-xs font-semibold mb-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                 Carousel Order (1, 2, 3...)
               </label>
               <input
@@ -629,12 +657,16 @@ export const AdminBanners: React.FC = () => {
                 min="1"
                 value={order}
                 onChange={(e) => setOrder(Number(e.target.value))}
-                className="w-full bg-surface-950 border border-surface-700 rounded-lg px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500"
+                className={`w-full border rounded-lg px-3.5 py-2 text-xs focus:outline-none transition-colors ${
+                  isDark
+                    ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-500'
+                    : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-slate-500'
+                }`}
               />
             </div>
 
             <div className="sm:col-span-2">
-              <label htmlFor="banner-alt" className="block text-xs font-semibold text-slate-300 mb-1">
+              <label htmlFor="banner-alt" className={`block text-xs font-semibold mb-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                 Alt Text / Title (Accessibility)
               </label>
               <input
@@ -643,17 +675,21 @@ export const AdminBanners: React.FC = () => {
                 placeholder="e.g. Festival Season Car Care Deals"
                 value={altText}
                 onChange={(e) => setAltText(e.target.value)}
-                className="w-full bg-surface-950 border border-surface-700 rounded-lg px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500"
+                className={`w-full border rounded-lg px-3.5 py-2 text-xs focus:outline-none transition-colors ${
+                  isDark
+                    ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-500'
+                    : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-slate-500'
+                }`}
               />
             </div>
 
             <div className="flex items-center pt-5">
-              <label className="flex items-center gap-2 text-xs text-slate-200 cursor-pointer">
+              <label className={`flex items-center gap-2 text-xs cursor-pointer ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                 <input
                   type="checkbox"
                   checked={isActive}
                   onChange={(e) => setIsActive(e.target.checked)}
-                  className="rounded border-surface-700 text-brand-500 w-4 h-4"
+                  className="rounded border-slate-400 text-slate-900 w-4 h-4"
                 />
                 <span>Active on Storefront</span>
               </label>
@@ -661,22 +697,26 @@ export const AdminBanners: React.FC = () => {
           </div>
 
           {/* Submit Actions */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-surface-800">
+          <div className={`flex items-center justify-end gap-3 pt-4 border-t ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
             <button
               type="button"
               onClick={() => setIsAdding(false)}
-              className="px-4 py-2 text-xs text-slate-400 hover:text-slate-200"
+              className={`px-4 py-2 text-xs transition-colors ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'}`}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={uploading}
-              className="px-6 py-2.5 rounded-lg bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-semibold text-xs flex items-center gap-2 transition-colors"
+              className={`px-6 py-2.5 rounded-lg font-semibold text-xs flex items-center gap-2 transition-colors ${
+                isDark
+                  ? 'bg-slate-100 hover:bg-white text-slate-950 disabled:opacity-50'
+                  : 'bg-slate-900 hover:bg-slate-800 text-white disabled:opacity-50'
+              }`}
             >
               {uploading ? (
                 <>
-                  <span className="animate-spin inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full" />
+                  <span className="animate-spin inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full" />
                   <span>Uploading to Cloudinary...</span>
                 </>
               ) : (
@@ -692,7 +732,7 @@ export const AdminBanners: React.FC = () => {
 
       {/* Banners List */}
       <div className="space-y-3">
-        <h2 className="text-xs font-mono font-bold uppercase text-slate-400 tracking-wider">
+        <h2 className={`text-xs font-mono font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
           Current Carousel Slides ({banners.length})
         </h2>
 
@@ -701,7 +741,7 @@ export const AdminBanners: React.FC = () => {
             <ShrellLoader size={48} />
           </div>
         ) : banners.length === 0 ? (
-          <div className="p-8 rounded-lg bg-surface-900 border border-surface-700 text-center text-xs text-slate-400">
+          <div className={`p-8 rounded-xl border text-center text-xs ${isDark ? 'bg-slate-900 border-slate-800 text-slate-400' : 'bg-white border-slate-200 text-slate-500'}`}>
             No banners created yet. Click &quot;Add New Banner&quot; above to create one.
           </div>
         ) : (
@@ -709,11 +749,15 @@ export const AdminBanners: React.FC = () => {
             {banners.map((b) => (
               <div
                 key={b.id}
-                className="p-4 rounded-lg bg-surface-900 border border-surface-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+                className={`p-4 rounded-xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-colors ${
+                  isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+                }`}
               >
                 {/* Thumbnails */}
-                <div className="flex items-center gap-4 flex-1">
-                  <div className="w-40 h-20 rounded-md bg-surface-950 border border-surface-800 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                <div className="flex items-center gap-4 flex-1 min-w-0">
+                  <div className={`w-40 h-20 rounded-lg border overflow-hidden flex-shrink-0 flex items-center justify-center ${
+                    isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
+                  }`}>
                     <img
                       src={b.desktopImageUrl}
                       alt={b.altText || 'Desktop Banner'}
@@ -722,7 +766,9 @@ export const AdminBanners: React.FC = () => {
                   </div>
 
                   {b.mobileImageUrl && b.mobileImageUrl !== b.desktopImageUrl && (
-                    <div className="w-16 h-20 rounded-md bg-surface-950 border border-surface-800 overflow-hidden flex-shrink-0 hidden sm:flex items-center justify-center">
+                    <div className={`w-16 h-20 rounded-lg border overflow-hidden flex-shrink-0 hidden sm:flex items-center justify-center ${
+                      isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
+                    }`}>
                       <img
                         src={b.mobileImageUrl}
                         alt="Mobile Banner"
@@ -731,28 +777,30 @@ export const AdminBanners: React.FC = () => {
                     </div>
                   )}
 
-                  <div className="space-y-1">
+                  <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-100 font-mono">
+                      <span className={`text-xs font-bold font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
                         Slide #{b.order}
                       </span>
                       <span
-                        className={`text-[10px] px-2 py-0.5 rounded-md font-mono ${
+                        className={`text-[10px] px-2 py-0.5 rounded-md font-mono font-semibold ${
                           b.isActive
-                            ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800'
-                            : 'bg-surface-800 text-slate-400 border border-surface-700'
+                            ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
+                            : isDark
+                              ? 'bg-slate-800 text-slate-400 border border-slate-700'
+                              : 'bg-slate-100 text-slate-500 border border-slate-200'
                         }`}
                       >
                         {b.isActive ? 'Active' : 'Hidden'}
                       </span>
                     </div>
 
-                    <div className="text-xs text-brand-400 font-mono">
+                    <div className={`text-xs font-mono truncate ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                       Target Link: <span className="underline">{b.targetUrl}</span>
                     </div>
 
                     {b.altText && (
-                      <div className="text-[11px] text-slate-400">
+                      <div className={`text-[11px] truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                         Title: {b.altText}
                       </div>
                     )}
@@ -760,14 +808,16 @@ export const AdminBanners: React.FC = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 self-end md:self-center">
+                <div className="flex items-center gap-2 self-end md:self-center shrink-0">
                   <button
                     type="button"
                     onClick={() => handleToggleActive(b)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-mono transition-colors border ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors border ${
                       b.isActive
-                        ? 'bg-surface-800 hover:bg-surface-750 text-slate-200 border-surface-700'
-                        : 'bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-300 border-emerald-800'
+                        ? isDark
+                          ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+                          : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
+                        : 'bg-emerald-600 hover:bg-emerald-700 text-white border-transparent font-medium'
                     }`}
                   >
                     {b.isActive ? 'Hide' : 'Unhide'}
@@ -778,14 +828,18 @@ export const AdminBanners: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleDeleteBanner(b.id)}
-                        className="px-2.5 py-1.5 rounded-md bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold tracking-wide transition-colors"
+                        className="px-2.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold tracking-wide transition-colors"
                       >
                         Confirm Delete
                       </button>
                       <button
                         type="button"
                         onClick={() => setConfirmDeleteId(null)}
-                        className="px-2 py-1.5 rounded-md bg-surface-800 hover:bg-surface-750 text-slate-300 text-xs transition-colors"
+                        className={`px-2 py-1.5 rounded-lg text-xs border transition-colors ${
+                          isDark
+                            ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
+                            : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
+                        }`}
                       >
                         Cancel
                       </button>
@@ -794,7 +848,9 @@ export const AdminBanners: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setConfirmDeleteId(b.id)}
-                      className="p-1.5 rounded-md bg-surface-800 hover:bg-rose-950 text-slate-400 hover:text-rose-400 transition-colors"
+                      className={`p-1.5 rounded-lg border transition-colors text-slate-400 hover:text-rose-500 ${
+                        isDark ? 'bg-slate-800 hover:bg-slate-700 border-slate-700' : 'bg-slate-100 hover:bg-slate-200 border-slate-300'
+                      }`}
                       title="Delete banner"
                     >
                       <i className="bi bi-trash3 text-sm"></i>
@@ -811,37 +867,41 @@ export const AdminBanners: React.FC = () => {
       {/* INTERACTIVE CROPPER MODAL (Desktop & Mobile Custom Ratio & Preview) */}
       {/* =================================================================== */}
       {cropModal.isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-surface-900 border border-surface-700 rounded-lg max-w-2xl w-full p-5 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-surface-800 pb-3">
+        <div className="fixed inset-0 z-[100] w-screen h-screen min-h-screen bg-black/75 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+          <div className={`border rounded-xl max-w-2xl w-full p-5 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl ${isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'}`}>
+            <div className={`flex items-center justify-between border-b pb-3 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
               <div className="flex items-center gap-2">
-                <i className="bi bi-crop text-brand-400 text-lg"></i>
-                <h3 className="text-sm font-bold text-slate-100 uppercase tracking-wider font-mono">
+                <i className={`bi bi-crop text-lg ${isDark ? 'text-slate-300' : 'text-slate-700'}`}></i>
+                <h3 className={`text-sm font-bold uppercase tracking-wider font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   Crop Banner for {cropModal.target === 'desktop' ? 'Desktop' : 'Mobile'}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setCropModal({ isOpen: false, target: 'desktop', imageUrl: '', originalFile: null })}
-                className="text-slate-400 hover:text-white"
+                className={`p-1 rounded-md transition-colors ${isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}`}
               >
-                <i className="bi bi-x-lg"></i>
+                <i className="bi bi-x-lg text-sm"></i>
               </button>
             </div>
 
             {/* Aspect Ratio Presets */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300">Aspect Ratio Preset</label>
+              <label className={`text-xs font-semibold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Aspect Ratio Preset</label>
               <div className="flex flex-wrap gap-2">
                 {cropModal.target === 'desktop' ? (
                   <>
                     <button
                       type="button"
                       onClick={() => setAspectRatio(16 / 5)}
-                      className={`px-3 py-1 rounded-md text-xs font-mono font-medium ${
+                      className={`px-3 py-1 rounded-lg text-xs font-mono font-medium border transition-colors ${
                         Math.abs(aspectRatio - 16 / 5) < 0.05
-                          ? 'bg-brand-500 text-white'
-                          : 'bg-surface-800 text-slate-300 hover:bg-surface-700'
+                          ? isDark
+                            ? 'bg-slate-100 text-slate-900 border-white'
+                            : 'bg-slate-900 text-white border-slate-900'
+                          : isDark
+                            ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-750'
+                            : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
                       }`}
                     >
                       16:5 (Ultrawide Banner)
@@ -849,10 +909,14 @@ export const AdminBanners: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setAspectRatio(16 / 9)}
-                      className={`px-3 py-1 rounded-md text-xs font-mono font-medium ${
+                      className={`px-3 py-1 rounded-lg text-xs font-mono font-medium border transition-colors ${
                         Math.abs(aspectRatio - 16 / 9) < 0.05
-                          ? 'bg-brand-500 text-white'
-                          : 'bg-surface-800 text-slate-300 hover:bg-surface-700'
+                          ? isDark
+                            ? 'bg-slate-100 text-slate-900 border-white'
+                            : 'bg-slate-900 text-white border-slate-900'
+                          : isDark
+                            ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-750'
+                            : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
                       }`}
                     >
                       16:9 (Standard Widescreen)
@@ -860,10 +924,14 @@ export const AdminBanners: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setAspectRatio(21 / 9)}
-                      className={`px-3 py-1 rounded-md text-xs font-mono font-medium ${
+                      className={`px-3 py-1 rounded-lg text-xs font-mono font-medium border transition-colors ${
                         Math.abs(aspectRatio - 21 / 9) < 0.05
-                          ? 'bg-brand-500 text-white'
-                          : 'bg-surface-800 text-slate-300 hover:bg-surface-700'
+                          ? isDark
+                            ? 'bg-slate-100 text-slate-900 border-white'
+                            : 'bg-slate-900 text-white border-slate-900'
+                          : isDark
+                            ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-750'
+                            : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
                       }`}
                     >
                       21:9 (Panoramic)
@@ -874,10 +942,14 @@ export const AdminBanners: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setAspectRatio(16 / 9)}
-                      className={`px-3 py-1 rounded-md text-xs font-mono font-medium ${
+                      className={`px-3 py-1 rounded-lg text-xs font-mono font-medium border transition-colors ${
                         Math.abs(aspectRatio - 16 / 9) < 0.05
-                          ? 'bg-brand-500 text-white'
-                          : 'bg-surface-800 text-slate-300 hover:bg-surface-700'
+                          ? isDark
+                            ? 'bg-slate-100 text-slate-900 border-white'
+                            : 'bg-slate-900 text-white border-slate-900'
+                          : isDark
+                            ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-750'
+                            : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
                       }`}
                     >
                       16:9 (Mobile Banner)
@@ -885,10 +957,14 @@ export const AdminBanners: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setAspectRatio(4 / 3)}
-                      className={`px-3 py-1 rounded-md text-xs font-mono font-medium ${
+                      className={`px-3 py-1 rounded-lg text-xs font-mono font-medium border transition-colors ${
                         Math.abs(aspectRatio - 4 / 3) < 0.05
-                          ? 'bg-brand-500 text-white'
-                          : 'bg-surface-800 text-slate-300 hover:bg-surface-700'
+                          ? isDark
+                            ? 'bg-slate-100 text-slate-900 border-white'
+                            : 'bg-slate-900 text-white border-slate-900'
+                          : isDark
+                            ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-750'
+                            : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
                       }`}
                     >
                       4:3 (Taller Card)
@@ -896,10 +972,14 @@ export const AdminBanners: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setAspectRatio(1)}
-                      className={`px-3 py-1 rounded-md text-xs font-mono font-medium ${
+                      className={`px-3 py-1 rounded-lg text-xs font-mono font-medium border transition-colors ${
                         Math.abs(aspectRatio - 1) < 0.05
-                          ? 'bg-brand-500 text-white'
-                          : 'bg-surface-800 text-slate-300 hover:bg-surface-700'
+                          ? isDark
+                            ? 'bg-slate-100 text-slate-900 border-white'
+                            : 'bg-slate-900 text-white border-slate-900'
+                          : isDark
+                            ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-750'
+                            : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
                       }`}
                     >
                       1:1 (Square)
@@ -910,19 +990,23 @@ export const AdminBanners: React.FC = () => {
             </div>
 
             {/* Canvas Preview Area */}
-            <div className="bg-surface-950 p-3 rounded-lg border border-surface-800 flex items-center justify-center overflow-hidden">
+            <div className={`p-3 rounded-lg border flex items-center justify-center overflow-hidden ${
+              isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+            }`}>
               <canvas
                 ref={canvasRef}
-                className="max-w-full max-h-[300px] object-contain rounded border border-surface-700"
+                className={`max-w-full max-h-[300px] object-contain rounded border ${
+                  isDark ? 'border-slate-800' : 'border-slate-300'
+                }`}
               />
             </div>
 
             {/* Adjustments: Zoom & Pan */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
               <div className="space-y-1">
-                <div className="flex justify-between text-xs text-slate-300">
+                <div className={`flex justify-between text-xs ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                   <span>Zoom</span>
-                  <span className="font-mono text-slate-400">{zoom.toFixed(1)}x</span>
+                  <span className={`font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{zoom.toFixed(1)}x</span>
                 </div>
                 <input
                   type="range"
@@ -931,14 +1015,14 @@ export const AdminBanners: React.FC = () => {
                   step="0.1"
                   value={zoom}
                   onChange={(e) => setZoom(parseFloat(e.target.value))}
-                  className="w-full accent-brand-500"
+                  className="w-full accent-slate-600 dark:accent-slate-300 cursor-pointer"
                 />
               </div>
 
               <div className="space-y-1">
-                <div className="flex justify-between text-xs text-slate-300">
+                <div className={`flex justify-between text-xs ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                   <span>Pan X</span>
-                  <span className="font-mono text-slate-400">{panX}%</span>
+                  <span className={`font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{panX}%</span>
                 </div>
                 <input
                   type="range"
@@ -946,14 +1030,14 @@ export const AdminBanners: React.FC = () => {
                   max="100"
                   value={panX}
                   onChange={(e) => setPanX(parseInt(e.target.value, 10))}
-                  className="w-full accent-brand-500"
+                  className="w-full accent-slate-600 dark:accent-slate-300 cursor-pointer"
                 />
               </div>
 
               <div className="space-y-1">
-                <div className="flex justify-between text-xs text-slate-300">
+                <div className={`flex justify-between text-xs ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                   <span>Pan Y</span>
-                  <span className="font-mono text-slate-400">{panY}%</span>
+                  <span className={`font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{panY}%</span>
                 </div>
                 <input
                   type="range"
@@ -961,13 +1045,13 @@ export const AdminBanners: React.FC = () => {
                   max="100"
                   value={panY}
                   onChange={(e) => setPanY(parseInt(e.target.value, 10))}
-                  className="w-full accent-brand-500"
+                  className="w-full accent-slate-600 dark:accent-slate-300 cursor-pointer"
                 />
               </div>
             </div>
 
             {/* Modal Actions */}
-            <div className="flex items-center justify-between pt-4 border-t border-surface-800">
+            <div className={`flex items-center justify-between pt-4 border-t ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
               <button
                 type="button"
                 onClick={() => {
@@ -975,7 +1059,7 @@ export const AdminBanners: React.FC = () => {
                   setPanX(0);
                   setPanY(0);
                 }}
-                className="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1"
+                className={`text-xs flex items-center gap-1 transition-colors ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'}`}
               >
                 <i className="bi bi-arrow-counterclockwise"></i>
                 <span>Reset Crop</span>
@@ -985,14 +1069,22 @@ export const AdminBanners: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setCropModal({ isOpen: false, target: 'desktop', imageUrl: '', originalFile: null })}
-                  className="px-4 py-2 rounded-md bg-surface-800 hover:bg-surface-700 text-xs font-semibold text-slate-300"
+                  className={`px-4 py-2 rounded-lg text-xs font-semibold border transition-colors ${
+                    isDark
+                      ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
+                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
+                  }`}
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleApplyCrop}
-                  className="px-5 py-2 rounded-md bg-brand-500 hover:bg-brand-600 text-xs font-semibold text-white flex items-center gap-1.5"
+                  className={`px-5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                    isDark
+                      ? 'bg-slate-100 hover:bg-white text-slate-950'
+                      : 'bg-slate-900 hover:bg-slate-800 text-white'
+                  }`}
                 >
                   <i className="bi bi-check2"></i>
                   <span>Apply Crop</span>

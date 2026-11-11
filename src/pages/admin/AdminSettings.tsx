@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Save, Check } from 'lucide-react';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { settingsRepository } from '../../infrastructure/repositories';
 import { paisaToRupees, rupeesToPaisa } from '../../domain/services/CurrencyService';
@@ -74,29 +73,33 @@ export const AdminSettings: React.FC = () => {
     );
   }
 
-  const inputCls = `w-full border rounded px-3 py-2 focus:outline-none focus:border-brand-500 ${isDark ? 'bg-surface-950 border-surface-700 text-slate-100' : 'bg-white border-[#E0DBD2] text-[#140E10]'}`;
-  const labelCls = `block uppercase mb-1 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`;
-  const sectionHeadCls = `text-xs uppercase tracking-wider font-bold border-b pb-2 ${isDark ? 'text-slate-300 border-surface-800' : 'text-[#3A3030] border-[#E0DBD2]'}`;
+  const inputCls = `w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+    isDark
+      ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+      : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+  }`;
+  const labelCls = `block uppercase mb-1 font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`;
+  const sectionHeadCls = `text-xs uppercase tracking-wider font-bold border-b pb-2 ${isDark ? 'text-slate-200 border-slate-800' : 'text-slate-800 border-slate-200'}`;
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div className={`border-b pb-4 ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
-        <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-slate-100' : 'text-[#140E10]'}`}>
+      <div className={`border-b pb-4 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+        <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
           COMMERCE SETTINGS & TAX RULES
         </h1>
-        <p className={`text-xs font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
+        <p className={`text-xs font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
           Store parameters, UPI payment handles, GST rates and shipping rules
         </p>
       </div>
 
       {saved && (
-        <div className="p-3 rounded bg-emerald-950/60 border border-emerald-800 text-emerald-300 text-xs font-mono flex items-center gap-2">
-          <Check className="w-4 h-4" />
+        <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs font-mono flex items-center gap-2">
+          <i className="bi bi-check-lg text-sm" aria-hidden="true" />
           <span>Store settings updated successfully.</span>
         </div>
       )}
 
-      <form onSubmit={handleSave} className={`p-6 rounded-lg border space-y-6 text-xs font-mono ${isDark ? 'bg-surface-900 border-surface-700' : 'bg-white border-[#E0DBD2]'}`}>
+      <form onSubmit={handleSave} className={`p-6 rounded-xl border space-y-6 text-xs font-mono shadow-xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
         <div className="space-y-4">
           <h2 className={sectionHeadCls}>Store Identity &amp; Contact</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -121,7 +124,7 @@ export const AdminSettings: React.FC = () => {
             <div>
               <label className={labelCls}>Store UPI VPA Handle</label>
               <input type="text" required value={storeUpiId} onChange={(e) => setStoreUpiId(e.target.value)}
-                placeholder="" className={inputCls} />
+                placeholder="e.g. shrell@icici" className={inputCls} />
             </div>
             <div>
               <label className={labelCls}>Registered Merchant Name</label>
@@ -149,10 +152,10 @@ export const AdminSettings: React.FC = () => {
           </div>
         </div>
 
-        <div className={`pt-4 border-t flex justify-end ${isDark ? 'border-surface-800' : 'border-[#E0DBD2]'}`}>
+        <div className={`pt-4 border-t flex justify-end ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
           <button type="submit"
-            className="px-6 py-2.5 rounded bg-brand-500 hover:bg-brand-600 text-white font-bold uppercase tracking-wider flex items-center gap-2 transition-colors">
-            <Save className="w-4 h-4" />
+            className="px-6 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 font-bold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer shadow-sm">
+            <i className="bi bi-floppy text-sm" aria-hidden="true" />
             <span>Save Configuration</span>
           </button>
         </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Product, Category } from '../../domain/types';
 import { productRepository, categoryRepository } from '../../infrastructure/repositories';
 import { ProductCard } from '../../components/ui/ProductCard';
@@ -132,46 +132,8 @@ export const CataloguePage: React.FC = () => {
     <div className={`min-h-screen py-6 px-4 sm:px-6 lg:px-8 transition-colors ${
       isDark ? 'bg-[#000000] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'
     }`}>
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header Breadcrumb & Title */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4 border-[#221215]/40 dark:border-[#221215]">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-mono opacity-60 mb-1">
-              <Link to="/" className="hover:underline">Home</Link>
-              <span>/</span>
-              <span className="text-[#FF000E] font-semibold">Catalogue</span>
-              {selectedCategory && (
-                <>
-                  <span>/</span>
-                  <span className="capitalize">{selectedCategory.replace(/-/g, ' ')}</span>
-                </>
-              )}
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Automotive Parts &amp; Touring Equipment
-            </h1>
-            <p className="text-xs sm:text-sm opacity-70 mt-0.5">
-              Precision engineered automotive hardware compatible with all major Indian platforms
-            </p>
-          </div>
-
-          {/* Quick Stats & Typo-Tolerant Engine Badge */}
-          <div className="flex flex-wrap items-center gap-2 text-xs font-mono self-start md:self-auto">
-            {searchInput.trim() && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#FF000E]/10 border border-[#FF000E]/30 text-[#FF000E]">
-                <i className="bi bi-lightning-charge-fill" aria-hidden="true" />
-                <span>Typo-Tolerant (Fuse.js)</span>
-              </span>
-            )}
-            <span className={`px-3 py-1 rounded-full border text-[11px] ${
-              isDark ? 'bg-[#130E10] border-[#261619] text-gray-300' : 'bg-gray-100 border-gray-200 text-gray-700'
-            }`}>
-              {loading ? 'Searching...' : `${filteredProducts.length} Products Found`}
-            </span>
-          </div>
-        </div>
-
-        {/* Search Bar & Controls Bar */}
+      <div className="max-w-7xl mx-auto space-y-5">
+        {/* Search Bar & Themed Controls Bar */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
           {/* Typo-Tolerant Input */}
           <div className="md:col-span-8 relative">
@@ -181,41 +143,62 @@ export const CataloguePage: React.FC = () => {
               placeholder="Instant typo-tolerant search (e.g. 'difuser', 'matts', 'cabl', 'led')..."
               value={searchInput}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className={`w-full rounded-xl pl-10 pr-10 py-2.5 text-xs sm:text-sm font-sans border transition-all focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+              className={`w-full rounded-xl pl-10 pr-24 py-2.5 text-xs sm:text-sm font-sans border transition-all focus:outline-none focus:border-[#FF000E] focus:ring-1 focus:ring-[#FF000E] ${
                 isDark
                   ? 'bg-[#0E0A0B] border-[#261619] text-[#F1EEEE] placeholder-gray-500'
                   : 'bg-white border-[#E0DBD2] text-[#140E10] placeholder-gray-400 shadow-xs'
               }`}
             />
-            {searchInput && (
-              <button
-                type="button"
-                onClick={() => handleSearchChange('')}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-white cursor-pointer"
-                aria-label="Clear search input"
-              >
-                <i className="bi bi-x-circle-fill text-sm" />
-              </button>
-            )}
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+              {searchInput.trim() && (
+                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#FF000E]/10 border border-[#FF000E]/30 text-[#FF000E]">
+                  <i className="bi bi-lightning-charge-fill text-[9px]" aria-hidden="true" />
+                  <span>Fuse.js</span>
+                </span>
+              )}
+              {searchInput && (
+                <button
+                  type="button"
+                  onClick={() => handleSearchChange('')}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-white cursor-pointer p-0.5"
+                  aria-label="Clear search input"
+                >
+                  <i className="bi bi-x-circle-fill text-sm" />
+                </button>
+              )}
+            </div>
           </div>
 
-          {/* Sort Selector */}
+          {/* Themed Sort Selector */}
           <div className="md:col-span-4 flex items-center gap-2">
-            <label className="text-xs font-mono font-semibold shrink-0 opacity-70">Sort By:</label>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className={`w-full rounded-xl px-3 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] cursor-pointer ${
-                isDark
-                  ? 'bg-[#0E0A0B] border-[#261619] text-[#F1EEEE]'
-                  : 'bg-white border-[#E0DBD2] text-[#140E10]'
-              }`}
-            >
-              <option value="relevance">Best Match / Relevance</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="rating-desc">Customer Rating (Highest)</option>
-            </select>
+            <label className={`text-xs font-mono font-semibold shrink-0 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Sort By:</label>
+            <div className="relative flex-1">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortOption)}
+                className={`w-full appearance-none rounded-xl pl-3.5 pr-8 py-2.5 text-xs font-mono border transition-all cursor-pointer focus:outline-none focus:border-[#FF000E] focus:ring-1 focus:ring-[#FF000E] ${
+                  isDark
+                    ? 'bg-[#0E0A0B] border-[#261619] text-[#F1EEEE] hover:border-[#381B20]'
+                    : 'bg-white border-[#E0DBD2] text-[#140E10] hover:border-[#C8C2B6] shadow-xs'
+                }`}
+              >
+                <option value="relevance" className={isDark ? 'bg-[#0E0A0B] text-white' : 'bg-white text-[#140E10]'}>
+                  Best Match / Relevance
+                </option>
+                <option value="price-asc" className={isDark ? 'bg-[#0E0A0B] text-white' : 'bg-white text-[#140E10]'}>
+                  Price: Low to High
+                </option>
+                <option value="price-desc" className={isDark ? 'bg-[#0E0A0B] text-white' : 'bg-white text-[#140E10]'}>
+                  Price: High to Low
+                </option>
+                <option value="rating-desc" className={isDark ? 'bg-[#0E0A0B] text-white' : 'bg-white text-[#140E10]'}>
+                  Customer Rating (Highest)
+                </option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-[#FF000E]">
+                <i className="bi bi-chevron-down text-xs" aria-hidden="true" />
+              </div>
+            </div>
           </div>
         </div>
 

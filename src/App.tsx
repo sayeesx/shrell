@@ -18,6 +18,7 @@ import { OrderFailurePage } from './pages/storefront/OrderFailurePage';
 import { OrderTrackingPage } from './pages/storefront/OrderTrackingPage';
 import { PoliciesPage } from './pages/storefront/PoliciesPage';
 import { ProfilePage } from './pages/storefront/ProfilePage';
+import { OrdersPage } from './pages/storefront/OrdersPage';
 import { OfflinePage } from './pages/storefront/OfflinePage';
 import { PreBookPage } from './pages/storefront/PreBookPage';
 
@@ -99,6 +100,7 @@ export const App: React.FC = () => {
           <Route path="/order-failure" element={<OrderFailurePage />} />
           <Route path="/track" element={<OrderTrackingPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/orders" element={<OrdersPage />} />
           <Route path="/pre-book" element={<PreBookPage />} />
           <Route path="/offline" element={<OfflinePage onRetry={() => setIsOnline(true)} />} />
           <Route path="/shipping-policy" element={<PoliciesPage />} />

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import confetti from 'canvas-confetti';
 import { useCart } from '../../application/CartContext';
 import { Product } from '../../domain/types';
 import { formatINR } from '../../domain/services/CurrencyService';
@@ -70,18 +71,119 @@ export const CartPage: React.FC = () => {
   const progressPercent = Math.min(100, Math.round((cart.subtotalPaisa / freeThreshold) * 100));
   const isFreeDeliveryUnlocked = remainingForFreeShipping === 0;
 
+  // Mobile viewport detection
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth < 768;
+  });
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Mobile celebration popup modal for Free Express Shipping
+  const [showFreeDeliveryModal, setShowFreeDeliveryModal] = useState(false);
+  const confettiFiredRef = useRef(false);
+
+  useEffect(() => {
+    if (isMobile && isFreeDeliveryUnlocked && !confettiFiredRef.current) {
+      confettiFiredRef.current = true;
+      setShowFreeDeliveryModal(true);
+      try {
+        confetti({
+          particleCount: 90,
+          spread: 70,
+          origin: { y: 0.5 },
+          colors: ['#FF000E', '#E0000C', '#CC000B', '#FF3342', '#FFFFFF', '#140E10'],
+        });
+      } catch (err) {
+        console.error('Confetti trigger failed:', err);
+      }
+    }
+  }, [isMobile, isFreeDeliveryUnlocked]);
+
+  const renderFreeDeliveryCelebrationModal = () => {
+    if (!showFreeDeliveryModal || !isMobile) return null;
+
+    return (
+      <div
+        className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="free-delivery-title"
+      >
+        <div
+          className={`relative w-full max-w-sm rounded-2xl border p-6 space-y-4 shadow-2xl text-center animate-in zoom-in-95 duration-200 ${
+            isDark ? 'bg-[#120E0F] border-[#2D161A] text-[#F1EEEE]' : 'bg-[#FFFFFF] border-[#E0DBD2] text-[#140E10]'
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Close Modal Button */}
+          <button
+            type="button"
+            onClick={() => setShowFreeDeliveryModal(false)}
+            className={`absolute top-3.5 right-3.5 w-8 h-8 rounded-full border flex items-center justify-center transition-colors cursor-pointer ${
+              isDark ? 'bg-[#1A1214] border-[#2D161A] text-slate-400 hover:text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-slate-600 hover:text-black'
+            }`}
+            aria-label="Close free delivery celebration modal"
+          >
+            <i className="bi bi-x-lg text-xs" />
+          </button>
+
+          {/* Delivery Van Graphic */}
+          <div className="relative mx-auto w-20 h-20 rounded-2xl flex items-center justify-center border p-2 bg-gradient-to-b from-[#FF000E]/15 to-transparent border-[#FF000E]/30">
+            <img
+              src="/images/shrell-delivery.webp"
+              alt="Express Delivery"
+              className="w-16 h-16 object-contain drop-shadow-md"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/shrell-delivery.webp';
+              }}
+            />
+            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF000E] opacity-75" />
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#FF000E]" />
+            </span>
+          </div>
+
+          <div className="space-y-1.5">
+            <span className="inline-block px-3 py-1 rounded-full text-[10px] font-mono font-black uppercase tracking-wider bg-[#FF000E] text-white">
+              UNLOCKED: FREE SHIPPING
+            </span>
+            <h3 id="free-delivery-title" className="text-lg font-bold tracking-tight">
+              Free Express Surface Delivery!
+            </h3>
+            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
+              Your order qualifies for zero shipping charge with priority dispatch across India.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowFreeDeliveryModal(false)}
+            className="w-full py-2.5 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-mono font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-sm active:scale-95"
+          >
+            Got it, Continue
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   const renderDeliveryTimeline = (compact = false) => (
     <div
       className={`rounded-2xl border transition-all duration-300 ${
         compact ? 'p-3 space-y-2.5 my-2' : 'p-4 space-y-3'
       } ${
-        isFreeDeliveryUnlocked
-          ? isDark
-            ? 'bg-gradient-to-r from-emerald-950/40 via-[#120E0F] to-[#120E0F] border-emerald-500/30 shadow-sm'
-            : 'bg-gradient-to-r from-emerald-50/70 via-white to-white border-emerald-200 shadow-xs'
-          : isDark
-            ? 'bg-[#120E0F] border-[#261619]'
-            : 'bg-white border-[#E0DBD2] shadow-xs'
+        isDark
+          ? isFreeDeliveryUnlocked
+            ? 'bg-[#120E0F] border-[#361B20]'
+            : 'bg-[#120E0F] border-[#261619]'
+          : isFreeDeliveryUnlocked
+            ? 'bg-[#FFFFFF] border-[#E0DBD2]'
+            : 'bg-[#FFFFFF] border-[#E0DBD2]'
       }`}
     >
       {/* Top Banner Row */}
@@ -100,19 +202,21 @@ export const CartPage: React.FC = () => {
             />
             {isFreeDeliveryUnlocked && (
               <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF000E] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF000E]" />
               </span>
             )}
           </div>
           <div className="min-w-0">
             {isFreeDeliveryUnlocked ? (
-              <div className="text-xs sm:text-sm font-semibold tracking-tight text-emerald-600 dark:text-emerald-400 truncate">
+              <div className={`text-xs sm:text-sm font-bold tracking-tight truncate ${
+                isDark ? 'text-white' : 'text-[#140E10]'
+              }`}>
                 Unlocked: Free Express Surface Shipping across India!
               </div>
             ) : (
               <div className="text-xs font-medium truncate">
-                Add <span className="font-bold text-[#FF000E]">{formatINR(remainingForFreeShipping)}</span> more to gain Free Delivery!
+                Add <span className="font-bold text-[#FF000E] font-mono">{formatINR(remainingForFreeShipping)}</span> more to gain Free Delivery!
               </div>
             )}
             <div className={`text-[10px] font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'} truncate`}>
@@ -125,12 +229,12 @@ export const CartPage: React.FC = () => {
 
         <div className="shrink-0">
           {isFreeDeliveryUnlocked ? (
-            <span className="px-2.5 py-1 rounded-full text-[11px] font-mono font-extrabold uppercase tracking-wider bg-emerald-500 text-white shadow-xs">
+            <span className="px-2.5 py-1 rounded-full text-[11px] font-mono font-extrabold uppercase tracking-wider bg-[#FF000E] text-white shadow-xs">
               FREE
             </span>
           ) : (
             <span className={`px-2.5 py-1 rounded-full text-[11px] font-mono font-semibold uppercase tracking-wider border ${
-              isDark ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
+              isDark ? 'bg-surface-900 border-[#261619] text-slate-300' : 'bg-[#F5F3EE] border-[#E0DBD2] text-slate-700'
             }`}>
               Threshold ₹300
             </span>
@@ -142,11 +246,7 @@ export const CartPage: React.FC = () => {
       <div className="space-y-1">
         <div className="relative w-full bg-black/10 dark:bg-white/10 h-2 rounded-full overflow-visible">
           <div
-            className={`h-full rounded-full transition-all duration-700 ease-out ${
-              isFreeDeliveryUnlocked
-                ? 'bg-gradient-to-r from-emerald-500 to-emerald-400'
-                : 'bg-gradient-to-r from-[#FF000E] via-[#FF3342] to-rose-400'
-            }`}
+            className="h-full rounded-full transition-all duration-700 ease-out bg-gradient-to-r from-[#850009] via-[#E0000C] to-[#FF000E]"
             style={{ width: `${progressPercent}%` }}
           />
 
@@ -160,10 +260,10 @@ export const CartPage: React.FC = () => {
           >
             <div className={`w-7 h-7 -mt-0.5 rounded-full p-0.5 border flex items-center justify-center shadow-md transition-transform duration-500 ${
               isFreeDeliveryUnlocked
-                ? 'bg-emerald-500 border-white text-white scale-110'
+                ? 'bg-[#FF000E] border-white text-white scale-110'
                 : isDark
-                  ? 'bg-slate-900 border-rose-500/50'
-                  : 'bg-white border-rose-300'
+                  ? 'bg-[#120E0F] border-[#FF000E]/50'
+                  : 'bg-white border-[#FF000E]/30'
             }`}>
               <img
                 src="/images/shrell-delivery.webp"
@@ -181,7 +281,7 @@ export const CartPage: React.FC = () => {
         <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-0.5">
           <span>₹0</span>
           <span>{formatINR(Math.round(freeThreshold / 2))}</span>
-          <span className={isFreeDeliveryUnlocked ? 'text-emerald-500 font-bold' : 'font-medium'}>
+          <span className={isFreeDeliveryUnlocked ? 'text-[#FF000E] font-bold' : 'font-medium'}>
             {formatINR(freeThreshold)} (Free Delivery)
           </span>
         </div>
@@ -278,8 +378,11 @@ export const CartPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Dynamic Delivery Timeline (Mobile) */}
-        {renderDeliveryTimeline(true)}
+        {/* Mobile Celebration Modal for Free Delivery */}
+        {renderFreeDeliveryCelebrationModal()}
+
+        {/* Dynamic Delivery Timeline (Mobile): show timeline if not yet unlocked, or modal is shown if unlocked */}
+        {!isFreeDeliveryUnlocked && renderDeliveryTimeline(true)}
 
         {/* 2. Cart Items List (Compact size, top-right delete, stepper on right) */}
         <div className="space-y-2">

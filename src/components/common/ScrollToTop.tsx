@@ -7,10 +7,27 @@ if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
 }
 
 export const ScrollToTop: React.FC = () => {
-  const { pathname, search } = useLocation();
+  const { pathname, search, hash } = useLocation();
 
   useEffect(() => {
-    // 1. Instant window scroll
+    // If an anchor hash is present, smoothly scroll the target element into view
+    if (hash) {
+      const targetId = hash.replace(/^#/, '');
+      const element = document.getElementById(targetId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      const timerId = setTimeout(() => {
+        const delayedEl = document.getElementById(targetId);
+        if (delayedEl) {
+          delayedEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+      return () => clearTimeout(timerId);
+    }
+
+    // 1. Instant window scroll to top
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
@@ -31,7 +48,7 @@ export const ScrollToTop: React.FC = () => {
       cancelAnimationFrame(rafId);
       clearTimeout(timerId);
     };
-  }, [pathname, search]);
+  }, [pathname, search, hash]);
 
   return null;
 };

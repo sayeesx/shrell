@@ -1,8 +1,27 @@
 <!DOCTYPE html>
-<html lang="en" class="bg-[#0A0808]">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function() {
+        try {
+          var t = localStorage.getItem('shrell-theme');
+          var root = document.documentElement;
+          if (t === 'light') {
+            root.classList.add('light');
+            root.classList.remove('dark');
+            root.style.backgroundColor = '#FFFEFA';
+            root.style.color = '#140E10';
+          } else {
+            root.classList.add('dark');
+            root.classList.remove('light');
+            root.style.backgroundColor = '#0A0808';
+            root.style.color = '#F1EEEE';
+          }
+        } catch(e) {}
+      })();
+    </script>
     <meta name="theme-color" content="#0A0808" />
     <meta name="description" content="SHRELL Automotive: Premium car accessories and touring equipment for every Indian vehicle." />
     <!-- Favicons for all devices, browsers, and screens -->

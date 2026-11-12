@@ -27,13 +27,16 @@ export const OrderSuccessPage: React.FC = () => {
     if (prefersReducedMotion || !canvas) return;
 
     const cardConfetti = confetti.create(canvas, { resize: true, useWorker: false });
+    const confettiColors = isDark
+      ? ['#FF000E', '#E0000C', '#FF000E', '#D4D0D0', '#E5E5E5']
+      : ['#FF000E', '#CC000B', '#E0000C', '#140E10', '#000000'];
 
     // Center burst inside card
     cardConfetti({
       particleCount: 80,
       spread: 70,
       origin: { x: 0.5, y: 0.42 },
-      colors: ['#FF000E', '#FF3B30', '#34C759', '#007AFF', '#FF9500', '#FFCC00'],
+      colors: confettiColors,
       disableForReducedMotion: true,
     });
 
@@ -44,7 +47,7 @@ export const OrderSuccessPage: React.FC = () => {
         angle: 60,
         spread: 55,
         origin: { x: 0.1, y: 0.55 },
-        colors: ['#FF000E', '#FF4D4D', '#FFD700', '#00C853'],
+        colors: confettiColors,
         disableForReducedMotion: true,
       });
       cardConfetti({
@@ -52,7 +55,7 @@ export const OrderSuccessPage: React.FC = () => {
         angle: 120,
         spread: 55,
         origin: { x: 0.9, y: 0.55 },
-        colors: ['#FF000E', '#FF4D4D', '#FFD700', '#00C853'],
+        colors: confettiColors,
         disableForReducedMotion: true,
       });
     }, 250);
@@ -61,7 +64,7 @@ export const OrderSuccessPage: React.FC = () => {
       clearTimeout(timer);
       cardConfetti.reset();
     };
-  }, []);
+  }, [isDark]);
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'}`}>
@@ -109,13 +112,13 @@ export const OrderSuccessPage: React.FC = () => {
             aria-hidden="true"
           />
 
-          {/* Decorative Confetti & Accent Dots (Reference Alignment) */}
+          {/* Decorative Confetti & Accent Dots (Theme-matched inside card) */}
           <div className="absolute inset-x-0 top-6 flex justify-around pointer-events-none opacity-80" aria-hidden="true">
-            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 -translate-y-2 translate-x-4" />
-            <span className="w-3 h-1.5 rounded-full bg-purple-500 rotate-45 translate-y-3" />
-            <span className="w-2 h-2 rounded-full bg-pink-500 translate-y-8 -translate-x-6" />
-            <span className="w-3 h-1 rounded-full bg-amber-400 -rotate-12 translate-y-1" />
-            <span className="w-2 h-2 rounded-full bg-emerald-400 translate-y-6 translate-x-8" />
+            <span className={`w-2.5 h-2.5 rounded-full -translate-y-2 translate-x-4 ${isDark ? 'bg-[#D4D0D0]' : 'bg-[#140E10]'}`} />
+            <span className="w-3 h-1.5 rounded-full bg-[#FF000E] rotate-45 translate-y-3" />
+            <span className={`w-2 h-2 rounded-full translate-y-8 -translate-x-6 ${isDark ? 'bg-[#E5E5E5]' : 'bg-[#000000]'}`} />
+            <span className="w-3 h-1 rounded-full bg-[#CC000B] -rotate-12 translate-y-1" />
+            <span className="w-2 h-2 rounded-full bg-[#FF000E] translate-y-6 translate-x-8" />
           </div>
 
           {/* Solid Vibrant Brand Red Checkmark Badge (Exact match to Reference Screen 3) */}

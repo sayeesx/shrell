@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import { useCart } from '../../application/CartContext';
@@ -8,6 +9,7 @@ import { productRepository } from '../../infrastructure/repositories';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 import { useTheme } from '../../application/ThemeContext';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
+import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 import { trackCartViewed } from '../../infrastructure/analytics/posthog';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
 
@@ -88,6 +90,8 @@ export const CartPage: React.FC = () => {
   const FREE_DELIVERY_SEEN_KEY = 'shrell_free_delivery_seen_products_v1';
   const [showFreeDeliveryModal, setShowFreeDeliveryModal] = useState(false);
 
+  useBodyScrollLock(showFreeDeliveryModal && isMobile);
+
   useEffect(() => {
     const currentIds = cart.items.map((item) => item.productId);
     const currentSet = new Set(currentIds);
@@ -134,17 +138,22 @@ export const CartPage: React.FC = () => {
       }
       setShowFreeDeliveryModal(true);
       try {
+        const confettiColors = isDark
+          ? ['#FF000E', '#E0000C', '#FF000E', '#D4D0D0', '#E5E5E5']
+          : ['#FF000E', '#CC000B', '#E0000C', '#140E10', '#000000'];
+
         confetti({
           particleCount: 90,
           spread: 70,
           origin: { y: 0.5 },
-          colors: ['#FF000E', '#E0000C', '#CC000B', '#FF3342', '#FFFFFF', '#140E10'],
+          colors: confettiColors,
+          zIndex: 100000,
         });
       } catch (err) {
         console.error('Confetti trigger failed:', err);
       }
     }
-  }, [isMobile, isFreeDeliveryUnlocked, cart.items]);
+  }, [isMobile, isFreeDeliveryUnlocked, cart.items, isDark]);
 
   // Allow closing free delivery modal with Escape
   useEffect(() => {
@@ -159,18 +168,22 @@ export const CartPage: React.FC = () => {
   }, [showFreeDeliveryModal]);
 
   const renderFreeDeliveryCelebrationModal = () => {
-    if (!showFreeDeliveryModal || !isMobile) return null;
+    if (!showFreeDeliveryModal || !isMobile || typeof document === 'undefined') return null;
 
-    return (
+    return createPortal(
       <div
-        className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300"
+        className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overscroll-contain touch-none"
+        style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
         role="dialog"
         aria-modal="true"
         aria-labelledby="free-delivery-title"
         onClick={() => setShowFreeDeliveryModal(false)}
       >
+        {/* Full-bleed blurred backdrop with zero top gap */}
+        <div className="fixed inset-0 modal-backdrop-solid" aria-hidden="true" />
+
         <div
-          className={`relative w-full max-w-sm rounded-2xl border overflow-hidden shadow-2xl flex items-stretch animate-in zoom-in-95 duration-200 ${
+          className={`relative z-10 w-full max-w-sm rounded-2xl border overflow-hidden shadow-2xl flex items-stretch animate-in zoom-in-95 duration-200 ${
             isDark ? 'bg-[#120E0F] border-[#2D161A] text-[#F1EEEE]' : 'bg-[#E9E9E9] border-[#D0C9BE] text-[#140E10]'
           }`}
           onClick={(e) => e.stopPropagation()}
@@ -203,8 +216,9 @@ export const CartPage: React.FC = () => {
             </button>
 
             <div className="space-y-1.5 pr-6">
-              <span className="inline-block px-2.5 py-0.5 rounded-full text-[9.5px] font-mono font-black uppercase tracking-wider bg-[#FF000E] text-white">
-                UNLOCKED: FREE SHIPPING
+              <span className="inline-flex items-center gap-1.5 whitespace-nowrap px-2.5 py-0.5 rounded-full text-[9.5px] font-mono font-black uppercase tracking-wider bg-[#FF000E] text-white">
+                <i className="bi bi-unlock-fill text-[10px]" aria-hidden="true" />
+                <span>FREE SHIPPING</span>
               </span>
               <h3 id="free-delivery-title" className="text-base font-bold leading-snug tracking-tight">
                 Free Express Surface Delivery!
@@ -223,7 +237,8 @@ export const CartPage: React.FC = () => {
             </button>
           </div>
         </div>
-      </div>
+      </div>,
+      document.body
     );
   };
 
@@ -442,9 +457,6 @@ export const CartPage: React.FC = () => {
             <ThemeToggle compact />
           </div>
         </div>
-
-        {/* Mobile Celebration Modal for Free Delivery */}
-        {renderFreeDeliveryCelebrationModal()}
 
         {/* Dynamic Delivery Timeline (Mobile): show timeline if not yet unlocked, or modal is shown if unlocked */}
         {!isFreeDeliveryUnlocked && renderDeliveryTimeline(true)}
@@ -782,11 +794,11 @@ export const CartPage: React.FC = () => {
           <button
             type="button"
             onClick={() => navigate('/checkout')}
-            className="shrink-0 py-2.5 px-3.5 sm:px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-[11px] sm:text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+            className="shrink-0 h-11 px-3.5 sm:px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-[11px] sm:text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-1.5"
           >
             <span>Select address at next step</span>
-            <span className="w-4.5 h-4.5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-              <i className="bi bi-arrow-right text-[9px]" />
+            <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+              <i className="bi bi-arrow-right text-[10px]" />
             </span>
           </button>
         </div>
@@ -1163,6 +1175,8 @@ export const CartPage: React.FC = () => {
 
       </div>
 
+      {/* Mobile Celebration Modal for Free Delivery (Portaled to document.body) */}
+      {renderFreeDeliveryCelebrationModal()}
     </div>
   );
 };

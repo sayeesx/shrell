@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCart } from '../../application/CartContext';
 import { useAuth } from '../../application/AuthContext';
@@ -87,11 +87,15 @@ export const CheckoutPage: React.FC = () => {
   const [postalCode, setPostalCode] = useState('');
   const [deliveryInstructions, setDeliveryInstructions] = useState('');
 
+  // Track last autofilled city so changing PIN always updates District / City accurately
+  const lastAutoCityRef = useRef<string>('');
+
   // Non-blocking Postal PIN autofill hook for Indian PIN codes
   const { loading: isPinLoading, data: pinData } = usePostalPincode(postalCode, {
-    onLookupSuccess: ({ city: autoCity, state: autoState }) => {
-      if (autoCity && (!city || city === pinData?.city)) {
+    onLookupSuccess: ({ city: autoCity, state: autoState, isFallback }) => {
+      if (autoCity && (!city || city === lastAutoCityRef.current || !isFallback)) {
         setCity(autoCity);
+        lastAutoCityRef.current = autoCity;
       }
       if (autoState) {
         setState(autoState);
@@ -594,7 +598,7 @@ export const CheckoutPage: React.FC = () => {
               <div className="max-w-xl mx-auto">
                 <button
                   type="submit"
-                  className="w-full py-2.5 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full h-11 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <span>Proceed to Payment Method</span>
                   <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
@@ -791,7 +795,7 @@ export const CheckoutPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 py-2.5 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
+                  className="flex-1 h-11 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <div className="flex items-center gap-1.5">

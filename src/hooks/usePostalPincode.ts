@@ -119,6 +119,55 @@ export const INDIAN_PIN_PREFIX_FALLBACK: Record<string, { state: string; city: s
 };
 
 /**
+ * Normalizes raw state strings from postal APIs to match canonical Indian state/UT names.
+ */
+export function normalizeIndianState(rawState: string): string {
+  const clean = rawState.trim();
+  if (!clean) return '';
+
+  const lower = clean.toLowerCase().replace(/\s+/g, ' ');
+  const aliasMap: Record<string, string> = {
+    'nct of delhi': 'Delhi',
+    'new delhi': 'Delhi',
+    'delhi': 'Delhi',
+    'orissa': 'Odisha',
+    'odisha': 'Odisha',
+    'uttaranchal': 'Uttarakhand',
+    'uttarakhand': 'Uttarakhand',
+    'pondicherry': 'Puducherry',
+    'puducherry': 'Puducherry',
+    'jammu & kashmir': 'Jammu and Kashmir',
+    'jammu and kashmir': 'Jammu and Kashmir',
+    'dadra & nagar haveli': 'Dadra and Nagar Haveli and Daman and Diu',
+    'dadra and nagar haveli': 'Dadra and Nagar Haveli and Daman and Diu',
+    'daman & diu': 'Dadra and Nagar Haveli and Daman and Diu',
+    'daman and diu': 'Dadra and Nagar Haveli and Daman and Diu',
+    'dadra and nagar haveli and daman and diu': 'Dadra and Nagar Haveli and Daman and Diu',
+    'andaman & nicobar islands': 'Andaman and Nicobar Islands',
+    'andaman and nicobar': 'Andaman and Nicobar Islands',
+    'chhatisgarh': 'Chhattisgarh',
+    'chhattisgarh': 'Chhattisgarh',
+  };
+
+  if (aliasMap[lower]) return aliasMap[lower];
+
+  // Title-case multi-word states while keeping "and" lowercase
+  return lower
+    .split(' ')
+    .map((word, idx) =>
+      idx > 0 && word === 'and' ? 'and' : word.charAt(0).toUpperCase() + word.slice(1)
+    )
+    .join(' ');
+}
+
+function cleanPostalField(val: unknown): string {
+  if (typeof val !== 'string') return '';
+  const trimmed = val.trim();
+  if (!trimmed || trimmed.toUpperCase() === 'NA' || trimmed.toUpperCase() === 'N/A') return '';
+  return trimmed;
+}
+
+/**
  * Resolves offline/fast fallback for a given 6-digit Indian PIN code.
  */
 export function getFallbackFromPin(pin: string): { state: string; city: string; district: string } | null {
@@ -138,13 +187,18 @@ export function usePostalPincode(
   pincode: string,
   options: UsePostalPincodeOptions = {}
 ): UsePostalPincodeResult {
-  const { onLookupSuccess, debounceMs = 350 } = options;
+  const { onLookupSuccess, debounceMs = 250 } = options;
   const [data, setData] = useState<PostalPincodeData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const abortControllerRef = useRef<AbortController | null>(null);
-  const lastFetchedPinRef = useRef<string>('');
+  const lastResolvedPinRef = useRef<string>('');
+  const onLookupSuccessRef = useRef(onLookupSuccess);
+
+  useEffect(() => {
+    onLookupSuccessRef.current = onLookupSuccess;
+  }, [onLookupSuccess]);
 
   const lookupPincode = useCallback(
     async (pin: string): Promise<PostalPincodeData | null> => {
@@ -157,19 +211,18 @@ export function usePostalPincode(
         return null;
       }
 
-      // Check cache first
+      // Check cache first (only live API results are cached)
       if (pincodeCache.has(cleanPin)) {
         const cached = pincodeCache.get(cleanPin)!;
+        lastResolvedPinRef.current = cleanPin;
         setData(cached);
         setError(null);
-        if (onLookupSuccess) {
-          onLookupSuccess({
-            city: cached.city,
-            state: cached.state,
-            district: cached.district,
-            isFallback: cached.isFallback,
-          });
-        }
+        onLookupSuccessRef.current?.({
+          city: cached.city,
+          state: cached.state,
+          district: cached.district,
+          isFallback: cached.isFallback,
+        });
         return cached;
       }
 
@@ -183,10 +236,10 @@ export function usePostalPincode(
       setLoading(true);
       setError(null);
 
-      // Timeout guard: 3.5 seconds before triggering instant fallback
+      // Timeout guard: 7 seconds before falling back
       const timeoutId = setTimeout(() => {
         controller.abort();
-      }, 3500);
+      }, 7000);
 
       try {
         const response = await fetch(`https://api.postalpincode.in/pincode/${cleanPin}`, {
@@ -203,12 +256,17 @@ export function usePostalPincode(
 
         if (Array.isArray(json) && json[0]?.Status === 'Success' && Array.isArray(json[0]?.PostOffice) && json[0].PostOffice.length > 0) {
           const poList = json[0].PostOffice;
-          const primaryPO = poList[0];
+          const primaryPO =
+            poList.find((po: any) => po.DeliveryStatus === 'Delivery') || poList[0];
 
-          const resolvedCity = primaryPO.District || primaryPO.Block || primaryPO.Name || '';
-          const resolvedState = primaryPO.State || '';
-          const resolvedDistrict = primaryPO.District || '';
-          const postOffices = poList.map((po: any) => po.Name).filter(Boolean);
+          const resolvedDistrict =
+            cleanPostalField(primaryPO.District) ||
+            cleanPostalField(primaryPO.Division) ||
+            cleanPostalField(primaryPO.Block) ||
+            cleanPostalField(primaryPO.Name);
+          const resolvedCity = resolvedDistrict;
+          const resolvedState = normalizeIndianState(cleanPostalField(primaryPO.State));
+          const postOffices = poList.map((po: any) => cleanPostalField(po.Name)).filter(Boolean);
 
           const result: PostalPincodeData = {
             pincode: cleanPin,
@@ -220,17 +278,16 @@ export function usePostalPincode(
           };
 
           pincodeCache.set(cleanPin, result);
+          lastResolvedPinRef.current = cleanPin;
           setData(result);
           setError(null);
 
-          if (onLookupSuccess) {
-            onLookupSuccess({
-              city: resolvedCity,
-              state: resolvedState,
-              district: resolvedDistrict,
-              isFallback: false,
-            });
-          }
+          onLookupSuccessRef.current?.({
+            city: resolvedCity,
+            state: resolvedState,
+            district: resolvedDistrict,
+            isFallback: false,
+          });
 
           return result;
         }
@@ -240,12 +297,12 @@ export function usePostalPincode(
       } catch (err: any) {
         clearTimeout(timeoutId);
 
-        // Don't flag aborted requests if user simply typed another digit
-        if (err.name === 'AbortError' && cleanPin !== lastFetchedPinRef.current) {
+        // If superseded by a newer PIN lookup abort, bail quietly without overwriting state
+        if (err.name === 'AbortError' && abortControllerRef.current !== controller) {
           return null;
         }
 
-        // Graceful non-blocking fallback
+        // Graceful non-blocking fallback (never cached so live lookup retries next time)
         const fallback = getFallbackFromPin(cleanPin);
         if (fallback) {
           const fallbackResult: PostalPincodeData = {
@@ -257,18 +314,16 @@ export function usePostalPincode(
             isFallback: true,
           };
 
-          pincodeCache.set(cleanPin, fallbackResult);
+          lastResolvedPinRef.current = cleanPin;
           setData(fallbackResult);
           setError(null);
 
-          if (onLookupSuccess) {
-            onLookupSuccess({
-              city: fallback.city,
-              state: fallback.state,
-              district: fallback.district,
-              isFallback: true,
-            });
-          }
+          onLookupSuccessRef.current?.({
+            city: fallback.city,
+            state: fallback.state,
+            district: fallback.district,
+            isFallback: true,
+          });
 
           return fallbackResult;
         }
@@ -276,25 +331,26 @@ export function usePostalPincode(
         setError('Unable to autofill location. Please enter city and state manually.');
         return null;
       } finally {
-        setLoading(false);
+        if (abortControllerRef.current === controller) {
+          setLoading(false);
+        }
       }
     },
-    [onLookupSuccess]
+    []
   );
 
   useEffect(() => {
     const cleanPin = pincode.trim().replace(/[^0-9]/g, '');
 
     if (cleanPin.length !== 6 || !/^[1-9][0-9]{5}$/.test(cleanPin)) {
+      lastResolvedPinRef.current = '';
       setData(null);
       return;
     }
 
-    if (cleanPin === lastFetchedPinRef.current) {
+    if (cleanPin === lastResolvedPinRef.current) {
       return;
     }
-
-    lastFetchedPinRef.current = cleanPin;
 
     const handler = setTimeout(() => {
       lookupPincode(cleanPin);

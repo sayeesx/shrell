@@ -1,0 +1,125 @@
+# SHRELL — BUILD COMPLETE ECOMMERCE BACKEND FROM SCRATCH
+
+Act as a senior full-stack engineer and PostgreSQL architect.
+
+## Project context
+- Backend workspace is starting from scratch.
+- Existing storefront frontend is approximately 40% complete.
+- Sanity is already integrated into the Admin panel.
+- Replace the old Cloudinary account with the new Shrell Cloudinary account.
+- Website is already hosted on Vercel.
+- Supabase is connected through Cursor integration, but actual application-level integration is missing.
+
+## 1. Audit first
+Inspect the entire workspace, existing frontend, Admin panel, Sanity integration and old Cloudinary configuration.
+
+Do not delete existing working code or create duplicate integrations.
+
+## 2. Supabase — Complete ecommerce database
+
+Connect the actual application to Supabase using `@supabase/supabase-js`.
+
+Build a normalized, production-ready PostgreSQL database covering:
+
+- Customers, profiles, authentication and addresses.
+- Products, variants, SKUs, categories and brands.
+- Vehicle compatibility (make, model, generation, year and variant).
+- Inventory, stock movements and reservations.
+- Shopping carts and wishlists.
+- Orders, order items and order history.
+- Payments, refunds and COD.
+- Shipping, tracking and PIN-code management.
+- Coupons, discounts and promotions.
+- Reviews and customer questions.
+- Admin roles, permissions and audit logs.
+
+Requirements:
+- UUIDs, foreign keys, indexes and constraints.
+- Accurate INR pricing using appropriate numeric types.
+- Atomic inventory and order operations.
+- Prevent overselling and duplicate transactions.
+- Version-controlled SQL migrations.
+- Generated database types.
+- Proper error handling.
+
+## 3. Security
+
+Implement strict Row Level Security (RLS).
+
+- Customers can access only their own data.
+- Admin permissions must be verified server-side.
+- Public users can access only published catalogue data.
+- Never expose service-role keys or private credentials.
+- Validate all inputs server-side.
+- Secure payment webhooks and prevent duplicate processing.
+- Test customer isolation and privilege escalation.
+
+## 4. Sanity — Audit existing integration
+
+Sanity is already connected to Admin. Fix and complete the existing integration instead of rebuilding it.
+
+Use Sanity for:
+- Product descriptions and specifications.
+- Product content and marketing information.
+- Categories, banners and collections.
+- SEO content.
+
+Use Supabase for prices, SKUs, inventory, orders and customers.
+
+Maintain stable identifiers between Sanity and Supabase.
+
+## 5. Cloudinary — Replace old account
+
+Completely replace the old Cloudinary configuration with the new Shrell account.
+
+- Update credentials and environment variables.
+- Update upload and image delivery integrations.
+- Support multiple product images, ordering and primary image selection.
+- Implement secure uploads and deletion.
+- Validate file types and sizes.
+- Optimize images and generate responsive versions.
+- Preserve existing image URLs until safely migrated.
+- Never expose API secrets.
+
+Do not invent credentials. Report which new account details are required.
+
+## 6. Frontend preservation
+
+The storefront is 40% complete.
+
+**STRICTLY DO NOT:**
+- Redesign or rebuild the storefront.
+- Change its theme, colors, typography or layout.
+- Remove existing sections or working functionality.
+- Rewrite existing components unnecessarily.
+
+Only connect existing frontend components to the real backend.
+
+Admin UI can be modified where necessary to support the new backend.
+
+## 7. Vercel
+
+Keep the existing Vercel hosting and deployment.
+
+Configure environment variables, production builds, caching and secure server-side operations.
+
+Do not migrate to Cloudflare Pages or introduce unnecessary CDNs.
+
+## 8. Production testing
+
+Test database migrations, RLS, authentication, product management, Sanity integration, Cloudinary uploads, inventory, cart, checkout, orders, payments, refunds and shipping.
+
+Check security vulnerabilities, duplicate transactions, calculation accuracy, API failures and exposed secrets.
+
+Fix identified issues.
+
+## Final rules
+
+- No mock backend or fake success messages.
+- No invented credentials.
+- No destructive database changes without approval.
+- No unnecessary frontend modifications.
+- No incomplete integrations presented as finished.
+- Keep the architecture modular and PostgreSQL-migration-friendly.
+
+First audit the workspace, then implement in stages. Report missing credentials or manual setup requirements instead of guessing.

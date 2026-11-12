@@ -79,6 +79,11 @@ export const CheckoutPage: React.FC = () => {
     }
     return '';
   });
+  const isPhoneAutofilled = Boolean(
+    user?.phone &&
+      phone.length === 10 &&
+      phone === user.phone.replace(/[^0-9]/g, '').slice(-10)
+  );
   const [email, setEmail] = useState(() => (isRealEmail(user?.email) ? user!.email : ''));
   const [addressLine1, setAddressLine1] = useState('');
   const [addressLine2, setAddressLine2] = useState('');
@@ -416,7 +421,6 @@ export const CheckoutPage: React.FC = () => {
                   <div>
                     <label className="block text-[11px] font-semibold mb-1 opacity-80">
                       Mobile Number *
-                      {user?.phone && <span className="ml-1.5 text-emerald-500 font-normal text-[10px]">(Auto-filled)</span>}
                     </label>
                     <div className="flex items-stretch gap-2">
                       <div className="relative shrink-0">
@@ -443,18 +447,31 @@ export const CheckoutPage: React.FC = () => {
                           aria-hidden="true"
                         />
                       </div>
-                      <input
-                        type="tel"
-                        inputMode="numeric"
-                        required
-                        maxLength={countryDialCode === '+91' ? 10 : 15}
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
-                        placeholder=""
-                        className={`flex-1 min-w-0 rounded-lg px-3.5 py-3 text-[13px] font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
-                          isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
-                        }`}
-                      />
+                      <div className="relative flex-1 min-w-0">
+                        <input
+                          type="tel"
+                          inputMode="numeric"
+                          required
+                          maxLength={countryDialCode === '+91' ? 10 : 15}
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
+                          placeholder=""
+                          className={`w-full rounded-lg pl-3.5 ${isPhoneAutofilled ? 'pr-10' : 'pr-3.5'} py-3 text-[13px] font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                            isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
+                          }`}
+                        />
+                        {isPhoneAutofilled && (
+                          <span
+                            title="Auto-filled from your account"
+                            aria-label="Phone number auto-filled"
+                            className={`pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center ${
+                              isDark ? 'bg-white text-[#140E10]' : 'bg-[#140E10] text-white'
+                            }`}
+                          >
+                            <i className="bi bi-check2 text-xs font-bold" aria-hidden="true" />
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -479,33 +496,46 @@ export const CheckoutPage: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
                   <div>
-                    <div className="min-h-[20px] flex items-center justify-between gap-1 mb-1">
+                    <div className="min-h-[20px] flex items-center mb-1">
                       <label className="block text-[11px] font-semibold opacity-80 whitespace-nowrap">PIN Code *</label>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        required
+                        maxLength={6}
+                        value={postalCode}
+                        onChange={(e) => setPostalCode(e.target.value.replace(/[^0-9]/g, ''))}
+                        placeholder=""
+                        className={`w-full rounded-lg pl-3.5 ${isPinLoading || pinData ? 'pr-10' : 'pr-3.5'} py-3 text-[13px] font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                          isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
+                        }`}
+                      />
                       {isPinLoading && (
-                        <span className="text-[10px] text-amber-500 font-normal inline-flex items-center gap-1 truncate">
-                          <i className="bi bi-arrow-repeat animate-spin text-[9px]" aria-hidden="true" />
-                          <span>Locating</span>
+                        <span
+                          aria-label="Looking up PIN code"
+                          className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center justify-center"
+                        >
+                          <span
+                            className={`w-4 h-4 rounded-full border-2 border-t-transparent animate-spin ${
+                              isDark ? 'border-[#F1EEEE]' : 'border-[#140E10]'
+                            }`}
+                          />
                         </span>
                       )}
-                      {pinData && !isPinLoading && (
-                        <span className="text-[10px] text-emerald-500 font-normal inline-flex items-center gap-0.5 truncate">
-                          <i className="bi bi-check2-circle text-[10px] shrink-0" aria-hidden="true" />
-                          <span className="truncate">{pinData.city}</span>
+                      {!isPinLoading && pinData && (
+                        <span
+                          title={`Location resolved: ${pinData.city}, ${pinData.state}`}
+                          aria-label="PIN code location resolved"
+                          className={`pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center ${
+                            isDark ? 'bg-white text-[#140E10]' : 'bg-[#140E10] text-white'
+                          }`}
+                        >
+                          <i className="bi bi-check2 text-xs font-bold" aria-hidden="true" />
                         </span>
                       )}
                     </div>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      required
-                      maxLength={6}
-                      value={postalCode}
-                      onChange={(e) => setPostalCode(e.target.value.replace(/[^0-9]/g, ''))}
-                      placeholder=""
-                      className={`w-full rounded-lg px-3.5 py-3 text-[13px] font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
-                        isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
-                      }`}
-                    />
                   </div>
 
                   <div>

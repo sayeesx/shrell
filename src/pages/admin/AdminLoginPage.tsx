@@ -25,7 +25,7 @@ export const AdminLoginPage: React.FC = () => {
     if (success) {
       navigate('/admin');
     } else {
-      setError('Invalid administrative security key. Default development key: shrelladmin2026');
+      setError('Invalid administrative security key. Please try again.');
     }
   };
 
@@ -85,9 +85,6 @@ export const AdminLoginPage: React.FC = () => {
                     : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
                 }`}
               />
-            </div>
-            <div className={`text-[10px] font-mono mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              For initial development setup, use: <code className="text-slate-500 dark:text-slate-300 font-bold">shrelladmin2026</code>
             </div>
           </div>
 

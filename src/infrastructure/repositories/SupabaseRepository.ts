@@ -307,7 +307,7 @@ export class SupabaseProductRepository implements IProductRepository {
       weightGrams: row.weight_grams || 1000,
       dimensionsCm: row.dimensions_cm || '',
       installationDifficulty: row.installation_difficulty || 'Moderate',
-      warrantyMonths: row.warranty_months || 12,
+      warrantyMonths: row.warranty_months ?? 12,
       specifications: Array.isArray(row.specifications) ? row.specifications : [],
       images: Array.isArray(row.images) ? row.images : [],
       stockQuantity: Number(row.stock_quantity) || 0,
@@ -1332,6 +1332,36 @@ export class SupabaseHomeSectionRepository implements IHomeSectionRepository {
 export class SupabaseReviewRepository implements IReviewRepository {
   private fallback = new MockReviewRepository();
 
+  private mapReviewRow = (r: any): ProductReview => ({
+    id: r.id,
+    productId: r.product_id,
+    customerId: r.customer_id,
+    authorName: r.author_name,
+    rating: r.rating,
+    title: r.title,
+    comment: r.comment,
+    isVerifiedPurchase: r.is_verified_purchase ?? true,
+    createdAt: r.created_at,
+  });
+
+  async getAllReviews(): Promise<ProductReview[]> {
+    if (!isSupabaseConfigured) return this.fallback.getAllReviews();
+    try {
+      const { data, error } = await supabase
+        .from('product_reviews')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        return this.fallback.getAllReviews();
+      }
+
+      return (data || []).map(this.mapReviewRow);
+    } catch {
+      return this.fallback.getAllReviews();
+    }
+  }
+
   async getByProductId(productId: string): Promise<ProductReview[]> {
     if (!isSupabaseConfigured) return this.fallback.getByProductId(productId);
     try {
@@ -1341,21 +1371,11 @@ export class SupabaseReviewRepository implements IReviewRepository {
         .eq('product_id', productId)
         .order('created_at', { ascending: false });
 
-      if (error || !data || data.length === 0) {
+      if (error) {
         return this.fallback.getByProductId(productId);
       }
 
-      return data.map((r: any) => ({
-        id: r.id,
-        productId: r.product_id,
-        customerId: r.customer_id,
-        authorName: r.author_name,
-        rating: r.rating,
-        title: r.title,
-        comment: r.comment,
-        isVerifiedPurchase: r.is_verified_purchase ?? true,
-        createdAt: r.created_at,
-      }));
+      return (data || []).map(this.mapReviewRow);
     } catch {
       return this.fallback.getByProductId(productId);
     }
@@ -1387,19 +1407,31 @@ export class SupabaseReviewRepository implements IReviewRepository {
         return this.fallback.addReview(review);
       }
 
-      return {
-        id: data.id,
-        productId: data.product_id,
-        customerId: data.customer_id,
-        authorName: data.author_name,
-        rating: data.rating,
-        title: data.title,
-        comment: data.comment,
-        isVerifiedPurchase: data.is_verified_purchase,
-        createdAt: data.created_at,
-      };
+      return this.mapReviewRow(data);
     } catch {
       return this.fallback.addReview(review);
+    }
+  }
+
+  async deleteReview(id: string): Promise<boolean> {
+    if (!isSupabaseConfigured) return this.fallback.deleteReview(id);
+    try {
+      const { error } = await supabase
+        .from('product_reviews')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Supabase review delete failed:', error);
+        return false;
+      }
+
+      // Also keep local fallback cache synced if this ID existed there
+      await this.fallback.deleteReview(id);
+      return true;
+    } catch (err) {
+      console.error('Review delete exception:', err);
+      return false;
     }
   }
 

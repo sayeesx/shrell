@@ -112,13 +112,18 @@ export const OrderSuccessPage: React.FC = () => {
             aria-hidden="true"
           />
 
-          {/* Decorative Confetti & Accent Dots (Theme-matched inside card) */}
-          <div className="absolute inset-x-0 top-6 flex justify-around pointer-events-none opacity-80" aria-hidden="true">
-            <span className={`w-2.5 h-2.5 rounded-full -translate-y-2 translate-x-4 ${isDark ? 'bg-[#D4D0D0]' : 'bg-[#140E10]'}`} />
-            <span className="w-3 h-1.5 rounded-full bg-[#FF000E] rotate-45 translate-y-3" />
-            <span className={`w-2 h-2 rounded-full translate-y-8 -translate-x-6 ${isDark ? 'bg-[#E5E5E5]' : 'bg-[#000000]'}`} />
-            <span className="w-3 h-1 rounded-full bg-[#CC000B] -rotate-12 translate-y-1" />
-            <span className="w-2 h-2 rounded-full bg-[#FF000E] translate-y-6 translate-x-8" />
+          {/* Resting Confetti Particles inside card (Theme-matched rectangular/diamond confetti pieces) */}
+          <div className="absolute inset-x-0 top-0 h-36 pointer-events-none overflow-hidden opacity-85" aria-hidden="true">
+            <span className={`absolute top-5 left-[12%] w-3 h-1.5 rounded-[1px] rotate-[28deg] ${isDark ? 'bg-[#D4D0D0]' : 'bg-[#140E10]'}`} />
+            <span className="absolute top-10 left-[22%] w-2.5 h-1 rounded-[1px] -rotate-[40deg] bg-[#FF000E]" />
+            <span className={`absolute top-16 left-[9%] w-2 h-2 rotate-45 ${isDark ? 'bg-[#E5E5E5]' : 'bg-[#000000]'}`} />
+            <span className="absolute top-6 left-[34%] w-1.5 h-3 rounded-[1px] rotate-[18deg] bg-[#CC000B]" />
+            <span className={`absolute top-20 left-[28%] w-3 h-1 rounded-[1px] -rotate-[15deg] ${isDark ? 'bg-[#D4D0D0]' : 'bg-[#140E10]'}`} />
+            <span className="absolute top-4 right-[32%] w-2.5 h-1 rounded-[1px] rotate-[52deg] bg-[#FF000E]" />
+            <span className={`absolute top-9 right-[20%] w-2 h-2 rotate-45 ${isDark ? 'bg-[#E5E5E5]' : 'bg-[#000000]'}`} />
+            <span className="absolute top-14 right-[10%] w-3 h-1.5 rounded-[1px] -rotate-[32deg] bg-[#FF000E]" />
+            <span className={`absolute top-22 right-[24%] w-2.5 h-1 rounded-[1px] rotate-[22deg] ${isDark ? 'bg-[#D4D0D0]' : 'bg-[#140E10]'}`} />
+            <span className="absolute top-24 left-[15%] w-2 h-1 rounded-[1px] rotate-[65deg] bg-[#E0000C]" />
           </div>
 
           {/* Solid Vibrant Brand Red Checkmark Badge (Exact match to Reference Screen 3) */}

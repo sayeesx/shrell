@@ -314,7 +314,7 @@ export const Navbar: React.FC = () => {
         {/* ========================================================= */}
         <div
           className={`hidden md:flex items-center justify-between gap-4 transition-all duration-500 ease-in-out ${
-            isScrolled ? 'h-16' : 'h-20'
+            isScrolled ? 'h-[68px]' : 'h-[88px]'
           }`}
         >
           {/* SHRELL Home Logo Button (subtly reduced size) */}
@@ -344,7 +344,7 @@ export const Navbar: React.FC = () => {
                   value={searchQuery}
                   onFocus={() => handleSearchFocus('desktop')}
                   onChange={(e) => handleSearchInputChange(e.target.value, 'desktop')}
-                  className="w-full rounded-full pl-11 pr-16 py-2.5 text-sm font-normal shadow-sm border border-transparent focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-sans bg-white text-gray-900 placeholder:text-gray-500"
+                  className="w-full rounded-full pl-11 pr-16 py-3 text-sm font-normal shadow-sm border border-transparent focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-sans bg-white text-gray-900 placeholder:text-gray-500"
                 />
                 {searchQuery && (
                   <button
@@ -420,7 +420,7 @@ export const Navbar: React.FC = () => {
         {/* ========================================================= */}
         {/* MOBILE NAVBAR (md:hidden) — Fixed Search Bar & Curved Nav */}
         {/* ========================================================= */}
-        <div className="md:hidden py-2.5 transition-all duration-300 ease-in-out">
+        <div className="md:hidden py-3.5 transition-all duration-300 ease-in-out">
           {/* Top Row: SHRELL Logo Home Button (subtly reduced size) + Menu & Cart */}
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center min-w-0">
@@ -465,7 +465,7 @@ export const Navbar: React.FC = () => {
                 value={searchQuery}
                 onFocus={() => handleSearchFocus('mobile')}
                 onChange={(e) => handleSearchInputChange(e.target.value, 'mobile')}
-                className="w-full rounded-full pl-10 pr-16 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 font-sans shadow-xs bg-white text-gray-900 placeholder:text-gray-500"
+                className="w-full rounded-full pl-10 pr-16 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 font-sans shadow-xs bg-white text-gray-900 placeholder:text-gray-500"
               />
               {searchQuery && (
                 <button

@@ -102,7 +102,9 @@ export interface IHomeSectionRepository {
 }
 
 export interface IReviewRepository {
+  getAllReviews(): Promise<ProductReview[]>;
   getByProductId(productId: string): Promise<ProductReview[]>;
   addReview(review: Omit<ProductReview, 'id' | 'createdAt'>): Promise<ProductReview>;
+  deleteReview(id: string): Promise<boolean>;
   getRatingSummary(productId: string): Promise<ProductRatingSummary>;
 }

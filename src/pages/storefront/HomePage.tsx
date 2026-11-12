@@ -153,7 +153,7 @@ export const HomePage: React.FC = () => {
         Clicking banner navigates directly to target page.
         ================================================================
       */}
-      <section className="pt-4 sm:pt-2 pb-0 sm:pb-4">
+      <section className="pt-1 sm:pt-1 pb-0 sm:pb-4">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           {banners.length > 0 && (
             <div
@@ -439,54 +439,80 @@ export const HomePage: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Card 2: Dark Graphite Panel - Ultra Shampoo Launching Soon */}
-                    <div className="rounded-2xl bg-[#0E0A0B] border border-[#221215] p-6 sm:p-7 flex flex-col justify-between flex-1 min-h-[230px] sm:min-h-[250px] group hover:border-[#4F242C] transition-all relative overflow-hidden">
-                      {/* Top: Shifted Texts with Background for Lavender and Passionfruit */}
-                      <div className="relative z-10 space-y-2.5 max-w-[70%] sm:max-w-[65%]">
+                    {/* Card 2: Ultra Shampoo Editorial Product Poster */}
+                    <div className="rounded-2xl bg-[#0A0808] border border-[#221215] p-5 sm:p-6 flex flex-col justify-between flex-1 min-h-[260px] sm:min-h-[275px] group hover:border-[#4F242C] transition-all relative overflow-hidden">
+                      {/* Subtle poster radial accent behind bottles */}
+                      <div
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                          background:
+                            'radial-gradient(circle at 82% 72%, rgba(255, 0, 14, 0.18) 0%, rgba(136, 67, 177, 0.12) 38%, rgba(10, 8, 8, 0) 70%)',
+                        }}
+                        aria-hidden="true"
+                      />
+
+                      {/* Poster Top Header Bar */}
+                      <div className="relative z-10 flex items-center justify-between border-b border-white/10 pb-2">
+                        <span className="text-[10px] font-mono font-bold uppercase tracking-[0.18em] text-[#FF000E]">
+                          SHRELL DETAILING
+                        </span>
+                        <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-300">
+                          500 ML • pH-NEUTRAL
+                        </span>
+                      </div>
+
+                      {/* Poster Title, Specs & Scents */}
+                      <div className="relative z-10 my-3 space-y-2.5 max-w-[68%] sm:max-w-[64%]">
                         <div>
-                          <h3 className="text-xl sm:text-2xl font-extrabold text-[#F1EEEE] tracking-tight leading-tight">
-                            Ultra Shampoo
+                          <h3 className="text-2xl sm:text-[28px] font-black text-white uppercase tracking-tight leading-[0.95]">
+                            ULTRA<br />SHAMPOO
                           </h3>
-                          <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                            <span
-                              className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold border backdrop-blur-xs"
-                              style={{
-                                backgroundColor: 'rgba(136, 67, 177, 0.22)',
-                                color: '#D8B4FE',
-                                borderColor: 'rgba(136, 67, 177, 0.4)',
-                              }}
-                            >
-                              Lavender Breeze
-                            </span>
-                            <span
-                              className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold border backdrop-blur-xs"
-                              style={{
-                                backgroundColor: 'rgba(231, 83, 6, 0.22)',
-                                color: '#FDBA74',
-                                borderColor: 'rgba(231, 83, 6, 0.4)',
-                              }}
-                            >
-                              Passionfruit Martini
-                            </span>
-                          </div>
+                          <p className="text-[11px] font-mono text-slate-300 mt-1.5 leading-snug">
+                            30 to 50 washes. Foam + lubricants, safe for wax &amp; sealants.
+                          </p>
                         </div>
 
-                        <div>
-                          <Link
-                            to="/pre-book"
-                            className="inline-block px-3 py-1.5 bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-semibold rounded-full transition-all shadow-sm cursor-pointer"
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span
+                            className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold border"
+                            style={{
+                              backgroundColor: 'rgba(136, 67, 177, 0.28)',
+                              color: '#E9D5FF',
+                              borderColor: 'rgba(136, 67, 177, 0.5)',
+                            }}
                           >
-                            Pre-Book Now
-                          </Link>
+                            Lavender Breeze
+                          </span>
+                          <span
+                            className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold border"
+                            style={{
+                              backgroundColor: 'rgba(231, 83, 6, 0.28)',
+                              color: '#FED7AA',
+                              borderColor: 'rgba(231, 83, 6, 0.5)',
+                            }}
+                          >
+                            Passionfruit Martini
+                          </span>
                         </div>
                       </div>
 
-                      {/* Bottom Right Corner: SUV Image */}
-                      <div className="absolute -bottom-1 -right-3 sm:-right-2 w-52 sm:w-64 h-32 sm:h-40 pointer-events-none flex items-end justify-end">
+                      {/* Poster Bottom CTA */}
+                      <div className="relative z-10 pt-1">
+                        <Link
+                          to="/pre-book"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-sm cursor-pointer"
+                        >
+                          <span>Pre-Book Now</span>
+                          <i className="bi bi-arrow-right text-[10px]" aria-hidden="true" />
+                        </Link>
+                      </div>
+
+                      {/* Poster Hero Subject: SUV + Twin Ultra Shampoo Bottles */}
+                      <div className="absolute -bottom-1 -right-2 sm:-right-1 w-52 sm:w-64 h-36 sm:h-44 pointer-events-none flex items-end justify-end">
                         <img
                           src="/suv.webp"
-                          alt="Ultra Shampoo Variants"
-                          className="w-full h-full object-contain scale-110 sm:scale-125 origin-bottom-right group-hover:scale-130 transition-transform duration-300"
+                          alt="SHRELL Ultra Shampoo Lavender Breeze and Passionfruit Martini 500ml bottles"
+                          className="w-full h-full object-contain scale-110 sm:scale-120 origin-bottom-right group-hover:scale-125 transition-transform duration-300"
                           style={{ filter: 'none' }}
                         />
                       </div>

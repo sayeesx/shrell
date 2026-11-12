@@ -10,6 +10,7 @@ import { useTheme } from '../../application/ThemeContext';
 import { ProductCard } from '../../components/ui/ProductCard';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { ProductDetailSkeleton } from '../../components/common/ShimmerSkeleton';
+import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 import { trackProductViewed } from '../../infrastructure/analytics/posthog';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
@@ -41,15 +42,26 @@ export const ProductDetailPage: React.FC = () => {
     ratingBreakdown: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
   });
 
-  // Review Modal State
+  // Review Modal Stepper State
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewStep, setReviewStep] = useState<1 | 2 | 3>(1);
   const [reviewAuthor, setReviewAuthor] = useState('');
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewHoverRating, setReviewHoverRating] = useState(0);
-  const [reviewTitle, setReviewTitle] = useState('');
   const [reviewComment, setReviewComment] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [reviewSuccessMsg, setReviewSuccessMsg] = useState('');
+
+  useBodyScrollLock(isReviewModalOpen);
+
+  useEffect(() => {
+    if (!isReviewModalOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsReviewModalOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isReviewModalOpen]);
 
   const productViews = [
     { id: 1, label: 'Primary Angle' },
@@ -58,11 +70,11 @@ export const ProductDetailPage: React.FC = () => {
     { id: 4, label: 'Vehicle Fitment' },
   ];
 
-  // Accordion open states - Shipping & Warranty expanded by default on all screens
+  // Accordion open states - Technical Specifications & Shipping & Warranty start collapsed
   const [openAccordions, setOpenAccordions] = useState<{ [key: string]: boolean }>({
     description: true,
     specs: false,
-    shipping: true,
+    shipping: false,
   });
 
   const toggleAccordion = (key: string) => {
@@ -175,19 +187,30 @@ export const ProductDetailPage: React.FC = () => {
     }, 400);
   };
 
-  const handleSubmitReview = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!product || !reviewComment.trim()) return;
+  const openReviewModal = () => {
+    setReviewStep(1);
+    setReviewRating(5);
+    setReviewHoverRating(0);
+    const profileName = user?.name && user.name !== 'Valued Customer' ? user.name.trim() : '';
+    setReviewAuthor(profileName);
+    setReviewComment('');
+    setReviewSuccessMsg('');
+    setIsReviewModalOpen(true);
+  };
+
+  const submitCustomerReview = async (skipFeedback = false) => {
+    if (!product || isSubmittingReview) return;
+    const trimmedComment = reviewComment.trim();
+    if (!skipFeedback && !trimmedComment) return;
 
     setIsSubmittingReview(true);
     try {
-      const author = reviewAuthor.trim() || user?.name || 'Verified Customer';
+      const author = reviewAuthor.trim() || 'Anonymous';
       await reviewRepository.addReview({
         productId: product.id,
         authorName: author,
         rating: reviewRating,
-        title: reviewTitle.trim() || undefined,
-        comment: reviewComment.trim(),
+        comment: skipFeedback ? `Rated ${reviewRating}/5 stars` : trimmedComment,
         isVerifiedPurchase: true,
         customerId: user?.id,
       });
@@ -198,18 +221,22 @@ export const ProductDetailPage: React.FC = () => {
       ]);
       setReviews(updatedList);
       setRatingSummary(updatedSummary);
-      setReviewSuccessMsg('Thank you! Your verified review and rating has been submitted.');
-      setReviewTitle('');
+      setReviewSuccessMsg('Thank you! Your review has been submitted.');
       setReviewComment('');
       setTimeout(() => {
         setIsReviewModalOpen(false);
         setReviewSuccessMsg('');
-      }, 1600);
+      }, 1500);
     } catch (err: any) {
       console.error('Failed to submit review:', err);
     } finally {
       setIsSubmittingReview(false);
     }
+  };
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await submitCustomerReview(false);
   };
 
   const renderStars = (score: number, size = 'text-xs') => {
@@ -516,51 +543,152 @@ export const ProductDetailPage: React.FC = () => {
           </div>
 
           {/* Accordion 2: Technical Specifications */}
-          {product.specifications && product.specifications.length > 0 && (
-            <div className={`border-b ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
-              <button type="button" onClick={() => toggleAccordion('specs')}
-                className={`w-full py-4 flex items-center justify-between text-left font-medium hover:text-[#FF000E] transition-colors cursor-pointer ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
-                <span className={`text-base font-semibold ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>Technical Specifications</span>
-                <i className={`bi ${openAccordions.specs ? 'bi-chevron-up' : 'bi-chevron-down'} text-xs ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}></i>
-              </button>
-              {openAccordions.specs && (
-                <div className="pb-6">
-                  <table className={`w-full text-left text-xs border rounded-lg overflow-hidden ${isDark ? 'border-[#261619] bg-[#130E10]' : 'border-[#E0DBD2] bg-[#F5F3EE]'}`}>
-                    <tbody>
-                      {product.specifications.map((spec, i) => (
-                        <tr key={i} className={isDark ? (i % 2 === 0 ? 'bg-[#130E10]' : 'bg-[#0E0A0B]') : (i % 2 === 0 ? 'bg-[#F5F3EE]' : 'bg-white')}>
-                          <td className={`px-4 py-2.5 font-normal w-2/5 border-b ${isDark ? 'text-[#8E8587] border-[#261619]' : 'text-[#5C5456] border-[#E0DBD2]'}`}>{spec.name}</td>
-                          <td className={`px-4 py-2.5 font-medium border-b ${isDark ? 'text-[#F1EEEE] border-[#261619]' : 'text-[#140E10] border-[#E0DBD2]'}`}>{spec.value}</td>
-                        </tr>
-                      ))}
-                      <tr className={isDark ? 'bg-[#130E10]' : 'bg-[#F5F3EE]'}>
-                        <td className={`px-4 py-2.5 font-normal border-b ${isDark ? 'text-[#8E8587] border-[#261619]' : 'text-[#5C5456] border-[#E0DBD2]'}`}>Dimensions</td>
-                        <td className={`px-4 py-2.5 font-medium border-b ${isDark ? 'text-[#F1EEEE] border-[#261619]' : 'text-[#140E10] border-[#E0DBD2]'}`}>{product.dimensionsCm} cm</td>
-                      </tr>
-                      <tr className={isDark ? 'bg-[#0E0A0B]' : 'bg-white'}>
-                        <td className={`px-4 py-2.5 font-normal ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>Net Weight</td>
-                        <td className={`px-4 py-2.5 font-medium ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>{product.weightGrams} grams</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          )}
+          {(() => {
+            const techSpecs = (product.specifications || []).filter(
+              (s) => s.group !== 'Shipping & Warranty'
+            );
+            const hasTechSpecs =
+              techSpecs.length > 0 || Boolean(product.dimensionsCm) || Boolean(product.weightGrams);
 
-          {/* Accordion 3: Shipping & Returns */}
+            if (!hasTechSpecs) return null;
+
+            return (
+              <div className={`border-b ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
+                <button
+                  type="button"
+                  onClick={() => toggleAccordion('specs')}
+                  className={`w-full py-4 flex items-center justify-between text-left font-medium hover:text-[#FF000E] transition-colors cursor-pointer ${
+                    isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'
+                  }`}
+                >
+                  <span className={`text-base font-semibold ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
+                    Technical Specifications
+                  </span>
+                  <i
+                    className={`bi ${openAccordions.specs ? 'bi-chevron-up' : 'bi-chevron-down'} text-xs ${
+                      isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'
+                    }`}
+                  />
+                </button>
+                {openAccordions.specs && (
+                  <div className="pb-6">
+                    <table
+                      className={`w-full text-left text-xs border rounded-lg overflow-hidden ${
+                        isDark ? 'border-[#261619] bg-[#130E10]' : 'border-[#E0DBD2] bg-[#F5F3EE]'
+                      }`}
+                    >
+                      <tbody>
+                        {techSpecs.map((spec, i) => (
+                          <tr
+                            key={i}
+                            className={
+                              isDark
+                                ? i % 2 === 0
+                                  ? 'bg-[#130E10]'
+                                  : 'bg-[#0E0A0B]'
+                                : i % 2 === 0
+                                  ? 'bg-[#F5F3EE]'
+                                  : 'bg-white'
+                            }
+                          >
+                            <td
+                              className={`px-4 py-2.5 font-normal w-2/5 border-b ${
+                                isDark ? 'text-[#8E8587] border-[#261619]' : 'text-[#5C5456] border-[#E0DBD2]'
+                              }`}
+                            >
+                              {spec.name}
+                            </td>
+                            <td
+                              className={`px-4 py-2.5 font-medium border-b ${
+                                isDark ? 'text-[#F1EEEE] border-[#261619]' : 'text-[#140E10] border-[#E0DBD2]'
+                              }`}
+                            >
+                              {spec.value}
+                            </td>
+                          </tr>
+                        ))}
+                        {product.dimensionsCm && (
+                          <tr className={isDark ? 'bg-[#130E10]' : 'bg-[#F5F3EE]'}>
+                            <td
+                              className={`px-4 py-2.5 font-normal border-b ${
+                                isDark ? 'text-[#8E8587] border-[#261619]' : 'text-[#5C5456] border-[#E0DBD2]'
+                              }`}
+                            >
+                              Dimensions
+                            </td>
+                            <td
+                              className={`px-4 py-2.5 font-medium border-b ${
+                                isDark ? 'text-[#F1EEEE] border-[#261619]' : 'text-[#140E10] border-[#E0DBD2]'
+                              }`}
+                            >
+                              {product.dimensionsCm} cm
+                            </td>
+                          </tr>
+                        )}
+                        <tr className={isDark ? 'bg-[#0E0A0B]' : 'bg-white'}>
+                          <td className={`px-4 py-2.5 font-normal ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>
+                            Net Weight
+                          </td>
+                          <td className={`px-4 py-2.5 font-medium ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
+                            {product.weightGrams} grams
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* Accordion 3: Shipping & Warranty */}
           <div className={`border-b ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
-            <button type="button" onClick={() => toggleAccordion('shipping')}
-              className={`w-full py-4 flex items-center justify-between text-left font-medium hover:text-[#FF000E] transition-colors cursor-pointer ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
-              <span className={`text-base font-semibold ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>Shipping &amp; Warranty</span>
-              <i className={`bi ${openAccordions.shipping ? 'bi-chevron-up' : 'bi-chevron-down'} text-xs ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}></i>
+            <button
+              type="button"
+              onClick={() => toggleAccordion('shipping')}
+              className={`w-full py-4 flex items-center justify-between text-left font-medium hover:text-[#FF000E] transition-colors cursor-pointer ${
+                isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'
+              }`}
+            >
+              <span className={`text-base font-semibold ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
+                Shipping &amp; Warranty
+              </span>
+              <i
+                className={`bi ${openAccordions.shipping ? 'bi-chevron-up' : 'bi-chevron-down'} text-xs ${
+                  isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'
+                }`}
+              />
             </button>
             {openAccordions.shipping && (
               <div className={`pb-6 space-y-2 text-xs leading-relaxed text-left ${isDark ? 'text-[#D8D1D1]' : 'text-[#3A3030]'}`}>
-                <p>• <strong className={isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}>Free Express Courier:</strong> Across India on all orders over ₹300 via BlueDart &amp; Delhivery Express.</p>
-                <p>• <strong className={isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}>Dispatch Guarantee:</strong> Dispatched within 24 hours from Pune logistics facility.</p>
-                <p>• <strong className={isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}>Manufacturer Warranty:</strong> {product.warrantyMonths} months comprehensive warranty coverage.</p>
-                <p>• <strong className={isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}>7-Day Returns:</strong> Rapid replacement guarantee for transit or manufacturing issues.</p>
+                {(() => {
+                  const customShipping = (product.specifications || []).filter(
+                    (s) => s.group === 'Shipping & Warranty'
+                  );
+                  const courierText =
+                    customShipping.find((s) => s.name === 'Free Express Courier')?.value ||
+                    'Across India on all orders over ₹300 via BlueDart & Delhivery Express.';
+                  const dispatchText =
+                    customShipping.find((s) => s.name === 'Dispatch Guarantee')?.value ||
+                    'Dispatched within 24 hours from Pune logistics facility.';
+                  const returnsText =
+                    customShipping.find((s) => s.name === '7-Day Returns')?.value ||
+                    'Rapid replacement guarantee for transit or manufacturing issues.';
+
+                  return (
+                    <>
+                      <p>• <strong className={isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}>Free Express Courier:</strong> {courierText}</p>
+                      <p>• <strong className={isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}>Dispatch Guarantee:</strong> {dispatchText}</p>
+                      <p>
+                        • <strong className={isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}>Manufacturer Warranty:</strong>{' '}
+                        {product.warrantyMonths > 0
+                          ? `${product.warrantyMonths} months comprehensive warranty coverage.`
+                          : 'Standard manufacturer terms apply.'}
+                      </p>
+                      <p>• <strong className={isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}>Returns &amp; Replacement:</strong> {returnsText}</p>
+                    </>
+                  );
+                })()}
               </div>
             )}
           </div>
@@ -584,14 +712,7 @@ export const ProductDetailPage: React.FC = () => {
 
             <button
               type="button"
-              onClick={() => {
-                setReviewRating(5);
-                setReviewHoverRating(0);
-                setReviewAuthor(user?.name || '');
-                setReviewTitle('');
-                setReviewComment('');
-                setIsReviewModalOpen(true);
-              }}
+              onClick={openReviewModal}
               className="px-4 py-2.5 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-semibold text-xs tracking-wide transition-all cursor-pointer flex items-center gap-2 active:scale-95 shadow-sm"
             >
               <i className="bi bi-pencil-square" />
@@ -667,7 +788,7 @@ export const ProductDetailPage: React.FC = () => {
                 </p>
                 <button
                   type="button"
-                  onClick={() => setIsReviewModalOpen(true)}
+                  onClick={openReviewModal}
                   className="px-4 py-2 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-semibold cursor-pointer transition-colors"
                 >
                   Rate &amp; Review First
@@ -729,11 +850,12 @@ export const ProductDetailPage: React.FC = () => {
           </div>
         </section>
 
-        {/* REVIEW & RATING SUBMISSION MODAL */}
+        {/* REVIEW & RATING SUBMISSION MODAL (3-Step Stepper) */}
         {isReviewModalOpen && createPortal(
           <div
             role="dialog"
             aria-modal="true"
+            aria-labelledby="review-modal-title"
             className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
             style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
           >
@@ -747,151 +869,266 @@ export const ProductDetailPage: React.FC = () => {
             {/* Centered Modal Card */}
             <div
               onClick={(e) => e.stopPropagation()}
-              className={`relative z-10 w-full max-w-lg border rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col p-6 space-y-4 my-auto ${
-                isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+              className={`relative z-10 w-full max-w-md border rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col p-6 space-y-5 my-auto ${
+                isDark ? 'bg-[#120E0F] border-[#2D161A] text-[#F1EEEE]' : 'bg-white border-[#E0DBD2] text-[#140E10]'
               }`}
             >
               <div className={`flex items-center justify-between border-b pb-3 ${
-                isDark ? 'border-slate-800' : 'border-slate-200'
+                isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'
               }`}>
-                <div>
-                  <h3 className="text-sm font-bold uppercase tracking-wider font-mono">
+                <div className="min-w-0 pr-3">
+                  <h3 id="review-modal-title" className="text-sm font-bold uppercase tracking-wider font-mono">
                     Write a Customer Review
                   </h3>
-                  <p className={`text-[11px] truncate mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  <p className={`text-[11px] truncate mt-0.5 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
                     {product.name}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsReviewModalOpen(false)}
-                  className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                    isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
+                  className={`p-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
+                    isDark ? 'text-slate-400 hover:text-white' : 'text-[#5C5456] hover:text-[#140E10]'
                   }`}
                   aria-label="Close review dialog"
                 >
-                  <i className="bi bi-x-lg text-xs" />
+                  <i className="bi bi-x-lg text-xs" aria-hidden="true" />
                 </button>
               </div>
 
               {reviewSuccessMsg ? (
                 <div className="py-8 text-center space-y-3">
-                  <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center mx-auto text-2xl">
-                    <i className="bi bi-check-lg" />
+                  <div className="w-12 h-12 rounded-full bg-[#FF000E]/15 text-[#FF000E] flex items-center justify-center mx-auto text-2xl">
+                    <i className="bi bi-check-lg" aria-hidden="true" />
                   </div>
-                  <div className="text-sm font-bold text-emerald-400 font-mono">
+                  <div className="text-sm font-bold text-[#FF000E] font-mono">
                     {reviewSuccessMsg}
                   </div>
                 </div>
               ) : (
-                <form onSubmit={handleSubmitReview} className="space-y-4 text-xs font-mono">
-                  {/* Star Rating Selector */}
-                  <div>
-                    <label className={`block uppercase font-bold mb-1.5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                      Overall Rating *
-                    </label>
-                    <div className="flex items-center gap-2">
-                      {[1, 2, 3, 4, 5].map((star) => {
-                        const active = (reviewHoverRating || reviewRating) >= star;
-                        return (
-                          <button
-                            key={star}
-                            type="button"
-                            onMouseEnter={() => setReviewHoverRating(star)}
-                            onMouseLeave={() => setReviewHoverRating(0)}
-                            onClick={() => setReviewRating(star)}
-                            className="text-2xl transition-transform hover:scale-110 cursor-pointer p-0.5"
-                            aria-label={`${star} star rating`}
+                <form onSubmit={handleSubmitReview} className="space-y-5 text-xs font-mono">
+                  {/* Stepper Progress Header */}
+                  <div className="flex items-center justify-between gap-2" aria-label="Review steps">
+                    {[
+                      { step: 1 as const, label: 'Rating' },
+                      { step: 2 as const, label: 'Name' },
+                      { step: 3 as const, label: 'Feedback' },
+                    ].map((item) => {
+                      const isCurrent = reviewStep === item.step;
+                      const isDone = reviewStep > item.step;
+                      return (
+                        <div key={item.step} className="flex-1 flex flex-col items-center gap-1">
+                          <div
+                            className={`w-full h-1.5 rounded-full transition-colors ${
+                              isCurrent || isDone
+                                ? 'bg-[#FF000E]'
+                                : isDark
+                                  ? 'bg-[#261619]'
+                                  : 'bg-[#E0DBD2]'
+                            }`}
+                          />
+                          <span
+                            className={`text-[10px] font-bold uppercase tracking-wider ${
+                              isCurrent
+                                ? 'text-[#FF000E]'
+                                : isDone
+                                  ? isDark
+                                    ? 'text-slate-200'
+                                    : 'text-[#140E10]'
+                                  : isDark
+                                    ? 'text-slate-500'
+                                    : 'text-[#8E8587]'
+                            }`}
                           >
-                            <i className={`bi ${active ? 'bi-star-fill text-amber-400' : 'bi-star text-slate-500'}`} />
-                          </button>
-                        );
-                      })}
-                      <span className="text-xs font-semibold text-amber-400 ml-2">
+                            {item.step}. {item.label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* STEP 1: Star Rating (Brand Red Theme) */}
+                  {reviewStep === 1 && (
+                    <div className="space-y-4 py-2 text-center">
+                      <label className={`block uppercase font-bold ${isDark ? 'text-slate-300' : 'text-[#3A3030]'}`}>
+                        How many stars would you give? *
+                      </label>
+                      <div className="flex items-center justify-center gap-2.5">
+                        {[1, 2, 3, 4, 5].map((star) => {
+                          const active = (reviewHoverRating || reviewRating) >= star;
+                          return (
+                            <button
+                              key={star}
+                              type="button"
+                              onMouseEnter={() => setReviewHoverRating(star)}
+                              onMouseLeave={() => setReviewHoverRating(0)}
+                              onClick={() => setReviewRating(star)}
+                              className="text-3xl transition-transform hover:scale-110 cursor-pointer p-1"
+                              aria-label={`${star} star rating`}
+                            >
+                              <i
+                                className={`bi ${
+                                  active
+                                    ? 'bi-star-fill text-[#FF000E]'
+                                    : isDark
+                                      ? 'bi-star text-slate-600'
+                                      : 'bi-star text-slate-300'
+                                }`}
+                                aria-hidden="true"
+                              />
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <div className="text-xs font-bold text-[#FF000E]">
                         {reviewRating === 5 && '5 Stars - Outstanding'}
                         {reviewRating === 4 && '4 Stars - Very Good'}
                         {reviewRating === 3 && '3 Stars - Average'}
                         {reviewRating === 2 && '2 Stars - Needs Improvement'}
                         {reviewRating === 1 && '1 Star - Poor'}
-                      </span>
+                      </div>
+
+                      <div className={`pt-4 border-t flex items-center justify-between gap-3 ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
+                        <button
+                          type="button"
+                          onClick={() => setIsReviewModalOpen(false)}
+                          className={`px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer ${
+                            isDark ? 'text-slate-400 hover:text-white' : 'text-[#5C5456] hover:text-[#140E10]'
+                          }`}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setReviewStep(2)}
+                          className="px-5 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-sm"
+                        >
+                          Next
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  {/* Reviewer Name */}
-                  <div>
-                    <label className={`block uppercase font-bold mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                      Your Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={reviewAuthor}
-                      onChange={(e) => setReviewAuthor(e.target.value)}
-                      placeholder="e.g. Rahul Sharma"
-                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
-                        isDark
-                          ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
-                          : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
-                      }`}
-                    />
-                  </div>
+                  {/* STEP 2: Optional Name (Autofilled from Profile if logged in, saves Anonymous if empty) */}
+                  {reviewStep === 2 && (
+                    <div className="space-y-4 py-1">
+                      <div>
+                        <label htmlFor="review-author-input" className={`block uppercase font-bold mb-1.5 ${isDark ? 'text-slate-300' : 'text-[#3A3030]'}`}>
+                          Your Name (Optional)
+                        </label>
+                        <input
+                          id="review-author-input"
+                          type="text"
+                          value={reviewAuthor}
+                          onChange={(e) => setReviewAuthor(e.target.value)}
+                          placeholder="Leave blank to post as Anonymous"
+                          className={`w-full border rounded-lg px-3.5 py-2.5 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                            isDark
+                              ? 'bg-[#181113] border-[#261619] text-white placeholder:text-slate-500'
+                              : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10] placeholder:text-[#8E8587]'
+                          }`}
+                        />
+                        <p className={`text-[11px] mt-1.5 font-sans ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
+                          {reviewAuthor.trim()
+                            ? `Will be displayed as "${reviewAuthor.trim()}".`
+                            : 'If left blank, your review will be saved as Anonymous.'}
+                        </p>
+                      </div>
 
-                  {/* Review Headline */}
-                  <div>
-                    <label className={`block uppercase font-bold mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                      Review Headline (Optional)
-                    </label>
-                    <input
-                      type="text"
-                      value={reviewTitle}
-                      onChange={(e) => setReviewTitle(e.target.value)}
-                      placeholder="e.g. Perfect fit on Scorpio-N, rugged build quality"
-                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
-                        isDark
-                          ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
-                          : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
-                      }`}
-                    />
-                  </div>
+                      <div className={`pt-4 border-t flex items-center justify-between gap-3 ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
+                        <button
+                          type="button"
+                          onClick={() => setReviewStep(1)}
+                          className={`px-4 py-2 rounded-lg border font-medium transition-colors cursor-pointer ${
+                            isDark
+                              ? 'border-[#261619] text-slate-300 hover:bg-white/5'
+                              : 'border-[#E0DBD2] text-[#3A3030] hover:bg-black/5'
+                          }`}
+                        >
+                          Back
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setReviewStep(3)}
+                          className="px-5 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-sm"
+                        >
+                          Next
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
-                  {/* Detailed Comment */}
-                  <div>
-                    <label className={`block uppercase font-bold mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                      Detailed Feedback *
-                    </label>
-                    <textarea
-                      rows={4}
-                      required
-                      value={reviewComment}
-                      onChange={(e) => setReviewComment(e.target.value)}
-                      placeholder="Describe ease of installation, finish quality, highway performance, fitment precision..."
-                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
-                        isDark
-                          ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
-                          : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
-                      }`}
-                    />
-                  </div>
+                  {/* STEP 3: Detailed Feedback (No headline; Cancel, Skip & Submit) */}
+                  {reviewStep === 3 && (
+                    <div className="space-y-4 py-1">
+                      <div>
+                        <label htmlFor="review-comment-input" className={`block uppercase font-bold mb-1.5 ${isDark ? 'text-slate-300' : 'text-[#3A3030]'}`}>
+                          Detailed Feedback
+                        </label>
+                        <textarea
+                          id="review-comment-input"
+                          rows={4}
+                          value={reviewComment}
+                          onChange={(e) => setReviewComment(e.target.value)}
+                          placeholder="Describe ease of installation, finish quality, highway performance, fitment precision..."
+                          className={`w-full border rounded-lg px-3.5 py-2.5 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                            isDark
+                              ? 'bg-[#181113] border-[#261619] text-white placeholder:text-slate-500'
+                              : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10] placeholder:text-[#8E8587]'
+                          }`}
+                        />
+                      </div>
 
-                  {/* Actions */}
-                  <div className={`pt-3 border-t flex justify-end gap-3 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
-                    <button
-                      type="button"
-                      onClick={() => setIsReviewModalOpen(false)}
-                      className={`px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer ${
-                        isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isSubmittingReview}
-                      className="px-5 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-sm disabled:opacity-50"
-                    >
-                      {isSubmittingReview ? 'Submitting...' : 'Submit Verified Review'}
-                    </button>
-                  </div>
+                      <div className={`pt-4 border-t flex flex-wrap items-center justify-between gap-2 ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setReviewStep(2)}
+                            disabled={isSubmittingReview}
+                            className={`px-3 py-2 rounded-lg border font-medium transition-colors cursor-pointer ${
+                              isDark
+                                ? 'border-[#261619] text-slate-300 hover:bg-white/5'
+                                : 'border-[#E0DBD2] text-[#3A3030] hover:bg-black/5'
+                            }`}
+                          >
+                            Back
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setIsReviewModalOpen(false)}
+                            disabled={isSubmittingReview}
+                            className={`px-3 py-2 rounded-lg font-medium transition-colors cursor-pointer ${
+                              isDark ? 'text-slate-400 hover:text-white' : 'text-[#5C5456] hover:text-[#140E10]'
+                            }`}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            disabled={isSubmittingReview}
+                            onClick={() => submitCustomerReview(true)}
+                            className={`px-3.5 py-2 rounded-lg border font-bold uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-50 ${
+                              isDark
+                                ? 'border-[#261619] text-slate-200 hover:bg-white/5'
+                                : 'border-[#E0DBD2] text-[#140E10] hover:bg-black/5'
+                            }`}
+                          >
+                            Skip
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={isSubmittingReview || !reviewComment.trim()}
+                            className="px-4 py-2 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-sm disabled:opacity-50"
+                          >
+                            {isSubmittingReview ? 'Submitting...' : 'Submit'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </form>
               )}
             </div>

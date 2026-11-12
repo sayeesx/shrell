@@ -8,7 +8,7 @@ export const Footer: React.FC = () => {
     <footer className={`border-t text-sm transition-colors duration-300 ${isDark ? 'bg-[#080000] border-[#221215] text-slate-400' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#5C5456]'}`}>
       {/* Main Footer Links */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand Info */}
           <div className="space-y-4 md:col-span-1">
             <Link to="/" className="inline-block group" aria-label="SHRELL Automotive Home">
@@ -24,29 +24,6 @@ export const Footer: React.FC = () => {
             <div className={`text-xs pt-1 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
               <span>Support Hours: Mon - Sat (9:30 AM - 6:30 PM IST)</span>
             </div>
-          </div>
-
-          {/* Product Categories */}
-          <div>
-            <h5 className={`text-xs font-mono uppercase tracking-wider mb-3 font-semibold ${isDark ? 'text-slate-200' : 'text-[#140E10]'}`}>
-              Equipment Categories
-            </h5>
-            <ul className="space-y-2 text-xs">
-              {[
-                { to: '/catalogue?category=air-fresheners', icon: 'bi-tree-fill', label: 'Air Fresheners & Fragrance' },
-                { to: '/catalogue?category=auxiliary-lighting', icon: 'bi-lightbulb-fill', label: 'OSRAM Auxiliary Lighting' },
-                { to: '/catalogue?category=all-weather-floor-protection', icon: 'bi-shield-fill-check', label: 'Laser 3D TPE Floor Liners' },
-                { to: '/catalogue?category=tyre-care-air-systems', icon: 'bi-speedometer2', label: '12V Heavy Duty Compressors' },
-                { to: '/catalogue?category=touring-recovery-gear', icon: 'bi-tools', label: 'Kinetic Recovery Systems' },
-              ].map((item) => (
-                <li key={item.to}>
-                  <Link to={item.to} className={`transition-colors flex items-center gap-2 ${isDark ? 'hover:text-white' : 'hover:text-[#140E10]'}`}>
-                    <i className={`bi ${item.icon} text-brand-500 text-sm`} aria-hidden="true"></i>
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
           </div>
 
           {/* Customer Support & Policies */}

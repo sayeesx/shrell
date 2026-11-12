@@ -34,32 +34,59 @@ export const AdminProducts: React.FC = () => {
   const [brandId, setBrandId] = useState('');
   const [shortDesc, setShortDesc] = useState('');
   const [desc, setDesc] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-  const [uploadingImage, setUploadingImage] = useState(false);
-  const [uploadError, setUploadError] = useState('');
+  const [imageUrls, setImageUrls] = useState<string[]>(['', '', '', '']);
+  const [uploadingSlots, setUploadingSlots] = useState<Record<number, boolean>>({});
+  const [uploadErrors, setUploadErrors] = useState<Record<number, string>>({});
   const [isUniversal, setIsUniversal] = useState(false);
   const [weightGrams, setWeightGrams] = useState('2000');
   const [dimensions, setDimensions] = useState('50x30x10');
+  const [installationDifficulty, setInstallationDifficulty] = useState<Product['installationDifficulty']>('Moderate');
+  const [warrantyMonths, setWarrantyMonths] = useState('24');
+  const [specRows, setSpecRows] = useState<{ group: string; name: string; value: string }[]>([]);
+  const [shippingCourier, setShippingCourier] = useState(
+    'Across India on all orders over ₹300 via BlueDart & Delhivery Express.'
+  );
+  const [shippingDispatch, setShippingDispatch] = useState(
+    'Dispatched within 24 hours from Pune logistics facility.'
+  );
+  const [shippingReturns, setShippingReturns] = useState(
+    'Rapid replacement guarantee for transit or manufacturing issues within 7 days.'
+  );
 
-  const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageFileChange = async (slotIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploadingImage(true);
-    setUploadError('');
+    setUploadingSlots((prev) => ({ ...prev, [slotIndex]: true }));
+    setUploadErrors((prev) => ({ ...prev, [slotIndex]: '' }));
     try {
       const result = await cloudinaryService.uploadImage(file, {
         maxSizeBytes: 8 * 1024 * 1024,
       });
       if (result && result.url) {
-        setImageUrl(result.url);
+        setImageUrls((prev) => {
+          const next = [...prev];
+          next[slotIndex] = result.url;
+          return next;
+        });
       }
     } catch (err: any) {
-      setUploadError(err.message || 'Image upload failed. Please try a different image or enter URL manually.');
+      setUploadErrors((prev) => ({
+        ...prev,
+        [slotIndex]: err.message || 'Image upload failed. Please try a different image or enter URL manually.',
+      }));
     } finally {
-      setUploadingImage(false);
+      setUploadingSlots((prev) => ({ ...prev, [slotIndex]: false }));
       e.target.value = '';
     }
+  };
+
+  const handleImageUrlChange = (slotIndex: number, value: string) => {
+    setImageUrls((prev) => {
+      const next = [...prev];
+      next[slotIndex] = value;
+      return next;
+    });
   };
 
   const loadData = async () => {
@@ -92,12 +119,20 @@ export const AdminProducts: React.FC = () => {
     setBrandId(brands[0]?.id || '');
     setShortDesc('');
     setDesc('');
-    setImageUrl('/logos/shrell-full_white-text_black-logo.png');
-    setUploadingImage(false);
-    setUploadError('');
+    setImageUrls(['', '', '', '']);
+    setUploadingSlots({});
+    setUploadErrors({});
     setIsUniversal(true);
     setWeightGrams('3000');
     setDimensions('80x25x15');
+    setInstallationDifficulty('Moderate');
+    setWarrantyMonths('24');
+    setSpecRows([
+      { group: 'General', name: 'Mounting Style', value: 'Universal' },
+    ]);
+    setShippingCourier('Across India on all orders over ₹300 via BlueDart & Delhivery Express.');
+    setShippingDispatch('Dispatched within 24 hours from Pune logistics facility.');
+    setShippingReturns('Rapid replacement guarantee for transit or manufacturing issues within 7 days.');
     setIsModalOpen(true);
   };
 
@@ -112,12 +147,37 @@ export const AdminProducts: React.FC = () => {
     setBrandId(p.brandId);
     setShortDesc(p.shortDescription);
     setDesc(p.description);
-    setImageUrl(p.images[0]?.url || '');
-    setUploadingImage(false);
-    setUploadError('');
+    setImageUrls([
+      p.images[0]?.url || '',
+      p.images[1]?.url || '',
+      p.images[2]?.url || '',
+      p.images[3]?.url || '',
+    ]);
+    setUploadingSlots({});
+    setUploadErrors({});
     setIsUniversal(p.isUniversalFit);
     setWeightGrams(p.weightGrams.toString());
     setDimensions(p.dimensionsCm);
+    setInstallationDifficulty(p.installationDifficulty || 'Moderate');
+    setWarrantyMonths((p.warrantyMonths ?? 12).toString());
+
+    const allSpecs = Array.isArray(p.specifications) ? p.specifications : [];
+    const techSpecs = allSpecs.filter((s) => s.group !== 'Shipping & Warranty');
+    const shipSpecs = allSpecs.filter((s) => s.group === 'Shipping & Warranty');
+
+    setSpecRows(techSpecs.map((s) => ({ group: s.group || 'General', name: s.name, value: s.value })));
+    setShippingCourier(
+      shipSpecs.find((s) => s.name === 'Free Express Courier')?.value ||
+        'Across India on all orders over ₹300 via BlueDart & Delhivery Express.'
+    );
+    setShippingDispatch(
+      shipSpecs.find((s) => s.name === 'Dispatch Guarantee')?.value ||
+        'Dispatched within 24 hours from Pune logistics facility.'
+    );
+    setShippingReturns(
+      shipSpecs.find((s) => s.name === '7-Day Returns')?.value ||
+        'Rapid replacement guarantee for transit or manufacturing issues within 7 days.'
+    );
     setIsModalOpen(true);
   };
 
@@ -126,25 +186,44 @@ export const AdminProducts: React.FC = () => {
     const pricePaisa = rupeesToPaisa(Number(priceRupees));
     const costPaisa = rupeesToPaisa(Number(costPriceRupees));
     const stock = Number(stockQuantity);
+    const parsedWarranty = Math.max(0, Number(warrantyMonths) || 0);
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
     const selectedCat = categories.find((c) => c.id === categoryId);
     const selectedBrand = brands.find((b) => b.id === brandId);
 
-    const cleanImageUrl = imageUrl.trim().startsWith('http://res.cloudinary.com/')
-      ? imageUrl.trim().replace(/^http:\/\/res\.cloudinary\.com\//, 'https://res.cloudinary.com/')
-      : imageUrl.trim();
+    const images = imageUrls
+      .map((raw) => raw.trim())
+      .filter(Boolean)
+      .map((raw, idx) => {
+        const cleanUrl = raw.startsWith('http://res.cloudinary.com/')
+          ? raw.replace(/^http:\/\/res\.cloudinary\.com\//, 'https://res.cloudinary.com/')
+          : raw;
+        return {
+          id: `img-${Date.now()}-${idx + 1}`,
+          productId: editingProduct?.id || '',
+          url: cleanUrl,
+          altText: idx === 0 ? name : `${name} view ${idx + 1}`,
+          sortOrder: idx + 1,
+          isPrimary: idx === 0,
+        };
+      });
 
-    const images = [
-      {
-        id: `img-${Date.now()}`,
-        productId: '',
-        url: cleanImageUrl || '/logos/shrell-full_white-text_black-logo.png',
-        altText: name,
-        sortOrder: 1,
-        isPrimary: true,
-      },
-    ];
+    const cleanedTechSpecs = specRows
+      .filter((r) => r.name.trim() && r.value.trim())
+      .map((r) => ({
+        group: r.group.trim() || 'General',
+        name: r.name.trim(),
+        value: r.value.trim(),
+      }));
+
+    const shippingSpecs = [
+      { group: 'Shipping & Warranty', name: 'Free Express Courier', value: shippingCourier.trim() },
+      { group: 'Shipping & Warranty', name: 'Dispatch Guarantee', value: shippingDispatch.trim() },
+      { group: 'Shipping & Warranty', name: '7-Day Returns', value: shippingReturns.trim() },
+    ].filter((s) => s.value.length > 0);
+
+    const specifications = [...cleanedTechSpecs, ...shippingSpecs];
 
     try {
       if (editingProduct) {
@@ -163,8 +242,11 @@ export const AdminProducts: React.FC = () => {
           description: desc,
           images,
           isUniversalFit: isUniversal,
-          weightGrams: Number(weightGrams),
+          weightGrams: Number(weightGrams) || 1000,
           dimensionsCm: dimensions,
+          installationDifficulty,
+          warrantyMonths: parsedWarranty,
+          specifications,
         });
       } else {
         await productRepository.create({
@@ -184,14 +266,11 @@ export const AdminProducts: React.FC = () => {
           isUniversalFit: isUniversal,
           isActive: true,
           isFeatured: false,
-          weightGrams: Number(weightGrams),
+          weightGrams: Number(weightGrams) || 1000,
           dimensionsCm: dimensions,
-          installationDifficulty: 'Moderate',
-          warrantyMonths: 24,
-          specifications: [
-            { group: 'General', name: 'Mounting Style', value: isUniversal ? 'Universal' : 'Direct Fit' },
-            { group: 'Dimensions', name: 'Packaging Box', value: `${dimensions} cm` },
-          ],
+          installationDifficulty,
+          warrantyMonths: parsedWarranty,
+          specifications,
         });
       }
 
@@ -474,113 +553,118 @@ export const AdminProducts: React.FC = () => {
                 </div>
               </div>
 
-              {/* Product Image Upload & URL */}
-              <div className="space-y-2">
+              {/* Product Images: 4 Optional Upload Boxes */}
+              <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <label className={`block uppercase font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    Product Image (Manual Upload or URL)
+                    Product Images (Up to 4 Optional Slots)
                   </label>
-                  {imageUrl && (
-                    <button
-                      type="button"
-                      onClick={() => setImageUrl('')}
-                      className="text-[11px] text-rose-500 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <i className="bi bi-trash text-xs" />
-                      <span>Remove</span>
-                    </button>
-                  )}
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    {imageUrls.filter((u) => u.trim()).length} / 4 added
+                  </span>
                 </div>
 
-                {/* Upload dropzone / trigger */}
-                <div className={`p-3 rounded-lg border-2 border-dashed transition-colors flex flex-col items-center justify-center gap-2 ${
-                  isDark ? 'border-slate-700 bg-slate-950/70 hover:border-slate-500' : 'border-slate-300 bg-slate-50 hover:border-slate-400'
-                }`}>
-                  {uploadingImage ? (
-                    <div className="py-4 flex flex-col items-center justify-center gap-2">
-                      <div className="w-6 h-6 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
-                      <span className="text-xs text-slate-400 font-mono">Uploading image to CDN...</span>
-                    </div>
-                  ) : imageUrl ? (
-                    <div className="flex items-center gap-4 w-full">
-                      <div className={`w-16 h-16 shrink-0 rounded-lg border overflow-hidden flex items-center justify-center p-1 ${
-                        isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
-                      }`}>
-                        <img
-                          src={imageUrl}
-                          alt="Product Preview"
-                          className="w-full h-full object-contain"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/logos/shrell-brandicon_no-bg.png';
-                          }}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[0, 1, 2, 3].map((slotIdx) => {
+                    const url = imageUrls[slotIdx] || '';
+                    const isUploading = Boolean(uploadingSlots[slotIdx]);
+                    const slotError = uploadErrors[slotIdx];
+
+                    return (
+                      <div
+                        key={slotIdx}
+                        className={`p-3 rounded-lg border space-y-2 ${
+                          isDark ? 'border-slate-700 bg-slate-950/60' : 'border-slate-300 bg-slate-50/70'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className={`font-semibold uppercase ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                            {slotIdx === 0 ? 'Image 1 (Primary)' : `Image ${slotIdx + 1}`}
+                          </span>
+                          {url && (
+                            <button
+                              type="button"
+                              onClick={() => handleImageUrlChange(slotIdx, '')}
+                              className="text-rose-500 hover:underline flex items-center gap-1 cursor-pointer"
+                            >
+                              <i className="bi bi-trash text-[10px]" aria-hidden="true" />
+                              <span>Remove</span>
+                            </button>
+                          )}
+                        </div>
+
+                        <div
+                          className={`p-2.5 rounded-lg border-2 border-dashed transition-colors flex items-center justify-center min-h-[76px] ${
+                            isDark ? 'border-slate-700 bg-slate-900/60 hover:border-slate-500' : 'border-slate-300 bg-white hover:border-slate-400'
+                          }`}
+                        >
+                          {isUploading ? (
+                            <div className="flex items-center gap-2 text-xs text-slate-400 font-mono">
+                              <div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                              <span>Uploading...</span>
+                            </div>
+                          ) : url ? (
+                            <div className="flex items-center gap-3 w-full">
+                              <div
+                                className={`w-12 h-12 shrink-0 rounded-md border overflow-hidden flex items-center justify-center p-1 ${
+                                  isDark ? 'bg-slate-950 border-slate-700' : 'bg-slate-50 border-slate-200'
+                                }`}
+                              >
+                                <img
+                                  src={url}
+                                  alt={`Product slot ${slotIdx + 1}`}
+                                  className="w-full h-full object-contain"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = '/logos/shrell-brandicon_no-bg.png';
+                                  }}
+                                />
+                              </div>
+                              <label className="text-[11px] font-medium cursor-pointer hover:underline flex items-center gap-1 text-slate-400 hover:text-white">
+                                <i className="bi bi-arrow-repeat text-xs" aria-hidden="true" />
+                                <span>Replace file</span>
+                                <input
+                                  type="file"
+                                  accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
+                                  onChange={(e) => handleImageFileChange(slotIdx, e)}
+                                  className="hidden"
+                                />
+                              </label>
+                            </div>
+                          ) : (
+                            <label className="flex flex-col items-center justify-center cursor-pointer w-full py-1 text-center">
+                              <i className={`bi bi-cloud-arrow-up text-lg mb-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`} aria-hidden="true" />
+                              <span className={`text-[11px] font-semibold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                                Upload image {slotIdx + 1}
+                              </span>
+                              <input
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
+                                onChange={(e) => handleImageFileChange(slotIdx, e)}
+                                className="hidden"
+                              />
+                            </label>
+                          )}
+                        </div>
+
+                        {slotError && (
+                          <div className="text-[10px] font-mono text-rose-500">{slotError}</div>
+                        )}
+
+                        <input
+                          type="text"
+                          value={url}
+                          onChange={(e) => handleImageUrlChange(slotIdx, e.target.value)}
+                          placeholder="Or paste image URL (optional)"
+                          aria-label={`Image ${slotIdx + 1} URL`}
+                          className={`w-full border rounded-md px-2.5 py-1.5 text-[11px] transition-colors focus:outline-none ${
+                            isDark
+                              ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                              : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                          }`}
                         />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className={`text-xs font-semibold truncate ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                          Image Uploaded
-                        </div>
-                        <div className="text-[11px] text-slate-400 truncate font-mono">
-                          {imageUrl}
-                        </div>
-                        <div className="mt-1 flex items-center gap-3">
-                          <label className={`text-xs font-medium cursor-pointer hover:underline flex items-center gap-1 ${
-                            isDark ? 'text-slate-300' : 'text-slate-700'
-                          }`}>
-                            <i className="bi bi-arrow-repeat text-xs" />
-                            <span>Replace with another file</span>
-                            <input
-                              type="file"
-                              accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
-                              onChange={handleImageFileChange}
-                              className="hidden"
-                            />
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <label className="py-3 flex flex-col items-center justify-center cursor-pointer w-full group">
-                      <i className={`bi bi-cloud-arrow-up text-2xl mb-1 transition-transform group-hover:-translate-y-0.5 ${
-                        isDark ? 'text-slate-400 group-hover:text-white' : 'text-slate-500 group-hover:text-slate-900'
-                      }`} />
-                      <span className={`text-xs font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                        Click to upload image file
-                      </span>
-                      <span className="text-[10px] text-slate-400 mt-0.5 font-mono">
-                        Supports WebP, PNG, JPG, SVG up to 8MB (Cloudinary CDN)
-                      </span>
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
-                        onChange={handleImageFileChange}
-                        className="hidden"
-                      />
-                    </label>
-                  )}
-                </div>
-
-                {uploadError && (
-                  <div className="text-[11px] font-mono text-rose-500 p-2 rounded bg-rose-500/10 border border-rose-500/30">
-                    {uploadError}
-                  </div>
-                )}
-
-                {/* Direct URL input */}
-                <div>
-                  <div className={`text-[10px] uppercase font-bold mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                    Or enter image URL manually:
-                  </div>
-                  <input
-                    type="url"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="https://res.cloudinary.com/... or /images/..."
-                    className={`w-full border rounded-lg px-3 py-1.5 text-xs transition-colors focus:outline-none ${
-                      isDark
-                        ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
-                        : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
-                    }`}
-                  />
+                    );
+                  })}
                 </div>
               </div>
 
@@ -612,6 +696,195 @@ export const AdminProducts: React.FC = () => {
                       : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
                   }`}
                 />
+              </div>
+
+              {/* Technical Specifications Section */}
+              <div className={`pt-3 border-t space-y-3 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+                <div className="flex items-center justify-between">
+                  <h3 className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                    Technical Specifications
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setSpecRows((prev) => [...prev, { group: 'General', name: '', value: '' }])}
+                    className="px-2.5 py-1 rounded-md border border-slate-500/40 text-[11px] font-semibold hover:bg-slate-500/10 transition-colors cursor-pointer"
+                  >
+                    + Add Spec
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                      Net Weight (g)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={weightGrams}
+                      onChange={(e) => setWeightGrams(e.target.value)}
+                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                        isDark
+                          ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                          : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                      Dimensions (cm)
+                    </label>
+                    <input
+                      type="text"
+                      value={dimensions}
+                      onChange={(e) => setDimensions(e.target.value)}
+                      placeholder="e.g. 80x25x15"
+                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                        isDark
+                          ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                          : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                      Installation
+                    </label>
+                    <select
+                      value={installationDifficulty}
+                      onChange={(e) => setInstallationDifficulty(e.target.value as Product['installationDifficulty'])}
+                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                        isDark
+                          ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                          : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                      }`}
+                    >
+                      <option value="Plug & Play">Plug &amp; Play</option>
+                      <option value="Moderate">Moderate</option>
+                      <option value="Professional Recommended">Professional Recommended</option>
+                    </select>
+                  </div>
+                </div>
+
+                {specRows.length > 0 && (
+                  <div className="space-y-2">
+                    {specRows.map((row, idx) => (
+                      <div key={idx} className="grid grid-cols-12 gap-2 items-center">
+                        <input
+                          type="text"
+                          value={row.name}
+                          onChange={(e) =>
+                            setSpecRows((prev) =>
+                              prev.map((item, i) => (i === idx ? { ...item, name: e.target.value } : item))
+                            )
+                          }
+                          placeholder="Spec name (e.g. Material)"
+                          aria-label={`Specification ${idx + 1} name`}
+                          className={`col-span-5 border rounded-lg px-2.5 py-1.5 text-xs focus:outline-none ${
+                            isDark
+                              ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                              : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                          }`}
+                        />
+                        <input
+                          type="text"
+                          value={row.value}
+                          onChange={(e) =>
+                            setSpecRows((prev) =>
+                              prev.map((item, i) => (i === idx ? { ...item, value: e.target.value } : item))
+                            )
+                          }
+                          placeholder="Value (e.g. T6 Aluminium)"
+                          aria-label={`Specification ${idx + 1} value`}
+                          className={`col-span-6 border rounded-lg px-2.5 py-1.5 text-xs focus:outline-none ${
+                            isDark
+                              ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                              : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                          }`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setSpecRows((prev) => prev.filter((_, i) => i !== idx))}
+                          aria-label={`Remove specification ${idx + 1}`}
+                          className="col-span-1 p-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10 flex items-center justify-center cursor-pointer"
+                        >
+                          <i className="bi bi-trash text-xs" aria-hidden="true" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Shipping & Warranty Section */}
+              <div className={`pt-3 border-t space-y-3 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+                <h3 className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                  Shipping &amp; Warranty
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                      Manufacturer Warranty (Months)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={warrantyMonths}
+                      onChange={(e) => setWarrantyMonths(e.target.value)}
+                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                        isDark
+                          ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                          : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                      Courier &amp; Express Shipping
+                    </label>
+                    <input
+                      type="text"
+                      value={shippingCourier}
+                      onChange={(e) => setShippingCourier(e.target.value)}
+                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                        isDark
+                          ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                          : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                      Dispatch Guarantee
+                    </label>
+                    <input
+                      type="text"
+                      value={shippingDispatch}
+                      onChange={(e) => setShippingDispatch(e.target.value)}
+                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                        isDark
+                          ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                          : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                      Returns &amp; Replacement
+                    </label>
+                    <input
+                      type="text"
+                      value={shippingReturns}
+                      onChange={(e) => setShippingReturns(e.target.value)}
+                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                        isDark
+                          ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                          : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                      }`}
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center gap-2 pt-2">

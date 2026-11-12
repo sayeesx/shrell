@@ -34,6 +34,7 @@ import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminSanity } from './pages/admin/AdminSanity';
 import { AdminHomeSections } from './pages/admin/AdminHomeSections';
 import { AdminCategories } from './pages/admin/AdminCategories';
+import { AdminReviews } from './pages/admin/AdminReviews';
 
 import { ScrollToTop } from './components/common/ScrollToTop';
 import { trackPageView } from './infrastructure/analytics/posthog';
@@ -115,6 +116,7 @@ export const App: React.FC = () => {
             <Route path="banners" element={<AdminBanners />} />
             <Route path="sanity" element={<AdminSanity />} />
             <Route path="products" element={<AdminProducts />} />
+            <Route path="reviews" element={<AdminReviews />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="inventory" element={<AdminInventory />} />
             <Route path="coupons" element={<AdminCoupons />} />

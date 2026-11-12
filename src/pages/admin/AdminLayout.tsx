@@ -23,6 +23,7 @@ export const AdminLayout: React.FC = () => {
     { name: 'Categories (CMS)', path: '/admin/categories', icon: 'bi-folder2-open' },
     { name: 'Hero Banners', path: '/admin/banners', icon: 'bi-images' },
     { name: 'Products', path: '/admin/products', icon: 'bi-box-seam' },
+    { name: 'Reviews', path: '/admin/reviews', icon: 'bi-star-half' },
     { name: 'Inventory & Movements', path: '/admin/inventory', icon: 'bi-stack' },
     { name: 'Orders & Fulfilment', path: '/admin/orders', icon: 'bi-bag-check' },
     { name: 'Coupons & Promos', path: '/admin/coupons', icon: 'bi-tag' },

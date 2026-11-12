@@ -779,6 +779,13 @@ export class MockReviewRepository implements IReviewRepository {
     this.reviews = loadFromStorage(STORAGE_KEYS.REVIEWS, INITIAL_REVIEWS);
   }
 
+  async getAllReviews(): Promise<ProductReview[]> {
+    this.reviews = loadFromStorage(STORAGE_KEYS.REVIEWS, INITIAL_REVIEWS);
+    return [...this.reviews].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }
+
   async getByProductId(productId: string): Promise<ProductReview[]> {
     this.reviews = loadFromStorage(STORAGE_KEYS.REVIEWS, INITIAL_REVIEWS);
     return this.reviews
@@ -797,6 +804,14 @@ export class MockReviewRepository implements IReviewRepository {
     this.reviews.unshift(newRev);
     saveToStorage(STORAGE_KEYS.REVIEWS, this.reviews);
     return newRev;
+  }
+
+  async deleteReview(id: string): Promise<boolean> {
+    this.reviews = loadFromStorage(STORAGE_KEYS.REVIEWS, INITIAL_REVIEWS);
+    const prevLen = this.reviews.length;
+    this.reviews = this.reviews.filter((r) => r.id !== id);
+    saveToStorage(STORAGE_KEYS.REVIEWS, this.reviews);
+    return this.reviews.length < prevLen;
   }
 
   async getRatingSummary(productId: string): Promise<ProductRatingSummary> {

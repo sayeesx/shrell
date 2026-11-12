@@ -1126,6 +1126,7 @@ export class SupabaseSettingsRepository implements ISettingsRepository {
 
       const storeInfo = settingsMap.store_info || {};
       const shippingRules = settingsMap.shipping_rules || {};
+      const seoOpengraph = settingsMap.seo_opengraph || {};
 
       return {
         storeName: storeInfo.storeName || 'SHRELL Automotive',
@@ -1138,6 +1139,14 @@ export class SupabaseSettingsRepository implements ISettingsRepository {
         standardShippingPaisa: shippingRules.standardShippingPaisa || 6000,
         gstRatePercent: shippingRules.gstRatePercent || 18,
         currency: 'INR',
+        ogTitle: seoOpengraph.ogTitle || 'SHRELL Automotive | Premium Car Accessories in India',
+        ogDescription:
+          seoOpengraph.ogDescription ||
+          'Shop premium car accessories and touring equipment for Indian vehicles. OSRAM auxiliary lighting, aerodynamic crossbars, 7D floor liners, and heavy-duty 12V tyre inflators.',
+        ogImageUrl: seoOpengraph.ogImageUrl || '/shrell-opengraph.png',
+        ogImageAlt:
+          seoOpengraph.ogImageAlt ||
+          'SHRELL Automotive - Premium Car Accessories & Touring Equipment',
       };
     } catch {
       return this.fallback.getSettings();
@@ -1150,7 +1159,7 @@ export class SupabaseSettingsRepository implements ISettingsRepository {
       const current = await this.getSettings();
       const updated = { ...current, ...settings };
 
-      await supabase.from('store_settings').upsert([
+      const { error } = await supabase.from('store_settings').upsert([
         {
           key: 'store_info',
           value: {
@@ -1170,8 +1179,26 @@ export class SupabaseSettingsRepository implements ISettingsRepository {
             gstRatePercent: updated.gstRatePercent,
           },
         },
+        {
+          key: 'seo_opengraph',
+          value: {
+            ogTitle: updated.ogTitle || 'SHRELL Automotive | Premium Car Accessories in India',
+            ogDescription:
+              updated.ogDescription ||
+              'Shop premium car accessories and touring equipment for Indian vehicles. OSRAM auxiliary lighting, aerodynamic crossbars, 7D floor liners, and heavy-duty 12V tyre inflators.',
+            ogImageUrl: updated.ogImageUrl || '/shrell-opengraph.png',
+            ogImageAlt:
+              updated.ogImageAlt ||
+              'SHRELL Automotive - Premium Car Accessories & Touring Equipment',
+          },
+        },
       ]);
 
+      if (error) {
+        return this.fallback.updateSettings(settings);
+      }
+
+      await this.fallback.updateSettings(updated);
       return updated;
     } catch {
       return this.fallback.updateSettings(settings);

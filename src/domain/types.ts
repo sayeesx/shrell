@@ -242,6 +242,10 @@ export interface StoreSettings {
   standardShippingPaisa: number;
   gstRatePercent: number;
   currency: CurrencyCode;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImageUrl?: string;
+  ogImageAlt?: string;
 }
 
 export interface HeroBanner {

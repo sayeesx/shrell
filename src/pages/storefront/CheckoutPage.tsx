@@ -464,11 +464,22 @@ export const CheckoutPage: React.FC = () => {
                           <span
                             title="Auto-filled from your account"
                             aria-label="Phone number auto-filled"
-                            className={`pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center ${
-                              isDark ? 'bg-white text-[#140E10]' : 'bg-[#140E10] text-white'
+                            className={`pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center ${
+                              isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'
                             }`}
                           >
-                            <i className="bi bi-check2 text-xs font-bold" aria-hidden="true" />
+                            <svg
+                              viewBox="0 0 16 16"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="w-4 h-4 block"
+                              aria-hidden="true"
+                            >
+                              <path d="M3.2 8.4L6.4 11.6L12.8 4.4" />
+                            </svg>
                           </span>
                         )}
                       </div>
@@ -528,11 +539,22 @@ export const CheckoutPage: React.FC = () => {
                         <span
                           title={`Location resolved: ${pinData.city}, ${pinData.state}`}
                           aria-label="PIN code location resolved"
-                          className={`pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center ${
-                            isDark ? 'bg-white text-[#140E10]' : 'bg-[#140E10] text-white'
+                          className={`pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center ${
+                            isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'
                           }`}
                         >
-                          <i className="bi bi-check2 text-xs font-bold" aria-hidden="true" />
+                          <svg
+                            viewBox="0 0 16 16"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="w-4 h-4 block"
+                            aria-hidden="true"
+                          >
+                            <path d="M3.2 8.4L6.4 11.6L12.8 4.4" />
+                          </svg>
                         </span>
                       )}
                     </div>

@@ -8,6 +8,7 @@ import { trackProductAddedToCart, trackProductRemovedFromCart, trackCouponApplie
 interface CartContextType {
   cart: Cart;
   settings: StoreSettings;
+  refreshSettings: () => Promise<void>;
   addItem: (product: Product, quantity?: number) => { success: boolean; message?: string };
   updateQuantity: (productId: string, quantity: number) => void;
   removeItem: (productId: string) => void;
@@ -50,8 +51,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const openCheckout = () => setIsCheckoutOpen(true);
   const closeCheckout = () => setIsCheckoutOpen(false);
 
+  const refreshSettings = async () => {
+    try {
+      const latest = await settingsRepository.getSettings();
+      setSettings(latest);
+    } catch (err) {
+      console.error('Failed to refresh settings:', err);
+    }
+  };
+
   useEffect(() => {
-    settingsRepository.getSettings().then(setSettings).catch(console.error);
+    refreshSettings();
   }, []);
 
   useEffect(() => {
@@ -205,6 +215,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         cart,
         settings,
+        refreshSettings,
         addItem,
         updateQuantity,
         removeItem,

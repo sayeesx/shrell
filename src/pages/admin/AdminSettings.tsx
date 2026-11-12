@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { settingsRepository } from '../../infrastructure/repositories';
+import { cloudinaryService } from '../../infrastructure/cloudinary/cloudinaryService';
 import { paisaToRupees, rupeesToPaisa } from '../../domain/services/CurrencyService';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
+import { useCart } from '../../application/CartContext';
 import { useTheme } from '../../application/ThemeContext';
+
+const DEFAULT_OG_IMAGE = '/shrell-opengraph.png';
 
 export const AdminSettings: React.FC = () => {
   const { finishPageLoad } = useNavigationLoading();
+  const { refreshSettings } = useCart();
   const { isDark } = useTheme();
   const [storeName, setStoreName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
@@ -17,6 +22,14 @@ export const AdminSettings: React.FC = () => {
   const [freeShippingRupees, setFreeShippingRupees] = useState('');
   const [standardShippingRupees, setStandardShippingRupees] = useState('');
   const [gstRate, setGstRate] = useState('');
+
+  // OpenGraph CDN & Social Share Fields
+  const [ogTitle, setOgTitle] = useState('');
+  const [ogDescription, setOgDescription] = useState('');
+  const [ogImageUrl, setOgImageUrl] = useState(DEFAULT_OG_IMAGE);
+  const [ogImageAlt, setOgImageAlt] = useState('');
+  const [uploadingOgImage, setUploadingOgImage] = useState(false);
+  const [ogUploadError, setOgUploadError] = useState('');
 
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -34,6 +47,13 @@ export const AdminSettings: React.FC = () => {
         setFreeShippingRupees(paisaToRupees(s.freeShippingThresholdPaisa).toString());
         setStandardShippingRupees(paisaToRupees(s.standardShippingPaisa).toString());
         setGstRate(s.gstRatePercent.toString());
+        setOgTitle(s.ogTitle || 'SHRELL Automotive | Premium Car Accessories in India');
+        setOgDescription(
+          s.ogDescription ||
+            'Shop premium car accessories and touring equipment for Indian vehicles. OSRAM auxiliary lighting, aerodynamic crossbars, 7D floor liners, and heavy-duty 12V tyre inflators.'
+        );
+        setOgImageUrl(s.ogImageUrl || DEFAULT_OG_IMAGE);
+        setOgImageAlt(s.ogImageAlt || 'SHRELL Automotive - Premium Car Accessories & Touring Equipment');
       } catch (err) {
         console.error('Failed to load settings:', err);
       } finally {
@@ -44,9 +64,37 @@ export const AdminSettings: React.FC = () => {
     load();
   }, []);
 
+  const handleOgImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingOgImage(true);
+    setOgUploadError('');
+    try {
+      const result = await cloudinaryService.uploadImage(file, {
+        maxSizeBytes: 8 * 1024 * 1024,
+      });
+      if (result && result.url) {
+        const cleanUrl = result.url.startsWith('http://res.cloudinary.com/')
+          ? result.url.replace(/^http:\/\/res\.cloudinary\.com\//, 'https://res.cloudinary.com/')
+          : result.url;
+        setOgImageUrl(cleanUrl);
+      }
+    } catch (err: any) {
+      setOgUploadError(err.message || 'OpenGraph image upload failed. Try again or enter a CDN URL manually.');
+    } finally {
+      setUploadingOgImage(false);
+      e.target.value = '';
+    }
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const cleanOgUrl = ogImageUrl.trim().startsWith('http://res.cloudinary.com/')
+        ? ogImageUrl.trim().replace(/^http:\/\/res\.cloudinary\.com\//, 'https://res.cloudinary.com/')
+        : ogImageUrl.trim() || DEFAULT_OG_IMAGE;
+
       await settingsRepository.updateSettings({
         storeName,
         contactEmail,
@@ -57,7 +105,12 @@ export const AdminSettings: React.FC = () => {
         freeShippingThresholdPaisa: rupeesToPaisa(Number(freeShippingRupees)),
         standardShippingPaisa: rupeesToPaisa(Number(standardShippingRupees)),
         gstRatePercent: Number(gstRate),
+        ogTitle: ogTitle.trim(),
+        ogDescription: ogDescription.trim(),
+        ogImageUrl: cleanOgUrl,
+        ogImageAlt: ogImageAlt.trim(),
       });
+      await refreshSettings();
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
@@ -148,6 +201,142 @@ export const AdminSettings: React.FC = () => {
             <div>
               <label className={labelCls}>Applicable GST Rate (%)</label>
               <input type="number" required value={gstRate} onChange={(e) => setGstRate(e.target.value)} className={inputCls} />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 pt-2">
+          <div className="flex items-center justify-between border-b pb-2 border-slate-200 dark:border-slate-800">
+            <h2 className={`text-xs uppercase tracking-wider font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+              OpenGraph &amp; Social Share Preview (CDN)
+            </h2>
+            {ogImageUrl !== DEFAULT_OG_IMAGE && (
+              <button
+                type="button"
+                onClick={() => setOgImageUrl(DEFAULT_OG_IMAGE)}
+                className="text-[11px] font-mono text-rose-500 hover:underline cursor-pointer"
+              >
+                Reset Default Image
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
+            {/* OpenGraph CDN Image Upload & URL */}
+            <div className="md:col-span-6 space-y-2.5">
+              <label className={labelCls}>OpenGraph Image (Upload to Cloudinary CDN)</label>
+              <div
+                className={`p-3 rounded-lg border-2 border-dashed transition-colors ${
+                  isDark ? 'border-slate-700 bg-slate-950/60 hover:border-slate-500' : 'border-slate-300 bg-slate-50 hover:border-slate-400'
+                }`}
+              >
+                {uploadingOgImage ? (
+                  <div className="py-6 flex flex-col items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                    <span className="text-[11px] text-slate-400">Uploading OpenGraph image to CDN...</span>
+                  </div>
+                ) : (
+                  <label className="py-2 flex flex-col items-center justify-center cursor-pointer text-center gap-1">
+                    <i className={`bi bi-cloud-arrow-up text-xl ${isDark ? 'text-slate-400' : 'text-slate-500'}`} aria-hidden="true" />
+                    <span className={`text-xs font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                      Click to upload OpenGraph banner (1200×630 recommended)
+                    </span>
+                    <span className="text-[10px] text-slate-400">
+                      Uploads to CDN and updates meta og:image / twitter:image
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/avif"
+                      onChange={handleOgImageUpload}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
+
+              {ogUploadError && (
+                <div className="text-[11px] text-rose-500 p-2 rounded bg-rose-500/10 border border-rose-500/30">
+                  {ogUploadError}
+                </div>
+              )}
+
+              <div>
+                <label htmlFor="og-image-url" className={labelCls}>OpenGraph Image CDN URL</label>
+                <input
+                  id="og-image-url"
+                  type="text"
+                  value={ogImageUrl}
+                  onChange={(e) => setOgImageUrl(e.target.value)}
+                  placeholder="https://res.cloudinary.com/... or /shrell-opengraph.png"
+                  className={inputCls}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="og-image-alt" className={labelCls}>OpenGraph Image Alt Text</label>
+                <input
+                  id="og-image-alt"
+                  type="text"
+                  value={ogImageAlt}
+                  onChange={(e) => setOgImageAlt(e.target.value)}
+                  className={inputCls}
+                />
+              </div>
+            </div>
+
+            {/* Live Social Link Card Preview */}
+            <div className="md:col-span-6 space-y-2">
+              <span className={labelCls}>Live OpenGraph Preview</span>
+              <div
+                className={`rounded-xl border overflow-hidden ${
+                  isDark ? 'bg-slate-950 border-slate-700' : 'bg-[#F5F3EE] border-slate-300'
+                }`}
+              >
+                <div className="aspect-[1200/630] w-full bg-black/20 overflow-hidden flex items-center justify-center">
+                  <img
+                    src={ogImageUrl || DEFAULT_OG_IMAGE}
+                    alt={ogImageAlt || 'OpenGraph preview'}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = DEFAULT_OG_IMAGE;
+                    }}
+                  />
+                </div>
+                <div className="p-3 space-y-1 font-sans">
+                  <div className="text-[10px] uppercase tracking-wider text-slate-400 font-mono">
+                    shrell.vercel.app
+                  </div>
+                  <div className={`text-xs font-bold line-clamp-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    {ogTitle || 'SHRELL Automotive | Premium Car Accessories in India'}
+                  </div>
+                  <div className={`text-[11px] line-clamp-2 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                    {ogDescription || 'Shop premium car accessories and touring equipment for Indian vehicles.'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 pt-1">
+            <div>
+              <label htmlFor="og-title" className={labelCls}>OpenGraph Title</label>
+              <input
+                id="og-title"
+                type="text"
+                value={ogTitle}
+                onChange={(e) => setOgTitle(e.target.value)}
+                className={inputCls}
+              />
+            </div>
+            <div>
+              <label htmlFor="og-description" className={labelCls}>OpenGraph Description</label>
+              <textarea
+                id="og-description"
+                rows={2}
+                value={ogDescription}
+                onChange={(e) => setOgDescription(e.target.value)}
+                className={inputCls}
+              />
             </div>
           </div>
         </div>

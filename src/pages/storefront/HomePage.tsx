@@ -10,12 +10,14 @@ import {
 import { ProductCard } from '../../components/ui/ProductCard';
 import { HomePageSkeleton } from '../../components/common/ShimmerSkeleton';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
+import { useCart } from '../../application/CartContext';
 import { useTheme } from '../../application/ThemeContext';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
 import { generateOrganizationSchema, generateWebSiteSchema } from '../../infrastructure/seo/schemaGenerators';
 
 export const HomePage: React.FC = () => {
   const { finishPageLoad } = useNavigationLoading();
+  const { settings } = useCart();
   const { isDark } = useTheme();
   const [loading, setLoading] = useState<boolean>(true);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -136,12 +138,15 @@ export const HomePage: React.FC = () => {
   return (
     <div className="space-y-8 sm:space-y-12 pb-20">
       <SEOHead
-        title="SHRELL Automotive | Premium Car Accessories in India"
-        description="Shop premium car accessories and touring equipment for Indian vehicles. OSRAM auxiliary lighting, aerodynamic crossbars, 7D floor liners, and heavy-duty 12V tyre inflators."
+        title={settings.ogTitle || 'SHRELL Automotive | Premium Car Accessories in India'}
+        description={
+          settings.ogDescription ||
+          'Shop premium car accessories and touring equipment for Indian vehicles. OSRAM auxiliary lighting, aerodynamic crossbars, 7D floor liners, and heavy-duty 12V tyre inflators.'
+        }
         canonicalPath="/"
         ogType="website"
-        ogImage="/shrell-opengraph.png"
-        ogImageAlt="SHRELL Automotive - Premium Car Accessories & Touring Equipment"
+        ogImage={settings.ogImageUrl || '/shrell-opengraph.png'}
+        ogImageAlt={settings.ogImageAlt || 'SHRELL Automotive - Premium Car Accessories & Touring Equipment'}
         structuredData={[generateOrganizationSchema(), generateWebSiteSchema()]}
       />
       <h1 className="sr-only">SHRELL Automotive | Premium Car Accessories in India</h1>
@@ -446,73 +451,75 @@ export const HomePage: React.FC = () => {
                         className="absolute inset-0 pointer-events-none"
                         style={{
                           background:
-                            'radial-gradient(circle at 82% 72%, rgba(255, 0, 14, 0.18) 0%, rgba(136, 67, 177, 0.12) 38%, rgba(10, 8, 8, 0) 70%)',
+                            'radial-gradient(circle at 82% 82%, rgba(255, 0, 14, 0.18) 0%, rgba(136, 67, 177, 0.12) 38%, rgba(10, 8, 8, 0) 70%)',
                         }}
                         aria-hidden="true"
                       />
 
-                      {/* Poster Top Header Bar */}
-                      <div className="relative z-10 flex items-center justify-between border-b border-white/10 pb-2">
-                        <span className="text-[10px] font-mono font-bold uppercase tracking-[0.18em] text-[#FF000E]">
-                          SHRELL DETAILING
-                        </span>
-                        <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-300">
-                          500 ML • pH-NEUTRAL
-                        </span>
-                      </div>
+                      <div className="relative z-10 flex flex-col gap-3">
+                        {/* Poster Top Header Bar */}
+                        <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                          <span className="text-[10px] font-mono font-bold uppercase tracking-[0.18em] text-[#FF000E]">
+                            SHRELL DETAILING
+                          </span>
+                          <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-300">
+                            500 ML • pH-NEUTRAL
+                          </span>
+                        </div>
 
-                      {/* Poster Title, Specs & Scents */}
-                      <div className="relative z-10 my-3 space-y-2.5 max-w-[68%] sm:max-w-[64%]">
+                        {/* Poster Title, Specs & Scents */}
+                        <div className="space-y-2.5">
+                          <div>
+                            <h3 className="text-2xl sm:text-[28px] font-black text-white uppercase tracking-tight leading-[0.95]">
+                              ULTRA<br />SHAMPOO
+                            </h3>
+                            <p className="text-[11px] font-mono text-slate-300 mt-1.5 leading-snug">
+                              30 to 50 washes. Foam + lubricants, safe for wax &amp; sealants.
+                            </p>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span
+                              className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold border"
+                              style={{
+                                backgroundColor: 'rgba(136, 67, 177, 0.28)',
+                                color: '#E9D5FF',
+                                borderColor: 'rgba(136, 67, 177, 0.5)',
+                              }}
+                            >
+                              Lavender Breeze
+                            </span>
+                            <span
+                              className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold border"
+                              style={{
+                                backgroundColor: 'rgba(231, 83, 6, 0.28)',
+                                color: '#FED7AA',
+                                borderColor: 'rgba(231, 83, 6, 0.5)',
+                              }}
+                            >
+                              Passionfruit Martini
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Poster CTA above Hero Image */}
                         <div>
-                          <h3 className="text-2xl sm:text-[28px] font-black text-white uppercase tracking-tight leading-[0.95]">
-                            ULTRA<br />SHAMPOO
-                          </h3>
-                          <p className="text-[11px] font-mono text-slate-300 mt-1.5 leading-snug">
-                            30 to 50 washes. Foam + lubricants, safe for wax &amp; sealants.
-                          </p>
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <span
-                            className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold border"
-                            style={{
-                              backgroundColor: 'rgba(136, 67, 177, 0.28)',
-                              color: '#E9D5FF',
-                              borderColor: 'rgba(136, 67, 177, 0.5)',
-                            }}
+                          <Link
+                            to="/pre-book"
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-sm cursor-pointer"
                           >
-                            Lavender Breeze
-                          </span>
-                          <span
-                            className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold border"
-                            style={{
-                              backgroundColor: 'rgba(231, 83, 6, 0.28)',
-                              color: '#FED7AA',
-                              borderColor: 'rgba(231, 83, 6, 0.5)',
-                            }}
-                          >
-                            Passionfruit Martini
-                          </span>
+                            <span>Pre-Book Now</span>
+                            <i className="bi bi-arrow-right text-[10px]" aria-hidden="true" />
+                          </Link>
                         </div>
-                      </div>
-
-                      {/* Poster Bottom CTA */}
-                      <div className="relative z-10 pt-1">
-                        <Link
-                          to="/pre-book"
-                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-sm cursor-pointer"
-                        >
-                          <span>Pre-Book Now</span>
-                          <i className="bi bi-arrow-right text-[10px]" aria-hidden="true" />
-                        </Link>
                       </div>
 
                       {/* Poster Hero Subject: SUV + Twin Ultra Shampoo Bottles */}
-                      <div className="absolute -bottom-1 -right-2 sm:-right-1 w-52 sm:w-64 h-36 sm:h-44 pointer-events-none flex items-end justify-end">
+                      <div className="relative z-10 mt-3 w-full h-36 sm:h-44 flex items-end justify-end overflow-hidden pointer-events-none">
                         <img
                           src="/suv.webp"
                           alt="SHRELL Ultra Shampoo Lavender Breeze and Passionfruit Martini 500ml bottles"
-                          className="w-full h-full object-contain scale-110 sm:scale-120 origin-bottom-right group-hover:scale-125 transition-transform duration-300"
+                          className="max-h-full w-auto max-w-full object-contain object-bottom group-hover:scale-105 origin-bottom transition-transform duration-300"
                           style={{ filter: 'none' }}
                         />
                       </div>

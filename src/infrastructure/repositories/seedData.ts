@@ -21,6 +21,11 @@ export const INITIAL_SETTINGS: StoreSettings = {
   standardShippingPaisa: 6000, // ₹60.00
   gstRatePercent: 18,
   currency: 'INR',
+  ogTitle: 'SHRELL Automotive | Premium Car Accessories in India',
+  ogDescription:
+    'Shop premium car accessories and touring equipment for Indian vehicles. OSRAM auxiliary lighting, aerodynamic crossbars, 7D floor liners, and heavy-duty 12V tyre inflators.',
+  ogImageUrl: '/shrell-opengraph.png',
+  ogImageAlt: 'SHRELL Automotive - Premium Car Accessories & Touring Equipment',
 };
 
 export const INITIAL_BRANDS: Brand[] = [

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { SITE_URL, ensureAbsoluteImageUrl } from './schemaGenerators';
+import { useCart } from '../../application/CartContext';
 
 export interface SEOHeadProps {
   title: string;
@@ -21,12 +22,14 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
   canonicalPath,
   canonicalUrl,
   ogType = 'website',
-  ogImage = '/shrell-opengraph.png',
-  ogImageAlt = 'SHRELL Automotive - Premium Car Accessories India',
+  ogImage,
+  ogImageAlt,
   twitterCard = 'summary_large_image',
   noIndex = false,
   structuredData,
 }) => {
+  const { settings } = useCart();
+
   // Resolve absolute canonical URL
   const resolvedCanonical = canonicalUrl
     ? canonicalUrl
@@ -34,7 +37,17 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
     ? `${SITE_URL}${canonicalPath.startsWith('/') ? '' : '/'}${canonicalPath}`
     : SITE_URL;
 
-  const absoluteOgImage = ensureAbsoluteImageUrl(ogImage);
+  const resolvedOgImage =
+    ogImage && ogImage !== '/shrell-opengraph.png'
+      ? ogImage
+      : settings?.ogImageUrl || '/shrell-opengraph.png';
+
+  const resolvedOgAlt =
+    ogImageAlt ||
+    settings?.ogImageAlt ||
+    'SHRELL Automotive - Premium Car Accessories India';
+
+  const absoluteOgImage = ensureAbsoluteImageUrl(resolvedOgImage);
 
   return (
     <Helmet>
@@ -53,20 +66,20 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
 
       {/* Open Graph / Facebook / WhatsApp */}
       <meta property="og:type" content={ogType} />
-      <meta property="og:site_name" content="SHRELL Automotive" />
+      <meta property="og:site_name" content={settings?.storeName || 'SHRELL Automotive'} />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:url" content={resolvedCanonical} />
       <meta property="og:image" content={absoluteOgImage} />
       <meta property="og:image:secure_url" content={absoluteOgImage} />
-      <meta property="og:image:alt" content={ogImageAlt} />
+      <meta property="og:image:alt" content={resolvedOgAlt} />
 
       {/* Twitter Cards */}
       <meta name="twitter:card" content={twitterCard} />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={absoluteOgImage} />
-      <meta name="twitter:image:alt" content={ogImageAlt} />
+      <meta name="twitter:image:alt" content={resolvedOgAlt} />
 
       {/* Structured Data (JSON-LD) */}
       {structuredData && (

@@ -71,24 +71,106 @@ const FALLBACK_PRODUCTS = {
   },
 };
 
+const DEFAULT_OG = {
+  title: 'SHRELL Automotive | Premium Car Accessories in India',
+  description:
+    'Shop premium car accessories and touring equipment for Indian vehicles. OSRAM auxiliary lighting, aerodynamic crossbars, 7D floor liners, and heavy-duty 12V tyre inflators.',
+  imageUrl: `${SITE_URL}/shrell-opengraph.png`,
+  imageAlt: 'SHRELL Automotive - Premium Car Accessories & Touring Equipment',
+};
+
 export default async function handler(req, res) {
-  const { slug } = req.query;
+  const { slug, path: pagePath } = req.query;
 
-  if (!slug || typeof slug !== 'string') {
-    return res.status(400).send('Missing slug parameter');
-  }
-
-  let product = null;
-
-  // Attempt to query Supabase
+  // Attempt to query Supabase for both SEO OpenGraph settings and optional product slug
   const supabaseUrl = process.env.VITE_SUPABASE_URL;
   const supabaseKey =
     process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
     process.env.VITE_SUPABASE_ANON_KEY;
 
-  if (supabaseUrl && supabaseKey) {
+  let ogSettings = { ...DEFAULT_OG };
+  const sb = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
+
+  if (sb) {
     try {
-      const sb = createClient(supabaseUrl, supabaseKey);
+      const { data: ogRow } = await sb
+        .from('store_settings')
+        .select('value')
+        .eq('key', 'seo_opengraph')
+        .maybeSingle();
+
+      if (ogRow?.value) {
+        const parsed = typeof ogRow.value === 'string' ? JSON.parse(ogRow.value) : ogRow.value;
+        if (parsed.ogTitle) ogSettings.title = parsed.ogTitle;
+        if (parsed.ogDescription) ogSettings.description = parsed.ogDescription;
+        if (parsed.ogImageUrl) ogSettings.imageUrl = ensureAbsoluteImageUrl(parsed.ogImageUrl);
+        if (parsed.ogImageAlt) ogSettings.imageAlt = parsed.ogImageAlt;
+      }
+    } catch (err) {
+      console.warn('[CrawlerHandler] OpenGraph settings lookup error:', err);
+    }
+  }
+
+  // Handle site / homepage / catalogue crawler requests (?path=/ or no slug)
+  if (!slug || typeof slug !== 'string') {
+    const cleanPath = typeof pagePath === 'string' && pagePath.startsWith('/') ? pagePath : '/';
+    const canonicalUrl = `${SITE_URL}${cleanPath === '/' ? '/' : cleanPath}`;
+    const title = escapeXml(ogSettings.title);
+    const description = escapeXml(ogSettings.description);
+    const absoluteImage = ensureAbsoluteImageUrl(ogSettings.imageUrl);
+    const imageAlt = escapeXml(ogSettings.imageAlt);
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${title}</title>
+  <meta name="description" content="${description}" />
+  <link rel="canonical" href="${canonicalUrl}" />
+
+  <!-- Open Graph / WhatsApp / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="SHRELL Automotive" />
+  <meta property="og:title" content="${title}" />
+  <meta property="og:description" content="${description}" />
+  <meta property="og:url" content="${canonicalUrl}" />
+  <meta property="og:image" content="${absoluteImage}" />
+  <meta property="og:image:secure_url" content="${absoluteImage}" />
+  <meta property="og:image:alt" content="${imageAlt}" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${title}" />
+  <meta name="twitter:description" content="${description}" />
+  <meta name="twitter:image" content="${absoluteImage}" />
+  <meta name="twitter:image:alt" content="${imageAlt}" />
+
+  <meta http-equiv="refresh" content="0; url=${canonicalUrl}" />
+  <script>
+    if (typeof window !== 'undefined') {
+      window.location.replace("${canonicalUrl}");
+    }
+  </script>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 2rem; background: #0A0808; color: #F1EEEE;">
+  <article>
+    <h1>${title}</h1>
+    <p>${description}</p>
+    <img src="${absoluteImage}" alt="${imageAlt}" style="max-width: 600px; height: auto; border-radius: 8px;" />
+  </article>
+</body>
+</html>`;
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=900, stale-while-revalidate=3600');
+    return res.status(200).send(html);
+  }
+
+  let product = null;
+
+  if (sb) {
+    try {
       const { data, error } = await sb
         .from('products')
         .select('*')
@@ -103,7 +185,7 @@ export default async function handler(req, res) {
           sku: data.sku,
           pricePaisa: data.price_paisa,
           shortDescription: data.short_description || data.description?.slice(0, 200),
-          imageUrl: data.images?.[0]?.url || `${SITE_URL}/shrell-opengraph.png`,
+          imageUrl: data.images?.[0]?.url || ogSettings.imageUrl,
         };
       }
     } catch (err) {
@@ -113,7 +195,11 @@ export default async function handler(req, res) {
 
   // Fallback lookup
   if (!product && FALLBACK_PRODUCTS[slug]) {
-    product = { slug, ...FALLBACK_PRODUCTS[slug] };
+    product = {
+      slug,
+      ...FALLBACK_PRODUCTS[slug],
+      imageUrl: ogSettings.imageUrl || FALLBACK_PRODUCTS[slug].imageUrl,
+    };
   }
 
   if (!product) {

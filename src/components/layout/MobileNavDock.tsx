@@ -129,7 +129,9 @@ export const MobileNavDock: React.FC = () => {
               <i
                 className={`bi ${item.isActive ? item.iconActive : item.iconInactive} text-[18px] leading-none transition-colors ${
                   item.isActive
-                    ? 'text-[#FF000E]'
+                    ? isDark
+                      ? 'text-[#F1EEEE]'
+                      : 'text-[#140E10]'
                     : isDark
                       ? 'text-gray-400 group-hover:text-white'
                       : 'text-[#8E8587] group-hover:text-[#140E10]'
@@ -145,7 +147,9 @@ export const MobileNavDock: React.FC = () => {
             <span
               className={`text-[9.5px] tracking-tight leading-none mt-0.5 transition-all duration-200 ${
                 item.isActive
-                  ? 'text-[#FF000E] font-semibold'
+                  ? isDark
+                    ? 'text-[#F1EEEE] font-semibold'
+                    : 'text-[#140E10] font-semibold'
                   : isDark
                     ? 'text-gray-400 font-normal group-hover:text-gray-200'
                     : 'text-[#8E8587] font-normal group-hover:text-[#140E10]'
@@ -167,7 +171,9 @@ export const MobileNavDock: React.FC = () => {
             <i
               className={`bi ${isProfileActive ? 'bi-person-fill' : 'bi-person'} text-[18px] leading-none transition-colors ${
                 isProfileActive
-                  ? 'text-[#FF000E]'
+                  ? isDark
+                    ? 'text-[#F1EEEE]'
+                    : 'text-[#140E10]'
                   : isDark
                     ? 'text-gray-400 group-hover:text-white'
                     : 'text-[#8E8587] group-hover:text-[#140E10]'
@@ -178,7 +184,9 @@ export const MobileNavDock: React.FC = () => {
           <span
             className={`text-[9.5px] tracking-tight leading-none mt-0.5 transition-all duration-200 ${
               isProfileActive
-                ? 'text-[#FF000E] font-semibold'
+                ? isDark
+                  ? 'text-[#F1EEEE] font-semibold'
+                  : 'text-[#140E10] font-semibold'
                 : isDark
                   ? 'text-gray-400 font-normal group-hover:text-gray-200'
                   : 'text-[#8E8587] font-normal group-hover:text-[#140E10]'

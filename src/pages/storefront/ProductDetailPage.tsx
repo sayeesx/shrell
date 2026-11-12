@@ -19,7 +19,7 @@ import { generateProductSchema, generateBreadcrumbSchema } from '../../infrastru
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { addItem } = useCart();
+  const { addItem, settings } = useCart();
   const { user } = useAuth();
   const { finishPageLoad } = useNavigationLoading();
   const { isDark } = useTheme();
@@ -257,7 +257,7 @@ export const ProductDetailPage: React.FC = () => {
 
   const productTitle = `${product.name} | Buy Online at SHRELL`;
   const productDescription = `Buy ${product.name} online at SHRELL Automotive. ${product.shortDescription || product.description.slice(0, 150)}. SKU: ${product.sku}. ₹${(product.pricePaisa / 100).toFixed(0)} with express delivery across India.`;
-  const productImageUrl = product.images?.[0]?.url || '/shrell-opengraph.png';
+  const productImageUrl = product.images?.[0]?.url || settings?.ogImageUrl || '/shrell-opengraph.png';
   const categoryTitle = product.categoryName || 'Equipment Catalogue';
   const categoryPath = product.categoryId ? `/catalogue?category=${product.categoryId}` : '/catalogue';
 

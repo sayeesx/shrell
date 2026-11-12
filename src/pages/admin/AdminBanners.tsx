@@ -1,7 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { HeroBanner } from '../../domain/types';
-import { bannerRepository } from '../../infrastructure/repositories';
+import { Category, HeroBanner, Product } from '../../domain/types';
+import {
+  bannerRepository,
+  categoryRepository,
+  productRepository,
+} from '../../infrastructure/repositories';
 import { cloudinaryService } from '../../infrastructure/cloudinary/cloudinaryService';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
@@ -19,6 +23,8 @@ export const AdminBanners: React.FC = () => {
   const { finishPageLoad } = useNavigationLoading();
   const { isDark } = useTheme();
   const [banners, setBanners] = useState<HeroBanner[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -27,6 +33,8 @@ export const AdminBanners: React.FC = () => {
   const [desktopPreview, setDesktopPreview] = useState<string>('');
   const [mobileFile, setMobileFile] = useState<File | null>(null);
   const [mobilePreview, setMobilePreview] = useState<string>('');
+  const [linkType, setLinkType] = useState<'page' | 'product'>('page');
+  const [selectedProductSlug, setSelectedProductSlug] = useState<string>('');
   const [targetUrl, setTargetUrl] = useState<string>('/catalogue');
   const [altText, setAltText] = useState<string>('');
   const [order, setOrder] = useState<number>(1);
@@ -88,8 +96,14 @@ export const AdminBanners: React.FC = () => {
   const loadBanners = async () => {
     setLoading(true);
     try {
-      const data = await bannerRepository.getAllForAdmin();
-      setBanners(data);
+      const [bannerList, productRes, categoryList] = await Promise.all([
+        bannerRepository.getAllForAdmin(),
+        productRepository.getAll({ limit: 100 }),
+        categoryRepository.getAll(),
+      ]);
+      setBanners(bannerList);
+      setProducts(productRes.products);
+      setCategories(categoryList);
     } catch (err) {
       console.error('Failed to load banners:', err);
     } finally {
@@ -301,6 +315,8 @@ export const AdminBanners: React.FC = () => {
       setDesktopPreview('');
       setMobileFile(null);
       setMobilePreview('');
+      setLinkType('page');
+      setSelectedProductSlug('');
       setTargetUrl('/catalogue');
       setAltText('');
       setOrder(banners.length + 2);
@@ -629,23 +645,153 @@ export const AdminBanners: React.FC = () => {
 
           {/* Navigation Link & Properties */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-            <div className="sm:col-span-2">
-              <label htmlFor="banner-target-url" className={`block text-xs font-semibold mb-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                Target Page Navigation URL (where clicking this banner will navigate) *
-              </label>
-              <input
-                id="banner-target-url"
-                type="text"
-                required
-                placeholder="e.g. /catalogue or /catalogue?category=roof-racks-cargo"
-                value={targetUrl}
-                onChange={(e) => setTargetUrl(e.target.value)}
-                className={`w-full border rounded-lg px-3.5 py-2 text-xs focus:outline-none transition-colors ${
-                  isDark
-                    ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-500'
-                    : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-slate-500'
-                }`}
-              />
+            <div className="sm:col-span-2 space-y-2.5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <label className={`block text-xs font-semibold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                  Banner Click Destination *
+                </label>
+                <div className="inline-flex rounded-lg border overflow-hidden text-[11px] font-mono border-slate-700/40">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLinkType('page');
+                      if (targetUrl.startsWith('/product/')) {
+                        setTargetUrl('/catalogue');
+                      }
+                    }}
+                    className={`px-3 py-1 font-semibold transition-colors cursor-pointer ${
+                      linkType === 'page'
+                        ? 'bg-[#FF000E] text-white'
+                        : isDark
+                          ? 'bg-slate-950 text-slate-300 hover:bg-slate-800'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
+                    Store Page
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLinkType('product');
+                      const fallbackProd =
+                        products.find((p) => p.slug === selectedProductSlug) || products[0];
+                      if (fallbackProd) {
+                        setSelectedProductSlug(fallbackProd.slug);
+                        setTargetUrl(`/product/${fallbackProd.slug}`);
+                        if (!altText.trim()) setAltText(fallbackProd.name);
+                      }
+                    }}
+                    className={`px-3 py-1 font-semibold transition-colors cursor-pointer ${
+                      linkType === 'product'
+                        ? 'bg-[#FF000E] text-white'
+                        : isDark
+                          ? 'bg-slate-950 text-slate-300 hover:bg-slate-800'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
+                    Uploaded Product ({products.length})
+                  </button>
+                </div>
+              </div>
+
+              {linkType === 'product' ? (
+                <div className="space-y-1.5">
+                  <select
+                    id="banner-product-select"
+                    aria-label="Select uploaded product for banner"
+                    value={selectedProductSlug}
+                    onChange={(e) => {
+                      const slug = e.target.value;
+                      setSelectedProductSlug(slug);
+                      if (slug) {
+                        setTargetUrl(`/product/${slug}`);
+                        const chosen = products.find((p) => p.slug === slug);
+                        if (chosen && !altText.trim()) {
+                          setAltText(chosen.name);
+                        }
+                      }
+                    }}
+                    className={`w-full border rounded-lg px-3.5 py-2 text-xs focus:outline-none transition-colors ${
+                      isDark
+                        ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-500'
+                        : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-slate-500'
+                    }`}
+                  >
+                    {products.length === 0 ? (
+                      <option value="">No uploaded products available</option>
+                    ) : (
+                      products.map((prod) => (
+                        <option key={prod.id} value={prod.slug}>
+                          {prod.name} ({prod.sku})
+                        </option>
+                      ))
+                    )}
+                  </select>
+                  <p className={`text-[11px] font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Navigates to product details: <span className="font-semibold">{targetUrl}</span>
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <select
+                    id="banner-page-select"
+                    aria-label="Select storefront page for banner"
+                    value={
+                      [
+                        '/',
+                        '/catalogue',
+                        '/pre-book',
+                        '/cart',
+                        '/track',
+                        '/profile',
+                        ...categories.map((c) => `/catalogue?category=${c.slug}`),
+                      ].includes(targetUrl)
+                        ? targetUrl
+                        : 'custom'
+                    }
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val !== 'custom') {
+                        setTargetUrl(val);
+                      }
+                    }}
+                    className={`w-full border rounded-lg px-3.5 py-2 text-xs focus:outline-none transition-colors ${
+                      isDark
+                        ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-500'
+                        : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-slate-500'
+                    }`}
+                  >
+                    <option value="/catalogue">Equipment Catalogue (/catalogue)</option>
+                    <option value="/">Home Page (/)</option>
+                    <option value="/pre-book">Ultra Shampoo Pre-Book (/pre-book)</option>
+                    <option value="/cart">My Cart (/cart)</option>
+                    <option value="/track">Track Order (/track)</option>
+                    {categories
+                      .filter((c) => c.isActive)
+                      .map((cat) => (
+                        <option key={cat.id} value={`/catalogue?category=${cat.slug}`}>
+                          Category: {cat.name} (/catalogue?category={cat.slug})
+                        </option>
+                      ))}
+                    <option value="custom">Custom Page URL...</option>
+                  </select>
+
+                  <input
+                    id="banner-target-url"
+                    type="text"
+                    required
+                    aria-label="Target Page Navigation URL"
+                    placeholder="e.g. /catalogue or /catalogue?category=roof-racks-cargo"
+                    value={targetUrl}
+                    onChange={(e) => setTargetUrl(e.target.value)}
+                    className={`w-full border rounded-lg px-3.5 py-2 text-xs font-mono focus:outline-none transition-colors ${
+                      isDark
+                        ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-500'
+                        : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-slate-500'
+                    }`}
+                  />
+                </div>
+              )}
             </div>
 
             <div>

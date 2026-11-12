@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Product, HeroBanner, HomeSection, Category } from '../../domain/types';
 import {
@@ -26,8 +26,32 @@ export const HomePage: React.FC = () => {
   const [banners, setBanners] = useState<HeroBanner[]>([]);
   const [currentSlide, setCurrentSlide] = useState<number>(0);
   const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [isManualPaused, setIsManualPaused] = useState<boolean>(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const manualPauseTimerRef = useRef<number | null>(null);
+  const wheelCooldownRef = useRef<number>(0);
+
+  // Pause auto-slide cleanly until 3 seconds after user finishes interacting/scrolling horizontally
+  const pauseAutoSlideFor3Seconds = () => {
+    setIsManualPaused(true);
+    if (manualPauseTimerRef.current !== null) {
+      window.clearTimeout(manualPauseTimerRef.current);
+    }
+    manualPauseTimerRef.current = window.setTimeout(() => {
+      setIsManualPaused(false);
+      manualPauseTimerRef.current = null;
+    }, 3000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (manualPauseTimerRef.current !== null) {
+        window.clearTimeout(manualPauseTimerRef.current);
+      }
+    };
+  }, []);
 
   // Swipe sensitivity threshold
   const minSwipeDistance = 40;
@@ -35,13 +59,16 @@ export const HomePage: React.FC = () => {
   const onTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
+    pauseAutoSlideFor3Seconds();
   };
 
   const onTouchMove = (e: React.TouchEvent) => {
     setTouchEnd(e.targetTouches[0].clientX);
+    pauseAutoSlideFor3Seconds();
   };
 
   const onTouchEnd = () => {
+    pauseAutoSlideFor3Seconds();
     if (!touchStart || !touchEnd) return;
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
@@ -50,6 +77,21 @@ export const HomePage: React.FC = () => {
       setCurrentSlide((prev) => (prev + 1) % banners.length);
     } else if (isRightSwipe && banners.length > 1) {
       setCurrentSlide((prev) => (prev === 0 ? banners.length - 1 : prev - 1));
+    }
+  };
+
+  const onBannerWheel = (e: React.WheelEvent) => {
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 6) {
+      pauseAutoSlideFor3Seconds();
+      const now = Date.now();
+      if (banners.length > 1 && now - wheelCooldownRef.current > 450 && Math.abs(e.deltaX) > 18) {
+        wheelCooldownRef.current = now;
+        if (e.deltaX > 0) {
+          setCurrentSlide((prev) => (prev + 1) % banners.length);
+        } else {
+          setCurrentSlide((prev) => (prev === 0 ? banners.length - 1 : prev - 1));
+        }
+      }
     }
   };
 
@@ -78,22 +120,24 @@ export const HomePage: React.FC = () => {
 
   // Carousel timer loop
   useEffect(() => {
-    if (banners.length <= 1 || isPaused) return;
+    if (banners.length <= 1 || isPaused || isManualPaused) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % banners.length);
     }, 4500);
     return () => clearInterval(timer);
-  }, [banners.length, isPaused]);
+  }, [banners.length, isPaused, isManualPaused]);
 
   const handlePrevSlide = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    pauseAutoSlideFor3Seconds();
     setCurrentSlide((prev) => (prev === 0 ? banners.length - 1 : prev - 1));
   };
 
   const handleNextSlide = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    pauseAutoSlideFor3Seconds();
     setCurrentSlide((prev) => (prev + 1) % banners.length);
   };
 
@@ -136,7 +180,7 @@ export const HomePage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 sm:space-y-12 pb-20">
+    <div className="space-y-1 sm:space-y-10 pb-20">
       <SEOHead
         title={settings.ogTitle || 'SHRELL Automotive | Premium Car Accessories in India'}
         description={
@@ -158,7 +202,7 @@ export const HomePage: React.FC = () => {
         Clicking banner navigates directly to target page.
         ================================================================
       */}
-      <section className="pt-1 sm:pt-1 pb-0 sm:pb-4">
+      <section className="pt-1 sm:pt-1 pb-0 sm:pb-2">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           {banners.length > 0 && (
             <div
@@ -168,6 +212,7 @@ export const HomePage: React.FC = () => {
               onTouchStart={onTouchStart}
               onTouchMove={onTouchMove}
               onTouchEnd={onTouchEnd}
+              onWheel={onBannerWheel}
             >
               {/* Active Banner Slide with Link */}
               <div className="w-full relative transition-all duration-300 flex items-center justify-center">
@@ -206,13 +251,13 @@ export const HomePage: React.FC = () => {
                 </Link>
               </div>
 
-              {/* Prev / Next Arrows */}
+              {/* Prev / Next Arrows (Desktop only, hidden on mobile browsers) */}
               {banners.length > 1 && (
                 <>
                   <button
                     type="button"
                     onClick={handlePrevSlide}
-                    className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-xs text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10 cursor-pointer"
+                    className="hidden md:flex absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-xs text-white items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10 cursor-pointer"
                     aria-label="Previous banner"
                   >
                     <i className="bi bi-chevron-left text-sm sm:text-base"></i>
@@ -221,7 +266,7 @@ export const HomePage: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleNextSlide}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-xs text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10 cursor-pointer"
+                    className="hidden md:flex absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-xs text-white items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-10 cursor-pointer"
                     aria-label="Next banner"
                   >
                     <i className="bi bi-chevron-right text-sm sm:text-base"></i>
@@ -233,7 +278,10 @@ export const HomePage: React.FC = () => {
                       <button
                         key={b.id}
                         type="button"
-                        onClick={() => setCurrentSlide(idx)}
+                        onClick={() => {
+                          pauseAutoSlideFor3Seconds();
+                          setCurrentSlide(idx);
+                        }}
                         aria-label={`Slide ${idx + 1}`}
                         className={`h-1.5 rounded-full transition-all cursor-pointer ${
                           currentSlide === idx ? 'w-6 bg-[#FF000E] shadow-xs' : 'w-1.5 bg-white/40 hover:bg-white/70'
@@ -249,7 +297,7 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* DYNAMIC PRODUCT & CMS CONTENT ZONE */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-10 sm:space-y-14 pt-2">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-10 sm:space-y-14 pt-0 sm:pt-2">
         {activeSections.map((section, secIdx) => {
           // =================================================================
           // 1. PRODUCT GRID SECTION (Crazy Finds, Deals, Category Showcases)

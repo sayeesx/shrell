@@ -323,7 +323,7 @@ export const Navbar: React.FC = () => {
               <img
                 src="/logos/shrell-logo-white.png"
                 alt="SHRELL Automotive"
-                className="h-[25px] lg:h-[27px] w-auto object-contain"
+                className="h-[21px] lg:h-[23px] w-auto object-contain"
               />
             </Link>
           </div>
@@ -428,7 +428,7 @@ export const Navbar: React.FC = () => {
                 <img
                   src="/logos/shrell-logo-white.png"
                   alt="SHRELL Automotive"
-                  className="h-[21px] w-auto object-contain"
+                  className="h-[18px] w-auto object-contain"
                 />
               </Link>
             </div>

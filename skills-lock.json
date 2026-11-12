@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "skills": {
+    "cloudinary-docs": {
+      "source": "cloudinary-devs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/platform/cloudinary-docs/SKILL.md",
+      "computedHash": "46e7cc576e705cbbbf8f001860a9a6c3a3daf63096940ce300ea827a8c739d08"
+    },
+    "cloudinary-next": {
+      "source": "cloudinary-devs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/frameworks/cloudinary-next/SKILL.md",
+      "computedHash": "0f42a4523cbc6bd89bacec131888f677795eb8ac87951a71df567c0797244ab2"
+    },
+    "cloudinary-react": {
+      "source": "cloudinary-devs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/frameworks/cloudinary-react/SKILL.md",
+      "computedHash": "4dd642e49ba9e3a446c0a6e92798fbcf023bfd536b4e141fb8d4a1ad8192246c"
+    },
+    "cloudinary-transformations": {
+      "source": "cloudinary-devs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/platform/cloudinary-transformations/SKILL.md",
+      "computedHash": "2689350550a4899fefc932f0b3bd05132d33a11f89c777fa788e187c9720e604"
+    },
+    "cloudinary-upload": {
+      "source": "cloudinary-devs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/platform/cloudinary-upload/SKILL.md",
+      "computedHash": "4f9c732956dfcdbe74f566c55154e5917b9748b1cab59cf6dcabc43b77d2d9c8"
+    },
+    "cloudinary-video": {
+      "source": "cloudinary-devs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/platform/cloudinary-video/SKILL.md",
+      "computedHash": "2f53ede6fb9b374e6b8227215f77b239ca510a28a4f796759de650534cbae859"
+    }
+  }
+}

@@ -10,6 +10,8 @@ import {
 import { cloudinaryService } from '../../infrastructure/cloudinary/cloudinaryService';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 import { useTheme } from '../../application/ThemeContext';
+import { ImageCropUploadModal } from '../../components/admin/ImageCropUploadModal';
+import { formatBytes, OptimizedImageResult } from '../../utils/imageOptimizer';
 
 export const AdminProducts: React.FC = () => {
   const { isDark } = useTheme();
@@ -37,6 +39,10 @@ export const AdminProducts: React.FC = () => {
   const [imageUrls, setImageUrls] = useState<string[]>(['', '', '', '']);
   const [uploadingSlots, setUploadingSlots] = useState<Record<number, boolean>>({});
   const [uploadErrors, setUploadErrors] = useState<Record<number, string>>({});
+  const [slotMeta, setSlotMeta] = useState<
+    Record<number, { format: string; sizeBytes: number; width: number; height: number }>
+  >({});
+  const [pendingCrop, setPendingCrop] = useState<{ slotIndex: number; file: File } | null>(null);
   const [isUniversal, setIsUniversal] = useState(false);
   const [weightGrams, setWeightGrams] = useState('2000');
   const [dimensions, setDimensions] = useState('50x30x10');
@@ -53,14 +59,15 @@ export const AdminProducts: React.FC = () => {
     'Rapid replacement guarantee for transit or manufacturing issues within 7 days.'
   );
 
-  const handleImageFileChange = async (slotIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const uploadFileToSlot = async (
+    slotIndex: number,
+    uploadFile: File,
+    stats?: OptimizedImageResult
+  ) => {
     setUploadingSlots((prev) => ({ ...prev, [slotIndex]: true }));
     setUploadErrors((prev) => ({ ...prev, [slotIndex]: '' }));
     try {
-      const result = await cloudinaryService.uploadImage(file, {
+      const result = await cloudinaryService.uploadImage(uploadFile, {
         maxSizeBytes: 8 * 1024 * 1024,
       });
       if (result && result.url) {
@@ -69,6 +76,17 @@ export const AdminProducts: React.FC = () => {
           next[slotIndex] = result.url;
           return next;
         });
+        if (stats) {
+          setSlotMeta((prev) => ({
+            ...prev,
+            [slotIndex]: {
+              format: stats.extension.toUpperCase(),
+              sizeBytes: stats.compressedBytes,
+              width: stats.width,
+              height: stats.height,
+            },
+          }));
+        }
       }
     } catch (err: any) {
       setUploadErrors((prev) => ({
@@ -77,8 +95,39 @@ export const AdminProducts: React.FC = () => {
       }));
     } finally {
       setUploadingSlots((prev) => ({ ...prev, [slotIndex]: false }));
-      e.target.value = '';
     }
+  };
+
+  const handleImageFileChange = async (slotIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    if (file.size > 20 * 1024 * 1024) {
+      setUploadErrors((prev) => ({
+        ...prev,
+        [slotIndex]: 'Raw file exceeds 20 MB limit. Please select a smaller source image.',
+      }));
+      return;
+    }
+
+    setUploadErrors((prev) => ({ ...prev, [slotIndex]: '' }));
+
+    // Skip raster cropper for SVGs and upload directly
+    if (file.type === 'image/svg+xml') {
+      await uploadFileToSlot(slotIndex, file);
+      return;
+    }
+
+    // Launch interactive crop -> WebP/JPEG compression workflow before CDN upload
+    setPendingCrop({ slotIndex, file });
+  };
+
+  const handleCropConfirm = async (optimizedFile: File, stats: OptimizedImageResult) => {
+    if (!pendingCrop) return;
+    const { slotIndex } = pendingCrop;
+    await uploadFileToSlot(slotIndex, optimizedFile, stats);
+    setPendingCrop(null);
   };
 
   const handleImageUrlChange = (slotIndex: number, value: string) => {
@@ -87,6 +136,13 @@ export const AdminProducts: React.FC = () => {
       next[slotIndex] = value;
       return next;
     });
+    if (!value) {
+      setSlotMeta((prev) => {
+        const next = { ...prev };
+        delete next[slotIndex];
+        return next;
+      });
+    }
   };
 
   const loadData = async () => {
@@ -122,6 +178,10 @@ export const AdminProducts: React.FC = () => {
     setImageUrls(['', '', '', '']);
     setUploadingSlots({});
     setUploadErrors({});
+    setSlotMeta({});
+    setPendingCrop(null);
+    setSlotMeta({});
+    setPendingCrop(null);
     setIsUniversal(true);
     setWeightGrams('3000');
     setDimensions('80x25x15');
@@ -155,6 +215,8 @@ export const AdminProducts: React.FC = () => {
     ]);
     setUploadingSlots({});
     setUploadErrors({});
+    setSlotMeta({});
+    setPendingCrop(null);
     setIsUniversal(p.isUniversalFit);
     setWeightGrams(p.weightGrams.toString());
     setDimensions(p.dimensionsCm);
@@ -553,11 +615,11 @@ export const AdminProducts: React.FC = () => {
                 </div>
               </div>
 
-              {/* Product Images: 4 Optional Upload Boxes */}
+              {/* Product Images: 4 Optional Upload Boxes (Crop + Compress to WebP/JPEG before CDN) */}
               <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
                   <label className={`block uppercase font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    Product Images (Up to 4 Optional Slots)
+                    Product Images (Crop + WebP Compress, Up to 4 Slots)
                   </label>
                   <span className="text-[10px] text-slate-400 font-mono">
                     {imageUrls.filter((u) => u.trim()).length} / 4 added
@@ -569,6 +631,7 @@ export const AdminProducts: React.FC = () => {
                     const url = imageUrls[slotIdx] || '';
                     const isUploading = Boolean(uploadingSlots[slotIdx]);
                     const slotError = uploadErrors[slotIdx];
+                    const optimizedInfo = slotMeta[slotIdx];
 
                     return (
                       <div
@@ -619,16 +682,23 @@ export const AdminProducts: React.FC = () => {
                                   }}
                                 />
                               </div>
-                              <label className="text-[11px] font-medium cursor-pointer hover:underline flex items-center gap-1 text-slate-400 hover:text-white">
-                                <i className="bi bi-arrow-repeat text-xs" aria-hidden="true" />
-                                <span>Replace file</span>
-                                <input
-                                  type="file"
-                                  accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
-                                  onChange={(e) => handleImageFileChange(slotIdx, e)}
-                                  className="hidden"
-                                />
-                              </label>
+                              <div className="flex flex-col gap-1 min-w-0">
+                                {optimizedInfo && (
+                                  <span className="text-[10px] font-mono text-emerald-500 font-semibold truncate">
+                                    {optimizedInfo.format} · {formatBytes(optimizedInfo.sizeBytes)} · {optimizedInfo.width}x{optimizedInfo.height}
+                                  </span>
+                                )}
+                                <label className="text-[11px] font-medium cursor-pointer hover:underline flex items-center gap-1 text-slate-400 hover:text-white">
+                                  <i className="bi bi-arrow-repeat text-xs" aria-hidden="true" />
+                                  <span>Crop &amp; replace</span>
+                                  <input
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
+                                    onChange={(e) => handleImageFileChange(slotIdx, e)}
+                                    className="hidden"
+                                  />
+                                </label>
+                              </div>
                             </div>
                           ) : (
                             <label className="flex flex-col items-center justify-center cursor-pointer w-full py-1 text-center">
@@ -922,6 +992,30 @@ export const AdminProducts: React.FC = () => {
         </div>,
         document.body
       )}
+      {/* Crop & Optimize Modal before CDN upload */}
+      <ImageCropUploadModal
+        file={pendingCrop?.file || null}
+        isOpen={Boolean(pendingCrop)}
+        slotLabel={
+          pendingCrop
+            ? pendingCrop.slotIndex === 0
+              ? 'Image 1 (Primary)'
+              : `Image ${pendingCrop.slotIndex + 1}`
+            : 'Product Image'
+        }
+        suggestedName={
+          sku || name
+            ? `${(sku || name).toLowerCase().replace(/[^a-z0-9]+/g, '-')}-slot-${(pendingCrop?.slotIndex ?? 0) + 1}`
+            : undefined
+        }
+        isUploading={pendingCrop ? Boolean(uploadingSlots[pendingCrop.slotIndex]) : false}
+        onCancel={() => {
+          if (!pendingCrop || !uploadingSlots[pendingCrop.slotIndex]) {
+            setPendingCrop(null);
+          }
+        }}
+        onConfirm={handleCropConfirm}
+      />
     </div>
   );
 };

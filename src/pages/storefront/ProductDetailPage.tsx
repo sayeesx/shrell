@@ -30,6 +30,7 @@ export const ProductDetailPage: React.FC = () => {
   const [quantity, setQuantity] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
   const [addedMessage, setAddedMessage] = useState<string>('');
+  const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'shared'>('idle');
   const [imageError, setImageError] = useState<boolean>(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
@@ -187,6 +188,43 @@ export const ProductDetailPage: React.FC = () => {
     }, 400);
   };
 
+  const handleShareProduct = async () => {
+    if (!product) return;
+    const shareUrl = `${window.location.origin}/product/${product.slug}`;
+    const shareTitle = `${product.name} | SHRELL Automotive`;
+    const shareText = product.shortDescription || `Check out ${product.name} at SHRELL Automotive`;
+
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+      try {
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl,
+        });
+        setShareStatus('shared');
+        setTimeout(() => setShareStatus('idle'), 2500);
+        return;
+      } catch (err: any) {
+        if (err?.name === 'AbortError') return;
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setShareStatus('copied');
+      setTimeout(() => setShareStatus('idle'), 2500);
+    } catch {
+      const input = document.createElement('input');
+      input.value = shareUrl;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      setShareStatus('copied');
+      setTimeout(() => setShareStatus('idle'), 2500);
+    }
+  };
+
   const openReviewModal = () => {
     setReviewStep(1);
     setReviewRating(5);
@@ -257,7 +295,8 @@ export const ProductDetailPage: React.FC = () => {
 
   const productTitle = `${product.name} | Buy Online at SHRELL`;
   const productDescription = `Buy ${product.name} online at SHRELL Automotive. ${product.shortDescription || product.description.slice(0, 150)}. SKU: ${product.sku}. ₹${(product.pricePaisa / 100).toFixed(0)} with express delivery across India.`;
-  const productImageUrl = product.images?.[0]?.url || settings?.ogImageUrl || '/shrell-opengraph.png';
+  const firstProductImage = product.images?.find((img) => img?.url?.trim())?.url?.trim();
+  const productImageUrl = firstProductImage || settings?.ogImageUrl || '/shrell-opengraph.png';
   const categoryTitle = product.categoryName || 'Equipment Catalogue';
   const categoryPath = product.categoryId ? `/catalogue?category=${product.categoryId}` : '/catalogue';
 
@@ -380,11 +419,36 @@ export const ProductDetailPage: React.FC = () => {
 
           {/* RIGHT: Buy Box */}
           <div className="space-y-4 sm:space-y-5">
-            {/* Title & Rating */}
+            {/* Title, Share Button & Rating */}
             <div className="space-y-1.5">
-              <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight leading-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
-                {product.name}
-              </h1>
+              <div className="flex items-start justify-between gap-3">
+                <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight leading-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
+                  {product.name}
+                </h1>
+                <button
+                  type="button"
+                  onClick={handleShareProduct}
+                  aria-label={`Share ${product.name}`}
+                  title="Share product link"
+                  className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF000E] ${
+                    shareStatus !== 'idle'
+                      ? isDark
+                        ? 'border-emerald-500/50 bg-emerald-950/50 text-emerald-300'
+                        : 'border-emerald-600/50 bg-emerald-50 text-emerald-700'
+                      : isDark
+                        ? 'border-[#261619] bg-[#130E10] hover:bg-[#1E1417] text-[#F1EEEE]'
+                        : 'border-[#E0DBD2] bg-[#F5F3EE] hover:bg-[#EDE9E1] text-[#140E10]'
+                  }`}
+                >
+                  <i
+                    className={`bi ${shareStatus !== 'idle' ? 'bi-check2' : 'bi-share'} text-xs`}
+                    aria-hidden="true"
+                  />
+                  <span>
+                    {shareStatus === 'copied' ? 'Link Copied' : shareStatus === 'shared' ? 'Shared' : 'Share'}
+                  </span>
+                </button>
+              </div>
 
               {/* Dynamic Rating Link */}
               <div className="flex items-center gap-2 text-xs pt-0.5">

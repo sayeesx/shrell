@@ -9,6 +9,7 @@ import { useNavigationLoading } from '../../application/NavigationLoadingContext
 import { useTheme } from '../../application/ThemeContext';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { StateSearchDropdown } from '../../components/checkout/StateSearchDropdown';
+import { CheckoutFlowTopBar } from '../../components/checkout/CheckoutFlowTopBar';
 import { usePostalPincode } from '../../hooks/usePostalPincode';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
 import {
@@ -353,40 +354,14 @@ export const CheckoutPage: React.FC = () => {
         description="Complete your order securely with UPI, Cards, Netbanking or Cash on Delivery."
         noIndex={true}
       />
-      <div className="max-w-xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-32 sm:pb-36 md:pb-12 space-y-4">
+      {/* Topbar Header (Shared exact position across My Cart & Checkout steps, no cart button) */}
+      <CheckoutFlowTopBar
+        title={getPageTitle()}
+        onBack={handleBackNavigation}
+        backLabel="Back"
+      />
 
-        {/* Topbar Header (Pure clean navigation matching exact reference images) */}
-        <div className={`flex items-center justify-between pb-3 border-b ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
-          <button
-            type="button"
-            onClick={handleBackNavigation}
-            className={`w-9 h-9 rounded-full flex items-center justify-center border transition-colors cursor-pointer active:scale-95 ${
-              isDark ? 'bg-[#130E10] border-[#261619] text-[#F1EEEE]' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10]'
-            }`}
-            aria-label="Back"
-          >
-            <i className="bi bi-chevron-left text-sm" />
-          </button>
-
-          <h1 className="text-base sm:text-lg font-bold tracking-tight">
-            {getPageTitle()}
-          </h1>
-
-          <Link
-            to="/cart"
-            className={`w-9 h-9 rounded-full flex items-center justify-center border transition-colors cursor-pointer relative active:scale-95 ${
-              isDark ? 'bg-[#130E10] border-[#261619] text-[#F1EEEE]' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10]'
-            }`}
-            aria-label="View Cart"
-          >
-            <i className="bi bi-bag text-sm" />
-            {cart.items.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-[#FF000E] text-white text-[9px] font-bold min-w-[16px] h-[16px] rounded-full flex items-center justify-center px-0.5 leading-none shadow-xs">
-                {cart.items.length}
-              </span>
-            )}
-          </Link>
-        </div>
+      <div className="max-w-xl mx-auto px-4 sm:px-6 py-4 sm:py-6 pb-32 sm:pb-36 md:pb-12 space-y-4">
 
         {/* Error Notification */}
         {errorMessage && (

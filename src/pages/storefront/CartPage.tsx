@@ -9,6 +9,7 @@ import { productRepository } from '../../infrastructure/repositories';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 import { useTheme } from '../../application/ThemeContext';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
+import { CheckoutFlowTopBar } from '../../components/checkout/CheckoutFlowTopBar';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 import { trackCartViewed } from '../../infrastructure/analytics/posthog';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
@@ -376,25 +377,13 @@ export const CartPage: React.FC = () => {
           description="Review your selected automotive accessories and equipment before checkout."
           noIndex={true}
         />
-        {/* Top Header - Fixed/pinned at top without compression */}
-        <div className={`w-full border-b shrink-0 ${isDark ? 'border-[#2D161A]' : 'border-[#D0C9BE]'}`}>
-          <div className="max-w-md md:max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className={`w-9 h-9 rounded-full border flex items-center justify-center transition-colors cursor-pointer active:scale-95 ${
-                isDark ? 'bg-[#130E10] border-[#2D161A] text-[#F1EEEE]' : 'bg-[#F5F3EE] border-[#D0C9BE] text-[#140E10]'
-              }`}
-              aria-label="Go back"
-            >
-              <i className="bi bi-chevron-left text-sm" />
-            </button>
-            <h1 className="text-base sm:text-lg font-bold tracking-tight">My Cart</h1>
-            <div className="flex items-center">
-              <ThemeToggle compact />
-            </div>
-          </div>
-        </div>
+        {/* Top Header - Shared coordinate alignment across Cart & Checkout */}
+        <CheckoutFlowTopBar
+          title="My Cart"
+          onBack={() => navigate(-1)}
+          backLabel="Go back"
+          rightSlot={<ThemeToggle compact />}
+        />
 
         {/* Empty Cart Body - Centered in remaining viewport space */}
         <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 text-center space-y-5 pb-20">
@@ -433,30 +422,20 @@ export const CartPage: React.FC = () => {
         noIndex={true}
       />
 
+      {/* 1. Mobile Header (Back button | My Cart | Theme toggle) - Locked coordinates */}
+      <div className="md:hidden">
+        <CheckoutFlowTopBar
+          title="My Cart"
+          onBack={() => navigate(-1)}
+          backLabel="Go back"
+          rightSlot={<ThemeToggle compact />}
+        />
+      </div>
+
       {/* ========================================================================= */}
       {/* MOBILE LAYOUT                                                             */}
       {/* ========================================================================= */}
-      <div className="block md:hidden max-w-md mx-auto px-3.5 py-3 pb-32 sm:pb-36 space-y-2">
-
-        {/* 1. Mobile Header (Back button | My Cart | Theme toggle) */}
-        <div className={`flex items-center justify-between pb-2 border-b ${isDark ? 'border-[#2D161A]' : 'border-[#D0C9BE]'}`}>
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className={`w-9 h-9 rounded-full border flex items-center justify-center transition-colors cursor-pointer active:scale-95 ${
-              isDark ? 'bg-[#130E10] border-[#2D161A] text-[#F1EEEE]' : 'bg-[#F5F3EE] border-[#D0C9BE] text-[#140E10]'
-            }`}
-            aria-label="Go back"
-          >
-            <i className="bi bi-chevron-left text-sm" />
-          </button>
-
-          <h1 className="text-base font-bold tracking-tight">My Cart</h1>
-
-          <div className="flex items-center">
-            <ThemeToggle compact />
-          </div>
-        </div>
+      <div className="block md:hidden max-w-md mx-auto px-3.5 py-2.5 pb-32 sm:pb-36 space-y-2">
 
         {/* Dynamic Delivery Timeline (Mobile): show timeline if not yet unlocked, or modal is shown if unlocked */}
         {!isFreeDeliveryUnlocked && renderDeliveryTimeline(true)}

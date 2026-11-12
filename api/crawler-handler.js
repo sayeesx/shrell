@@ -179,13 +179,16 @@ export default async function handler(req, res) {
         .maybeSingle();
 
       if (!error && data) {
+        const firstImage = Array.isArray(data.images)
+          ? data.images.find((img) => img && typeof img.url === 'string' && img.url.trim())?.url?.trim()
+          : '';
         product = {
           name: data.name,
           slug: data.slug,
           sku: data.sku,
           pricePaisa: data.price_paisa,
           shortDescription: data.short_description || data.description?.slice(0, 200),
-          imageUrl: data.images?.[0]?.url || ogSettings.imageUrl,
+          imageUrl: firstImage || ogSettings.imageUrl,
         };
       }
     } catch (err) {
@@ -198,7 +201,7 @@ export default async function handler(req, res) {
     product = {
       slug,
       ...FALLBACK_PRODUCTS[slug],
-      imageUrl: ogSettings.imageUrl || FALLBACK_PRODUCTS[slug].imageUrl,
+      imageUrl: FALLBACK_PRODUCTS[slug].imageUrl || ogSettings.imageUrl,
     };
   }
 

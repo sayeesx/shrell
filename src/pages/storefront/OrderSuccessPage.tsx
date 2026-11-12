@@ -6,6 +6,7 @@ import { formatINR } from '../../domain/services/CurrencyService';
 import { whatsAppService } from '../../features/whatsapp/WhatsAppService';
 import { useTheme } from '../../application/ThemeContext';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
+import { CheckoutFlowTopBar } from '../../components/checkout/CheckoutFlowTopBar';
 
 export const OrderSuccessPage: React.FC = () => {
   const location = useLocation();
@@ -73,33 +74,12 @@ export const OrderSuccessPage: React.FC = () => {
         description="Your order has been confirmed successfully."
         noIndex={true}
       />
+      <CheckoutFlowTopBar
+        title="Checkout"
+        onBack={() => navigate('/')}
+        backLabel="Back to Home"
+      />
       <div className="max-w-md mx-auto px-4 py-4 sm:py-8 space-y-6">
-
-        {/* Topbar (Matching Reference Screen 3: Back | Checkout | Bag) */}
-        <div className={`flex items-center justify-between pb-3 border-b ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
-          <button
-            type="button"
-            onClick={() => navigate('/')}
-            className={`w-9 h-9 rounded-full flex items-center justify-center border transition-colors cursor-pointer active:scale-95 ${
-              isDark ? 'bg-[#130E10] border-[#261619] text-[#F1EEEE]' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10]'
-            }`}
-            aria-label="Back to Home"
-          >
-            <i className="bi bi-chevron-left text-sm" />
-          </button>
-
-          <h1 className="text-lg font-bold tracking-tight">Checkout</h1>
-
-          <Link
-            to="/cart"
-            className={`w-9 h-9 rounded-full flex items-center justify-center border transition-colors cursor-pointer active:scale-95 ${
-              isDark ? 'bg-[#130E10] border-[#261619] text-[#F1EEEE]' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10]'
-            }`}
-            aria-label="View Cart"
-          >
-            <i className="bi bi-bag text-sm" />
-          </Link>
-        </div>
 
         {/* Main Success Card (Reduced border radius) */}
         <div className={`p-6 sm:p-8 rounded-xl border text-center space-y-6 shadow-sm relative overflow-hidden ${

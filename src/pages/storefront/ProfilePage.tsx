@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../application/AuthContext';
 import { useCart } from '../../application/CartContext';
 import { useTheme } from '../../application/ThemeContext';
@@ -7,23 +7,43 @@ import { useNavigationLoading } from '../../application/NavigationLoadingContext
 import { Order } from '../../domain/types';
 import { orderRepository } from '../../infrastructure/repositories';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
+import { CustomerOrdersPanel } from './OrdersPage';
+
+type ProfileTab = 'overview' | 'orders';
 
 export const ProfilePage: React.FC = () => {
   const { user, logout, openAuthModal } = useAuth();
   const { itemCount } = useCart();
   const { isDark } = useTheme();
   const { finishPageLoad } = useNavigationLoading();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const rawTab = searchParams.get('tab');
+  const activeTab: ProfileTab = rawTab === 'orders' ? 'orders' : 'overview';
 
   const [orders, setOrders] = useState<Order[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState<boolean>(true);
+
+  const handleTabChange = (tab: ProfileTab) => {
+    const nextParams = new URLSearchParams(searchParams);
+    if (tab === 'overview') {
+      nextParams.delete('tab');
+    } else {
+      nextParams.set('tab', tab);
+    }
+    setSearchParams(nextParams, { replace: true });
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
     async function fetchOrders() {
       if (!user) {
+        setLoadingOrders(false);
         finishPageLoad();
         return;
       }
       try {
+        setLoadingOrders(true);
         let userOrders = await orderRepository.getOrdersByCustomer(user.id);
         if (userOrders.length === 0 && user.phone) {
           const all = await orderRepository.getAllOrders();
@@ -35,6 +55,7 @@ export const ProfilePage: React.FC = () => {
       } catch (err) {
         console.error('Failed to load customer orders:', err);
       } finally {
+        setLoadingOrders(false);
         finishPageLoad();
       }
     }
@@ -123,82 +144,151 @@ export const ProfilePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Dashboard Grid Options */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Link to="/track" className={`rounded-2xl border p-5 transition-all flex items-start gap-4 group ${isDark ? 'bg-surface-900 border-surface-800 hover:border-surface-700' : 'bg-white border-[#E0DBD2] hover:border-[#FF000E]/40'}`}>
-            <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${isDark ? 'bg-surface-800 text-slate-300 group-hover:bg-brand-950 group-hover:text-brand-400' : 'bg-[#F5F3EE] text-[#5C5456] group-hover:bg-[#FFE0E2] group-hover:text-[#FF000E]'}`}>
-              <i className="bi bi-box-seam text-xl" />
-            </div>
-            <div className="flex-1">
-              <h2 className={`text-sm font-bold transition-colors ${isDark ? 'text-white group-hover:text-brand-400' : 'text-[#140E10] group-hover:text-[#FF000E]'}`}>Track Consignment</h2>
-              <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>Real-time BlueDart, Delhivery & DTDC tracking.</p>
-            </div>
-            <i className={`bi bi-chevron-right text-xs self-center ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`} />
-          </Link>
-
-          <Link to="/cart" className={`rounded-2xl border p-5 transition-all flex items-start gap-4 group ${isDark ? 'bg-surface-900 border-surface-800 hover:border-surface-700' : 'bg-white border-[#E0DBD2] hover:border-[#FF000E]/40'}`}>
-            <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${isDark ? 'bg-surface-800 text-slate-300 group-hover:bg-brand-950 group-hover:text-brand-400' : 'bg-[#F5F3EE] text-[#5C5456] group-hover:bg-[#FFE0E2] group-hover:text-[#FF000E]'}`}>
-              <i className="bi bi-bag text-xl" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <h2 className={`text-sm font-bold transition-colors ${isDark ? 'text-white group-hover:text-brand-400' : 'text-[#140E10] group-hover:text-[#FF000E]'}`}>Shopping Bag</h2>
-                {itemCount > 0 && (
-                  <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-brand-500 text-white">{itemCount}</span>
-                )}
-              </div>
-              <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>Review items, apply promo codes, and checkout.</p>
-            </div>
-            <i className={`bi bi-chevron-right text-xs self-center ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`} />
-          </Link>
-
-          <a
-            href="/orders"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`rounded-2xl border p-5 transition-all flex items-start gap-4 group cursor-pointer ${
-              isDark ? 'bg-surface-900 border-surface-800 hover:border-surface-700' : 'bg-white border-[#E0DBD2] hover:border-[#FF000E]/40'
+        {/* Profile Tabs: Overview & My Orders */}
+        <div
+          role="tablist"
+          aria-label="Account sections"
+          className={`flex items-center gap-2 p-1 rounded-xl border ${
+            isDark ? 'bg-[#0E0A0B] border-surface-800' : 'bg-[#F5F3EE] border-[#E0DBD2]'
+          }`}
+        >
+          <button
+            type="button"
+            role="tab"
+            id="tab-overview"
+            aria-selected={activeTab === 'overview'}
+            aria-controls="panel-overview"
+            onClick={() => handleTabChange('overview')}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowRight') handleTabChange('orders');
+            }}
+            className={`flex-1 py-2.5 px-4 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer flex items-center justify-center gap-2 ${
+              activeTab === 'overview'
+                ? 'bg-[#FF000E] text-white shadow-xs'
+                : isDark
+                  ? 'text-slate-300 hover:text-white'
+                  : 'text-[#4A4244] hover:text-[#140E10]'
             }`}
           >
-            <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
-              isDark ? 'bg-surface-800 text-slate-300 group-hover:bg-brand-950 group-hover:text-brand-400' : 'bg-[#F5F3EE] text-[#5C5456] group-hover:bg-[#FFE0E2] group-hover:text-[#FF000E]'
-            }`}>
-              <i className="bi bi-bag-check text-xl" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <h2 className={`text-sm font-bold transition-colors ${isDark ? 'text-white group-hover:text-brand-400' : 'text-[#140E10] group-hover:text-[#FF000E]'}`}>
-                  My Orders
-                </h2>
-                {orders.length > 0 && (
-                  <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-brand-500 text-white">
-                    {orders.length}
-                  </span>
-                )}
-              </div>
-              <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
-                {orders.length > 0 ? `${orders.length} orders placed • Open dedicated portal` : 'View order history, leave reviews, and track.'}
-              </p>
-            </div>
-            <i className={`bi bi-box-arrow-up-right text-xs self-center ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`} />
-          </a>
+            <i className="bi bi-person-badge text-sm" aria-hidden="true" />
+            <span>Overview</span>
+          </button>
 
-          <a
-            href="https://wa.me/919876543210?text=Hi%20SHRELL%20Automotive%20Team,%20I%20need%20assistance%20with%20my%20account."
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`rounded-2xl border p-5 transition-all flex items-start gap-4 group ${isDark ? 'bg-surface-900 border-surface-800 hover:border-surface-700' : 'bg-white border-[#E0DBD2] hover:border-emerald-300'}`}
+          <button
+            type="button"
+            role="tab"
+            id="tab-orders"
+            aria-selected={activeTab === 'orders'}
+            aria-controls="panel-orders"
+            onClick={() => handleTabChange('orders')}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowLeft') handleTabChange('overview');
+            }}
+            className={`flex-1 py-2.5 px-4 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer flex items-center justify-center gap-2 ${
+              activeTab === 'orders'
+                ? 'bg-[#FF000E] text-white shadow-xs'
+                : isDark
+                  ? 'text-slate-300 hover:text-white'
+                  : 'text-[#4A4244] hover:text-[#140E10]'
+            }`}
           >
-            <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${isDark ? 'bg-emerald-950/80 border border-emerald-800 text-emerald-400' : 'bg-emerald-50 border border-emerald-200 text-emerald-600'}`}>
-              <i className="bi bi-whatsapp text-xl" />
-            </div>
-            <div className="flex-1">
-              <h2 className={`text-sm font-bold transition-colors ${isDark ? 'text-white group-hover:text-emerald-400' : 'text-[#140E10] group-hover:text-emerald-600'}`}>WhatsApp Desk</h2>
-              <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>Chat directly with technical support.</p>
-            </div>
-            <i className={`bi bi-chevron-right text-xs self-center ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`} />
-          </a>
+            <i className="bi bi-bag-check text-sm" aria-hidden="true" />
+            <span>My Orders</span>
+            {orders.length > 0 && (
+              <span
+                className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${
+                  activeTab === 'orders'
+                    ? 'bg-white text-[#FF000E]'
+                    : 'bg-[#FF000E] text-white'
+                }`}
+              >
+                {orders.length}
+              </span>
+            )}
+          </button>
         </div>
+
+        {/* Tab Panels */}
+        {activeTab === 'overview' ? (
+          <div id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Link to="/track" className={`rounded-2xl border p-5 transition-all flex items-start gap-4 group ${isDark ? 'bg-surface-900 border-surface-800 hover:border-surface-700' : 'bg-white border-[#E0DBD2] hover:border-[#FF000E]/40'}`}>
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${isDark ? 'bg-surface-800 text-slate-300 group-hover:bg-brand-950 group-hover:text-brand-400' : 'bg-[#F5F3EE] text-[#5C5456] group-hover:bg-[#FFE0E2] group-hover:text-[#FF000E]'}`}>
+                <i className="bi bi-box-seam text-xl" aria-hidden="true" />
+              </div>
+              <div className="flex-1">
+                <h2 className={`text-sm font-bold transition-colors ${isDark ? 'text-white group-hover:text-brand-400' : 'text-[#140E10] group-hover:text-[#FF000E]'}`}>Track Consignment</h2>
+                <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>Real-time BlueDart, Delhivery & DTDC tracking.</p>
+              </div>
+              <i className={`bi bi-chevron-right text-xs self-center ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`} aria-hidden="true" />
+            </Link>
+
+            <Link to="/cart" className={`rounded-2xl border p-5 transition-all flex items-start gap-4 group ${isDark ? 'bg-surface-900 border-surface-800 hover:border-surface-700' : 'bg-white border-[#E0DBD2] hover:border-[#FF000E]/40'}`}>
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${isDark ? 'bg-surface-800 text-slate-300 group-hover:bg-brand-950 group-hover:text-brand-400' : 'bg-[#F5F3EE] text-[#5C5456] group-hover:bg-[#FFE0E2] group-hover:text-[#FF000E]'}`}>
+                <i className="bi bi-bag text-xl" aria-hidden="true" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h2 className={`text-sm font-bold transition-colors ${isDark ? 'text-white group-hover:text-brand-400' : 'text-[#140E10] group-hover:text-[#FF000E]'}`}>Shopping Bag</h2>
+                  {itemCount > 0 && (
+                    <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-brand-500 text-white">{itemCount}</span>
+                  )}
+                </div>
+                <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>Review items, apply promo codes, and checkout.</p>
+              </div>
+              <i className={`bi bi-chevron-right text-xs self-center ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`} aria-hidden="true" />
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => handleTabChange('orders')}
+              className={`rounded-2xl border p-5 transition-all flex items-start gap-4 group cursor-pointer text-left ${
+                isDark ? 'bg-surface-900 border-surface-800 hover:border-surface-700' : 'bg-white border-[#E0DBD2] hover:border-[#FF000E]/40'
+              }`}
+            >
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
+                isDark ? 'bg-surface-800 text-slate-300 group-hover:bg-brand-950 group-hover:text-brand-400' : 'bg-[#F5F3EE] text-[#5C5456] group-hover:bg-[#FFE0E2] group-hover:text-[#FF000E]'
+              }`}>
+                <i className="bi bi-bag-check text-xl" aria-hidden="true" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h2 className={`text-sm font-bold transition-colors ${isDark ? 'text-white group-hover:text-brand-400' : 'text-[#140E10] group-hover:text-[#FF000E]'}`}>
+                    My Orders
+                  </h2>
+                  {orders.length > 0 && (
+                    <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-brand-500 text-white">
+                      {orders.length}
+                    </span>
+                  )}
+                </div>
+                <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
+                  {orders.length > 0 ? `${orders.length} orders placed • View order history` : 'View order history, leave reviews, and track.'}
+                </p>
+              </div>
+              <i className={`bi bi-chevron-right text-xs self-center ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`} aria-hidden="true" />
+            </button>
+
+            <a
+              href="https://wa.me/919876543210?text=Hi%20SHRELL%20Automotive%20Team,%20I%20need%20assistance%20with%20my%20account."
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`rounded-2xl border p-5 transition-all flex items-start gap-4 group ${isDark ? 'bg-surface-900 border-surface-800 hover:border-surface-700' : 'bg-white border-[#E0DBD2] hover:border-emerald-300'}`}
+            >
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${isDark ? 'bg-emerald-950/80 border border-emerald-800 text-emerald-400' : 'bg-emerald-50 border border-emerald-200 text-emerald-600'}`}>
+                <i className="bi bi-whatsapp text-xl" aria-hidden="true" />
+              </div>
+              <div className="flex-1">
+                <h2 className={`text-sm font-bold transition-colors ${isDark ? 'text-white group-hover:text-emerald-400' : 'text-[#140E10] group-hover:text-emerald-600'}`}>WhatsApp Desk</h2>
+                <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>Chat directly with technical support.</p>
+              </div>
+              <i className={`bi bi-chevron-right text-xs self-center ${isDark ? 'text-slate-500' : 'text-[#8E8587]'}`} aria-hidden="true" />
+            </a>
+          </div>
+        ) : (
+          <div id="panel-orders" role="tabpanel" aria-labelledby="tab-orders">
+            <CustomerOrdersPanel orders={orders} loading={loadingOrders} />
+          </div>
+        )}
 
         {/* Logout Section */}
         <div className="pt-4 text-center">

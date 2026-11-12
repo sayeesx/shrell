@@ -124,7 +124,7 @@ export const StateSearchDropdown: React.FC<StateSearchDropdownProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`w-full rounded-lg px-3.5 py-2.5 text-xs border text-left flex items-center justify-between transition-all focus:outline-none focus:ring-2 focus:ring-[#FF000E] cursor-pointer ${
+        className={`w-full rounded-lg px-3.5 py-3 text-[13px] border text-left flex items-center justify-between transition-all focus:outline-none focus:ring-2 focus:ring-[#FF000E] cursor-pointer ${
           isDark
             ? 'bg-[#181113] border-[#261619] text-white hover:border-[#3D2024]'
             : 'bg-[#F5F3EE] border-[#E0DBD2] text-black hover:border-gray-400'

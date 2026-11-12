@@ -258,43 +258,20 @@ export const ProductDetailPage: React.FC = () => {
         structuredData={[productSchema, breadcrumbSchema]}
       />
 
-      <div className="max-w-2xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-36 sm:pb-16 space-y-6 sm:space-y-8">
-        {/* Semantic Crawlable Breadcrumbs with Real Links */}
-        <nav aria-label="Breadcrumb">
-          <ol className="flex items-center flex-wrap gap-1.5 text-xs">
-            <li>
-              <Link
-                to="/"
-                className={`transition-colors hover:text-[#FF000E] ${
-                  isDark ? 'text-slate-400' : 'text-[#5C5456]'
-                }`}
-              >
-                Home
-              </Link>
-            </li>
-            <li className="text-slate-500" aria-hidden="true">/</li>
-            <li>
-              <Link
-                to={categoryPath}
-                className={`transition-colors hover:text-[#FF000E] ${
-                  isDark ? 'text-slate-400' : 'text-[#5C5456]'
-                }`}
-              >
-                {categoryTitle}
-              </Link>
-            </li>
-            <li className="text-slate-500" aria-hidden="true">/</li>
-            <li
-              aria-current="page"
-              className={`font-medium truncate max-w-[200px] sm:max-w-md ${
-                isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'
-              }`}
-            >
-              {product.name}
-            </li>
-          </ol>
-        </nav>
+      {/* Semantic Crawlable Breadcrumbs with Real Links (hidden visually, preserved for SEO & screen readers) */}
+      <nav aria-label="Breadcrumb" className="sr-only">
+        <ol>
+          <li>
+            <Link to="/">Home</Link>
+          </li>
+          <li>
+            <Link to={categoryPath}>{categoryTitle}</Link>
+          </li>
+          <li aria-current="page">{product.name}</li>
+        </ol>
+      </nav>
 
+      <div className="max-w-2xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-36 sm:pb-16 space-y-6 sm:space-y-8">
         {/* Main Product Showcase */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../application/AuthContext';
 import { useTheme } from '../../application/ThemeContext';
@@ -11,8 +11,39 @@ export const MobileNavDock: React.FC = () => {
   const { user, openAuthModal } = useAuth();
   const { isDark } = useTheme();
   const { itemCount } = useCart();
+  const navRef = useRef<HTMLElement>(null);
 
   const isAdmin = location.pathname.startsWith('/admin');
+
+  // Keep --mobile-dock-height synced to the exact rendered dock height so Cart CTA sits flush above the text carousel
+  useEffect(() => {
+    if (isAdmin) {
+      document.documentElement.style.removeProperty('--mobile-dock-height');
+      return;
+    }
+
+    const updateHeight = () => {
+      if (navRef.current) {
+        const height = navRef.current.getBoundingClientRect().height;
+        document.documentElement.style.setProperty('--mobile-dock-height', `${height}px`);
+      }
+    };
+
+    updateHeight();
+
+    let observer: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && navRef.current) {
+      observer = new ResizeObserver(updateHeight);
+      observer.observe(navRef.current);
+    }
+    window.addEventListener('resize', updateHeight);
+
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', updateHeight);
+      document.documentElement.style.removeProperty('--mobile-dock-height');
+    };
+  }, [isAdmin]);
 
   // Show dock nav for storefront pages including checkout, cart, and delivery address.
   // Only hide on the dedicated admin portal.
@@ -64,6 +95,7 @@ export const MobileNavDock: React.FC = () => {
 
   return (
     <nav
+      ref={navRef}
       className={`fixed bottom-0 left-0 right-0 z-40 md:hidden backdrop-blur-xl border-t select-none transition-all duration-300 ${
         isDark
           ? 'bg-[#0A0808]/95 border-[#221215] shadow-[0_-10px_35px_rgba(0,0,0,0.85)]'

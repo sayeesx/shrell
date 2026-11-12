@@ -7,7 +7,7 @@ if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
 }
 
 export const ScrollToTop: React.FC = () => {
-  const { pathname, search, hash } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
     // If an anchor hash is present, smoothly scroll the target element into view
@@ -48,7 +48,7 @@ export const ScrollToTop: React.FC = () => {
       cancelAnimationFrame(rafId);
       clearTimeout(timerId);
     };
-  }, [pathname, search, hash]);
+  }, [pathname, hash]);
 
   return null;
 };

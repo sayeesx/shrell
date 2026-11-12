@@ -18,7 +18,25 @@ import {
   trackOrderCompleted,
 } from '../../infrastructure/analytics/posthog';
 
-type CheckoutStep = 'address' | 'payment' | 'summary';
+type CheckoutStep = 'address' | 'payment';
+
+const COUNTRY_DIAL_CODES = [
+  { code: 'IN', dial: '+91', label: 'India' },
+  { code: 'US', dial: '+1', label: 'United States' },
+  { code: 'AE', dial: '+971', label: 'UAE' },
+  { code: 'GB', dial: '+44', label: 'United Kingdom' },
+  { code: 'SG', dial: '+65', label: 'Singapore' },
+  { code: 'AU', dial: '+61', label: 'Australia' },
+  { code: 'CA', dial: '+1', label: 'Canada' },
+  { code: 'DE', dial: '+49', label: 'Germany' },
+  { code: 'SA', dial: '+966', label: 'Saudi Arabia' },
+  { code: 'QA', dial: '+974', label: 'Qatar' },
+  { code: 'OM', dial: '+968', label: 'Oman' },
+  { code: 'KW', dial: '+965', label: 'Kuwait' },
+  { code: 'BH', dial: '+973', label: 'Bahrain' },
+  { code: 'MY', dial: '+60', label: 'Malaysia' },
+  { code: 'JP', dial: '+81', label: 'Japan' },
+];
 
 export const CheckoutPage: React.FC = () => {
   const { cart, clearCart } = useCart();
@@ -28,10 +46,10 @@ export const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Tab / Step resolution: 'address' (Step 1), 'payment' (Step 2), 'summary' (Step 3)
+  // Tab / Step resolution: 'address' (Step 1), 'payment' (Step 2)
   const rawStep = searchParams.get('step');
   const currentStep: CheckoutStep =
-    rawStep === 'payment' ? 'payment' : rawStep === 'summary' ? 'summary' : 'address';
+    rawStep === 'payment' || rawStep === 'summary' ? 'payment' : 'address';
 
   useEffect(() => {
     finishPageLoad();
@@ -52,6 +70,8 @@ export const CheckoutPage: React.FC = () => {
 
   // Form Fields - Auto-fill from logged in user details ONLY if valid
   const [fullName, setFullName] = useState(() => (user?.name && user.name !== 'Valued Customer' ? user.name : ''));
+  const [countryOption, setCountryOption] = useState('IN:+91');
+  const countryDialCode = countryOption.split(':')[1] || '+91';
   const [phone, setPhone] = useState(() => {
     if (user?.phone) {
       const clean = user.phone.replace(/[^0-9]/g, '');
@@ -148,8 +168,12 @@ export const CheckoutPage: React.FC = () => {
       return false;
     }
     const cleanPhone = phone.replace(/[^0-9]/g, '');
-    if (cleanPhone.length !== 10) {
-      setErrorMessage('Please provide a valid 10-digit Indian mobile number for courier dispatch.');
+    if (countryDialCode === '+91' ? cleanPhone.length !== 10 : cleanPhone.length < 6 || cleanPhone.length > 15) {
+      setErrorMessage(
+        countryDialCode === '+91'
+          ? 'Please provide a valid 10-digit Indian mobile number for courier dispatch.'
+          : 'Please provide a valid mobile number for courier dispatch.'
+      );
       return false;
     }
     const cleanPin = postalCode.replace(/[^0-9]/g, '');
@@ -173,18 +197,7 @@ export const CheckoutPage: React.FC = () => {
     setSearchParams({ step: 'payment' });
   };
 
-  // Navigate to Step 3 (Order Summary) from Step 2
-  const handleProceedToSummary = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!validateAddress()) {
-      setSearchParams({ step: 'address' });
-      return;
-    }
-    trackCheckoutStepCompleted('payment', { paymentMethod: selectedMethod });
-    setSearchParams({ step: 'summary' });
-  };
-
-  // Submit Final Order (From Step 3: Order Summary)
+  // Submit Final Order directly from Step 2 (Payment Method)
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
@@ -194,7 +207,10 @@ export const CheckoutPage: React.FC = () => {
       return;
     }
 
+    trackCheckoutStepCompleted('payment', { paymentMethod: selectedMethod });
+
     const cleanPhone = phone.replace(/[^0-9]/g, '');
+    const formattedPhone = countryDialCode === '+91' ? cleanPhone : `${countryDialCode}${cleanPhone}`;
     const cleanPin = postalCode.replace(/[^0-9]/g, '');
 
     trackPaymentAttempted(selectedMethod, cart.totalPaisa);
@@ -219,7 +235,7 @@ export const CheckoutPage: React.FC = () => {
         id: `addr-${Date.now()}`,
         customerId: `cust-${cleanPhone}`,
         fullName: fullName.trim(),
-        phone: cleanPhone,
+        phone: formattedPhone,
         addressLine1: addressLine1.trim(),
         addressLine2: addressLine2.trim() || undefined,
         city: city.trim(),
@@ -237,7 +253,7 @@ export const CheckoutPage: React.FC = () => {
         customerId: `cust-${cleanPhone}`,
         customerName: fullName.trim(),
         customerEmail: email.trim() || `${cleanPhone}@guest.shrell.com`,
-        customerPhone: cleanPhone,
+        customerPhone: formattedPhone,
         status: selectedMethod === 'COD' ? 'CONFIRMED' : 'PENDING',
         paymentStatus: selectedMethod === 'COD' ? 'PENDING' : 'PENDING',
         paymentMethod: selectedMethod,
@@ -308,17 +324,13 @@ export const CheckoutPage: React.FC = () => {
         return 'Delivery Address';
       case 'payment':
         return 'Payment Method';
-      case 'summary':
-        return 'Order Summary';
       default:
         return 'Checkout';
     }
   };
 
   const handleBackNavigation = () => {
-    if (currentStep === 'summary') {
-      setSearchParams({ step: 'payment' });
-    } else if (currentStep === 'payment') {
+    if (currentStep === 'payment') {
       setSearchParams({ step: 'address' });
     } else {
       navigate('/cart');
@@ -381,13 +393,6 @@ export const CheckoutPage: React.FC = () => {
         {currentStep === 'address' && (
           <form onSubmit={handleProceedToPayment} className="space-y-4">
             <div className="space-y-3.5">
-              <div className={`border-b pb-2 ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
-                <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-                  <i className="bi bi-geo-alt-fill text-[#FF000E]" />
-                  <span>Consignee &amp; Delivery Details</span>
-                </h2>
-              </div>
-
               <div className="space-y-3 text-xs">
                 <div>
                   <label className="block text-[11px] font-semibold mb-1 opacity-80">Full Name *</label>
@@ -397,7 +402,7 @@ export const CheckoutPage: React.FC = () => {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder=""
-                    className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                    className={`w-full rounded-lg px-3.5 py-3 text-[13px] border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                       isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                     }`}
                   />
@@ -406,19 +411,43 @@ export const CheckoutPage: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-[11px] font-semibold mb-1 opacity-80">
-                      Mobile Number (10 Digits) *
+                      Mobile Number *
                       {user?.phone && <span className="ml-1.5 text-emerald-500 font-normal text-[10px]">(Auto-filled)</span>}
                     </label>
-                    <div className="relative">
-                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[11px] font-mono opacity-60">+91</span>
+                    <div className="flex items-stretch gap-2">
+                      <div className="relative shrink-0">
+                        <select
+                          aria-label="Country code"
+                          value={countryOption}
+                          onChange={(e) => setCountryOption(e.target.value)}
+                          className={`appearance-none h-full rounded-lg pl-3 pr-7 py-3 text-[13px] font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] cursor-pointer ${
+                            isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
+                          }`}
+                        >
+                          {COUNTRY_DIAL_CODES.map((c) => (
+                            <option
+                              key={c.code}
+                              value={`${c.code}:${c.dial}`}
+                              className={isDark ? 'bg-[#0E0A0B] text-white' : 'bg-white text-[#140E10]'}
+                            >
+                              {c.code} {c.dial}
+                            </option>
+                          ))}
+                        </select>
+                        <i
+                          className="bi bi-chevron-down text-[10px] text-gray-400 pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2"
+                          aria-hidden="true"
+                        />
+                      </div>
                       <input
                         type="tel"
+                        inputMode="numeric"
                         required
-                        maxLength={10}
+                        maxLength={countryDialCode === '+91' ? 10 : 15}
                         value={phone}
                         onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
                         placeholder=""
-                        className={`w-full rounded-lg pl-12 pr-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                        className={`flex-1 min-w-0 rounded-lg px-3.5 py-3 text-[13px] font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                           isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                         }`}
                       />
@@ -437,52 +466,55 @@ export const CheckoutPage: React.FC = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder=""
-                      className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                      className={`w-full rounded-lg px-3.5 py-3 text-[13px] border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                         isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                       }`}
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
                   <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block text-[11px] font-semibold opacity-80">Postal PIN Code (6 Digits) *</label>
+                    <div className="min-h-[20px] flex items-center justify-between gap-1 mb-1">
+                      <label className="block text-[11px] font-semibold opacity-80 whitespace-nowrap">PIN Code *</label>
                       {isPinLoading && (
-                        <span className="text-[10px] text-amber-500 font-normal inline-flex items-center gap-1">
+                        <span className="text-[10px] text-amber-500 font-normal inline-flex items-center gap-1 truncate">
                           <i className="bi bi-arrow-repeat animate-spin text-[9px]" aria-hidden="true" />
-                          <span>Locating...</span>
+                          <span>Locating</span>
                         </span>
                       )}
                       {pinData && !isPinLoading && (
-                        <span className="text-[10px] text-emerald-500 font-normal inline-flex items-center gap-1">
-                          <i className="bi bi-check2-circle text-[10px]" aria-hidden="true" />
-                          <span>Autofilled ({pinData.city})</span>
+                        <span className="text-[10px] text-emerald-500 font-normal inline-flex items-center gap-0.5 truncate">
+                          <i className="bi bi-check2-circle text-[10px] shrink-0" aria-hidden="true" />
+                          <span className="truncate">{pinData.city}</span>
                         </span>
                       )}
                     </div>
                     <input
                       type="text"
+                      inputMode="numeric"
                       required
                       maxLength={6}
                       value={postalCode}
                       onChange={(e) => setPostalCode(e.target.value.replace(/[^0-9]/g, ''))}
                       placeholder=""
-                      className={`w-full rounded-lg px-3.5 py-2.5 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                      className={`w-full rounded-lg px-3.5 py-3 text-[13px] font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                         isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                       }`}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold mb-1 opacity-80">City / District *</label>
+                    <div className="min-h-[20px] flex items-center mb-1">
+                      <label className="block text-[11px] font-semibold opacity-80 whitespace-nowrap">District / City *</label>
+                    </div>
                     <input
                       type="text"
                       required
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
                       placeholder=""
-                      className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                      className={`w-full rounded-lg px-3.5 py-3 text-[13px] border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                         isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                       }`}
                     />
@@ -497,7 +529,7 @@ export const CheckoutPage: React.FC = () => {
                     value={addressLine1}
                     onChange={(e) => setAddressLine1(e.target.value)}
                     placeholder=""
-                    className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                    className={`w-full rounded-lg px-3.5 py-3 text-[13px] border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                       isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                     }`}
                   />
@@ -511,7 +543,7 @@ export const CheckoutPage: React.FC = () => {
                       value={addressLine2}
                       onChange={(e) => setAddressLine2(e.target.value)}
                       placeholder=""
-                      className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                      className={`w-full rounded-lg px-3.5 py-3 text-[13px] border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                         isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                       }`}
                     />
@@ -529,7 +561,7 @@ export const CheckoutPage: React.FC = () => {
                     value={deliveryInstructions}
                     onChange={(e) => setDeliveryInstructions(e.target.value)}
                     placeholder=""
-                    className={`w-full rounded-lg px-3.5 py-2.5 text-xs border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                    className={`w-full rounded-lg px-3.5 py-3 text-[13px] border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                       isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                     }`}
                   />
@@ -550,14 +582,14 @@ export const CheckoutPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Mobile Fixed Bottom CTA Button (Fixed above dock text carousel) */}
+            {/* Mobile Fixed Bottom CTA Button (Flush above dock text carousel) */}
             <div
               className={`fixed left-0 right-0 z-50 md:hidden py-2 px-3 border-t backdrop-blur-xl transition-all ${
                 isDark
                   ? 'bg-[#0A0808]/95 border-[#2D161A] shadow-[0_-8px_25px_rgba(0,0,0,0.85)]'
                   : 'bg-white/95 border-[#D0C9BE] shadow-[0_-4px_18px_rgba(0,0,0,0.1)]'
               }`}
-              style={{ bottom: 'calc(73px + env(safe-area-inset-bottom, 0px))' }}
+              style={{ bottom: 'var(--mobile-dock-height, 70px)' }}
             >
               <div className="max-w-xl mx-auto">
                 <button
@@ -575,10 +607,10 @@ export const CheckoutPage: React.FC = () => {
         )}
 
         {/* ========================================================================= */}
-        {/* STEP 2: PAYMENT METHOD TAB (Exact match to Reference Screen 1)            */}
+        {/* STEP 2: PAYMENT METHOD TAB (Submits directly to Payment Success)          */}
         {/* ========================================================================= */}
         {currentStep === 'payment' && (
-          <div className="space-y-3.5">
+          <form onSubmit={handleSubmitOrder} className="space-y-3.5">
 
             {/* Address Recap Chip */}
             <div className={`p-3 rounded-lg border flex items-center justify-between text-xs ${
@@ -587,7 +619,7 @@ export const CheckoutPage: React.FC = () => {
               <div className="flex items-center gap-2.5 min-w-0">
                 <i className="bi bi-geo-alt-fill text-[#FF000E] shrink-0" />
                 <span className="truncate">
-                  Deliver to: <strong>{fullName || 'Recipient'}</strong> {phone && `(${phone})`}{addressLine1 && `, ${addressLine1}`}
+                  Deliver to: <strong>{fullName || 'Recipient'}</strong> {phone && `(${countryDialCode} ${phone})`}{addressLine1 && `, ${addressLine1}`}
                 </span>
               </div>
               <button
@@ -689,7 +721,7 @@ export const CheckoutPage: React.FC = () => {
                             value={customerUpiId}
                             onChange={(e) => setCustomerUpiId(e.target.value.trim())}
                             placeholder=""
-                            className={`w-full rounded-lg px-3 py-2 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                            className={`w-full rounded-lg px-3.5 py-2.5 text-[13px] font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                               isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                             }`}
                           />
@@ -705,7 +737,7 @@ export const CheckoutPage: React.FC = () => {
                             value={utrNumber}
                             onChange={(e) => setUtrNumber(e.target.value.trim())}
                             placeholder=""
-                            className={`w-full rounded-lg px-3 py-2 text-xs font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                            className={`w-full rounded-lg px-3.5 py-2.5 text-[13px] font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
                               isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
                             }`}
                           />
@@ -720,171 +752,6 @@ export const CheckoutPage: React.FC = () => {
             {/* Desktop Step 2 CTA Button */}
             <div className="hidden md:block pt-3">
               <button
-                type="button"
-                onClick={() => handleProceedToSummary()}
-                className="w-full py-3.5 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2"
-              >
-                <span>Add Payment Method</span>
-                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                  <i className="bi bi-arrow-right text-[10px]" />
-                </span>
-              </button>
-            </div>
-
-            {/* Mobile Fixed Bottom CTA Button (Fixed above dock text carousel) */}
-            <div
-              className={`fixed left-0 right-0 z-50 md:hidden py-2 px-3 border-t backdrop-blur-xl transition-all ${
-                isDark
-                  ? 'bg-[#0A0808]/95 border-[#2D161A] shadow-[0_-8px_25px_rgba(0,0,0,0.85)]'
-                  : 'bg-white/95 border-[#D0C9BE] shadow-[0_-4px_18px_rgba(0,0,0,0.1)]'
-              }`}
-              style={{ bottom: 'calc(73px + env(safe-area-inset-bottom, 0px))' }}
-            >
-              <div className="max-w-xl mx-auto">
-                <button
-                  type="button"
-                  onClick={() => handleProceedToSummary()}
-                  className="w-full py-2.5 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-xs uppercase tracking-wider shadow-md active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <span>Add Payment Method</span>
-                  <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                    <i className="bi bi-arrow-right text-[10px]" />
-                  </span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================================= */}
-        {/* STEP 3: ORDER SUMMARY TAB                                                 */}
-        {/* ========================================================================= */}
-        {currentStep === 'summary' && (
-          <form onSubmit={handleSubmitOrder} className="space-y-3.5">
-
-            {/* Delivery Address Chip */}
-            <div className={`p-3.5 rounded-xl border flex items-center justify-between text-xs ${
-              isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2]'
-            }`}>
-              <div className="space-y-1 min-w-0 pr-3">
-                <div className="flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-[#FF000E]">
-                  <i className="bi bi-geo-alt-fill" />
-                  <span>Delivery Address</span>
-                </div>
-                <div className="font-semibold text-xs sm:text-sm">{fullName} ({phone})</div>
-                <div className="text-gray-400 truncate">{addressLine1}, {city} - {postalCode}, {state}</div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSearchParams({ step: 'address' })}
-                className="text-xs font-semibold text-[#FF000E] hover:underline shrink-0 cursor-pointer"
-              >
-                Change
-              </button>
-            </div>
-
-            {/* Selected Payment Method Chip */}
-            <div className={`p-3.5 rounded-xl border flex items-center justify-between text-xs ${
-              isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2]'
-            }`}>
-              <div className="space-y-1 min-w-0 pr-3">
-                <div className="flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-[#FF000E]">
-                  <i className="bi bi-credit-card-2-front" />
-                  <span>Payment Method</span>
-                </div>
-                <div className="font-semibold text-xs sm:text-sm">
-                  {selectedMethod === 'MANUAL_UPI' && 'UPI Transfer / Wallet'}
-                  {selectedMethod === 'RAZORPAY' && 'Credit / Debit Card / Net Banking'}
-                  {selectedMethod === 'COD' && 'Cash on Delivery'}
-                </div>
-                {utrNumber && <div className="text-[11px] font-mono text-gray-400">UTR: {utrNumber}</div>}
-              </div>
-              <button
-                type="button"
-                onClick={() => setSearchParams({ step: 'payment' })}
-                className="text-xs font-semibold text-[#FF000E] hover:underline shrink-0 cursor-pointer"
-              >
-                Change
-              </button>
-            </div>
-
-            {/* Order Items & Price Summary Card */}
-            <div className={`p-3.5 sm:p-4 rounded-xl border space-y-3 ${
-              isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
-            }`}>
-              <div className={`flex items-center justify-between border-b pb-2 ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
-                <h3 className="font-bold text-xs sm:text-sm">Order Summary ({cart.items.length} items)</h3>
-                <Link to="/cart" className="text-xs text-[#FF000E] hover:underline font-semibold">
-                  Review Cart
-                </Link>
-              </div>
-
-              {/* Items Preview */}
-              <div className="max-h-52 overflow-y-auto space-y-2 pr-1">
-                {cart.items.map((it) => (
-                  <div key={it.productId} className="flex items-center justify-between gap-3 text-xs">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className={`w-8 h-8 rounded-lg overflow-hidden shrink-0 border flex items-center justify-center p-0.5 ${
-                        isDark ? 'bg-[#181113] border-[#261619]' : 'bg-[#F5F3EE] border-[#E0DBD2]'
-                      }`}>
-                        <img
-                          src={
-                            it.product.images[0]?.url && !it.product.images[0].url.includes('shrell-')
-                              ? it.product.images[0].url
-                              : '/logos/shrell-brandicon_no-bg.png'
-                          }
-                          alt={it.product.name}
-                          className={`w-full h-full object-contain ${
-                            it.product.images[0]?.url && !it.product.images[0].url.includes('shrell-') ? '' : 'opacity-40 p-0.5'
-                          }`}
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <span className="truncate block font-medium">{it.product.name}</span>
-                        <span className="text-[10.5px] text-gray-500 font-mono">Qty: {it.quantity}</span>
-                      </div>
-                    </div>
-                    <span className={`font-mono font-semibold shrink-0 ${isDark ? 'text-white' : 'text-black'}`}>{formatINR(it.subtotalPaisa)}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Price Breakdown */}
-              <div className={`pt-2.5 border-t space-y-1.5 text-xs ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Sub total</span>
-                  <span className={`font-semibold ${isDark ? 'text-white' : 'text-black'}`}>{formatINR(cart.subtotalPaisa)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Delivery Fee</span>
-                  <span className="font-semibold">
-                    {cart.shippingPaisa === 0 ? <span className="text-emerald-400 font-bold">FREE</span> : formatINR(cart.shippingPaisa)}
-                  </span>
-                </div>
-                {cart.discountPaisa > 0 && (
-                  <div className="flex justify-between text-emerald-400">
-                    <span>Discount Voucher</span>
-                    <span className="font-semibold">−{formatINR(cart.discountPaisa)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between text-[10.5px] opacity-70">
-                  <span>GST (18% Included)</span>
-                  <span className="font-mono">{formatINR(cart.taxPaisa)}</span>
-                </div>
-              </div>
-
-              {/* Total Payable */}
-              <div className={`pt-2.5 border-t flex justify-between items-center ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
-                <span className="font-bold text-xs sm:text-sm">Total Payable</span>
-                <span className={`font-extrabold text-base sm:text-lg ${isDark ? 'text-white' : 'text-black'}`}>
-                  {formatINR(cart.totalPaisa)}
-                </span>
-              </div>
-            </div>
-
-            {/* Desktop Step 3 CTA Button */}
-            <div className="hidden md:block pt-2">
-              <button
                 type="submit"
                 disabled={isSubmitting}
                 className="w-full py-3.5 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
@@ -896,7 +763,7 @@ export const CheckoutPage: React.FC = () => {
                   </div>
                 ) : (
                   <>
-                    <span>Proceed to Pay</span>
+                    <span>Proceed to Pay ({formatINR(cart.totalPaisa)})</span>
                     <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
                       <i className="bi bi-arrow-right text-[10px]" />
                     </span>
@@ -905,14 +772,14 @@ export const CheckoutPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Mobile Fixed Bottom CTA Button (Fixed above dock text carousel) */}
+            {/* Mobile Fixed Bottom CTA Button (Flush above dock text carousel) */}
             <div
               className={`fixed left-0 right-0 z-50 md:hidden py-2 px-3 border-t backdrop-blur-xl transition-all ${
                 isDark
                   ? 'bg-[#0A0808]/95 border-[#2D161A] shadow-[0_-8px_25px_rgba(0,0,0,0.85)]'
                   : 'bg-white/95 border-[#D0C9BE] shadow-[0_-4px_18px_rgba(0,0,0,0.1)]'
               }`}
-              style={{ bottom: 'calc(73px + env(safe-area-inset-bottom, 0px))' }}
+              style={{ bottom: 'var(--mobile-dock-height, 70px)' }}
             >
               <div className="max-w-xl mx-auto flex items-center justify-between gap-3">
                 <div className="min-w-0">

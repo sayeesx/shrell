@@ -20,6 +20,11 @@ export const CataloguePage: React.FC = () => {
 
   const urlQuery = searchParams.get('search') || '';
   const urlCategory = searchParams.get('category') || '';
+  const urlSort = searchParams.get('sort');
+  const sortBy: SortOption =
+    urlSort === 'price-asc' || urlSort === 'price-desc' || urlSort === 'rating-desc'
+      ? urlSort
+      : 'relevance';
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -28,7 +33,6 @@ export const CataloguePage: React.FC = () => {
   // Filter & Search states
   const [searchInput, setSearchInput] = useState(urlQuery);
   const [selectedCategory, setSelectedCategory] = useState<string>(urlCategory);
-  const [sortBy, setSortBy] = useState<SortOption>('relevance');
 
   // Load all products and categories
   useEffect(() => {
@@ -126,7 +130,6 @@ export const CataloguePage: React.FC = () => {
   const handleClearFilters = () => {
     setSearchInput('');
     setSelectedCategory('');
-    setSortBy('relevance');
     setSearchParams({}, { replace: true });
   };
 
@@ -172,76 +175,7 @@ export const CataloguePage: React.FC = () => {
         noIndex={Boolean(urlQuery.trim())}
         structuredData={generateBreadcrumbSchema(breadcrumbItems)}
       />
-      <div className="max-w-7xl mx-auto space-y-5">
-        {/* Search Bar & Themed Controls Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-          {/* Typo-Tolerant Input */}
-          <div className="md:col-span-8 relative">
-            <i className="bi bi-search text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 text-sm pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Instant typo-tolerant search (e.g. 'difuser', 'matts', 'cabl', 'led')..."
-              value={searchInput}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className={`w-full rounded-xl pl-10 pr-24 py-2.5 text-xs sm:text-sm font-sans border transition-all focus:outline-none focus:border-[#FF000E] focus:ring-1 focus:ring-[#FF000E] ${
-                isDark
-                  ? 'bg-[#0E0A0B] border-[#261619] text-[#F1EEEE] placeholder-gray-500'
-                  : 'bg-white border-[#E0DBD2] text-[#140E10] placeholder-gray-400 shadow-xs'
-              }`}
-            />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-              {searchInput.trim() && (
-                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#FF000E]/10 border border-[#FF000E]/30 text-[#FF000E]">
-                  <i className="bi bi-lightning-charge-fill text-[9px]" aria-hidden="true" />
-                  <span>Fuse.js</span>
-                </span>
-              )}
-              {searchInput && (
-                <button
-                  type="button"
-                  onClick={() => handleSearchChange('')}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-white cursor-pointer p-0.5"
-                  aria-label="Clear search input"
-                >
-                  <i className="bi bi-x-circle-fill text-sm" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Themed Sort Selector */}
-          <div className="md:col-span-4 flex items-center gap-2">
-            <label className={`text-xs font-mono font-semibold shrink-0 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Sort By:</label>
-            <div className="relative flex-1">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as SortOption)}
-                className={`w-full appearance-none rounded-xl pl-3.5 pr-8 py-2.5 text-xs font-mono border transition-all cursor-pointer focus:outline-none focus:border-[#FF000E] focus:ring-1 focus:ring-[#FF000E] ${
-                  isDark
-                    ? 'bg-[#0E0A0B] border-[#261619] text-[#F1EEEE] hover:border-[#381B20]'
-                    : 'bg-white border-[#E0DBD2] text-[#140E10] hover:border-[#C8C2B6] shadow-xs'
-                }`}
-              >
-                <option value="relevance" className={isDark ? 'bg-[#0E0A0B] text-white' : 'bg-white text-[#140E10]'}>
-                  Best Match / Relevance
-                </option>
-                <option value="price-asc" className={isDark ? 'bg-[#0E0A0B] text-white' : 'bg-white text-[#140E10]'}>
-                  Price: Low to High
-                </option>
-                <option value="price-desc" className={isDark ? 'bg-[#0E0A0B] text-white' : 'bg-white text-[#140E10]'}>
-                  Price: High to Low
-                </option>
-                <option value="rating-desc" className={isDark ? 'bg-[#0E0A0B] text-white' : 'bg-white text-[#140E10]'}>
-                  Customer Rating (Highest)
-                </option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-[#FF000E]">
-                <i className="bi bi-chevron-down text-xs" aria-hidden="true" />
-              </div>
-            </div>
-          </div>
-        </div>
-
+      <div className="max-w-7xl mx-auto space-y-4">
         {/* Category Filter Chips Carousel */}
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
           <button
@@ -299,7 +233,7 @@ export const CataloguePage: React.FC = () => {
             <div>
               <h3 className="text-base font-bold">No Matching Accessories Found</h3>
               <p className="text-xs opacity-70 mt-1 max-w-sm mx-auto">
-                No items matched "{searchInput}". Even with Fuse.js typo tolerance, we couldn't find a matching product.
+                No items matched &ldquo;{searchInput}&rdquo;. Try a different spelling or product name.
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-2 pt-2">

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import { Order } from '../../domain/types';
@@ -11,6 +11,7 @@ export const OrderSuccessPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isDark } = useTheme();
+  const confettiCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const order = (location.state as { order?: Order })?.order;
 
@@ -19,41 +20,47 @@ export const OrderSuccessPage: React.FC = () => {
   const customerName = order?.customerName || 'Valued Customer';
   const totalAmount = order ? formatINR(order.totalPaisa) : '₹4,999.00';
 
-  // Trigger celebratory confetti animation on page load
+  // Trigger celebratory confetti animation strictly inside the payment success card
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
+    const canvas = confettiCanvasRef.current;
+    if (prefersReducedMotion || !canvas) return;
 
-    // Center burst
-    confetti({
-      particleCount: 90,
+    const cardConfetti = confetti.create(canvas, { resize: true, useWorker: false });
+
+    // Center burst inside card
+    cardConfetti({
+      particleCount: 80,
       spread: 70,
-      origin: { y: 0.6 },
+      origin: { x: 0.5, y: 0.42 },
       colors: ['#FF000E', '#FF3B30', '#34C759', '#007AFF', '#FF9500', '#FFCC00'],
       disableForReducedMotion: true,
     });
 
-    // Secondary side bursts
+    // Secondary side bursts inside card
     const timer = setTimeout(() => {
-      confetti({
-        particleCount: 50,
+      cardConfetti({
+        particleCount: 45,
         angle: 60,
         spread: 55,
-        origin: { x: 0, y: 0.7 },
+        origin: { x: 0.1, y: 0.55 },
         colors: ['#FF000E', '#FF4D4D', '#FFD700', '#00C853'],
         disableForReducedMotion: true,
       });
-      confetti({
-        particleCount: 50,
+      cardConfetti({
+        particleCount: 45,
         angle: 120,
         spread: 55,
-        origin: { x: 1, y: 0.7 },
+        origin: { x: 0.9, y: 0.55 },
         colors: ['#FF000E', '#FF4D4D', '#FFD700', '#00C853'],
         disableForReducedMotion: true,
       });
     }, 250);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      cardConfetti.reset();
+    };
   }, []);
 
   return (
@@ -95,6 +102,12 @@ export const OrderSuccessPage: React.FC = () => {
         <div className={`p-6 sm:p-8 rounded-xl border text-center space-y-6 shadow-sm relative overflow-hidden ${
           isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2]'
         }`}>
+          {/* Card-Scoped Confetti Canvas */}
+          <canvas
+            ref={confettiCanvasRef}
+            className="pointer-events-none absolute inset-0 w-full h-full z-20"
+            aria-hidden="true"
+          />
 
           {/* Decorative Confetti & Accent Dots (Reference Alignment) */}
           <div className="absolute inset-x-0 top-6 flex justify-around pointer-events-none opacity-80" aria-hidden="true">

@@ -1,14 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../../application/CartContext';
 import { useAuth } from '../../application/AuthContext';
-import { ThemeToggle } from '../ui/ThemeToggle';
-import { Product } from '../../domain/types';
-import { productRepository } from '../../infrastructure/repositories';
-import { searchProductsWithFuse } from '../../infrastructure/search/searchService';
-import { formatINR } from '../../domain/services/CurrencyService';
-import { trackSearchPerformed } from '../../infrastructure/analytics/posthog';
 import { useTheme } from '../../application/ThemeContext';
+import { ThemeToggle } from '../ui/ThemeToggle';
+import { trackSearchPerformed } from '../../infrastructure/analytics/posthog';
+
+export type CatalogueSortOption = 'relevance' | 'price-asc' | 'price-desc' | 'rating-desc';
+
+const SORT_OPTIONS: { value: CatalogueSortOption; label: string }[] = [
+  { value: 'relevance', label: 'Best Match / Relevance' },
+  { value: 'price-asc', label: 'Price: Low to High' },
+  { value: 'price-desc', label: 'Price: High to Low' },
+  { value: 'rating-desc', label: 'Customer Rating (Highest)' },
+];
+
 export const ANNOUNCEMENT_MESSAGES = [
   { text: 'Fast Surface Dispatch via BlueDart & Delhivery Express Logistics', icon: 'bi-box-seam-fill' },
   { text: 'Verified OEM Equipment Guaranteed', icon: 'bi-patch-check-fill' },
@@ -20,59 +26,91 @@ export const Navbar: React.FC = () => {
   const { itemCount } = useCart();
   const { user, openAuthModal } = useAuth();
   const { isDark } = useTheme();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [searchResults, setSearchResults] = useState<Product[]>([]);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const searchContainerRef = useRef<HTMLDivElement>(null);
-  const mobileSearchRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
   const navigate = useNavigate();
 
-  // Load products for instant client-side Fuse.js fuzzy indexing
-  useEffect(() => {
-    let isMounted = true;
-    productRepository
-      .getAll({ limit: 100 })
-      .then((res) => {
-        if (isMounted) setAllProducts(res.products);
-      })
-      .catch(console.error);
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Instant typo-tolerant Fuse.js search on query change
-  useEffect(() => {
-    const trimmed = searchQuery.trim();
-    if (!trimmed) {
-      setSearchResults([]);
-      setIsDropdownOpen(false);
-      return;
+  const [searchQuery, setSearchQuery] = useState(() => {
+    if (typeof window !== 'undefined' && window.location.pathname === '/catalogue') {
+      return new URLSearchParams(window.location.search).get('search') || '';
     }
+    return '';
+  });
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [viewportOffsetTop, setViewportOffsetTop] = useState(0);
+  const [openSortMenu, setOpenSortMenu] = useState<'desktop' | 'mobile' | null>(null);
 
-    const matches = searchProductsWithFuse(allProducts, trimmed, { limit: 5 });
-    setSearchResults(matches);
-    setIsDropdownOpen(true);
-  }, [searchQuery, allProducts]);
+  const desktopInputRef = useRef<HTMLInputElement>(null);
+  const mobileInputRef = useRef<HTMLInputElement>(null);
+  const desktopSortRef = useRef<HTMLDivElement>(null);
+  const mobileSortRef = useRef<HTMLDivElement>(null);
+  const activeSearchInputRef = useRef<'desktop' | 'mobile' | null>(null);
 
-  // Click outside to close search suggestions dropdown
+  const rawSort =
+    location.pathname === '/catalogue'
+      ? new URLSearchParams(location.search).get('sort')
+      : null;
+  const activeSort: CatalogueSortOption =
+    rawSort === 'price-asc' || rawSort === 'price-desc' || rawSort === 'rating-desc'
+      ? rawSort
+      : 'relevance';
+
+  // Close sort menu on outside click or Escape key
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        searchContainerRef.current &&
-        !searchContainerRef.current.contains(e.target as Node) &&
-        mobileSearchRef.current &&
-        !mobileSearchRef.current.contains(e.target as Node)
-      ) {
-        setIsDropdownOpen(false);
+    if (!openSortMenu) return;
+
+    const handlePointerDown = (e: MouseEvent) => {
+      const container = openSortMenu === 'desktop' ? desktopSortRef.current : mobileSortRef.current;
+      if (container && !container.contains(e.target as Node)) {
+        setOpenSortMenu(null);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpenSortMenu(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [openSortMenu]);
+
+  // Sync header search input with URL query when not actively focused in the input
+  useEffect(() => {
+    const isDesktopFocused = document.activeElement === desktopInputRef.current;
+    const isMobileFocused = document.activeElement === mobileInputRef.current;
+    if (isDesktopFocused || isMobileFocused) return;
+
+    if (location.pathname === '/catalogue') {
+      const urlSearch = new URLSearchParams(location.search).get('search') || '';
+      setSearchQuery(urlSearch);
+    } else {
+      setSearchQuery('');
+    }
+  }, [location.pathname, location.search]);
+
+  // Keep header pinned to the visual viewport top when mobile virtual keyboard opens
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    const syncViewport = () => {
+      const offset = Math.max(0, Math.round(vv.offsetTop));
+      setViewportOffsetTop((prev) => (prev === offset ? prev : offset));
+    };
+
+    syncViewport();
+    vv.addEventListener('resize', syncViewport);
+    vv.addEventListener('scroll', syncViewport);
+
+    return () => {
+      vv.removeEventListener('resize', syncViewport);
+      vv.removeEventListener('scroll', syncViewport);
+    };
   }, []);
 
   // Smooth scroll listener with hysteresis to avoid boundary jitter/stutter
@@ -99,20 +137,134 @@ export const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      trackSearchPerformed(searchQuery.trim(), searchResults.length, 'navbar');
-      setIsDropdownOpen(false);
-      navigate(`/catalogue?search=${encodeURIComponent(searchQuery.trim())}`);
+  const preserveInputFocus = (source: 'desktop' | 'mobile') => {
+    const ref = source === 'desktop' ? desktopInputRef : mobileInputRef;
+    requestAnimationFrame(() => {
+      if (ref.current && document.activeElement !== ref.current) {
+        ref.current.focus({ preventScroll: true });
+      }
+    });
+  };
+
+  const handleSearchFocus = (source: 'desktop' | 'mobile') => {
+    activeSearchInputRef.current = source;
+    const vv = window.visualViewport;
+    if (vv) {
+      const sync = () => setViewportOffsetTop(Math.max(0, Math.round(vv.offsetTop)));
+      sync();
+      setTimeout(sync, 80);
+      setTimeout(sync, 250);
     }
   };
 
-  const handleSelectProduct = (slug: string) => {
-    setIsDropdownOpen(false);
-    setSearchQuery('');
-    navigate(`/product/${slug}`);
+  const handleSearchInputChange = (value: string, source: 'desktop' | 'mobile') => {
+    setSearchQuery(value);
+    activeSearchInputRef.current = source;
+
+    if (location.pathname !== '/catalogue') {
+      if (value.length > 0) {
+        const target = value.trim()
+          ? `/catalogue?search=${encodeURIComponent(value)}`
+          : '/catalogue';
+        navigate(target);
+        preserveInputFocus(source);
+      }
+      return;
+    }
+
+    const nextParams = new URLSearchParams(location.search);
+    if (value.trim()) {
+      nextParams.set('search', value);
+    } else {
+      nextParams.delete('search');
+    }
+    const qs = nextParams.toString();
+    navigate(`/catalogue${qs ? `?${qs}` : ''}`, { replace: true });
+    preserveInputFocus(source);
   };
+
+  const handleClearSearch = (source: 'desktop' | 'mobile') => {
+    setSearchQuery('');
+    if (location.pathname === '/catalogue') {
+      const nextParams = new URLSearchParams(location.search);
+      nextParams.delete('search');
+      const qs = nextParams.toString();
+      navigate(`/catalogue${qs ? `?${qs}` : ''}`, { replace: true });
+    }
+    preserveInputFocus(source);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = searchQuery.trim();
+    if (trimmed) {
+      trackSearchPerformed(trimmed, 0, 'navbar');
+      navigate(`/catalogue?search=${encodeURIComponent(trimmed)}`, {
+        replace: location.pathname === '/catalogue',
+      });
+    } else if (location.pathname !== '/catalogue') {
+      navigate('/catalogue');
+    }
+  };
+
+  const handleSelectSort = (sortValue: CatalogueSortOption) => {
+    const nextParams = new URLSearchParams(location.pathname === '/catalogue' ? location.search : '');
+    if (sortValue === 'relevance') {
+      nextParams.delete('sort');
+    } else {
+      nextParams.set('sort', sortValue);
+    }
+    if (location.pathname !== '/catalogue' && searchQuery.trim()) {
+      nextParams.set('search', searchQuery.trim());
+    }
+    const qs = nextParams.toString();
+    navigate(`/catalogue${qs ? `?${qs}` : ''}`, { replace: location.pathname === '/catalogue' });
+    setOpenSortMenu(null);
+  };
+
+  const renderSortDropdown = () => (
+    <div
+      role="menu"
+      aria-label="Sort products"
+      className={`absolute right-0 top-full mt-2 w-60 rounded-2xl border shadow-2xl overflow-hidden z-50 ${
+        isDark
+          ? 'bg-[#0E0A0B] border-[#261619] text-[#F1EEEE]'
+          : 'bg-white border-[#E0DBD2] text-[#140E10]'
+      }`}
+    >
+      <div
+        className={`px-3.5 py-2 border-b text-[11px] font-mono font-bold uppercase tracking-wider ${
+          isDark ? 'border-[#261619] text-slate-400' : 'border-[#E0DBD2] text-[#5C5456]'
+        }`}
+      >
+        Sort By
+      </div>
+      <div className="py-1">
+        {SORT_OPTIONS.map((opt) => {
+          const isSelected = activeSort === opt.value;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              role="menuitemradio"
+              aria-checked={isSelected}
+              onClick={() => handleSelectSort(opt.value)}
+              className={`w-full px-3.5 py-2.5 text-left text-xs font-medium flex items-center justify-between gap-2 transition-colors cursor-pointer ${
+                isSelected
+                  ? 'text-[#FF000E] font-bold bg-[#FF000E]/10'
+                  : isDark
+                    ? 'hover:bg-white/5 text-[#F1EEEE]'
+                    : 'hover:bg-black/5 text-[#140E10]'
+              }`}
+            >
+              <span>{opt.label}</span>
+              {isSelected && <i className="bi bi-check2 text-sm text-[#FF000E]" aria-hidden="true" />}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
 
   const handleProfileClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -125,7 +277,14 @@ export const Navbar: React.FC = () => {
 
   return (
     <header
-      className={`sticky top-0 z-40 transition-all duration-500 ease-in-out ${
+      style={
+        viewportOffsetTop > 0
+          ? { transform: `translate3d(0, ${viewportOffsetTop}px, 0)` }
+          : undefined
+      }
+      className={`sticky top-0 z-40 ${
+        viewportOffsetTop > 0 ? 'transition-none' : 'transition-all duration-500 ease-in-out'
+      } ${
         isScrolled
           ? 'bg-[#0A0808]/95 backdrop-blur-md border-b border-[#221215] shadow-xl rounded-b-[32px] text-white'
           : 'bg-[#0A0808] border-b border-[#221215]/60 text-white'
@@ -169,8 +328,8 @@ export const Navbar: React.FC = () => {
             </Link>
           </div>
 
-          {/* Desktop Giant Pill Search Bar with Fuse.js Instant Results */}
-          <div ref={searchContainerRef} className="flex-1 max-w-xl relative mx-4">
+          {/* Desktop Giant Pill Search Bar — typing auto-opens Categories tab */}
+          <div ref={desktopSortRef} className="flex-1 max-w-xl relative mx-4">
             <form onSubmit={handleSearchSubmit} className="relative">
               <div className="relative w-full flex items-center">
                 <i
@@ -178,112 +337,45 @@ export const Navbar: React.FC = () => {
                   aria-hidden="true"
                 />
                 <input
+                  ref={desktopInputRef}
                   type="text"
+                  aria-label="Search accessories"
                   placeholder="What's on your mind? Search accessories..."
                   value={searchQuery}
-                  onFocus={() => searchQuery.trim() && setIsDropdownOpen(true)}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-full pl-11 pr-11 py-2.5 text-sm font-normal shadow-sm border border-transparent focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-sans bg-white text-gray-900 placeholder:text-gray-500"
+                  onFocus={() => handleSearchFocus('desktop')}
+                  onChange={(e) => handleSearchInputChange(e.target.value, 'desktop')}
+                  className="w-full rounded-full pl-11 pr-16 py-2.5 text-sm font-normal shadow-sm border border-transparent focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all font-sans bg-white text-gray-900 placeholder:text-gray-500"
                 />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => handleClearSearch('desktop')}
+                    aria-label="Clear search"
+                    className="absolute right-10 text-gray-400 hover:text-gray-700 transition-colors cursor-pointer p-1"
+                  >
+                    <i className="bi bi-x-lg text-sm" aria-hidden="true" />
+                  </button>
+                )}
                 <button
-                  type="submit"
-                  aria-label="Filter or search"
-                  className="absolute right-3.5 text-gray-500 hover:text-brand-600 transition-colors cursor-pointer"
+                  type="button"
+                  onClick={() => setOpenSortMenu((prev) => (prev === 'desktop' ? null : 'desktop'))}
+                  aria-label="Sort products"
+                  aria-expanded={openSortMenu === 'desktop'}
+                  aria-haspopup="menu"
+                  className={`absolute right-3.5 transition-colors cursor-pointer p-1 ${
+                    activeSort !== 'relevance' || openSortMenu === 'desktop'
+                      ? 'text-[#FF000E]'
+                      : 'text-gray-500 hover:text-brand-600'
+                  }`}
                 >
                   <i className="bi bi-sliders text-base" aria-hidden="true" />
+                  {activeSort !== 'relevance' && (
+                    <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-[#FF000E]" />
+                  )}
                 </button>
               </div>
             </form>
-
-            {/* Instant Typo-Tolerant Search Dropdown (Fuse.js) */}
-            {isDropdownOpen && searchQuery.trim() && (
-              <div
-                className={`absolute top-full left-0 right-0 mt-2 rounded-2xl border shadow-2xl overflow-hidden z-50 backdrop-blur-xl animate-in fade-in slide-in-from-top-1 duration-150 ${
-                  isDark
-                    ? 'bg-[#0E0A0B]/95 border-[#261619] text-[#F1EEEE]'
-                    : 'bg-white/95 border-[#E0DBD2] text-[#140E10]'
-                }`}
-              >
-                <div
-                  className={`px-4 py-2 border-b flex items-center justify-between text-[11px] font-mono ${
-                    isDark ? 'border-[#261619] text-gray-400' : 'border-[#E0DBD2] text-gray-500'
-                  }`}
-                >
-                  <span className="flex items-center gap-1.5 font-bold uppercase tracking-wider">
-                    <i className="bi bi-lightning-charge-fill text-[#FF000E]" />
-                    <span>Instant Results</span>
-                  </span>
-                  <span className="px-2 py-0.5 rounded text-[10px] bg-red-500/10 text-[#FF000E] border border-red-500/20">
-                    Typo-Tolerant (Fuse.js)
-                  </span>
-                </div>
-
-                <div className="max-h-80 overflow-y-auto divide-y divide-gray-100 dark:divide-[#261619]/60">
-                  {searchResults.length > 0 ? (
-                    searchResults.map((product) => (
-                      <div
-                        key={product.id}
-                        onClick={() => handleSelectProduct(product.slug)}
-                        className={`p-3 flex items-center gap-3 transition-colors cursor-pointer ${
-                          isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'
-                        }`}
-                      >
-                        <div
-                          className={`w-11 h-11 rounded-lg border flex items-center justify-center overflow-hidden shrink-0 ${
-                            isDark ? 'bg-black/40 border-[#261619]' : 'bg-[#F5F3EE] border-[#E0DBD2]'
-                          }`}
-                        >
-                          <img
-                            src={product.images[0]?.url || '/logos/shrell-brandicon_no-bg.png'}
-                            alt={product.name}
-                            className="w-full h-full object-contain p-1"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-xs font-semibold truncate leading-snug">
-                            {product.name}
-                          </h4>
-                          <div className="flex items-center gap-2 mt-0.5 text-[10px] font-mono">
-                            <span className="text-[#FF000E] font-bold">
-                              {formatINR(product.pricePaisa)}
-                            </span>
-                            {product.categoryName && (
-                              <span
-                                className={`truncate px-1.5 py-0.5 rounded ${
-                                  isDark ? 'bg-white/10 text-gray-300' : 'bg-black/5 text-gray-600'
-                                }`}
-                              >
-                                {product.categoryName}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <i className="bi bi-chevron-right text-xs opacity-40 shrink-0" />
-                      </div>
-                    ))
-                  ) : (
-                    <div className="p-6 text-center text-xs opacity-60">
-                      No matching products for "{searchQuery}". Try a different spelling or part name.
-                    </div>
-                  )}
-                </div>
-
-                {searchResults.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={handleSearchSubmit}
-                    className={`w-full py-2.5 px-4 text-center text-xs font-bold font-mono transition-colors border-t cursor-pointer flex items-center justify-center gap-1.5 ${
-                      isDark
-                        ? 'bg-black/40 hover:bg-black/80 border-[#261619] text-[#FF000E]'
-                        : 'bg-gray-50 hover:bg-gray-100 border-[#E0DBD2] text-[#FF000E]'
-                    }`}
-                  >
-                    <span>View all matches in Catalogue</span>
-                    <i className="bi bi-arrow-right text-[11px]" />
-                  </button>
-                )}
-              </div>
-            )}
+            {openSortMenu === 'desktop' && renderSortDropdown()}
           </div>
 
           {/* Desktop Nav Links (Home, Categories, Cart, Profile) */}
@@ -358,113 +450,52 @@ export const Navbar: React.FC = () => {
             </div>
           </div>
 
-          {/* Search Bar: Persistently fixed and visible on mobile even when scrolling */}
-          <div ref={mobileSearchRef} className="mt-2.5 relative">
+          {/* Search Bar: Persistently fixed and visible on mobile even when keyboard opens */}
+          <div ref={mobileSortRef} className="mt-2.5 relative">
             <form onSubmit={handleSearchSubmit} className="relative">
               <i
                 className="bi bi-search text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 text-sm pointer-events-none"
                 aria-hidden="true"
               />
               <input
+                ref={mobileInputRef}
                 type="text"
+                aria-label="Search parts"
                 placeholder="What's on your mind? Search parts..."
                 value={searchQuery}
-                onFocus={() => searchQuery.trim() && setIsDropdownOpen(true)}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-full pl-10 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 font-sans shadow-xs bg-white text-gray-900 placeholder:text-gray-500"
+                onFocus={() => handleSearchFocus('mobile')}
+                onChange={(e) => handleSearchInputChange(e.target.value, 'mobile')}
+                className="w-full rounded-full pl-10 pr-16 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 font-sans shadow-xs bg-white text-gray-900 placeholder:text-gray-500"
               />
-              {searchQuery ? (
+              {searchQuery && (
                 <button
                   type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                  onClick={() => handleClearSearch('mobile')}
+                  className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer p-1"
                   aria-label="Clear search"
                 >
-                  <i className="bi bi-x text-base" />
-                </button>
-              ) : (
-                <button type="submit" className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer" aria-label="Search filter">
-                  <i className="bi bi-sliders text-sm" aria-hidden="true" />
+                  <i className="bi bi-x text-base" aria-hidden="true" />
                 </button>
               )}
-            </form>
-
-            {/* Mobile Instant Typo-Tolerant Search Dropdown (Fuse.js) */}
-            {isDropdownOpen && searchQuery.trim() && (
-              <div
-                className={`absolute top-full left-0 right-0 mt-2 rounded-2xl border shadow-2xl overflow-hidden z-50 backdrop-blur-xl animate-in fade-in slide-in-from-top-1 duration-150 ${
-                  isDark
-                    ? 'bg-[#0E0A0B]/95 border-[#261619] text-[#F1EEEE]'
-                    : 'bg-white/95 border-[#E0DBD2] text-[#140E10]'
+              <button
+                type="button"
+                onClick={() => setOpenSortMenu((prev) => (prev === 'mobile' ? null : 'mobile'))}
+                className={`absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer p-1 transition-colors ${
+                  activeSort !== 'relevance' || openSortMenu === 'mobile'
+                    ? 'text-[#FF000E]'
+                    : 'text-gray-500 hover:text-brand-600'
                 }`}
+                aria-label="Sort products"
+                aria-expanded={openSortMenu === 'mobile'}
+                aria-haspopup="menu"
               >
-                <div
-                  className={`px-3 py-1.5 border-b flex items-center justify-between text-[10px] font-mono ${
-                    isDark ? 'border-[#261619] text-gray-400' : 'border-[#E0DBD2] text-gray-500'
-                  }`}
-                >
-                  <span className="flex items-center gap-1 font-bold uppercase">
-                    <i className="bi bi-lightning-charge-fill text-[#FF000E]" />
-                    <span>Quick Results</span>
-                  </span>
-                  <span className="text-[#FF000E]">Fuse.js Fuzzy</span>
-                </div>
-
-                <div className="max-h-64 overflow-y-auto divide-y divide-gray-100 dark:divide-[#261619]/60">
-                  {searchResults.length > 0 ? (
-                    searchResults.map((product) => (
-                      <div
-                        key={product.id}
-                        onClick={() => handleSelectProduct(product.slug)}
-                        className={`p-2.5 flex items-center gap-2.5 transition-colors cursor-pointer ${
-                          isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'
-                        }`}
-                      >
-                        <div
-                          className={`w-9 h-9 rounded-lg border flex items-center justify-center overflow-hidden shrink-0 ${
-                            isDark ? 'bg-black/40 border-[#261619]' : 'bg-[#F5F3EE] border-[#E0DBD2]'
-                          }`}
-                        >
-                          <img
-                            src={product.images[0]?.url || '/logos/shrell-brandicon_no-bg.png'}
-                            alt={product.name}
-                            className="w-full h-full object-contain p-0.5"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-xs font-semibold truncate leading-tight">
-                            {product.name}
-                          </h4>
-                          <span className="text-[11px] font-bold text-[#FF000E] font-mono">
-                            {formatINR(product.pricePaisa)}
-                          </span>
-                        </div>
-                        <i className="bi bi-chevron-right text-xs opacity-40 shrink-0" />
-                      </div>
-                    ))
-                  ) : (
-                    <div className="p-4 text-center text-xs opacity-60">
-                      No matching products.
-                    </div>
-                  )}
-                </div>
-
-                {searchResults.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={handleSearchSubmit}
-                    className={`w-full py-2 px-3 text-center text-[11px] font-bold font-mono transition-colors border-t cursor-pointer flex items-center justify-center gap-1.5 ${
-                      isDark
-                        ? 'bg-black/40 hover:bg-black/80 border-[#261619] text-[#FF000E]'
-                        : 'bg-gray-50 hover:bg-gray-100 border-[#E0DBD2] text-[#FF000E]'
-                    }`}
-                  >
-                    <span>View all in Catalogue</span>
-                    <i className="bi bi-arrow-right text-[10px]" />
-                  </button>
+                <i className="bi bi-sliders text-sm" aria-hidden="true" />
+                {activeSort !== 'relevance' && (
+                  <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-[#FF000E]" />
                 )}
-              </div>
-            )}
+              </button>
+            </form>
+            {openSortMenu === 'mobile' && renderSortDropdown()}
           </div>
         </div>
       </div>

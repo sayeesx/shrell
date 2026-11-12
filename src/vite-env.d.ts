@@ -21,3 +21,14 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+declare module 'country-telephone-data' {
+  export interface CountryDataItem {
+    name: string;
+    iso2: string;
+    dialCode: string;
+    priority: number;
+    format?: string;
+  }
+  export const allCountries: CountryDataItem[];
+}

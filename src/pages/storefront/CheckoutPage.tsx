@@ -10,6 +10,7 @@ import { useTheme } from '../../application/ThemeContext';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { StateSearchDropdown } from '../../components/checkout/StateSearchDropdown';
 import { CheckoutFlowTopBar } from '../../components/checkout/CheckoutFlowTopBar';
+import { CountryCodeDropdown } from '../../components/checkout/CountryCodeDropdown';
 import { LeaveCheckoutConfirmModal } from '../../components/checkout/LeaveCheckoutConfirmModal';
 import { usePostalPincode } from '../../hooks/usePostalPincode';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
@@ -21,24 +22,6 @@ import {
 } from '../../infrastructure/analytics/posthog';
 
 type CheckoutStep = 'address' | 'payment';
-
-const COUNTRY_DIAL_CODES = [
-  { code: 'IN', dial: '+91', label: 'India' },
-  { code: 'US', dial: '+1', label: 'United States' },
-  { code: 'AE', dial: '+971', label: 'UAE' },
-  { code: 'GB', dial: '+44', label: 'United Kingdom' },
-  { code: 'SG', dial: '+65', label: 'Singapore' },
-  { code: 'AU', dial: '+61', label: 'Australia' },
-  { code: 'CA', dial: '+1', label: 'Canada' },
-  { code: 'DE', dial: '+49', label: 'Germany' },
-  { code: 'SA', dial: '+966', label: 'Saudi Arabia' },
-  { code: 'QA', dial: '+974', label: 'Qatar' },
-  { code: 'OM', dial: '+968', label: 'Oman' },
-  { code: 'KW', dial: '+965', label: 'Kuwait' },
-  { code: 'BH', dial: '+973', label: 'Bahrain' },
-  { code: 'MY', dial: '+60', label: 'Malaysia' },
-  { code: 'JP', dial: '+81', label: 'Japan' },
-];
 
 export const CheckoutPage: React.FC = () => {
   const { cart, clearCart } = useCart();
@@ -72,7 +55,8 @@ export const CheckoutPage: React.FC = () => {
 
   // Form Fields - Auto-fill from logged in user details ONLY if valid
   const [fullName, setFullName] = useState(() => (user?.name && user.name !== 'Valued Customer' ? user.name : ''));
-  const [countryOption, setCountryOption] = useState('IN:+91');
+  const [countryOption, setCountryOption] = useState('in:+91');
+  const selectedCountryIso2 = countryOption.split(':')[0] || 'in';
   const countryDialCode = countryOption.split(':')[1] || '+91';
   const [phone, setPhone] = useState(() => {
     if (user?.phone) {
@@ -397,30 +381,10 @@ export const CheckoutPage: React.FC = () => {
                       Mobile Number *
                     </label>
                     <div className="flex items-stretch gap-2">
-                      <div className="relative shrink-0">
-                        <select
-                          aria-label="Country code"
-                          value={countryOption}
-                          onChange={(e) => setCountryOption(e.target.value)}
-                          className={`appearance-none h-full rounded-lg pl-3 pr-7 py-3 text-[13px] font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] cursor-pointer ${
-                            isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
-                          }`}
-                        >
-                          {COUNTRY_DIAL_CODES.map((c) => (
-                            <option
-                              key={c.code}
-                              value={`${c.code}:${c.dial}`}
-                              className={isDark ? 'bg-[#0E0A0B] text-white' : 'bg-white text-[#140E10]'}
-                            >
-                              {c.code} {c.dial}
-                            </option>
-                          ))}
-                        </select>
-                        <i
-                          className="bi bi-chevron-down text-[10px] text-gray-400 pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2"
-                          aria-hidden="true"
-                        />
-                      </div>
+                      <CountryCodeDropdown
+                        selectedIso2={selectedCountryIso2}
+                        onChange={(country) => setCountryOption(`${country.iso2}:+${country.dialCode}`)}
+                      />
                       <div className="relative flex-1 min-w-0">
                         <input
                           type="tel"

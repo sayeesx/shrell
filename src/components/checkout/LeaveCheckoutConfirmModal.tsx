@@ -11,7 +11,7 @@ export interface LeaveCheckoutConfirmModalProps {
 
 /**
  * Confirmation modal shown when user clicks Back on Cart, Delivery Address, or Payment Method.
- * Renders as a bottom-anchored sheet on mobile and centered popup on desktop.
+ * Anchors sad-cat art flush to the bottom-right margin inside a desktop popup or mobile bottom sheet.
  */
 export const LeaveCheckoutConfirmModal: React.FC<LeaveCheckoutConfirmModalProps> = ({
   isOpen,
@@ -47,36 +47,37 @@ export const LeaveCheckoutConfirmModal: React.FC<LeaveCheckoutConfirmModalProps>
 
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative z-10 w-full md:max-w-md rounded-t-2xl md:rounded-2xl border p-5 sm:p-6 pb-7 sm:pb-6 text-center space-y-4 transition-transform ${
+        className={`relative z-10 w-full md:max-w-md rounded-t-2xl md:rounded-2xl border p-5 sm:p-6 pb-6 text-left overflow-hidden min-h-[220px] transition-transform ${
           isDark
             ? 'bg-[#0A0A0A] border-[#261619] text-[#F1EEEE]'
             : 'bg-white border-[#E0DBD2] text-[#140E10]'
         }`}
       >
         {/* Drag pill indicator for mobile bottom sheet */}
-        <div className="md:hidden w-10 h-1 rounded-full bg-current opacity-20 mx-auto -mt-1" aria-hidden="true" />
+        <div className="md:hidden w-10 h-1 rounded-full bg-current opacity-20 mx-auto mb-3" aria-hidden="true" />
 
-        <img
-          src="/images/cat-sad.webp"
-          alt="Sad cat hoping you complete your order"
-          className="w-36 h-36 sm:w-40 sm:h-40 mx-auto object-contain bg-transparent border-0 shadow-none"
-          style={{ boxShadow: 'none', background: 'transparent' }}
-        />
-
-        <div className="space-y-1.5">
+        <div className="relative z-10 pr-24 sm:pr-32 space-y-2">
           <h2 id="leave-checkout-title" className="text-lg sm:text-xl font-bold tracking-tight">
             Wait... are you sure you want to leave?
           </h2>
           <p className={`text-xs sm:text-sm leading-relaxed ${isDark ? 'text-[#A8A0A2]' : 'text-[#5C5456]'}`}>
-            Your gear is packed in the bay and even Milo looks heartbroken. Do you truly wish to leave your order behind?
+            Your automotive gear is already queued for dispatch. Do you truly wish to head back and leave your order behind?
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
+        {/* Left action column sized clear of bottom-right cat image */}
+        <div className="relative z-10 mt-5 w-[calc(100%-7.25rem)] sm:w-[calc(100%-9.25rem)] flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={onContinueOrder}
+            className="w-full py-2.5 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer"
+          >
+            Complete Order
+          </button>
           <button
             type="button"
             onClick={onConfirmLeave}
-            className={`w-full sm:w-1/2 py-3 px-4 rounded-xl border text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
+            className={`w-full py-2.5 px-4 rounded-xl border text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
               isDark
                 ? 'border-[#2B2B2B] bg-[#141414] hover:bg-[#1E1E1E] text-[#F1EEEE]'
                 : 'border-[#D0C9BE] bg-[#F5F3EE] hover:bg-[#EDE9E1] text-[#140E10]'
@@ -84,14 +85,15 @@ export const LeaveCheckoutConfirmModal: React.FC<LeaveCheckoutConfirmModalProps>
           >
             I Will Go Back
           </button>
-          <button
-            type="button"
-            onClick={onContinueOrder}
-            className="w-full sm:w-1/2 py-3 px-4 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer"
-          >
-            Complete Order
-          </button>
         </div>
+
+        {/* Sad cat attached strictly to bottom-right margin with zero background or shadow */}
+        <img
+          src="/images/cat-sad.webp"
+          alt="Sad cat hoping you complete your order"
+          className="pointer-events-none select-none absolute right-0 bottom-0 w-28 h-28 sm:w-36 sm:h-36 object-contain object-right-bottom bg-transparent border-0 shadow-none"
+          style={{ boxShadow: 'none', background: 'transparent' }}
+        />
       </div>
     </div>,
     document.body

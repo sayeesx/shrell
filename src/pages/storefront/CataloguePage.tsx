@@ -233,7 +233,7 @@ export const CataloguePage: React.FC = () => {
                     Is that you, Milo?
                   </h3>
                   <p className={`text-xs sm:text-sm max-w-md mx-auto ${isDark ? 'text-neutral-400' : 'text-[#5C5456]'}`}>
-                    Milo must be walking on the keyboard again. Try searching a real accessory name!
+                    Looks like Milo is typing on the keyboard again! Try searching a real accessory name.
                   </p>
                 </div>
                 <img

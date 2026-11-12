@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../../application/ThemeContext';
+import { PaymentMethodIcons } from '../common/PaymentMethodIcons';
 
 export const Footer: React.FC = () => {
   const { isDark } = useTheme();
@@ -71,16 +72,13 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Legal & GST Bar */}
-        <div className={`mt-10 pt-6 border-t flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono gap-4 ${isDark ? 'border-[#221215]/80 text-slate-500' : 'border-[#E0DBD2]/80 text-[#8E8587]'}`}>
-          <p>© {new Date().getFullYear()} SHRELL Automotive India Private Limited. All rights reserved.</p>
-          <div className="flex items-center gap-3">
+        <div className={`mt-10 pt-6 border-t flex flex-col md:flex-row items-center justify-between text-[11px] font-mono gap-4 ${isDark ? 'border-[#221215]/80 text-slate-500' : 'border-[#E0DBD2]/80 text-[#8E8587]'}`}>
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-center sm:text-left">
+            <p>© {new Date().getFullYear()} SHRELL Automotive India Private Limited. All rights reserved.</p>
+            <span className="hidden sm:inline">•</span>
             <span>GSTIN: 27AABCV1234F1Z8</span>
-            <span>•</span>
-            <span className="flex items-center gap-1">
-              <i className="bi bi-credit-card-2-front" aria-hidden="true"></i>
-              Direct UPI &amp; COD Supported
-            </span>
           </div>
+          <PaymentMethodIcons />
         </div>
       </div>
     </footer>

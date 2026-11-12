@@ -19,7 +19,7 @@ import {
 import { INITIAL_PRODUCTS } from '../../infrastructure/repositories/seedData';
 import { useTheme } from '../../application/ThemeContext';
 
-export const AdminSanity: React.FC = () => {
+export const AdminSanity: React.FC<{ embedded?: boolean }> = ({ embedded = false }) => {
   const { isDark } = useTheme();
   const [config, setConfig] = useState<SanityConfig>(getSanityConfig());
   const [showToken, setShowToken] = useState(false);
@@ -322,17 +322,23 @@ export const banner = defineType({
 });`;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 py-6">
+    <div className={embedded ? 'space-y-6 w-full' : 'space-y-6 w-full px-2 sm:px-4 py-4'}>
       {/* Page Header */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-5 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${isDark ? 'border-[#222222]' : 'border-slate-200'}`}>
         <div>
           <div className="flex items-center gap-2.5">
-            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isDark ? 'bg-slate-800 text-slate-200 border border-slate-700' : 'bg-slate-100 text-slate-800 border border-slate-200'}`}>
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isDark ? 'bg-[#141414] text-slate-200 border border-[#222222]' : 'bg-slate-100 text-slate-800 border border-slate-200'}`}>
               <i className="bi bi-stars text-sm" aria-hidden="true" />
             </div>
-            <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              Sanity CMS Integration Hub
-            </h1>
+            {embedded ? (
+              <h2 className={`text-base sm:text-lg font-bold font-mono tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Sanity CMS Integration Hub
+              </h2>
+            ) : (
+              <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Sanity CMS Integration Hub
+              </h1>
+            )}
           </div>
           <p className={`text-xs mt-1 font-sans ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             Connect Sanity Headless CMS for live product catalogue, image management, and real-time storefront synchronization.

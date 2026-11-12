@@ -9,7 +9,11 @@ interface CartContextType {
   cart: Cart;
   settings: StoreSettings;
   refreshSettings: () => Promise<void>;
-  addItem: (product: Product, quantity?: number) => { success: boolean; message?: string };
+  addItem: (
+    product: Product,
+    quantity?: number,
+    options?: { allowOutOfStockWaitlist?: boolean }
+  ) => { success: boolean; message?: string };
   updateQuantity: (productId: string, quantity: number) => void;
   removeItem: (productId: string) => void;
   clearCart: () => void;
@@ -86,8 +90,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const cart = calculateCart(items, coupon, settings);
 
-  const addItem = (product: Product, quantity = 1): { success: boolean; message?: string } => {
-    if (product.stockQuantity <= 0) {
+  const addItem = (
+    product: Product,
+    quantity = 1,
+    options?: { allowOutOfStockWaitlist?: boolean }
+  ): { success: boolean; message?: string } => {
+    const allowOutOfStock = Boolean(options?.allowOutOfStockWaitlist);
+    if (product.stockQuantity <= 0 && !allowOutOfStock) {
       return { success: false, message: `${product.name} is currently out of stock.` };
     }
 
@@ -97,10 +106,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (existingIndex > -1) {
       const existing = items[existingIndex];
       const targetQty = existing.quantity + quantity;
-      if (targetQty > product.stockQuantity) {
+      if (product.stockQuantity > 0 && targetQty > product.stockQuantity) {
         return {
           success: false,
           message: `Cannot add more. Only ${product.stockQuantity} units available in stock.`,
+        };
+      }
+      if (product.stockQuantity <= 0 && allowOutOfStock) {
+        return {
+          success: true,
+          message: "Saved in your cart. We'll send you a message once this item is restocked!",
         };
       }
       newItems = [...items];
@@ -110,27 +125,34 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         subtotalPaisa: targetQty * existing.unitPricePaisa,
       };
     } else {
-      if (quantity > product.stockQuantity) {
+      if (product.stockQuantity > 0 && quantity > product.stockQuantity) {
         return {
           success: false,
           message: `Only ${product.stockQuantity} units available in stock.`,
         };
       }
+      const addQty = product.stockQuantity <= 0 ? 1 : quantity;
       newItems = [
         ...items,
         {
           productId: product.id,
           product,
-          quantity,
+          quantity: addQty,
           unitPricePaisa: product.pricePaisa,
-          subtotalPaisa: quantity * product.pricePaisa,
+          subtotalPaisa: addQty * product.pricePaisa,
         },
       ];
     }
 
     setItems(newItems);
-    trackProductAddedToCart(product, quantity);
-    return { success: true };
+    trackProductAddedToCart(product, product.stockQuantity <= 0 ? 1 : quantity);
+    return {
+      success: true,
+      message:
+        product.stockQuantity <= 0
+          ? "Saved in your cart! We'll send you a message once this item is restocked."
+          : undefined,
+    };
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
@@ -142,7 +164,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setItems((prev) =>
       prev.map((item) => {
         if (item.productId === productId) {
-          const clamped = Math.min(quantity, item.product.stockQuantity);
+          const clamped =
+            item.product.stockQuantity > 0
+              ? Math.min(quantity, item.product.stockQuantity)
+              : 1;
           return {
             ...item,
             quantity: clamped,

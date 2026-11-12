@@ -10,6 +10,7 @@ import { useTheme } from '../../application/ThemeContext';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { StateSearchDropdown } from '../../components/checkout/StateSearchDropdown';
 import { CheckoutFlowTopBar } from '../../components/checkout/CheckoutFlowTopBar';
+import { LeaveCheckoutConfirmModal } from '../../components/checkout/LeaveCheckoutConfirmModal';
 import { usePostalPincode } from '../../hooks/usePostalPincode';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
 import {
@@ -339,12 +340,10 @@ export const CheckoutPage: React.FC = () => {
     }
   };
 
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
+
   const handleBackNavigation = () => {
-    if (currentStep === 'payment') {
-      setSearchParams({ step: 'address' });
-    } else {
-      navigate('/cart');
-    }
+    setIsLeaveModalOpen(true);
   };
 
   return (
@@ -844,6 +843,16 @@ export const CheckoutPage: React.FC = () => {
         )}
 
       </div>
+
+      {/* Sad Cat Exit Confirmation Modal */}
+      <LeaveCheckoutConfirmModal
+        isOpen={isLeaveModalOpen}
+        onContinueOrder={() => setIsLeaveModalOpen(false)}
+        onConfirmLeave={() => {
+          setIsLeaveModalOpen(false);
+          navigate('/');
+        }}
+      />
     </div>
   );
 };

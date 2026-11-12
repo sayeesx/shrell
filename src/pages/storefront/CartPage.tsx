@@ -10,6 +10,7 @@ import { useNavigationLoading } from '../../application/NavigationLoadingContext
 import { useTheme } from '../../application/ThemeContext';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
 import { CheckoutFlowTopBar } from '../../components/checkout/CheckoutFlowTopBar';
+import { LeaveCheckoutConfirmModal } from '../../components/checkout/LeaveCheckoutConfirmModal';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 import { trackCartViewed } from '../../infrastructure/analytics/posthog';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
@@ -25,6 +26,7 @@ export const CartPage: React.FC = () => {
   const [isApplying, setIsApplying] = useState(false);
   const [suggestions, setSuggestions] = useState<Product[]>([]);
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
 
   const handleImageError = (id: string) => {
     setFailedImages((prev) => ({ ...prev, [id]: true }));
@@ -426,7 +428,7 @@ export const CartPage: React.FC = () => {
       <div className="md:hidden">
         <CheckoutFlowTopBar
           title="My Cart"
-          onBack={() => navigate(-1)}
+          onBack={() => setIsLeaveModalOpen(true)}
           backLabel="Go back"
           rightSlot={<ThemeToggle compact />}
         />
@@ -790,11 +792,36 @@ export const CartPage: React.FC = () => {
 
         {/* Desktop Header */}
         <div className={`flex items-center justify-between border-b pb-4 ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
-          <div>
-            <h1 className="text-2xl lg:text-3xl font-extrabold tracking-tight">My Shopping Cart</h1>
-            <p className={`text-xs mt-1 ${isDark ? 'text-[#8E8587]' : 'text-[#706869]'}`}>
-              {cart.items.length} unique automotive equipment accessory item(s) selected
-            </p>
+          <div className="flex items-center gap-3.5">
+            <button
+              type="button"
+              onClick={() => setIsLeaveModalOpen(true)}
+              aria-label="Go back"
+              className={`w-9 h-9 rounded-full border flex items-center justify-center transition-colors cursor-pointer active:scale-95 ${
+                isDark
+                  ? 'bg-[#130E10] border-[#261619] text-[#F1EEEE] hover:bg-[#1C1416]'
+                  : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#140E10] hover:bg-[#EDE9E1]'
+              }`}
+            >
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-4 h-4 block"
+                aria-hidden="true"
+              >
+                <path d="M10.2 3.2L5.4 8L10.2 12.8" />
+              </svg>
+            </button>
+            <div>
+              <h1 className="text-2xl lg:text-3xl font-extrabold tracking-tight">My Shopping Cart</h1>
+              <p className={`text-xs mt-1 ${isDark ? 'text-[#8E8587]' : 'text-[#706869]'}`}>
+                {cart.items.length} unique automotive equipment accessory item(s) selected
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -1156,6 +1183,19 @@ export const CartPage: React.FC = () => {
 
       {/* Mobile Celebration Modal for Free Delivery (Portaled to document.body) */}
       {renderFreeDeliveryCelebrationModal()}
+
+      {/* Sad Cat Exit Confirmation Modal */}
+      <LeaveCheckoutConfirmModal
+        isOpen={isLeaveModalOpen}
+        onContinueOrder={() => {
+          setIsLeaveModalOpen(false);
+          navigate('/checkout');
+        }}
+        onConfirmLeave={() => {
+          setIsLeaveModalOpen(false);
+          navigate('/');
+        }}
+      />
     </div>
   );
 };

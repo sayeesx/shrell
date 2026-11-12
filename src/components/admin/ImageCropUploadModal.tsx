@@ -305,14 +305,14 @@ export const ImageCropUploadModal: React.FC<ImageCropUploadModalProps> = ({
 
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative z-10 w-full max-w-xl border rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col my-auto ${
-          isDark ? 'bg-[#120D0F] border-[#2C181C] text-[#F1EEEE]' : 'bg-white border-[#E0DBD2] text-[#140E10]'
+        className={`relative z-10 admin-modal-panel border rounded-2xl shadow-2xl overflow-hidden my-auto ${
+          isDark ? 'admin-modal-dark bg-[#0A0A0A] border-[#222222] text-[#F1EEEE]' : 'bg-white border-[#E0DBD2] text-[#140E10]'
         }`}
       >
         {/* Header */}
         <div
-          className={`px-5 py-3.5 border-b flex items-center justify-between gap-3 ${
-            isDark ? 'border-[#261619] bg-[#160F11]' : 'border-[#E0DBD2] bg-[#FAF8F4]'
+          className={`px-5 py-3.5 border-b shrink-0 flex items-center justify-between gap-3 ${
+            isDark ? 'border-[#222222] bg-[#050505]' : 'border-[#E0DBD2] bg-[#FAF8F4]'
           }`}
         >
           <div className="min-w-0">

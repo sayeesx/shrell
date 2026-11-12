@@ -155,26 +155,24 @@ html.light {
     scrollbar-width: none !important;
   }
 
-  /* Atmospheric red radial lighting behind main content (dark only) */
+  /* Solid black background in dark mode (no gradient washes) */
   .bg-atmospheric-red {
     background-color: var(--bg-base);
-    background-image:
-      radial-gradient(ellipse 90% 45% at 50% -10%, rgba(224, 0, 12, 0.14) 0%, rgba(101, 0, 8, 0.06) 40%, transparent 75%),
-      radial-gradient(circle at 50% 100%, rgba(176, 0, 10, 0.05) 0%, transparent 50%);
+    background-image: none;
   }
 
   html.light .bg-atmospheric-red {
     background-image: none;
   }
 
-  /* Editorial Card: dark black-to-crimson gradient cards with soft light blending */
+  /* Editorial Card: flat obsidian black in dark mode, warm neutral in light mode */
   .editorial-card {
-    background: linear-gradient(180deg, #130E10 0%, #0A0808 100%);
-    border: 1px solid #261619;
+    background: #0A0A0A;
+    border: 1px solid #222222;
   }
 
   html.light .editorial-card {
-    background: linear-gradient(180deg, #EDE9E1 0%, #F5F3EE 100%);
+    background: #F5F3EE;
     border: 1px solid #D6D0C7;
   }
 
@@ -466,6 +464,61 @@ html.light {
   -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
   backdrop-filter: blur(24px) saturate(180%) !important;
   pointer-events: auto;
+}
+
+/* Fluid 3/4 Viewport Admin Modal (auto-resizes smoothly across window dimensions) */
+.admin-modal-panel {
+  width: min(94vw, 1280px);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .admin-modal-panel {
+    width: 75vw;
+    height: 75vh;
+    min-height: 480px;
+    max-height: 88vh;
+  }
+}
+
+/* Pure Black Dark-Mode Neutralization for Admin Shell & Portaled Admin Modals (Zero dark-blue slate tint / zero gradients) */
+html:not(.light) .admin-dark-shell,
+html:not(.light) .admin-dark-shell .bg-slate-950,
+html:not(.light) .admin-dark-shell .bg-slate-950\/50,
+html:not(.light) .admin-dark-shell .bg-slate-950\/40,
+html:not(.light) .admin-dark-shell .bg-slate-950\/60,
+html:not(.light) .admin-modal-panel.admin-modal-dark,
+html:not(.light) .admin-modal-panel.admin-modal-dark .bg-slate-950,
+html:not(.light) .admin-modal-panel.admin-modal-dark .bg-slate-950\/60 {
+  background-color: #000000 !important;
+  background-image: none !important;
+}
+
+html:not(.light) .admin-dark-shell .bg-slate-900,
+html:not(.light) .admin-dark-shell .bg-slate-900\/60,
+html:not(.light) .admin-dark-shell .bg-slate-900\/50,
+html:not(.light) .admin-modal-panel.admin-modal-dark,
+html:not(.light) .admin-modal-panel.admin-modal-dark .bg-slate-900,
+html:not(.light) .admin-modal-panel.admin-modal-dark .bg-slate-900\/60 {
+  background-color: #0A0A0A !important;
+  background-image: none !important;
+}
+
+html:not(.light) .admin-dark-shell .bg-slate-800,
+html:not(.light) .admin-dark-shell .bg-slate-800\/40,
+html:not(.light) .admin-dark-shell .bg-slate-800\/50,
+html:not(.light) .admin-modal-panel.admin-modal-dark .bg-slate-800 {
+  background-color: #141414 !important;
+}
+
+html:not(.light) .admin-dark-shell .border-slate-800,
+html:not(.light) .admin-dark-shell .border-slate-700,
+html:not(.light) .admin-modal-panel.admin-modal-dark,
+html:not(.light) .admin-modal-panel.admin-modal-dark .border-slate-800,
+html:not(.light) .admin-modal-panel.admin-modal-dark .border-slate-700 {
+  border-color: #222222 !important;
 }
 
 /* ============================================================

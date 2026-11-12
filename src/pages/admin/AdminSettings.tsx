@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { settingsRepository } from '../../infrastructure/repositories';
 import { cloudinaryService } from '../../infrastructure/cloudinary/cloudinaryService';
+import { formatBytes, optimizeImageFile } from '../../utils/imageOptimizer';
 import { paisaToRupees, rupeesToPaisa } from '../../domain/services/CurrencyService';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 import { useCart } from '../../application/CartContext';
@@ -30,6 +31,7 @@ export const AdminSettings: React.FC = () => {
   const [ogImageAlt, setOgImageAlt] = useState('');
   const [uploadingOgImage, setUploadingOgImage] = useState(false);
   const [ogUploadError, setOgUploadError] = useState('');
+  const [ogUploadStats, setOgUploadStats] = useState('');
 
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -70,9 +72,28 @@ export const AdminSettings: React.FC = () => {
 
     setUploadingOgImage(true);
     setOgUploadError('');
+    setOgUploadStats('');
     try {
-      const result = await cloudinaryService.uploadImage(file, {
+      let uploadFile = file;
+      if (file.type !== 'image/svg+xml') {
+        const optimized = await optimizeImageFile(file, {
+          maxDimension: 1200,
+          targetAspectRatio: 1200 / 630,
+          targetMaxBytes: 120 * 1024,
+          format: 'image/jpeg',
+          fileNameBase: 'shrell-opengraph',
+        });
+        URL.revokeObjectURL(optimized.previewUrl);
+        uploadFile = optimized.file;
+        setOgUploadStats(
+          `Optimized 1200x630 JPEG: ${formatBytes(file.size)} -> ${formatBytes(optimized.compressedBytes)}`
+        );
+      }
+
+      const result = await cloudinaryService.uploadImage(uploadFile, {
         maxSizeBytes: 8 * 1024 * 1024,
+        assetFolder: 'shrell/opengraph',
+        tags: 'opengraph',
       });
       if (result && result.url) {
         const cleanUrl = result.url.startsWith('http://res.cloudinary.com/')
@@ -135,7 +156,7 @@ export const AdminSettings: React.FC = () => {
   const sectionHeadCls = `text-xs uppercase tracking-wider font-bold border-b pb-2 ${isDark ? 'text-slate-200 border-slate-800' : 'text-slate-800 border-slate-200'}`;
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 w-full">
       <div className={`border-b pb-4 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
         <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
           COMMERCE SETTINGS & TAX RULES
@@ -257,6 +278,12 @@ export const AdminSettings: React.FC = () => {
               {ogUploadError && (
                 <div className="text-[11px] text-rose-500 p-2 rounded bg-rose-500/10 border border-rose-500/30">
                   {ogUploadError}
+                </div>
+              )}
+
+              {ogUploadStats && (
+                <div className="text-[11px] font-mono text-emerald-500 p-2 rounded bg-emerald-500/10 border border-emerald-500/30">
+                  {ogUploadStats}
                 </div>
               )}
 

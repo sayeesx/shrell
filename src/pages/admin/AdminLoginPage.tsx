@@ -30,7 +30,7 @@ export const AdminLoginPage: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-200 ${isDark ? 'bg-slate-950' : 'bg-slate-50'}`}>
+    <div className={`min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-200 ${isDark ? 'admin-dark-shell bg-[#000000] text-[#F1EEEE]' : 'bg-slate-50'}`}>
       <SEOHead
         title="Admin Sign In | SHRELL Automotive"
         description="Administrative authentication portal."
@@ -41,7 +41,7 @@ export const AdminLoginPage: React.FC = () => {
         <ThemeToggle />
       </div>
 
-      <div className={`w-full max-w-md rounded-2xl p-8 space-y-6 border shadow-xl ${isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'}`}>
+      <div className={`w-full max-w-md rounded-2xl p-8 space-y-6 border shadow-xl ${isDark ? 'bg-[#0A0A0A] border-[#222222] text-[#F1EEEE]' : 'bg-white border-slate-200 text-slate-900'}`}>
         <div className="text-center space-y-3">
           <div className="w-12 h-12 flex items-center justify-center mx-auto">
             <img

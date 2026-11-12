@@ -321,11 +321,11 @@ export const AdminCategories: React.FC = () => {
             aria-hidden="true"
           />
 
-          {/* Centered Modal Card */}
+          {/* Centered Modal Card (3/4 window adaptive size) */}
           <div
             onClick={(e) => e.stopPropagation()}
-            className={`relative z-10 w-full max-w-lg rounded-xl border p-6 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl my-auto ${
-              isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+            className={`relative z-10 admin-modal-panel rounded-xl border p-6 space-y-4 overflow-y-auto shadow-2xl my-auto ${
+              isDark ? 'admin-modal-dark bg-[#0A0A0A] border-[#222222] text-[#F1EEEE]' : 'bg-white border-slate-200 text-slate-900'
             }`}
           >
             <div className={`flex items-center justify-between border-b pb-3 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>

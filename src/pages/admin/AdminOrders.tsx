@@ -244,10 +244,10 @@ export const AdminOrders: React.FC = () => {
             aria-hidden="true"
           />
 
-          {/* Centered Modal Card */}
+          {/* Centered Modal Card (3/4 window adaptive size) */}
           <div
             onClick={(e) => e.stopPropagation()}
-            className={`relative z-10 w-full max-w-3xl border rounded-xl overflow-hidden max-h-[90vh] flex flex-col shadow-2xl my-auto ${isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}`}
+            className={`relative z-10 admin-modal-panel border rounded-xl overflow-hidden shadow-2xl my-auto ${isDark ? 'admin-modal-dark bg-[#0A0A0A] border-[#222222] text-[#F1EEEE]' : 'bg-white border-slate-200 text-slate-900'}`}
           >
             {/* Header */}
             <div className={`px-6 py-4 border-b flex items-center justify-between ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>

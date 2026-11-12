@@ -7,6 +7,7 @@ import {
   productRepository,
 } from '../../infrastructure/repositories';
 import { cloudinaryService } from '../../infrastructure/cloudinary/cloudinaryService';
+import { cropAndCompressImage, formatBytes, optimizeImageFile } from '../../utils/imageOptimizer';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
@@ -83,15 +84,13 @@ export const AdminBanners: React.FC = () => {
     originalFile: null,
   });
 
-  useBodyScrollLock(cropModal.isOpen);
+  useBodyScrollLock(cropModal.isOpen || isAdding);
   const [aspectRatio, setAspectRatio] = useState<number>(16 / 5); // default desktop ~3.2:1
   const [zoom, setZoom] = useState<number>(1);
   const [panX, setPanX] = useState<number>(0);
   const [panY, setPanY] = useState<number>(0);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imageObjRef = useRef<HTMLImageElement | null>(null);
-
-  const isCloudinaryActive = cloudinaryService.isConfigured();
 
   const loadBanners = async () => {
     setLoading(true);
@@ -210,27 +209,43 @@ export const AdminBanners: React.FC = () => {
     }
   }, [aspectRatio, zoom, panX, panY, cropModal.isOpen]);
 
-  const handleApplyCrop = () => {
+  const handleApplyCrop = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    canvas.toBlob((blob) => {
-      if (!blob) return;
-      const fileName = `${cropModal.target}-banner-cropped.png`;
-      const croppedFile = new File([blob], fileName, { type: 'image/png' });
-      const croppedUrl = URL.createObjectURL(blob);
+    const isDesktop = cropModal.target === 'desktop';
+    try {
+      const optimized = await cropAndCompressImage(
+        canvas,
+        cropModal.originalFile?.size || canvas.width * canvas.height,
+        {
+          crop: { x: 0, y: 0, width: canvas.width, height: canvas.height },
+          maxDimension: isDesktop ? 1440 : 900,
+          targetMaxBytes: (isDesktop ? 150 : 95) * 1024,
+          format: 'image/webp',
+          fileNameBase: `${cropModal.target}-banner`,
+        }
+      );
 
-      if (cropModal.target === 'desktop') {
-        setDesktopFile(croppedFile);
-        setDesktopPreview(croppedUrl);
+      if (isDesktop) {
+        setDesktopFile(optimized.file);
+        setDesktopPreview(optimized.previewUrl);
       } else {
-        setMobileFile(croppedFile);
-        setMobilePreview(croppedUrl);
+        setMobileFile(optimized.file);
+        setMobilePreview(optimized.previewUrl);
       }
 
       setCropModal({ isOpen: false, target: 'desktop', imageUrl: '', originalFile: null });
-      setStatusMessage({ text: `Custom crop applied for ${cropModal.target} banner!`, isError: false });
-    }, 'image/png');
+      setStatusMessage({
+        text: `Cropped & compressed ${cropModal.target} banner to WebP (${formatBytes(optimized.compressedBytes)}).`,
+        isError: false,
+      });
+    } catch (err: any) {
+      setStatusMessage({
+        text: err?.message || `Failed to optimize ${cropModal.target} banner crop.`,
+        isError: true,
+      });
+    }
   };
 
   const handleCreateBanner = async (e: React.FormEvent) => {
@@ -247,25 +262,53 @@ export const AdminBanners: React.FC = () => {
       let uploadedDesktopUrl = desktopPreview;
       let uploadedMobileUrl = mobilePreview;
 
-      // 1. Upload Desktop image via Cloudinary service, with safe local fallback
+      // 1. Optimize & upload Desktop image via Cloudinary service, with safe local fallback
       if (desktopFile) {
+        let readyDesktop = desktopFile;
+        if (readyDesktop.type !== 'image/svg+xml' && (readyDesktop.type !== 'image/webp' || readyDesktop.size > 160 * 1024)) {
+          const opt = await optimizeImageFile(readyDesktop, {
+            maxDimension: 1440,
+            targetMaxBytes: 150 * 1024,
+            format: 'image/webp',
+            fileNameBase: 'shrell-desktop-banner',
+          });
+          URL.revokeObjectURL(opt.previewUrl);
+          readyDesktop = opt.file;
+        }
         try {
-          const result = await cloudinaryService.uploadImage(desktopFile);
+          const result = await cloudinaryService.uploadImage(readyDesktop, {
+            assetFolder: 'shrell/banners',
+            tags: 'banner,desktop',
+          });
           uploadedDesktopUrl = result.url;
         } catch (cloudErr) {
           console.warn('Cloudinary upload error, using optimized local storage:', cloudErr);
-          uploadedDesktopUrl = await fileToCompressedDataUrl(desktopFile, 1400);
+          uploadedDesktopUrl = await fileToCompressedDataUrl(readyDesktop, 1400);
         }
       }
 
-      // 2. Upload Mobile image if provided
+      // 2. Optimize & upload Mobile image if provided
       if (mobileFile) {
+        let readyMobile = mobileFile;
+        if (readyMobile.type !== 'image/svg+xml' && (readyMobile.type !== 'image/webp' || readyMobile.size > 105 * 1024)) {
+          const opt = await optimizeImageFile(readyMobile, {
+            maxDimension: 900,
+            targetMaxBytes: 95 * 1024,
+            format: 'image/webp',
+            fileNameBase: 'shrell-mobile-banner',
+          });
+          URL.revokeObjectURL(opt.previewUrl);
+          readyMobile = opt.file;
+        }
         try {
-          const result = await cloudinaryService.uploadImage(mobileFile);
+          const result = await cloudinaryService.uploadImage(readyMobile, {
+            assetFolder: 'shrell/banners',
+            tags: 'banner,mobile',
+          });
           uploadedMobileUrl = result.url;
         } catch (cloudErr) {
           console.warn('Cloudinary upload error, using optimized local storage:', cloudErr);
-          uploadedMobileUrl = await fileToCompressedDataUrl(mobileFile, 800);
+          uploadedMobileUrl = await fileToCompressedDataUrl(readyMobile, 800);
         }
       }
 
@@ -366,15 +409,15 @@ export const AdminBanners: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="space-y-6 w-full">
       {/* Header */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${isDark ? 'border-[#222222]' : 'border-slate-200'}`}>
         <div>
           <h1 className={`text-xl sm:text-2xl font-bold font-mono tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
             Hero Carousel Banners
           </h1>
-          <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-            Upload custom cropped banners for desktop &amp; mobile with page navigation links. Background transparency preserved.
+          <p className={`text-xs mt-1 ${isDark ? 'text-neutral-400' : 'text-slate-500'}`}>
+            Upload custom cropped banners for desktop &amp; mobile with page or product navigation links.
           </p>
         </div>
 
@@ -384,7 +427,7 @@ export const AdminBanners: React.FC = () => {
             setIsAdding(!isAdding);
             setStatusMessage(null);
           }}
-          className={`px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors self-start sm:self-auto ${
+          className={`px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors self-start sm:self-auto cursor-pointer ${
             isDark
               ? 'bg-slate-100 hover:bg-white text-slate-950'
               : 'bg-slate-900 hover:bg-slate-800 text-white'
@@ -393,32 +436,6 @@ export const AdminBanners: React.FC = () => {
           <i className={`bi ${isAdding ? 'bi-x-lg' : 'bi-plus-lg'} text-sm`}></i>
           <span>{isAdding ? 'Close Uploader' : 'Add New Banner'}</span>
         </button>
-      </div>
-
-      {/* Cloudinary Status Banner */}
-      <div className={`p-4 rounded-xl border flex items-center justify-between text-xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-xs'}`}>
-        <div className="flex items-center gap-2.5">
-          <i className="bi bi-cloud-arrow-up text-lg text-slate-400"></i>
-          <div>
-            <div className={`font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-              Cloudinary Media Storage:{' '}
-              {isCloudinaryActive ? (
-                <span className="text-emerald-500 font-bold">Connected &amp; Active</span>
-              ) : (
-                <span className="text-amber-500 font-bold">Ready for credentials in .env</span>
-              )}
-            </div>
-            <p className={`text-[11px] mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              Images will be stored exactly as uploaded without background removal or lossy compression.
-            </p>
-          </div>
-        </div>
-
-        {!isCloudinaryActive && (
-          <span className={`text-[10px] font-mono px-2.5 py-1 rounded-md border ${isDark ? 'bg-slate-950 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
-            VITE_CLOUDINARY_CLOUD_NAME in .env
-          </span>
-        )}
       </div>
 
       {/* Status Feedback Message */}
@@ -438,12 +455,43 @@ export const AdminBanners: React.FC = () => {
         </div>
       )}
 
-      {/* Add New Banner Form Drawer */}
-      {isAdding && (
-        <form onSubmit={handleCreateBanner} className={`p-6 rounded-xl border space-y-6 ${isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900 shadow-xs'}`}>
-          <h2 className={`text-sm font-bold uppercase tracking-wider font-mono border-b pb-2 ${isDark ? 'text-white border-slate-800' : 'text-slate-900 border-slate-200'}`}>
-            Upload &amp; Custom Crop Hero Banner
-          </h2>
+      {/* Add New Banner Modal (3/4 window adaptive size) */}
+      {isAdding && createPortal(
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
+          style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
+        >
+          <div
+            className="fixed inset-0 modal-backdrop-solid"
+            onClick={() => {
+              if (!uploading) setIsAdding(false);
+            }}
+            aria-hidden="true"
+          />
+          <form
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={handleCreateBanner}
+            className={`relative z-10 admin-modal-panel border rounded-xl shadow-2xl overflow-hidden my-auto ${
+              isDark ? 'admin-modal-dark bg-[#0A0A0A] border-[#222222] text-[#F1EEEE]' : 'bg-white border-slate-200 text-slate-900'
+            }`}
+          >
+            <div className={`px-6 py-4 border-b shrink-0 flex items-center justify-between ${isDark ? 'border-[#222222]' : 'border-slate-200'}`}>
+              <h2 className={`text-sm font-bold uppercase tracking-wider font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Upload &amp; Custom Crop Hero Banner
+              </h2>
+              <button
+                type="button"
+                disabled={uploading}
+                onClick={() => setIsAdding(false)}
+                className={`p-1 rounded-lg transition-colors cursor-pointer ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
+                aria-label="Close banner uploader"
+              >
+                <i className="bi bi-x-lg text-xs" aria-hidden="true" />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto flex-1 space-y-6">
 
           {/* Banner Upload Dimensions Specifications */}
           <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl border ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
@@ -843,19 +891,20 @@ export const AdminBanners: React.FC = () => {
             </div>
           </div>
 
+            </div>
           {/* Submit Actions */}
-          <div className={`flex items-center justify-end gap-3 pt-4 border-t ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+          <div className={`px-6 py-4 flex items-center justify-end gap-3 border-t shrink-0 ${isDark ? 'border-[#222222] bg-[#050505]' : 'border-slate-200 bg-slate-50'}`}>
             <button
               type="button"
               onClick={() => setIsAdding(false)}
-              className={`px-4 py-2 text-xs transition-colors ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'}`}
+              className={`px-4 py-2 text-xs transition-colors cursor-pointer ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'}`}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={uploading}
-              className={`px-6 py-2.5 rounded-lg font-semibold text-xs flex items-center gap-2 transition-colors ${
+              className={`px-6 py-2.5 rounded-lg font-semibold text-xs flex items-center gap-2 transition-colors cursor-pointer ${
                 isDark
                   ? 'bg-slate-100 hover:bg-white text-slate-950 disabled:opacity-50'
                   : 'bg-slate-900 hover:bg-slate-800 text-white disabled:opacity-50'
@@ -874,7 +923,9 @@ export const AdminBanners: React.FC = () => {
               )}
             </button>
           </div>
-        </form>
+          </form>
+        </div>,
+        document.body
       )}
 
       {/* Banners List */}
@@ -1017,8 +1068,8 @@ export const AdminBanners: React.FC = () => {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
-          style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
+          className="fixed inset-0 z-[100000] flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
+          style={{ position: 'fixed', inset: 0, zIndex: 100000 }}
         >
           {/* Dedicated Fullscreen Frosted Backdrop Layer (zero background bleed) */}
           <div
@@ -1027,10 +1078,10 @@ export const AdminBanners: React.FC = () => {
             aria-hidden="true"
           />
 
-          {/* Centered Modal Card */}
+          {/* Centered Modal Card (3/4 window adaptive size) */}
           <div
             onClick={(e) => e.stopPropagation()}
-            className={`relative z-10 border rounded-xl max-w-2xl w-full p-5 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl my-auto ${isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'}`}
+            className={`relative z-10 admin-modal-panel border rounded-xl p-5 sm:p-6 space-y-4 overflow-y-auto shadow-2xl my-auto ${isDark ? 'admin-modal-dark bg-[#0A0A0A] border-[#222222] text-[#F1EEEE]' : 'bg-white border-slate-200 text-slate-900'}`}
           >
             <div className={`flex items-center justify-between border-b pb-3 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
               <div className="flex items-center gap-2">

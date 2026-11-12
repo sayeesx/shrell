@@ -69,6 +69,8 @@ export const AdminProducts: React.FC = () => {
     try {
       const result = await cloudinaryService.uploadImage(uploadFile, {
         maxSizeBytes: 8 * 1024 * 1024,
+        assetFolder: 'shrell/products',
+        tags: 'product',
       });
       if (result && result.url) {
         setImageUrls((prev) => {
@@ -477,14 +479,14 @@ export const AdminProducts: React.FC = () => {
             aria-hidden="true"
           />
 
-          {/* Centered Modal Card */}
+          {/* Centered Modal Card (3/4 window adaptive size) */}
           <div
             onClick={(e) => e.stopPropagation()}
-            className={`relative z-10 w-full max-w-2xl border rounded-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col my-auto ${
-              isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+            className={`relative z-10 admin-modal-panel border rounded-xl shadow-2xl overflow-hidden my-auto ${
+              isDark ? 'admin-modal-dark bg-[#0A0A0A] border-[#222222] text-[#F1EEEE]' : 'bg-white border-slate-200 text-slate-900'
             }`}
           >
-            <div className={`px-6 py-4 border-b flex items-center justify-between ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+            <div className={`px-6 py-4 border-b shrink-0 flex items-center justify-between ${isDark ? 'border-[#222222]' : 'border-slate-200'}`}>
               <h2 className="text-sm font-bold font-mono uppercase tracking-wider">
                 {editingProduct ? 'Edit Product Details' : 'Create New Product'}
               </h2>

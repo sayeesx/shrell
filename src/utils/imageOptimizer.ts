@@ -221,3 +221,49 @@ export async function cropAndCompressImage(
     qualityUsed: bestQuality,
   };
 }
+
+export interface AutoOptimizeOptions {
+  maxDimension?: number;
+  targetMaxBytes?: number;
+  format?: ImageOutputFormat;
+  targetAspectRatio?: number;
+  fileNameBase?: string;
+}
+
+/**
+ * Automatically center-crops (optional aspect ratio), resizes, and compresses a raster
+ * File client-side before uploading so Cloudinary free-tier storage/bandwidth is minimized.
+ */
+export async function optimizeImageFile(
+  file: File,
+  options: AutoOptimizeOptions = {}
+): Promise<OptimizedImageResult> {
+  const { img, objectUrl } = await loadImageElement(file);
+  try {
+    const rotCanvas = buildRotatedCanvas(img, 0);
+    const srcW = rotCanvas.width;
+    const srcH = rotCanvas.height;
+
+    let crop: CropRect = { x: 0, y: 0, width: srcW, height: srcH };
+    if (options.targetAspectRatio && options.targetAspectRatio > 0) {
+      const currentRatio = srcW / srcH;
+      if (currentRatio > options.targetAspectRatio) {
+        const cropW = srcH * options.targetAspectRatio;
+        crop = { x: (srcW - cropW) / 2, y: 0, width: cropW, height: srcH };
+      } else if (currentRatio < options.targetAspectRatio) {
+        const cropH = srcW / options.targetAspectRatio;
+        crop = { x: 0, y: (srcH - cropH) / 2, width: srcW, height: cropH };
+      }
+    }
+
+    return await cropAndCompressImage(rotCanvas, file.size, {
+      crop,
+      maxDimension: options.maxDimension ?? 1200,
+      targetMaxBytes: options.targetMaxBytes ?? 120 * 1024,
+      format: options.format ?? 'image/webp',
+      fileNameBase: options.fileNameBase || file.name,
+    });
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}

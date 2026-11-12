@@ -31,7 +31,7 @@ import { AdminOrders } from './pages/admin/AdminOrders';
 import { AdminInventory } from './pages/admin/AdminInventory';
 import { AdminCoupons } from './pages/admin/AdminCoupons';
 import { AdminSettings } from './pages/admin/AdminSettings';
-import { AdminSanity } from './pages/admin/AdminSanity';
+import { AdminConfiguration } from './pages/admin/AdminConfiguration';
 import { AdminHomeSections } from './pages/admin/AdminHomeSections';
 import { AdminCategories } from './pages/admin/AdminCategories';
 import { AdminReviews } from './pages/admin/AdminReviews';
@@ -114,7 +114,8 @@ export const App: React.FC = () => {
             <Route path="sections" element={<AdminHomeSections />} />
             <Route path="categories" element={<AdminCategories />} />
             <Route path="banners" element={<AdminBanners />} />
-            <Route path="sanity" element={<AdminSanity />} />
+            <Route path="configuration" element={<AdminConfiguration />} />
+            <Route path="sanity" element={<Navigate to="/admin/configuration" replace />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="reviews" element={<AdminReviews />} />
             <Route path="orders" element={<AdminOrders />} />

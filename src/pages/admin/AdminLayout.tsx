@@ -3,14 +3,12 @@ import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '../../application/AuthContext';
 import { useTheme } from '../../application/ThemeContext';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
-import { getRepositoryMode } from '../../infrastructure/repositories';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
 
 export const AdminLayout: React.FC = () => {
   const { user, isAdmin, logout } = useAuth();
   const { isDark } = useTheme();
   const location = useLocation();
-  const repoMode = getRepositoryMode();
 
   // Route Guard: Redirect to /admin/login if not logged in as admin
   if (!isAdmin) {
@@ -27,21 +25,29 @@ export const AdminLayout: React.FC = () => {
     { name: 'Inventory & Movements', path: '/admin/inventory', icon: 'bi-stack' },
     { name: 'Orders & Fulfilment', path: '/admin/orders', icon: 'bi-bag-check' },
     { name: 'Coupons & Promos', path: '/admin/coupons', icon: 'bi-tag' },
-    { name: 'Sanity CMS', path: '/admin/sanity', icon: 'bi-magic' },
+    { name: 'Configuration', path: '/admin/configuration', icon: 'bi-sliders2' },
     { name: 'Settings', path: '/admin/settings', icon: 'bi-gear' },
   ];
 
   return (
-    <div className={`min-h-screen flex flex-col md:flex-row transition-colors duration-200 ${isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
+    <div
+      className={`min-h-screen flex flex-col md:flex-row transition-colors duration-200 ${
+        isDark ? 'admin-dark-shell bg-[#000000] text-[#F1EEEE]' : 'bg-slate-50 text-slate-900'
+      }`}
+    >
       <SEOHead
         title="Admin Console | SHRELL Automotive"
         description="Internal administration dashboard."
         noIndex={true}
       />
       {/* Sidebar */}
-      <aside className={`w-full md:w-64 flex flex-col flex-shrink-0 transition-colors duration-200 ${isDark ? 'bg-slate-900 border-r border-slate-800' : 'bg-white border-r border-slate-200'}`}>
+      <aside
+        className={`w-full md:w-64 flex flex-col flex-shrink-0 transition-colors duration-200 ${
+          isDark ? 'bg-[#0A0A0A] border-b md:border-b-0 md:border-r border-[#222222]' : 'bg-white border-b md:border-b-0 md:border-r border-slate-200'
+        }`}
+      >
         {/* Brand Header */}
-        <div className={`p-4 md:p-5 flex items-center justify-between border-b ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+        <div className={`p-4 md:p-5 flex items-center justify-between border-b ${isDark ? 'border-[#222222]' : 'border-slate-200'}`}>
           <div className="flex items-center gap-2.5 min-w-0">
             <img
               src="/logos/shrell-brandicon_no-bg.png"
@@ -49,10 +55,12 @@ export const AdminLayout: React.FC = () => {
               className="w-8 h-8 object-contain shrink-0"
             />
             <div className="min-w-0">
-              <span className={`text-sm font-bold font-mono tracking-wider whitespace-nowrap block ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
+              <span className={`text-sm font-bold font-mono tracking-wider whitespace-nowrap block ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 SHRELL ADMIN
               </span>
-              <div className={`text-[10px] font-mono whitespace-nowrap ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Operations Portal</div>
+              <div className={`text-[10px] font-mono whitespace-nowrap ${isDark ? 'text-neutral-400' : 'text-slate-500'}`}>
+                Operations Portal
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-1.5 shrink-0 ml-2">
@@ -61,19 +69,14 @@ export const AdminLayout: React.FC = () => {
               to="/"
               target="_blank"
               rel="noopener noreferrer"
-              className={`p-1.5 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-800 text-slate-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'}`}
+              className={`p-1.5 rounded-lg transition-colors ${
+                isDark ? 'hover:bg-[#141414] text-neutral-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'
+              }`}
               title="Open Customer Storefront"
             >
               <i className="bi bi-box-arrow-up-right text-xs" aria-hidden="true" />
             </Link>
           </div>
-        </div>
-
-        {/* Database Mode Badge */}
-        <div className={`px-4 py-2.5 flex items-center gap-2 text-[11px] font-mono border-b ${isDark ? 'bg-slate-950/50 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
-          <i className="bi bi-database text-xs text-slate-400" aria-hidden="true" />
-          <span>Database:</span>
-          <span className={`font-semibold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{repoMode}</span>
         </div>
 
         {/* Nav Links */}
@@ -91,10 +94,10 @@ export const AdminLayout: React.FC = () => {
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-mono font-medium transition-colors ${
                   isActive
                     ? isDark
-                      ? 'bg-slate-800 text-white font-semibold border border-slate-700 shadow-sm'
+                      ? 'bg-[#141414] text-white font-semibold border border-[#2B2B2B]'
                       : 'bg-slate-100 text-slate-900 font-semibold border border-slate-200 shadow-xs'
                     : isDark
-                      ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                      ? 'text-neutral-400 hover:text-neutral-100 hover:bg-[#101010]'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
@@ -106,20 +109,22 @@ export const AdminLayout: React.FC = () => {
         </nav>
 
         {/* User Footer */}
-        <div className={`p-4 border-t flex items-center justify-between ${isDark ? 'border-slate-800 bg-slate-950/40' : 'border-slate-200 bg-slate-50'}`}>
+        <div className={`p-4 border-t flex items-center justify-between ${isDark ? 'border-[#222222] bg-[#050505]' : 'border-slate-200 bg-slate-50'}`}>
           <div className="flex items-center gap-2 overflow-hidden">
-            <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-mono font-bold flex-shrink-0 ${isDark ? 'bg-slate-800 text-slate-200' : 'bg-slate-200 text-slate-800 border border-slate-300'}`}>
+            <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-mono font-bold flex-shrink-0 ${isDark ? 'bg-[#181818] text-neutral-200 border border-[#2B2B2B]' : 'bg-slate-200 text-slate-800 border border-slate-300'}`}>
               AD
             </div>
             <div className="truncate">
-              <div className={`text-xs font-semibold truncate ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{user?.name || 'Administrator'}</div>
-              <div className={`text-[10px] font-mono truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{user?.email || 'admin@shrell.com'}</div>
+              <div className={`text-xs font-semibold truncate ${isDark ? 'text-neutral-200' : 'text-slate-900'}`}>{user?.name || 'Administrator'}</div>
+              <div className={`text-[10px] font-mono truncate ${isDark ? 'text-neutral-400' : 'text-slate-500'}`}>{user?.email || 'admin@shrell.com'}</div>
             </div>
           </div>
           <button
             type="button"
             onClick={logout}
-            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${isDark ? 'hover:bg-slate-800 text-slate-400 hover:text-rose-400' : 'hover:bg-slate-200 text-slate-500 hover:text-rose-600'}`}
+            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+              isDark ? 'hover:bg-[#141414] text-neutral-400 hover:text-rose-400' : 'hover:bg-slate-200 text-slate-500 hover:text-rose-600'
+            }`}
             title="Sign Out"
           >
             <i className="bi bi-box-arrow-right text-sm" aria-hidden="true" />
@@ -128,7 +133,7 @@ export const AdminLayout: React.FC = () => {
       </aside>
 
       {/* Main Administrative View Area */}
-      <main className={`flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 transition-colors duration-200 ${isDark ? 'bg-slate-950' : 'bg-slate-50'}`}>
+      <main className={`flex-1 min-w-0 overflow-y-auto p-4 sm:p-6 md:p-8 transition-colors duration-200 ${isDark ? 'bg-[#000000]' : 'bg-slate-50'}`}>
         <Outlet />
       </main>
     </div>

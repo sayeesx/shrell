@@ -214,10 +214,10 @@ export const AdminInventory: React.FC = () => {
             aria-hidden="true"
           />
 
-          {/* Centered Modal Card */}
+          {/* Centered Modal Card (3/4 window adaptive size) */}
           <div
             onClick={(e) => e.stopPropagation()}
-            className={`relative z-10 w-full max-w-md border rounded-xl shadow-2xl p-6 space-y-4 my-auto ${isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-900'}`}
+            className={`relative z-10 admin-modal-panel border rounded-xl shadow-2xl p-6 space-y-4 overflow-y-auto my-auto ${isDark ? 'admin-modal-dark bg-[#0A0A0A] border-[#222222] text-[#F1EEEE]' : 'bg-white border-slate-200 text-slate-900'}`}
           >
             <h2 className={`text-sm font-bold font-mono uppercase tracking-wider border-b pb-2 ${isDark ? 'text-white border-slate-800' : 'text-slate-900 border-slate-200'}`}>
               Adjust Inventory: {selectedProduct.name}

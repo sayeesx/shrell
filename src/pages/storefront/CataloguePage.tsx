@@ -10,6 +10,7 @@ import { useTheme } from '../../application/ThemeContext';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
 import { generateBreadcrumbSchema } from '../../infrastructure/seo/schemaGenerators';
+import { isGibberishSearchQuery } from '../../utils/searchClassifier';
 
 type SortOption = 'relevance' | 'price-asc' | 'price-desc' | 'rating-desc';
 
@@ -223,19 +224,45 @@ export const CataloguePage: React.FC = () => {
             ))}
           </div>
         ) : (
-          /* Empty Search State with helpful suggestions */
-          <div className={`p-12 text-center rounded-2xl border space-y-4 my-8 ${
-            isDark ? 'bg-[#0E0A0B] border-[#261619]' : 'bg-white border-[#E0DBD2]'
-          }`}>
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-[#FF000E]/10 border border-[#FF000E]/20 text-[#FF000E] flex items-center justify-center text-2xl">
-              <i className="bi bi-search" aria-hidden="true" />
-            </div>
-            <div>
-              <h3 className="text-base font-bold">No Matching Accessories Found</h3>
-              <p className="text-xs opacity-70 mt-1 max-w-sm mx-auto">
-                No items matched &ldquo;{searchInput}&rdquo;. Try a different spelling or product name.
-              </p>
-            </div>
+          /* Empty Search State (no background or shadow around image) */
+          <div className="p-6 sm:p-10 text-center space-y-4 my-6 bg-transparent border-0 shadow-none">
+            {isGibberishSearchQuery(searchInput) ? (
+              <>
+                <div className="space-y-1">
+                  <h3 className={`text-lg sm:text-xl font-bold tracking-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
+                    Is that you, Milo?
+                  </h3>
+                  <p className={`text-xs sm:text-sm max-w-md mx-auto ${isDark ? 'text-neutral-400' : 'text-[#5C5456]'}`}>
+                    Milo must be walking on the keyboard again. Try searching a real accessory name!
+                  </p>
+                </div>
+                <img
+                  src="/images/catsearching.avif"
+                  alt="Milo the cat typing random keys on keyboard"
+                  className="w-44 h-44 sm:w-52 sm:h-52 mx-auto object-contain bg-transparent border-0 shadow-none"
+                  style={{ boxShadow: 'none', background: 'transparent' }}
+                />
+              </>
+            ) : (
+              <>
+                <img
+                  src="/images/Chill Guy PNG.png"
+                  alt="Item not found in inventory"
+                  className="w-44 h-44 sm:w-52 sm:h-52 mx-auto object-contain bg-transparent border-0 shadow-none"
+                  style={{ boxShadow: 'none', background: 'transparent' }}
+                />
+                <div className="space-y-1">
+                  <h3 className={`text-lg sm:text-xl font-bold tracking-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
+                    This item is not found in our inventory
+                  </h3>
+                  <p className={`text-xs sm:text-sm max-w-md mx-auto ${isDark ? 'text-neutral-400' : 'text-[#5C5456]'}`}>
+                    {searchInput.trim()
+                      ? `Nothing matched "${searchInput}" right now. Check back soon or explore another category.`
+                      : 'No accessories matched the active filter right now.'}
+                  </p>
+                </div>
+              </>
+            )}
             <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
               <button
                 type="button"

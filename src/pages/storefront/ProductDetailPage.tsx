@@ -167,11 +167,11 @@ export const ProductDetailPage: React.FC = () => {
     if (isAddingToCart) return;
     setIsAddingToCart(true);
     setTimeout(() => {
-      const res = addItem(product, quantity);
+      const res = addItem(product, quantity, { allowOutOfStockWaitlist: true });
       setIsAddingToCart(false);
       if (res.success) {
-        setAddedMessage('Added to cart!');
-        setTimeout(() => setAddedMessage(''), 3000);
+        setAddedMessage(res.message || 'Added to cart!');
+        setTimeout(() => setAddedMessage(''), 4000);
       } else {
         setAddedMessage(res.message || 'Could not add to cart.');
       }
@@ -179,7 +179,7 @@ export const ProductDetailPage: React.FC = () => {
   };
 
   const handleBuyNow = () => {
-    if (isBuyingNow) return;
+    if (isOutOfStock || isBuyingNow) return;
     setIsBuyingNow(true);
     setTimeout(() => {
       const res = addItem(product, quantity);
@@ -530,12 +530,39 @@ export const ProductDetailPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Out of Stock Restock Notification Banner (no background or shadow on image) */}
+            {isOutOfStock && (
+              <div
+                role="status"
+                className={`p-3.5 sm:p-4 rounded-xl border flex items-center gap-3.5 ${
+                  isDark
+                    ? 'bg-[#0A0A0A] border-[#261619] text-[#F1EEEE]'
+                    : 'bg-[#FAF8F4] border-[#E0DBD2] text-[#140E10]'
+                }`}
+              >
+                <img
+                  src="/images/Tired Worker in a Busy Warehouse_converted.avif"
+                  alt="Warehouse team preparing restock"
+                  className="w-20 h-20 sm:w-24 sm:h-24 object-contain shrink-0 bg-transparent border-0 shadow-none"
+                  style={{ boxShadow: 'none', background: 'transparent' }}
+                />
+                <div className="space-y-1 min-w-0">
+                  <p className="text-sm font-bold tracking-tight text-[#FF000E]">
+                    We&apos;re extremely sorry!
+                  </p>
+                  <p className={`text-xs leading-relaxed ${isDark ? 'text-neutral-300' : 'text-[#3A3030]'}`}>
+                    This item is currently out of stock. Add it to your cart and once we restock, we&apos;ll send you a message right away.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Action Buttons with loaders */}
             <div className="space-y-2.5 pt-2">
               <button
                 type="button"
                 onClick={handleAddToCart}
-                disabled={isOutOfStock || isAddingToCart}
+                disabled={isAddingToCart}
                 className={`relative w-full py-3 sm:py-3.5 rounded-lg border disabled:opacity-40 font-medium text-sm transition-colors cursor-pointer flex items-center justify-center overflow-hidden ${isDark ? 'border-[#261619] bg-[#130E10] hover:bg-[#1A1214] text-[#F1EEEE]' : 'border-[#E0DBD2] bg-[#F5F3EE] hover:bg-[#EDE9E1] text-[#140E10]'}`}
               >
                 <span className={`transition-all duration-300 ${isAddingToCart ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}>
@@ -552,7 +579,13 @@ export const ProductDetailPage: React.FC = () => {
                 type="button"
                 onClick={handleBuyNow}
                 disabled={isOutOfStock || isBuyingNow}
-                className="relative w-full py-3.5 sm:py-4 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] disabled:opacity-40 text-white font-medium text-sm transition-colors cursor-pointer flex items-center justify-center overflow-hidden"
+                className={`relative w-full py-3.5 sm:py-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center overflow-hidden ${
+                  isOutOfStock
+                    ? isDark
+                      ? 'bg-neutral-800 text-neutral-500 border border-neutral-700 cursor-not-allowed'
+                      : 'bg-neutral-200 text-neutral-500 border border-neutral-300 cursor-not-allowed'
+                    : 'bg-[#FF000E] hover:bg-[#E0000C] disabled:opacity-40 text-white cursor-pointer'
+                }`}
               >
                 <span className={`transition-all duration-300 ${isBuyingNow ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}>
                   Buy it now

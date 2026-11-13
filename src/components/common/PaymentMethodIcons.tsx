@@ -8,14 +8,19 @@ import {
 } from 'simple-icons';
 import { useTheme } from '../../application/ThemeContext';
 
+export interface PaymentMethodIconsProps {
+  className?: string;
+}
+
 /**
  * Renders authentic brand SVG payment icons (UPI, Visa, Mastercard dual-circle,
  * Google Pay, Apple Pay, PhonePe, Paytm) without placeholder CSS badges.
+ * Self-optimizes alignment with shrink-0 badges for all mobile & desktop viewports.
  */
-export const PaymentMethodIcons: React.FC = () => {
+export const PaymentMethodIcons: React.FC<PaymentMethodIconsProps> = ({ className = '' }) => {
   const { isDark } = useTheme();
 
-  const cardContainerCls = `h-7 px-2 rounded-md border inline-flex items-center justify-center transition-colors ${
+  const cardContainerCls = `h-7 px-2 shrink-0 rounded-md border inline-flex items-center justify-center transition-colors ${
     isDark
       ? 'bg-[#0F0F0F] border-[#242424] text-[#F1EEEE]'
       : 'bg-white border-[#DED8CE] text-[#140E10]'
@@ -55,7 +60,7 @@ export const PaymentMethodIcons: React.FC = () => {
   ];
 
   return (
-    <div className="flex items-center flex-wrap gap-1.5" aria-label="Supported payment methods">
+    <div className={`flex items-center flex-wrap gap-1.5 ${className}`} aria-label="Supported payment methods">
       {/* Authentic NPCI UPI Dual-Chevron Mark + Wordmark */}
       <span className={cardContainerCls} title="Unified Payments Interface (UPI)" aria-label="UPI">
         <svg viewBox="0 0 64 24" className="h-4 w-auto" role="img" aria-label="UPI logo">

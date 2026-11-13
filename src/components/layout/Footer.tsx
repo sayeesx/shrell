@@ -78,7 +78,9 @@ export const Footer: React.FC = () => {
             <span className="hidden sm:inline">•</span>
             <span>GSTIN: 27AABCV1234F1Z8</span>
           </div>
-          <PaymentMethodIcons />
+          <div className="w-full md:w-auto flex justify-center md:justify-end">
+            <PaymentMethodIcons className="justify-center md:justify-end" />
+          </div>
         </div>
       </div>
     </footer>

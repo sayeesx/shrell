@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Product, Category } from '../../domain/types';
 import { productRepository, categoryRepository } from '../../infrastructure/repositories';
 import { ProductCard } from '../../components/ui/ProductCard';
-import { ProductCardSkeleton } from '../../components/common/ShimmerSkeleton';
+import { ProductCardSkeleton, CategoryRowSkeleton } from '../../components/common/ShimmerSkeleton';
 import { searchProductsWithFuse } from '../../infrastructure/search/searchService';
 import { trackSearchPerformed } from '../../infrastructure/analytics/posthog';
 import { useTheme } from '../../application/ThemeContext';
@@ -167,37 +167,41 @@ export const CataloguePage: React.FC = () => {
       />
       <div className="max-w-7xl mx-auto space-y-4">
         {/* Category Filter Chips Carousel */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
-          <button
-            type="button"
-            onClick={() => handleCategorySelect('')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold whitespace-nowrap border transition-all cursor-pointer ${
-              !selectedCategory
-                ? 'bg-[#FF000E] text-white border-[#FF000E] shadow-sm'
-                : isDark
-                ? 'bg-[#130E10] text-gray-300 border-[#261619] hover:border-gray-600'
-                : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
-            }`}
-          >
-            All Products
-          </button>
-          {categories.map((cat) => (
+        {loading && categories.length === 0 ? (
+          <CategoryRowSkeleton />
+        ) : (
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
             <button
-              key={cat.id}
               type="button"
-              onClick={() => handleCategorySelect(cat.slug)}
+              onClick={() => handleCategorySelect('')}
               className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold whitespace-nowrap border transition-all cursor-pointer ${
-                selectedCategory === cat.slug
+                !selectedCategory
                   ? 'bg-[#FF000E] text-white border-[#FF000E] shadow-sm'
                   : isDark
                   ? 'bg-[#130E10] text-gray-300 border-[#261619] hover:border-gray-600'
                   : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
               }`}
             >
-              {cat.name}
+              All Products
             </button>
-          ))}
-        </div>
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => handleCategorySelect(cat.slug)}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold whitespace-nowrap border transition-all cursor-pointer ${
+                  selectedCategory === cat.slug
+                    ? 'bg-[#FF000E] text-white border-[#FF000E] shadow-sm'
+                    : isDark
+                    ? 'bg-[#130E10] text-gray-300 border-[#261619] hover:border-gray-600'
+                    : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
+                }`}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Products Grid / Shimmer Loading */}
         {loading ? (

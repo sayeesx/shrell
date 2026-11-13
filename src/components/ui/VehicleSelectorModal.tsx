@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { AnimatePresence, motion } from 'motion/react';
 import { useVehicle } from '../../application/VehicleContext';
 import { useBodyScrollLock } from '../common/useBodyScrollLock';
 
@@ -36,8 +37,6 @@ export const VehicleSelectorModal: React.FC<VehicleSelectorModalProps> = ({ isOp
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
-
   const currentMake = makes.find((m) => m.id === selectedMakeId);
   const currentModel = models.find((m) => m.id === selectedModelId);
   const currentVariant = variants.find((v) => v.id === selectedVariantId);
@@ -60,25 +59,39 @@ export const VehicleSelectorModal: React.FC<VehicleSelectorModalProps> = ({ isOp
     onClose();
   };
 
-  return createPortal(
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="vehicle-selector-title"
-      className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
-      style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
-    >
-      {/* Dedicated Fullscreen Frosted Backdrop Layer (zero background bleed) */}
-      <div
-        className="fixed inset-0 modal-backdrop-solid"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+  if (typeof document === 'undefined') return null;
 
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="relative z-10 w-full max-w-lg bg-white border border-gray-200/90 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto"
-      >
+  return createPortal(
+    <AnimatePresence>
+      {isOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="vehicle-selector-title"
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
+          style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
+        >
+          {/* Dedicated Fullscreen Frosted Backdrop Layer (zero background bleed) */}
+          <motion.div
+            key="vehicle-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 modal-backdrop-solid"
+            onClick={onClose}
+            aria-hidden="true"
+          />
+
+          <motion.div
+            key="vehicle-dialog"
+            initial={{ opacity: 0, scale: 0.94, y: 14 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.94, y: 14 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative z-10 w-full max-w-lg bg-white border border-gray-200/90 rounded-3xl shadow-2xl overflow-hidden my-auto"
+          >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
           <div className="flex items-center gap-3">
@@ -230,8 +243,10 @@ export const VehicleSelectorModal: React.FC<VehicleSelectorModalProps> = ({ isOp
             <span>Apply Fitment Filter</span>
           </button>
         </div>
-      </div>
-    </div>,
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>,
     document.body
   );
 };

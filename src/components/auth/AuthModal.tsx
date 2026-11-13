@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'motion/react';
 import { useAuth } from '../../application/AuthContext';
 import { useTheme } from '../../application/ThemeContext';
 import { useBodyScrollLock } from '../common/useBodyScrollLock';
@@ -67,8 +68,6 @@ export const AuthModal: React.FC = () => {
       }, 150);
     }
   }, [step]);
-
-  if (!isAuthModalOpen) return null;
 
   const handlePhoneSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,34 +160,46 @@ export const AuthModal: React.FC = () => {
     inputRefs[0]?.current?.focus();
   };
 
-  return createPortal(
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
-      style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
-    >
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 modal-backdrop-solid"
-        onClick={closeAuthModal}
-        aria-hidden="true"
-      />
+  if (typeof document === 'undefined') return null;
 
-      {/* Modal Container: Elevated above virtual keyboard on mobile */}
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-sm sm:max-w-md rounded-3xl p-6 sm:p-8 z-10 transition-all duration-300 ease-out my-auto max-h-[calc(100dvh-2rem)] overflow-y-auto ${
-          isDark
-            ? 'bg-[#0E0A0B] text-[#F1EEEE] border border-[#261619] shadow-[0_25px_60px_rgba(0,0,0,0.9)]'
-            : 'bg-[#FFFEFA] text-[#140E10] border border-[#E0DBD2] shadow-[0_25px_60px_rgba(0,0,0,0.12)]'
-        }`}
-        style={{
-          transform: keyboardOffset > 0 ? `translateY(-${Math.min(keyboardOffset * 0.45, 140)}px)` : undefined,
-        }}
-        role="dialog"
-        aria-modal="true"
-      >
+  return createPortal(
+    <AnimatePresence>
+      {isAuthModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
+          style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
+        >
+          {/* Backdrop */}
+          <motion.div
+            key="auth-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="fixed inset-0 modal-backdrop-solid"
+            onClick={closeAuthModal}
+            aria-hidden="true"
+          />
+
+          {/* Modal Container: Elevated above virtual keyboard on mobile */}
+          <motion.div
+            key="auth-dialog"
+            initial={{ opacity: 0, scale: 0.94, y: 14 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.94, y: 14 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            onClick={(e) => e.stopPropagation()}
+            className={`relative w-full max-w-sm sm:max-w-md rounded-3xl p-6 sm:p-8 z-10 transition-colors duration-300 ease-out my-auto max-h-[calc(100dvh-2rem)] overflow-y-auto ${
+              isDark
+                ? 'bg-[#0E0A0B] text-[#F1EEEE] border border-[#261619] shadow-[0_25px_60px_rgba(0,0,0,0.9)]'
+                : 'bg-[#FFFEFA] text-[#140E10] border border-[#E0DBD2] shadow-[0_25px_60px_rgba(0,0,0,0.12)]'
+            }`}
+            style={{
+              transform: keyboardOffset > 0 ? `translateY(-${Math.min(keyboardOffset * 0.45, 140)}px)` : undefined,
+            }}
+          >
         {/* Mobile Indicator Bar */}
         <div className={`w-10 h-1 rounded-full mx-auto mb-4 sm:hidden ${isDark ? 'bg-[#261619]' : 'bg-[#E0DBD2]'}`} />
 
@@ -426,8 +437,10 @@ export const AuthModal: React.FC = () => {
             </button>
           </div>
         )}
-      </div>
-    </div>,
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>,
     document.body
   );
 };

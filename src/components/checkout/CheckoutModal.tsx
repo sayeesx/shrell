@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
+import { AnimatePresence, motion } from 'motion/react';
 import { useCart } from '../../application/CartContext';
 import { useAuth } from '../../application/AuthContext';
 import { Order, PaymentMethod } from '../../domain/types';
@@ -148,8 +149,6 @@ export const CheckoutModal: React.FC = () => {
     }
   }, [isCheckoutOpen]);
 
-  if (!isCheckoutOpen) return null;
-
   const handleCopyUpi = () => {
     navigator.clipboard.writeText(storeUpiId);
     setCopiedUpi(true);
@@ -270,27 +269,41 @@ export const CheckoutModal: React.FC = () => {
     }
   };
 
-  return createPortal(
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-[99999] flex items-stretch md:items-center justify-end md:justify-center md:p-6 overflow-hidden"
-      style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
-    >
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 modal-backdrop-solid"
-        onClick={closeCheckout}
-        aria-hidden="true"
-      />
+  if (typeof document === 'undefined') return null;
 
-      {/* Modal / Drawer */}
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className={`relative z-10 w-[92%] sm:w-[85%] md:w-full max-w-md md:max-w-2xl h-[100dvh] md:h-auto md:max-h-[90vh] border-l md:border flex flex-col md:rounded-2xl animate-slide-right-drawer md:animate-none overflow-hidden ${isDark ? 'bg-[#0E0A0B] text-[#F1EEEE] border-[#261619]' : 'bg-white text-[#140E10] border-[#E0DBD2]'}`}
-        role="dialog"
-        aria-modal="true"
-      >
+  return createPortal(
+    <AnimatePresence>
+      {isCheckoutOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-[99999] flex items-stretch md:items-center justify-end md:justify-center md:p-6 overflow-hidden"
+          style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
+        >
+          {/* Backdrop */}
+          <motion.div
+            key="checkout-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 modal-backdrop-solid"
+            onClick={closeCheckout}
+            aria-hidden="true"
+          />
+
+          {/* Modal / Drawer */}
+          <motion.div
+            key="checkout-drawer"
+            initial={{ opacity: 0, x: 30, scale: 0.98 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 30, scale: 0.98 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            onClick={(e) => e.stopPropagation()}
+            className={`relative z-10 w-[92%] sm:w-[85%] md:w-full max-w-md md:max-w-2xl h-[100dvh] md:h-auto md:max-h-[90vh] border-l md:border flex flex-col md:rounded-2xl overflow-hidden ${isDark ? 'bg-[#0E0A0B] text-[#F1EEEE] border-[#261619]' : 'bg-white text-[#140E10] border-[#E0DBD2]'}`}
+            role="dialog"
+            aria-modal="true"
+          >
         {/* Header */}
         <div className={`flex items-center justify-between px-4 sm:px-6 py-3.5 border-b flex-shrink-0 ${isDark ? 'border-[#261619] bg-[#0A0808]' : 'border-[#E0DBD2] bg-[#F5F3EE]'}`}>
           <Link to="/" onClick={closeCheckout} className="flex items-center group cursor-pointer" aria-label="SHRELL Home">
@@ -539,8 +552,10 @@ export const CheckoutModal: React.FC = () => {
             </form>
           )}
         </div>
-      </div>
-    </div>,
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>,
     document.body
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'motion/react';
 import confetti from 'canvas-confetti';
 import { useCart } from '../../application/CartContext';
 import { Product } from '../../domain/types';
@@ -215,79 +216,96 @@ export const CartPage: React.FC = () => {
   };
 
   const renderFreeDeliveryCelebrationModal = () => {
-    if (!showFreeDeliveryModal || typeof document === 'undefined') return null;
+    if (typeof document === 'undefined') return null;
 
     return createPortal(
-      <div
-        className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overscroll-contain touch-none"
-        style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="free-delivery-title"
-        onClick={() => setShowFreeDeliveryModal(false)}
-      >
-        {/* Full-bleed blurred backdrop with zero top gap */}
-        <div className="fixed inset-0 modal-backdrop-solid" aria-hidden="true" />
-
-        <div
-          className={`relative z-10 w-full max-w-sm rounded-2xl border overflow-hidden shadow-2xl flex items-stretch animate-in zoom-in-95 duration-200 ${
-            isDark ? 'bg-[#120E0F] border-[#2D161A] text-[#F1EEEE]' : 'bg-[#E9E9E9] border-[#D0C9BE] text-[#140E10]'
-          }`}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Left Side: Man Holding Box Image covering full modal height without expanding height */}
-          <div className="relative w-[40%] shrink-0 overflow-hidden select-none">
-            <img
-              src="/images/man-holding-box.webp"
-              alt="SHRELL delivery partner holding express package"
-              width={400}
-              height={500}
-              className="absolute inset-0 w-full h-full object-cover object-[center_18%]"
+      <AnimatePresence>
+        {showFreeDeliveryModal && (
+          <div
+            className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overscroll-contain touch-none"
+            style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="free-delivery-title"
+            onClick={() => setShowFreeDeliveryModal(false)}
+          >
+            {/* Full-bleed blurred backdrop with zero top gap */}
+            <motion.div
+              key="free-delivery-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 modal-backdrop-solid"
+              aria-hidden="true"
             />
-          </div>
 
-          {/* Right Side: Celebration Message & Action */}
-          <div className="flex-1 min-w-0 p-4 flex flex-col justify-center space-y-2.5 text-left">
-            {/* Close Modal Button */}
-            <button
-              type="button"
-              onClick={() => setShowFreeDeliveryModal(false)}
-              className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full border flex items-center justify-center transition-colors cursor-pointer ${
-                isDark
-                  ? 'bg-[#1A1214] border-[#2D161A] text-slate-300 hover:text-white'
-                  : 'bg-[#DCDCDC] border-[#C6C0B8] text-[#4A4244] hover:text-[#140E10]'
+            <motion.div
+              key="free-delivery-card"
+              initial={{ opacity: 0, scale: 0.93, y: 14 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.93, y: 14 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className={`relative z-10 w-full max-w-sm rounded-2xl border overflow-hidden shadow-2xl flex items-stretch ${
+                isDark ? 'bg-[#120E0F] border-[#2D161A] text-[#F1EEEE]' : 'bg-[#E9E9E9] border-[#D0C9BE] text-[#140E10]'
               }`}
-              aria-label="Close free delivery celebration modal"
+              onClick={(e) => e.stopPropagation()}
             >
-              <i className="bi bi-x-lg text-xs" aria-hidden="true" />
-            </button>
+              {/* Left Side: Man Holding Box Image covering full modal height without expanding height */}
+              <div className="relative w-[40%] shrink-0 overflow-hidden select-none">
+                <img
+                  src="/images/man-holding-box.webp"
+                  alt="SHRELL delivery partner holding express package"
+                  width={400}
+                  height={500}
+                  className="absolute inset-0 w-full h-full object-cover object-[center_18%]"
+                />
+              </div>
 
-            <div className="space-y-1.5 pr-6">
-              <span className="inline-flex items-center gap-1.5 whitespace-nowrap px-2.5 py-0.5 rounded-full text-[9.5px] font-mono font-black uppercase tracking-wider bg-[#FF000E] text-white">
-                <i className="bi bi-unlock-fill text-[10px]" aria-hidden="true" />
-                <span>FREE SHIPPING</span>
-              </span>
-              <h3 id="free-delivery-title" className="text-base font-bold leading-snug tracking-tight">
-                Free Express Surface Delivery!
-              </h3>
-              <p className={`text-[11.5px] leading-relaxed ${isDark ? 'text-slate-300' : 'text-[#4A4244]'}`}>
-                Your order qualifies for zero shipping charge with priority dispatch across India.
-              </p>
-            </div>
+              {/* Right Side: Celebration Message & Action */}
+              <div className="flex-1 min-w-0 p-4 flex flex-col justify-center space-y-2.5 text-left">
+                {/* Close Modal Button */}
+                <button
+                  type="button"
+                  onClick={() => setShowFreeDeliveryModal(false)}
+                  className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full border flex items-center justify-center transition-colors cursor-pointer ${
+                    isDark
+                      ? 'bg-[#1A1214] border-[#2D161A] text-slate-300 hover:text-white'
+                      : 'bg-[#DCDCDC] border-[#C6C0B8] text-[#4A4244] hover:text-[#140E10]'
+                  }`}
+                  aria-label="Close free delivery celebration modal"
+                >
+                  <i className="bi bi-x-lg text-xs" aria-hidden="true" />
+                </button>
 
-            <button
-              type="button"
-              onClick={() => setShowFreeDeliveryModal(false)}
-              className="w-full py-2 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-mono font-bold text-[11px] uppercase tracking-wider transition-all cursor-pointer shadow-sm active:scale-95"
-            >
-              Got it, Continue
-            </button>
-            <p className={`text-[10.5px] text-center font-normal pt-0.5 tracking-tight ${isDark ? 'text-slate-400' : 'text-[#7A7575]'}`}>
-              Redirecting to your cart in {deliveryModalCountdown}...
-            </p>
+                <div className="space-y-1.5 pr-6">
+                  <span className="inline-flex items-center gap-1.5 whitespace-nowrap px-2.5 py-0.5 rounded-full text-[9.5px] font-mono font-black uppercase tracking-wider bg-[#FF000E] text-white">
+                    <i className="bi bi-unlock-fill text-[10px]" aria-hidden="true" />
+                    <span>FREE SHIPPING</span>
+                  </span>
+                  <h3 id="free-delivery-title" className="text-base font-bold leading-snug tracking-tight">
+                    Free Express Surface Delivery!
+                  </h3>
+                  <p className={`text-[11.5px] leading-relaxed ${isDark ? 'text-slate-300' : 'text-[#4A4244]'}`}>
+                    Your order qualifies for zero shipping charge with priority dispatch across India.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowFreeDeliveryModal(false)}
+                  className="w-full py-2 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-mono font-bold text-[11px] uppercase tracking-wider transition-all cursor-pointer shadow-sm active:scale-95"
+                >
+                  Got it, Continue
+                </button>
+                <p className={`text-[10.5px] text-center font-normal pt-0.5 tracking-tight ${isDark ? 'text-slate-400' : 'text-[#7A7575]'}`}>
+                  Redirecting to your cart in {deliveryModalCountdown}...
+                </p>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      </div>,
+        )}
+      </AnimatePresence>,
       document.body
     );
   };

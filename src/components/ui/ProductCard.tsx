@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'motion/react';
 import { Product } from '../../domain/types';
 import { formatINR } from '../../domain/services/CurrencyService';
 import { useCart } from '../../application/CartContext';
@@ -70,7 +71,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const isActionActive = btnState === 'added' || btnState === 'checkout';
 
   return (
-    <article className={`group relative border rounded-xl overflow-hidden flex flex-col transition-all duration-200 ${isDark ? 'bg-[#0A0808] bg-gradient-to-b from-[#130E10] to-[#0A0808] border-[#221215] hover:border-[#4F242C]' : 'bg-white border-[#E0DBD2] hover:border-[#FF000E]/40'}`}>
+    <motion.article
+      whileHover={{ y: -3, transition: { duration: 0.2, ease: 'easeOut' } }}
+      className={`group relative border rounded-xl overflow-hidden flex flex-col transition-colors duration-200 ${isDark ? 'bg-[#0A0808] bg-gradient-to-b from-[#130E10] to-[#0A0808] border-[#221215] hover:border-[#4F242C]' : 'bg-white border-[#E0DBD2] hover:border-[#FF000E]/40'}`}
+    >
       {/* Product Image Link */}
       <Link
         to={`/product/${product.slug}`}
@@ -81,18 +85,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           alt={`${product.name} - SHRELL Automotive Accessory`}
         />
 
-        {/* Top-right Wishlist Button */}
-        <button
+        {/* Top-right Wishlist Button with fluid spring tap */}
+        <motion.button
           type="button"
+          whileTap={{ scale: 0.82 }}
           onClick={handleWishlistToggle}
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-          className={`absolute top-2 right-2 sm:top-2.5 sm:right-2.5 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-md backdrop-blur-xs border flex items-center justify-center transition-colors ${isDark ? 'bg-black/60 hover:bg-black/90 text-[#F1EEEE] border-[#261619]' : 'bg-white/80 hover:bg-white text-[#5C5456] border-[#E0DBD2]'}`}
+          className={`absolute top-2 right-2 sm:top-2.5 sm:right-2.5 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-md backdrop-blur-xs border flex items-center justify-center transition-colors cursor-pointer ${isDark ? 'bg-black/60 hover:bg-black/90 text-[#F1EEEE] border-[#261619]' : 'bg-white/80 hover:bg-white text-[#5C5456] border-[#E0DBD2]'}`}
         >
           <i
-            className={`bi ${isWishlisted ? 'bi-heart-fill text-[#FF000E]' : 'bi-heart'} text-xs sm:text-sm leading-none`}
+            className={`bi ${isWishlisted ? 'bi-heart-fill text-[#FF000E]' : 'bi-heart'} text-xs sm:text-sm leading-none transition-transform`}
             aria-hidden="true"
           ></i>
-        </button>
+        </motion.button>
 
         {/* Bottom Image Overlay Offers Badge */}
         <div className="absolute bottom-2 left-2 z-10 pointer-events-none">
@@ -132,8 +137,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
 
           {/* Quick Add Button with Skew-Sweep "Added to cart" -> Rotate to "Checkout" Animation */}
-          <button
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.94 }}
             onClick={handleButtonClick}
             disabled={isOutOfStock || btnState === 'adding'}
             className={`shrell-cart-btn ${btnState === 'added' ? 'is-added' : ''} ${btnState === 'checkout' ? 'is-checkout' : ''} relative min-h-[32px] sm:min-h-[34px] px-3 py-1 rounded-lg text-xs font-semibold flex items-center justify-center transition-all flex-shrink-0 select-none outline-none focus:outline-none focus:ring-0 disabled:opacity-100 ${
@@ -147,7 +153,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                       ? isDark
                         ? 'bg-[#1A1214] text-[#7A7575] cursor-not-allowed border border-[#261619] min-w-[70px] sm:min-w-[80px]'
                         : 'bg-[#F0EDE6] text-[#9E9898] cursor-not-allowed border border-[#E0DBD2] min-w-[70px] sm:min-w-[80px]'
-                      : 'bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white active:scale-95 min-w-[70px] sm:min-w-[80px]'
+                      : 'bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white min-w-[70px] sm:min-w-[80px]'
             }`}
             aria-label={
               isOutOfStock
@@ -216,9 +222,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 <i className="bi bi-arrow-right text-[10px] leading-none" aria-hidden="true"></i>
               </span>
             </span>
-          </button>
+          </motion.button>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 };

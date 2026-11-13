@@ -1,12 +1,20 @@
 import { useEffect } from 'react';
+import { getGlobalLenis } from './SmoothScrollProvider';
 
 /**
  * Custom hook to lock body scrolling when a modal or dialog is open,
- * preventing background scrolling while compensating for scrollbar shift.
+ * preventing background scrolling while compensating for scrollbar shift
+ * and syncing with Lenis smooth scroll.
  */
 export function useBodyScrollLock(isLocked: boolean): void {
   useEffect(() => {
     if (!isLocked) return;
+
+    // Pause Lenis smooth scroll while modal is active
+    const lenis = getGlobalLenis();
+    if (lenis) {
+      lenis.stop();
+    }
 
     // Save previous overflow & padding
     const originalBodyOverflow = document.body.style.overflow;
@@ -37,6 +45,11 @@ export function useBodyScrollLock(isLocked: boolean): void {
       mains.forEach((m, idx) => {
         m.style.overflow = mainOverflows[idx] || '';
       });
+
+      // Resume Lenis smooth scroll
+      if (lenis) {
+        lenis.start();
+      }
     };
   }, [isLocked]);
 }

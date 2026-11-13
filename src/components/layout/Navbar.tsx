@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'motion/react';
 import { useCart } from '../../application/CartContext';
 import { useAuth } from '../../application/AuthContext';
 import { useTheme } from '../../application/ThemeContext';
@@ -402,9 +403,15 @@ export const Navbar: React.FC = () => {
             >
               <i className="bi bi-bag text-lg leading-none" aria-hidden="true" />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#FF000E] text-white text-[10px] font-semibold min-w-[18px] h-[18px] rounded-full flex items-center justify-center leading-none px-1 shadow-sm">
+                <motion.span
+                  key={`desktop-badge-${itemCount}`}
+                  initial={{ scale: 0.5 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                  className="absolute -top-1 -right-1 bg-[#FF000E] text-white text-[10px] font-semibold min-w-[18px] h-[18px] rounded-full flex items-center justify-center leading-none px-1 shadow-sm"
+                >
                   {itemCount}
-                </span>
+                </motion.span>
               )}
             </Link>
           </div>
@@ -435,9 +442,15 @@ export const Navbar: React.FC = () => {
               >
                 <i className="bi bi-bag text-sm leading-none" />
                 {itemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#FF000E] text-white text-[9px] font-semibold min-w-[16px] h-[16px] rounded-full flex items-center justify-center leading-none px-0.5 shadow-sm">
+                  <motion.span
+                    key={`mobile-badge-${itemCount}`}
+                    initial={{ scale: 0.5 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                    className="absolute -top-1 -right-1 bg-[#FF000E] text-white text-[9px] font-semibold min-w-[16px] h-[16px] rounded-full flex items-center justify-center leading-none px-0.5 shadow-sm"
+                  >
                     {itemCount}
-                  </span>
+                  </motion.span>
                 )}
               </Link>
             </div>

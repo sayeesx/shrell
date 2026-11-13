@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'motion/react';
 import { useAuth } from '../../application/AuthContext';
 import { useTheme } from '../../application/ThemeContext';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
@@ -134,7 +135,17 @@ export const AdminLayout: React.FC = () => {
 
       {/* Main Administrative View Area */}
       <main className={`flex-1 min-w-0 overflow-y-auto p-4 sm:p-6 md:p-8 transition-colors duration-200 ${isDark ? 'bg-[#000000]' : 'bg-slate-50'}`}>
-        <Outlet />
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </main>
     </div>
   );

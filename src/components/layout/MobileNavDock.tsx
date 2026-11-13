@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'motion/react';
 import { useAuth } from '../../application/AuthContext';
 import { useTheme } from '../../application/ThemeContext';
 import { useCart } from '../../application/CartContext';
@@ -123,7 +124,7 @@ export const MobileNavDock: React.FC = () => {
           <Link
             key={item.id}
             to={item.to}
-            className="group relative flex flex-col items-center justify-center py-0.5 transition-transform active:scale-95 duration-200 cursor-pointer"
+            className="group relative flex flex-col items-center justify-center py-0.5 active:scale-95 transition-transform duration-150 cursor-pointer"
           >
             <div className="w-10 h-6 flex items-center justify-center transition-all duration-200 relative">
               <i
@@ -139,9 +140,15 @@ export const MobileNavDock: React.FC = () => {
                 aria-hidden="true"
               />
               {item.badge !== undefined && item.badge > 0 && (
-                <span className="absolute -top-1 right-1 bg-[#FF000E] text-white text-[8.5px] font-bold min-w-[14px] h-[14px] rounded-full flex items-center justify-center px-0.5 leading-none shadow-xs">
+                <motion.span
+                  key={item.badge}
+                  initial={{ scale: 0.5 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                  className="absolute -top-1 right-1 bg-[#FF000E] text-white text-[8.5px] font-bold min-w-[14px] h-[14px] rounded-full flex items-center justify-center px-0.5 leading-none shadow-xs"
+                >
                   {item.badge}
-                </span>
+                </motion.span>
               )}
             </div>
             <span
@@ -164,7 +171,7 @@ export const MobileNavDock: React.FC = () => {
         <button
           type="button"
           onClick={handleProfileClick}
-          className="group relative flex flex-col items-center justify-center py-0.5 transition-transform active:scale-95 duration-200 cursor-pointer"
+          className="group relative flex flex-col items-center justify-center py-0.5 active:scale-95 transition-transform duration-150 cursor-pointer"
           aria-label="Account profile"
         >
           <div className="w-10 h-6 flex items-center justify-center transition-all duration-200">

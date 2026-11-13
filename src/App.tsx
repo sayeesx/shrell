@@ -1,11 +1,13 @@
 import React from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'motion/react';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { MobileNavDock } from './components/layout/MobileNavDock';
 import { AuthModal } from './components/auth/AuthModal';
 import { CheckoutModal } from './components/checkout/CheckoutModal';
 import { useTheme } from './application/ThemeContext';
+import { SmoothScrollProvider } from './components/common/SmoothScrollProvider';
 
 // Storefront Pages
 import { HomePage } from './pages/storefront/HomePage';
@@ -76,70 +78,86 @@ export const App: React.FC = () => {
   const shouldShowHeader = !isAdminRoute && (isHomePage || isCataloguePage);
 
   return (
-    <div
-      className={`min-h-screen flex flex-col bg-atmospheric-red font-sans antialiased pb-16 md:pb-0 transition-colors duration-300 ${
-        isDark ? 'bg-[#000000] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'
-      }`}
-    >
-      <ScrollToTop />
+    <SmoothScrollProvider>
+      <div
+        className={`min-h-screen flex flex-col bg-atmospheric-red font-sans antialiased pb-16 md:pb-0 transition-colors duration-300 ${
+          isDark ? 'bg-[#000000] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'
+        }`}
+      >
+        <ScrollToTop />
 
-      {/* Storefront Navigation: Only on Home and Category pages */}
-      {shouldShowHeader && <Navbar />}
+        {/* Storefront Navigation: Only on Home and Category pages */}
+        {shouldShowHeader && <Navbar />}
 
-      {/* Main Content View */}
-      <div className="flex-1">
-        <Routes>
-          {/* Storefront Routes */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/catalogue" element={<CataloguePage />} />
-          <Route path="/deals" element={<Navigate to="/cart" replace />} />
-          <Route path="/product/:slug" element={<ProductDetailPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/order-success" element={<OrderSuccessPage />} />
-          <Route path="/order-failure" element={<OrderFailurePage />} />
-          <Route path="/track" element={<OrderTrackingPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/orders" element={<Navigate to="/profile?tab=orders" replace />} />
-          <Route path="/pre-book" element={<PreBookPage />} />
-          <Route path="/offline" element={<OfflinePage onRetry={() => setIsOnline(true)} />} />
-          <Route path="/shipping-policy" element={<PoliciesPage />} />
-          <Route path="/returns-policy" element={<PoliciesPage />} />
-          <Route path="/privacy-policy" element={<PoliciesPage />} />
+        {/* Main Content View with motion.dev page transition */}
+        <div className="flex-1 flex flex-col">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={isAdminRoute ? 'admin-root' : location.pathname}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{
+                duration: 0.24,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="flex-1 flex flex-col w-full"
+            >
+              <Routes location={location}>
+                {/* Storefront Routes */}
+                <Route path="/" element={<HomePage />} />
+                <Route path="/catalogue" element={<CataloguePage />} />
+                <Route path="/deals" element={<Navigate to="/cart" replace />} />
+                <Route path="/product/:slug" element={<ProductDetailPage />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/order-success" element={<OrderSuccessPage />} />
+                <Route path="/order-failure" element={<OrderFailurePage />} />
+                <Route path="/track" element={<OrderTrackingPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/orders" element={<Navigate to="/profile?tab=orders" replace />} />
+                <Route path="/pre-book" element={<PreBookPage />} />
+                <Route path="/offline" element={<OfflinePage onRetry={() => setIsOnline(true)} />} />
+                <Route path="/shipping-policy" element={<PoliciesPage />} />
+                <Route path="/returns-policy" element={<PoliciesPage />} />
+                <Route path="/privacy-policy" element={<PoliciesPage />} />
 
-          {/* Admin Routes */}
-          <Route path="/admin/login" element={<AdminLoginPage />} />
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboardOverview />} />
-            <Route path="sections" element={<AdminHomeSections />} />
-            <Route path="categories" element={<AdminCategories />} />
-            <Route path="banners" element={<AdminBanners />} />
-            <Route path="configuration" element={<AdminConfiguration />} />
-            <Route path="sanity" element={<Navigate to="/admin/configuration" replace />} />
-            <Route path="products" element={<AdminProducts />} />
-            <Route path="reviews" element={<AdminReviews />} />
-            <Route path="orders" element={<AdminOrders />} />
-            <Route path="inventory" element={<AdminInventory />} />
-            <Route path="coupons" element={<AdminCoupons />} />
-            <Route path="settings" element={<AdminSettings />} />
-          </Route>
+                {/* Admin Routes */}
+                <Route path="/admin/login" element={<AdminLoginPage />} />
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboardOverview />} />
+                  <Route path="sections" element={<AdminHomeSections />} />
+                  <Route path="categories" element={<AdminCategories />} />
+                  <Route path="banners" element={<AdminBanners />} />
+                  <Route path="configuration" element={<AdminConfiguration />} />
+                  <Route path="sanity" element={<Navigate to="/admin/configuration" replace />} />
+                  <Route path="products" element={<AdminProducts />} />
+                  <Route path="reviews" element={<AdminReviews />} />
+                  <Route path="orders" element={<AdminOrders />} />
+                  <Route path="inventory" element={<AdminInventory />} />
+                  <Route path="coupons" element={<AdminCoupons />} />
+                  <Route path="settings" element={<AdminSettings />} />
+                </Route>
 
-          {/* Fallback to home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+                {/* Fallback to home */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Storefront Footer (Rendered strictly on home page) */}
+        {location.pathname === '/' && <Footer />}
+
+        {/* Mobile Floating Bottom Navigation Dock */}
+        {!isAdminRoute && <MobileNavDock />}
+
+        {/* Global Phone & 4-Digit Verification Modal */}
+        <AuthModal />
+
+        {/* Global Checkout Modal */}
+        <CheckoutModal />
       </div>
-
-      {/* Storefront Footer (Rendered strictly on home page) */}
-      {location.pathname === '/' && <Footer />}
-
-      {/* Mobile Floating Bottom Navigation Dock */}
-      {!isAdminRoute && <MobileNavDock />}
-
-      {/* Global Phone & 4-Digit Verification Modal */}
-      <AuthModal />
-
-      {/* Global Checkout Modal */}
-      <CheckoutModal />
-    </div>
+    </SmoothScrollProvider>
   );
 };

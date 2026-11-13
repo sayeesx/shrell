@@ -208,6 +208,12 @@ export const CartPage: React.FC = () => {
     addItem(prod, 1);
   };
 
+  const getShortTitle = (name: string) => {
+    const words = name.trim().split(/\s+/);
+    if (words.length <= 3) return name;
+    return `${words.slice(0, 3).join(' ')}..`;
+  };
+
   const renderFreeDeliveryCelebrationModal = () => {
     if (!showFreeDeliveryModal || typeof document === 'undefined') return null;
 
@@ -629,13 +635,13 @@ export const CartPage: React.FC = () => {
                 return (
                   <div
                     key={prod.id}
-                    className={`w-24 shrink-0 snap-start p-1.5 rounded-xl border flex flex-col justify-between ${
+                    className={`w-28 shrink-0 snap-start p-1.5 rounded-xl border flex flex-col justify-between ${
                       isDark ? 'bg-[#130E10] border-[#2D161A]' : 'bg-white border-[#D0C9BE] shadow-xs'
                     }`}
                   >
                     <div>
-                      {/* Compact 1:1 Square Image Container */}
-                      <div className={`w-14 h-14 mx-auto aspect-square rounded-lg flex items-center justify-center p-1 overflow-hidden border ${
+                      {/* Image Container filling card width with clean margin padding */}
+                      <div className={`w-full aspect-square rounded-lg flex items-center justify-center p-1.5 overflow-hidden border ${
                         isDark ? 'bg-[#181113] border-[#2D161A]' : 'bg-[#F5F3EE] border-[#D0C9BE]'
                       }`}>
                         {prod.images?.[0]?.url && !prod.images[0].url.includes('shrell-') && !failedImages[`sug-${prod.id}`] ? (
@@ -650,19 +656,19 @@ export const CartPage: React.FC = () => {
                             <img
                               src="/logos/shrell-brandicon_no-bg.png"
                               alt="SHRELL"
-                              className="w-6 h-6 object-contain"
+                              className="w-7 h-7 object-contain"
                             />
                           </div>
                         )}
                       </div>
                       <Link
                         to={`/product/${prod.slug}`}
-                        className="font-bold text-[10px] line-clamp-1 leading-tight mt-1 block hover:text-[#FF000E] transition-colors"
+                        className="font-bold text-[11px] leading-tight mt-1.5 block hover:text-[#FF000E] transition-colors truncate"
                         title={prod.name}
                       >
-                        {prod.name}
+                        {getShortTitle(prod.name)}
                       </Link>
-                      <p className={`font-extrabold text-[11px] mt-0.5 ${isDark ? 'text-white' : 'text-black'}`}>
+                      <p className={`font-extrabold text-xs mt-0.5 ${isDark ? 'text-white' : 'text-black'}`}>
                         {formatINR(prod.pricePaisa)}
                       </p>
                     </div>

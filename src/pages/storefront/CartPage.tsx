@@ -95,7 +95,7 @@ export const CartPage: React.FC = () => {
   const [deliveryModalCountdown, setDeliveryModalCountdown] = useState(3);
   const suppressFreeDeliveryPopupRef = useRef(false);
 
-  useBodyScrollLock(showFreeDeliveryModal && isMobile);
+  useBodyScrollLock(showFreeDeliveryModal);
 
   useEffect(() => {
     if (suppressFreeDeliveryPopupRef.current) {
@@ -133,7 +133,7 @@ export const CartPage: React.FC = () => {
       }
     }
 
-    if (!isMobile || !isFreeDeliveryUnlocked || currentIds.length === 0) {
+    if (!isFreeDeliveryUnlocked || currentIds.length === 0) {
       return;
     }
 
@@ -209,7 +209,7 @@ export const CartPage: React.FC = () => {
   };
 
   const renderFreeDeliveryCelebrationModal = () => {
-    if (!showFreeDeliveryModal || !isMobile || typeof document === 'undefined') return null;
+    if (!showFreeDeliveryModal || typeof document === 'undefined') return null;
 
     return createPortal(
       <div
@@ -891,8 +891,8 @@ export const CartPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Dynamic Delivery Timeline (Desktop) */}
-        {renderDeliveryTimeline(false)}
+        {/* Dynamic Delivery Timeline (Desktop - only shown before reaching free shipping threshold) */}
+        {!isFreeDeliveryUnlocked && renderDeliveryTimeline(false)}
 
         {/* 2-Column Desktop Grid */}
         <div className="grid grid-cols-12 gap-6 items-start">

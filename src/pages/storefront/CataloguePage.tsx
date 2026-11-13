@@ -106,17 +106,6 @@ export const CataloguePage: React.FC = () => {
     }
   }, [searchInput, filteredProducts.length]);
 
-  const handleSearchChange = (value: string) => {
-    setSearchInput(value);
-    const newParams = new URLSearchParams(searchParams);
-    if (value.trim()) {
-      newParams.set('search', value.trim());
-    } else {
-      newParams.delete('search');
-    }
-    setSearchParams(newParams, { replace: true });
-  };
-
   const handleCategorySelect = (slug: string) => {
     setSelectedCategory(slug);
     const newParams = new URLSearchParams(searchParams);
@@ -271,24 +260,6 @@ export const CataloguePage: React.FC = () => {
                   className="px-4 py-2 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer"
                 >
                   Clear All Filters
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSearchChange('mats')}
-                  className={`px-3 py-2 rounded-lg border text-xs font-mono transition-colors cursor-pointer ${
-                    isDark ? 'border-[#261619] hover:bg-white/5' : 'border-gray-200 hover:bg-gray-50'
-                  }`}
-                >
-                  Try "Mats"
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSearchChange('diffuser')}
-                  className={`px-3 py-2 rounded-lg border text-xs font-mono transition-colors cursor-pointer ${
-                    isDark ? 'border-[#261619] hover:bg-white/5' : 'border-gray-200 hover:bg-gray-50'
-                  }`}
-                >
-                  Try "Diffuser"
                 </button>
               </div>
             )}

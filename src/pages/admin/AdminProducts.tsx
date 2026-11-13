@@ -373,7 +373,7 @@ export const AdminProducts: React.FC = () => {
         <button
           type="button"
           onClick={openCreateModal}
-          className="px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-1.5 transition-colors self-start sm:self-auto cursor-pointer shadow-sm"
+          className="px-4 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-1.5 transition-colors self-start sm:self-auto cursor-pointer shadow-sm"
         >
           <i className="bi bi-plus-lg text-sm" aria-hidden="true" />
           <span>Add New Product</span>
@@ -984,9 +984,10 @@ export const AdminProducts: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-sm"
+                  className="px-6 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold uppercase tracking-wider transition-all active:scale-95 cursor-pointer shadow-md flex items-center gap-1.5"
                 >
-                  Save Product
+                  <i className="bi bi-check2 text-base" aria-hidden="true" />
+                  <span>Save Product</span>
                 </button>
               </div>
             </form>

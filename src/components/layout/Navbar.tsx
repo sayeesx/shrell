@@ -232,13 +232,6 @@ export const Navbar: React.FC = () => {
           : 'bg-white border-[#E0DBD2] text-[#140E10]'
       }`}
     >
-      <div
-        className={`px-3.5 py-2 border-b text-[11px] font-mono font-bold uppercase tracking-wider ${
-          isDark ? 'border-[#261619] text-slate-400' : 'border-[#E0DBD2] text-[#5C5456]'
-        }`}
-      >
-        Sort By
-      </div>
       <div className="py-1">
         {SORT_OPTIONS.map((opt) => {
           const isSelected = activeSort === opt.value;

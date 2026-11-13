@@ -172,7 +172,7 @@ export const AdminCoupons: React.FC = () => {
               </div>
               <div className={`pt-2 flex justify-end gap-3 border-t ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
                 <button type="button" onClick={() => setIsModalOpen(false)} className={`px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'}`}>Cancel</button>
-                <button type="submit" className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-sm">Save Coupon</button>
+                <button type="submit" className="px-5 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold uppercase tracking-wider transition-all active:scale-95 cursor-pointer shadow-sm">Save Coupon</button>
               </div>
             </form>
           </div>

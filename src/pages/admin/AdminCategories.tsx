@@ -447,7 +447,7 @@ export const AdminCategories: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-5 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 disabled:opacity-50 font-bold font-mono uppercase tracking-wider transition-colors cursor-pointer shadow-sm"
+                  className="px-5 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white disabled:opacity-50 font-bold font-mono uppercase tracking-wider transition-all active:scale-95 cursor-pointer shadow-sm"
                 >
                   {isSaving ? 'Saving...' : editingCategory ? 'Update Category' : 'Create Category'}
                 </button>

@@ -49,7 +49,7 @@ export const LeaveCheckoutConfirmModal: React.FC<LeaveCheckoutConfirmModalProps>
 
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative z-10 w-full md:max-w-md rounded-t-2xl md:rounded-2xl border p-5 sm:p-6 pb-6 text-left overflow-hidden min-h-[220px] transition-transform ${
+        className={`relative z-10 w-full md:max-w-md rounded-t-2xl md:rounded-2xl border p-6 sm:p-7 pb-8 text-left overflow-hidden min-h-[260px] sm:min-h-[290px] transition-transform ${
           isDark
             ? 'bg-[#0A0A0A] border-[#261619] text-[#F1EEEE]'
             : 'bg-white border-[#E0DBD2] text-[#140E10]'
@@ -68,7 +68,7 @@ export const LeaveCheckoutConfirmModal: React.FC<LeaveCheckoutConfirmModalProps>
         </div>
 
         {/* Left action column sized clear of bottom-right cat image */}
-        <div className="relative z-10 mt-5 w-[calc(100%-8.5rem)] sm:w-[calc(100%-10.5rem)] flex flex-col gap-2">
+        <div className="relative z-10 mt-6 w-[calc(100%-8.5rem)] sm:w-[calc(100%-10.5rem)] flex flex-col gap-2.5">
           <button
             type="button"
             onClick={onContinueOrder}
@@ -89,11 +89,11 @@ export const LeaveCheckoutConfirmModal: React.FC<LeaveCheckoutConfirmModalProps>
           </button>
         </div>
 
-        {/* Sad cat image enlarged and touching the content margin rather than extreme corner */}
+        {/* Sad cat image attached strictly to right margin */}
         <img
           src="/images/cat-sad.webp"
           alt="Sad cat hoping you complete your order"
-          className="pointer-events-none select-none absolute right-4 bottom-4 sm:right-6 sm:bottom-6 w-32 h-32 sm:w-40 sm:h-40 object-contain object-right-bottom bg-transparent border-0 shadow-none"
+          className="pointer-events-none select-none absolute right-0 bottom-0 w-36 h-36 sm:w-44 sm:h-44 object-contain object-right-bottom bg-transparent border-0 shadow-none"
           style={{ boxShadow: 'none', background: 'transparent' }}
         />
       </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
@@ -92,10 +92,17 @@ export const CartPage: React.FC = () => {
   // Mobile celebration popup modal for Free Express Shipping (show once per product set, or when a new product is added)
   const FREE_DELIVERY_SEEN_KEY = 'shrell_free_delivery_seen_products_v1';
   const [showFreeDeliveryModal, setShowFreeDeliveryModal] = useState(false);
+  const [deliveryModalCountdown, setDeliveryModalCountdown] = useState(3);
+  const suppressFreeDeliveryPopupRef = useRef(false);
 
   useBodyScrollLock(showFreeDeliveryModal && isMobile);
 
   useEffect(() => {
+    if (suppressFreeDeliveryPopupRef.current) {
+      suppressFreeDeliveryPopupRef.current = false;
+      return;
+    }
+
     const currentIds = cart.items.map((item) => item.productId);
     const currentSet = new Set(currentIds);
 
@@ -170,14 +177,36 @@ export const CartPage: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showFreeDeliveryModal]);
 
-  // Auto-close free delivery modal after 3 seconds without a distracting countdown ticker
+  // Auto-close free delivery modal with dynamic 3, 2, 1 countdown
   useEffect(() => {
     if (!showFreeDeliveryModal) return;
-    const autoCloseTimer = setTimeout(() => {
-      setShowFreeDeliveryModal(false);
-    }, 3000);
-    return () => clearTimeout(autoCloseTimer);
+    setDeliveryModalCountdown(3);
+
+    const interval = setInterval(() => {
+      setDeliveryModalCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setShowFreeDeliveryModal(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, [showFreeDeliveryModal]);
+
+  const handleAddSuggestion = (prod: Product) => {
+    try {
+      const raw = localStorage.getItem(FREE_DELIVERY_SEEN_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(parsed) && !parsed.includes(prod.id)) {
+        localStorage.setItem(FREE_DELIVERY_SEEN_KEY, JSON.stringify([...parsed, prod.id]));
+      }
+    } catch {}
+    suppressFreeDeliveryPopupRef.current = true;
+    addItem(prod, 1);
+  };
 
   const renderFreeDeliveryCelebrationModal = () => {
     if (!showFreeDeliveryModal || !isMobile || typeof document === 'undefined') return null;
@@ -248,7 +277,7 @@ export const CartPage: React.FC = () => {
               Got it, Continue
             </button>
             <p className={`text-[10.5px] text-center font-normal pt-0.5 tracking-tight ${isDark ? 'text-slate-400' : 'text-[#7A7575]'}`}>
-              Redirecting to your cart in 3, 2, 1...
+              Redirecting to your cart in {deliveryModalCountdown}...
             </p>
           </div>
         </div>
@@ -588,11 +617,11 @@ export const CartPage: React.FC = () => {
         </div>
 
         {/* ========================================================================= */}
-        {/* 4. PRODUCT SUGGESTIONS (Flush Left - No Title, No Left Margin Indent)   */}
+        {/* 4. PRODUCT SUGGESTIONS (Add More Items Carousel)                          */}
         {/* ========================================================================= */}
         {displayedSuggestions.length > 0 && (
           <div className="pt-1">
-            <div className="-mx-3.5 px-3.5 flex gap-2 overflow-x-auto pb-1 scrollbar-none snap-x snap-mandatory">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none snap-x snap-mandatory w-full">
               {displayedSuggestions.map((prod) => {
                 const inCartItem = cart.items.find((it) => it.productId === prod.id);
                 const currentQty = inCartItem?.quantity || 0;
@@ -600,19 +629,20 @@ export const CartPage: React.FC = () => {
                 return (
                   <div
                     key={prod.id}
-                    className={`w-28 shrink-0 snap-start p-1.5 rounded-xl border flex flex-col justify-between ${
+                    className={`w-24 shrink-0 snap-start p-1.5 rounded-xl border flex flex-col justify-between ${
                       isDark ? 'bg-[#130E10] border-[#2D161A]' : 'bg-white border-[#D0C9BE] shadow-xs'
                     }`}
                   >
                     <div>
-                      <div className={`w-full h-14 rounded-lg flex items-center justify-center p-1 overflow-hidden border ${
+                      {/* Compact 1:1 Square Image Container */}
+                      <div className={`w-14 h-14 mx-auto aspect-square rounded-lg flex items-center justify-center p-1 overflow-hidden border ${
                         isDark ? 'bg-[#181113] border-[#2D161A]' : 'bg-[#F5F3EE] border-[#D0C9BE]'
                       }`}>
                         {prod.images?.[0]?.url && !prod.images[0].url.includes('shrell-') && !failedImages[`sug-${prod.id}`] ? (
                           <img
                             src={prod.images[0].url}
                             alt={prod.name}
-                            className="w-full h-full object-contain"
+                            className="w-full h-full object-contain aspect-square"
                             onError={() => handleImageError(`sug-${prod.id}`)}
                           />
                         ) : (
@@ -620,38 +650,41 @@ export const CartPage: React.FC = () => {
                             <img
                               src="/logos/shrell-brandicon_no-bg.png"
                               alt="SHRELL"
-                              className="w-7 h-7 object-contain"
+                              className="w-6 h-6 object-contain"
                             />
                           </div>
                         )}
                       </div>
                       <Link
                         to={`/product/${prod.slug}`}
-                        className="font-bold text-[11px] line-clamp-1 leading-snug mt-1.5 block hover:text-[#FF000E] transition-colors"
+                        className="font-bold text-[10px] line-clamp-1 leading-tight mt-1 block hover:text-[#FF000E] transition-colors"
+                        title={prod.name}
                       >
                         {prod.name}
                       </Link>
-                      <p className={`font-extrabold text-xs mt-0.5 ${isDark ? 'text-white' : 'text-black'}`}>
+                      <p className={`font-extrabold text-[11px] mt-0.5 ${isDark ? 'text-white' : 'text-black'}`}>
                         {formatINR(prod.pricePaisa)}
                       </p>
                     </div>
 
                     <div className={`mt-1.5 pt-1 border-t ${isDark ? 'border-[#2D161A]' : 'border-[#D0C9BE]'}`}>
                       {currentQty > 0 ? (
-                        <div className="w-full flex items-center justify-between rounded-lg bg-[#FF000E] text-white py-1 px-2.5 font-bold text-xs">
+                        <div className="w-full h-7 rounded-lg bg-[#FF000E] text-white px-2 font-bold text-xs flex items-center justify-between shadow-xs">
                           <button
                             type="button"
                             onClick={() => updateQuantity(prod.id, currentQty - 1)}
-                            className="hover:scale-110 active:scale-95 transition-transform"
+                            className="w-5 h-full flex items-center justify-center hover:scale-110 active:scale-95 transition-transform text-sm leading-none"
+                            aria-label="Decrease quantity"
                           >
                             −
                           </button>
-                          <span className="font-mono text-xs">{currentQty}</span>
+                          <span className="font-mono text-xs select-none">{currentQty}</span>
                           <button
                             type="button"
                             onClick={() => updateQuantity(prod.id, currentQty + 1)}
                             disabled={currentQty >= prod.stockQuantity}
-                            className="hover:scale-110 active:scale-95 transition-transform disabled:opacity-40"
+                            className="w-5 h-full flex items-center justify-center hover:scale-110 active:scale-95 transition-transform disabled:opacity-40 text-sm leading-none"
+                            aria-label="Increase quantity"
                           >
                             +
                           </button>
@@ -659,9 +692,9 @@ export const CartPage: React.FC = () => {
                       ) : (
                         <button
                           type="button"
-                          onClick={() => addItem(prod, 1)}
+                          onClick={() => handleAddSuggestion(prod)}
                           disabled={prod.stockQuantity <= 0}
-                          className="w-full py-1.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-xs uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-40 flex items-center justify-center shadow-xs"
+                          className="w-full h-7 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-xs uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-40 flex items-center justify-center shadow-xs"
                         >
                           + ADD
                         </button>

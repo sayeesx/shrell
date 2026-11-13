@@ -8,6 +8,7 @@ import { useCart } from '../../application/CartContext';
 import { useAuth } from '../../application/AuthContext';
 import { useTheme } from '../../application/ThemeContext';
 import { ProductCard } from '../../components/ui/ProductCard';
+import { PaymentMethodIcons } from '../../components/common/PaymentMethodIcons';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { ProductDetailSkeleton } from '../../components/common/ShimmerSkeleton';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
@@ -601,23 +602,8 @@ export const ProductDetailPage: React.FC = () => {
             {/* Secure Checkout badges */}
             <div className={`pt-3 border-t space-y-2 text-center ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
               <p className={`text-xs font-medium ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>Secure Checkout With</p>
-              <div className="flex items-center justify-center gap-3 flex-wrap pt-0.5">
-                <div title="Visa" className={`h-6 px-2.5 py-0.5 rounded border flex items-center justify-center ${isDark ? 'border-[#261619] bg-[#130E10]' : 'border-[#E0DBD2] bg-[#F5F3EE]'}`}>
-                  <span className={`font-bold text-[11px] tracking-wider italic ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>VISA</span>
-                </div>
-                <div title="Mastercard" className={`h-6 px-2.5 py-0.5 rounded border flex items-center justify-center gap-0.5 ${isDark ? 'border-[#261619] bg-[#130E10]' : 'border-[#E0DBD2] bg-[#F5F3EE]'}`}>
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#EB001B] inline-block opacity-90 -mr-1"></span>
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#B0000A] inline-block opacity-90"></span>
-                </div>
-                <div title="Apple Pay" className={`h-6 px-2.5 py-0.5 rounded border flex items-center justify-center gap-1 text-[11px] font-medium ${isDark ? 'border-[#261619] bg-[#130E10] text-[#F1EEEE]' : 'border-[#E0DBD2] bg-[#F5F3EE] text-[#140E10]'}`}>
-                  <i className="bi bi-apple text-xs"></i><span>Pay</span>
-                </div>
-                <div title="Google Pay" className={`h-6 px-2.5 py-0.5 rounded border flex items-center justify-center gap-1 text-[11px] font-medium ${isDark ? 'border-[#261619] bg-[#130E10] text-[#F1EEEE]' : 'border-[#E0DBD2] bg-[#F5F3EE] text-[#140E10]'}`}>
-                  <span className="text-[#FF000E]">G</span><span>Pay</span>
-                </div>
-                <div title="UPI" className={`h-6 px-2.5 py-0.5 rounded border flex items-center justify-center text-[10px] font-bold ${isDark ? 'border-[#261619] bg-[#130E10] text-[#F1EEEE]' : 'border-[#E0DBD2] bg-[#F5F3EE] text-[#140E10]'}`}>
-                  <span>UPI</span>
-                </div>
+              <div className="flex items-center justify-center pt-0.5">
+                <PaymentMethodIcons />
               </div>
             </div>
           </div>

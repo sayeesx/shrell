@@ -170,6 +170,15 @@ export const CartPage: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showFreeDeliveryModal]);
 
+  // Auto-close free delivery modal after 3 seconds without a distracting countdown ticker
+  useEffect(() => {
+    if (!showFreeDeliveryModal) return;
+    const autoCloseTimer = setTimeout(() => {
+      setShowFreeDeliveryModal(false);
+    }, 3000);
+    return () => clearTimeout(autoCloseTimer);
+  }, [showFreeDeliveryModal]);
+
   const renderFreeDeliveryCelebrationModal = () => {
     if (!showFreeDeliveryModal || !isMobile || typeof document === 'undefined') return null;
 
@@ -238,6 +247,9 @@ export const CartPage: React.FC = () => {
             >
               Got it, Continue
             </button>
+            <p className={`text-[10.5px] text-center font-normal pt-0.5 tracking-tight ${isDark ? 'text-slate-400' : 'text-[#7A7575]'}`}>
+              Redirecting to your cart in 3, 2, 1...
+            </p>
           </div>
         </div>
       </div>,
@@ -465,8 +477,8 @@ export const CartPage: React.FC = () => {
                   isDark ? 'bg-[#130E10] border-[#2D161A]' : 'bg-white border-[#D0C9BE] shadow-xs'
                 }`}
               >
-                {/* Product image (clean compact frame) */}
-                <div className={`w-13 h-13 shrink-0 rounded-lg flex items-center justify-center p-1 overflow-hidden border ${
+                {/* Product image (clean compact square frame) */}
+                <div className={`w-16 h-16 shrink-0 aspect-square rounded-lg flex items-center justify-center p-1.5 overflow-hidden border ${
                   isDark ? 'bg-[#181113] border-[#2D161A]' : 'bg-[#F5F3EE] border-[#D0C9BE]'
                 }`}>
                   {isImageAvailable ? (
@@ -474,7 +486,7 @@ export const CartPage: React.FC = () => {
                       src={cleanImg}
                       alt={item.product.name}
                       referrerPolicy="no-referrer"
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-contain aspect-square"
                       onError={() => handleImageError(item.productId)}
                     />
                   ) : (
@@ -482,7 +494,7 @@ export const CartPage: React.FC = () => {
                       <img
                         src="/logos/shrell-brandicon_no-bg.png"
                         alt="SHRELL"
-                        className="w-7 h-7 object-contain"
+                        className="w-8 h-8 object-contain"
                       />
                     </div>
                   )}
@@ -580,7 +592,7 @@ export const CartPage: React.FC = () => {
         {/* ========================================================================= */}
         {displayedSuggestions.length > 0 && (
           <div className="pt-1">
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none snap-x snap-mandatory w-full">
+            <div className="-mx-3.5 px-3.5 flex gap-2 overflow-x-auto pb-1 scrollbar-none snap-x snap-mandatory">
               {displayedSuggestions.map((prod) => {
                 const inCartItem = cart.items.find((it) => it.productId === prod.id);
                 const currentQty = inCartItem?.quantity || 0;
@@ -588,12 +600,12 @@ export const CartPage: React.FC = () => {
                 return (
                   <div
                     key={prod.id}
-                    className={`w-32 shrink-0 snap-start p-2 rounded-xl border flex flex-col justify-between ${
+                    className={`w-28 shrink-0 snap-start p-1.5 rounded-xl border flex flex-col justify-between ${
                       isDark ? 'bg-[#130E10] border-[#2D161A]' : 'bg-white border-[#D0C9BE] shadow-xs'
                     }`}
                   >
                     <div>
-                      <div className={`w-full h-20 rounded-lg flex items-center justify-center p-1 overflow-hidden border ${
+                      <div className={`w-full h-14 rounded-lg flex items-center justify-center p-1 overflow-hidden border ${
                         isDark ? 'bg-[#181113] border-[#2D161A]' : 'bg-[#F5F3EE] border-[#D0C9BE]'
                       }`}>
                         {prod.images?.[0]?.url && !prod.images[0].url.includes('shrell-') && !failedImages[`sug-${prod.id}`] ? (
@@ -608,7 +620,7 @@ export const CartPage: React.FC = () => {
                             <img
                               src="/logos/shrell-brandicon_no-bg.png"
                               alt="SHRELL"
-                              className="w-8 h-8 object-contain"
+                              className="w-7 h-7 object-contain"
                             />
                           </div>
                         )}
@@ -626,7 +638,7 @@ export const CartPage: React.FC = () => {
 
                     <div className={`mt-1.5 pt-1 border-t ${isDark ? 'border-[#2D161A]' : 'border-[#D0C9BE]'}`}>
                       {currentQty > 0 ? (
-                        <div className="w-full flex items-center justify-between rounded-md bg-[#FF000E] text-white py-0.5 px-2 font-bold text-xs">
+                        <div className="w-full flex items-center justify-between rounded-lg bg-[#FF000E] text-white py-1 px-2.5 font-bold text-xs">
                           <button
                             type="button"
                             onClick={() => updateQuantity(prod.id, currentQty - 1)}
@@ -649,7 +661,7 @@ export const CartPage: React.FC = () => {
                           type="button"
                           onClick={() => addItem(prod, 1)}
                           disabled={prod.stockQuantity <= 0}
-                          className="w-full py-1 rounded-md border border-[#FF000E] text-[#FF000E] hover:bg-[#FF000E] hover:text-white font-bold text-[10px] uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-40"
+                          className="w-full py-1.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-xs uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-40 flex items-center justify-center shadow-xs"
                         >
                           + ADD
                         </button>
@@ -658,6 +670,8 @@ export const CartPage: React.FC = () => {
                   </div>
                 );
               })}
+              {/* Trailing spacer so last item scrolls comfortably clear of margin */}
+              <div className="w-1.5 shrink-0" aria-hidden="true" />
             </div>
           </div>
         )}
@@ -1187,9 +1201,9 @@ export const CartPage: React.FC = () => {
       {/* Sad Cat Exit Confirmation Modal */}
       <LeaveCheckoutConfirmModal
         isOpen={isLeaveModalOpen}
+        itemName={cart.items.length === 1 ? cart.items[0].product.name : cart.items.length > 1 ? 'Your items' : undefined}
         onContinueOrder={() => {
           setIsLeaveModalOpen(false);
-          navigate('/checkout');
         }}
         onConfirmLeave={() => {
           setIsLeaveModalOpen(false);

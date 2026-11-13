@@ -2,20 +2,29 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import 'flag-icons/css/flag-icons.min.css';
 import { allCountries } from 'country-telephone-data';
 import { useTheme } from '../../application/ThemeContext';
+import { getCountryPhoneRule, PhoneRule } from '../../utils/phoneRules';
+
+export { getCountryPhoneRule };
+export type { PhoneRule };
 
 export interface CountryDialOption {
   iso2: string;
   dialCode: string;
   name: string;
+  phoneRule: PhoneRule;
 }
 
-const ORDERED_COUNTRIES: CountryDialOption[] = (() => {
+export const ORDERED_COUNTRIES: CountryDialOption[] = (() => {
   const normalized: CountryDialOption[] = (allCountries as Array<{ name: string; iso2: string; dialCode: string }>)
-    .map((c) => ({
-      name: c.name.replace(/\s*\([^)]*\)\s*/g, '').trim() || c.name,
-      iso2: c.iso2.toLowerCase(),
-      dialCode: String(c.dialCode).replace(/^\+/, ''),
-    }))
+    .map((c) => {
+      const iso2 = c.iso2.toLowerCase();
+      return {
+        name: c.name.replace(/\s*\([^)]*\)\s*/g, '').trim() || c.name,
+        iso2,
+        dialCode: String(c.dialCode).replace(/^\+/, ''),
+        phoneRule: getCountryPhoneRule(iso2),
+      };
+    })
     .sort((a, b) => {
       if (a.iso2 === 'in') return -1;
       if (b.iso2 === 'in') return 1;

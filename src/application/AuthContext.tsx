@@ -53,6 +53,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // 1. Supabase Auth Integration
     if (isSupabaseConfigured) {
+      const resolvePhone = (sbUser: any): string => {
+        let existingPhone = '';
+        try {
+          const prev = localStorage.getItem(AUTH_STORAGE_KEY);
+          if (prev) {
+            existingPhone = JSON.parse(prev)?.phone || '';
+          }
+        } catch {
+          // ignore parsing error
+        }
+        return (
+          sbUser.phone ||
+          sbUser.user_metadata?.phone ||
+          sbUser.user_metadata?.phone_number ||
+          sbUser.user_metadata?.mobile ||
+          existingPhone ||
+          ''
+        );
+      };
+
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (!isMounted) return;
         if (session?.user) {
@@ -63,7 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             id: sbUser.id,
             name,
             email: sbUser.email || '',
-            phone: sbUser.phone || '',
+            phone: resolvePhone(sbUser),
             role,
           };
           setUser(sessionData);
@@ -84,7 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             id: sbUser.id,
             name,
             email: sbUser.email || '',
-            phone: sbUser.phone || '',
+            phone: resolvePhone(sbUser),
             role,
           };
           setUser(sessionData);

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../application/CartContext';
+import { useAuth } from '../../application/AuthContext';
 import { Order, PaymentMethod } from '../../domain/types';
 import { formatINR } from '../../domain/services/CurrencyService';
 import { orderRepository } from '../../infrastructure/repositories';
@@ -42,20 +43,79 @@ const INDIAN_STATES = [
 
 export const CheckoutModal: React.FC = () => {
   const { cart, clearCart, isCheckoutOpen, closeCheckout } = useCart();
+  const { user } = useAuth();
   const { isDark } = useTheme();
 
   useBodyScrollLock(isCheckoutOpen);
 
+  const SAVED_DELIVERY_KEY = 'shrell_saved_delivery_address_v1';
+
+  const getSavedDelivery = () => {
+    try {
+      const raw = localStorage.getItem(SAVED_DELIVERY_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const getStoredSessionPhone = (): string => {
+    try {
+      const raw = localStorage.getItem('shrell_user_session_v1');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.phone) {
+          const clean = String(parsed.phone).replace(/[^0-9]/g, '');
+          if (clean) return clean.slice(-10);
+        }
+      }
+    } catch {}
+    return '';
+  };
+
+  const initialSaved = getSavedDelivery();
+
   // Form Fields
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [addressLine1, setAddressLine1] = useState('');
-  const [addressLine2, setAddressLine2] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('Maharashtra');
-  const [postalCode, setPostalCode] = useState('');
-  const [deliveryInstructions, setDeliveryInstructions] = useState('');
+  const [fullName, setFullName] = useState(() => {
+    if (user?.name && user.name !== 'Valued Customer') return user.name;
+    if (initialSaved?.fullName) return initialSaved.fullName;
+    return '';
+  });
+  const [phone, setPhone] = useState(() => {
+    if (user?.phone) {
+      const clean = String(user.phone).replace(/[^0-9]/g, '');
+      if (clean) return clean.slice(-10);
+    }
+    const sessionPhone = getStoredSessionPhone();
+    if (sessionPhone) return sessionPhone;
+    if (initialSaved?.phone) {
+      const clean = String(initialSaved.phone).replace(/[^0-9]/g, '');
+      if (clean) return clean.slice(-10);
+    }
+    return '';
+  });
+  const [email, setEmail] = useState(() => {
+    if (user?.email && !user.email.includes('@customer.shrell.com') && !user.email.includes('@guest.shrell.com')) return user.email;
+    if (initialSaved?.email) return initialSaved.email;
+    return '';
+  });
+  const [addressLine1, setAddressLine1] = useState(() => initialSaved?.addressLine1 || '');
+  const [addressLine2, setAddressLine2] = useState(() => initialSaved?.addressLine2 || '');
+  const [city, setCity] = useState(() => initialSaved?.city || '');
+  const [state, setState] = useState(() => initialSaved?.state || 'Maharashtra');
+  const [postalCode, setPostalCode] = useState(() => initialSaved?.postalCode || '');
+  const [deliveryInstructions, setDeliveryInstructions] = useState(() => initialSaved?.deliveryInstructions || '');
+
+  // Auto-sync when user session or modal opens
+  useEffect(() => {
+    const autoPhone = (user?.phone ? String(user.phone).replace(/[^0-9]/g, '').slice(-10) : '') || getStoredSessionPhone();
+    if (autoPhone && !phone) {
+      setPhone(autoPhone);
+    }
+    if (user?.name && user.name !== 'Valued Customer' && !fullName) {
+      setFullName(user.name);
+    }
+  }, [user, isCheckoutOpen]);
 
   // Non-blocking Postal PIN autofill hook for Indian PIN codes
   const { loading: isPinLoading, data: pinData } = usePostalPincode(postalCode, {
@@ -133,6 +193,25 @@ export const CheckoutModal: React.FC = () => {
 
     try {
       const idempotencyKey = `ord-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+
+      try {
+        localStorage.setItem(
+          SAVED_DELIVERY_KEY,
+          JSON.stringify({
+            fullName: fullName.trim(),
+            phone: cleanPhone,
+            email: email.trim(),
+            addressLine1: addressLine1.trim(),
+            addressLine2: addressLine2.trim(),
+            city: city.trim(),
+            state,
+            postalCode: cleanPin,
+            deliveryInstructions: deliveryInstructions.trim(),
+          })
+        );
+      } catch {
+        // ignore storage error
+      }
 
       const itemsSnapshot = cart.items.map((it, idx) => ({
         id: `item-${Date.now()}-${idx}`,
@@ -321,12 +400,12 @@ export const CheckoutModal: React.FC = () => {
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   {[
-                    { label: 'Full Name *', type: 'text', required: true, placeholder: 'e.g. Rahul Sharma', value: fullName, onChange: (v: string) => setFullName(v) },
-                    { label: 'Mobile Number (10 digits) *', type: 'tel', required: true, placeholder: 'e.g. 9876543210', value: phone, onChange: (v: string) => setPhone(v), maxLength: 10 },
+                    { label: 'Full Name *', name: 'name', id: 'modal-delivery-name', type: 'text', autoComplete: 'name', required: true, placeholder: 'e.g. Rahul Sharma', value: fullName, onChange: (v: string) => setFullName(v) },
+                    { label: 'Mobile Number (10 digits) *', name: 'phone', id: 'modal-delivery-phone', type: 'tel', autoComplete: 'tel', inputMode: 'numeric', required: true, placeholder: 'e.g. 9876543210', value: phone, onChange: (v: string) => setPhone(v.replace(/[^0-9]/g, '')), maxLength: 10 },
                   ].map((f) => (
                     <div key={f.label}>
                       <label className={`block mb-1 ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>{f.label}</label>
-                      <input type={f.type} required={f.required} placeholder={f.placeholder} value={f.value}
+                      <input type={f.type} name={f.name} id={f.id} autoComplete={f.autoComplete} inputMode={f.inputMode as any} required={f.required} placeholder={f.placeholder} value={f.value}
                         onChange={(e) => f.onChange(e.target.value)} maxLength={f.maxLength}
                         className={`w-full border rounded-lg px-3 py-2 placeholder-[#5C5456] focus:outline-none focus:border-[#FF000E] ${isDark ? 'bg-[#0A0808] border-[#261619] text-[#F1EEEE]' : 'bg-white border-[#E0DBD2] text-[#140E10]'}`} />
                     </div>
@@ -334,25 +413,25 @@ export const CheckoutModal: React.FC = () => {
 
                   <div className="sm:col-span-2">
                     <label className={`block mb-1 ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>Email Address (Optional for Invoice)</label>
-                    <input type="email" placeholder="e.g. rahul@example.com" value={email} onChange={(e) => setEmail(e.target.value)}
+                    <input type="email" name="email" id="modal-delivery-email" autoComplete="email" placeholder="e.g. rahul@example.com" value={email} onChange={(e) => setEmail(e.target.value)}
                       className={`w-full border rounded-lg px-3 py-2 placeholder-[#5C5456] focus:outline-none focus:border-[#FF000E] ${isDark ? 'bg-[#0A0808] border-[#261619] text-[#F1EEEE]' : 'bg-white border-[#E0DBD2] text-[#140E10]'}`} />
                   </div>
 
                   <div className="sm:col-span-2">
                     <label className={`block mb-1 ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>Address Line 1 *</label>
-                    <input type="text" required placeholder="House / Flat / Street Name" value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)}
+                    <input type="text" name="addressLine1" id="modal-delivery-address-1" autoComplete="address-line1" required placeholder="House / Flat / Street Name" value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)}
                       className={`w-full border rounded-lg px-3 py-2 placeholder-[#5C5456] focus:outline-none focus:border-[#FF000E] ${isDark ? 'bg-[#0A0808] border-[#261619] text-[#F1EEEE]' : 'bg-white border-[#E0DBD2] text-[#140E10]'}`} />
                   </div>
 
                   <div className="sm:col-span-2">
                     <label className={`block mb-1 ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>Address Line 2 (Apartment / Landmark)</label>
-                    <input type="text" placeholder="Near City Center / Building 4B" value={addressLine2} onChange={(e) => setAddressLine2(e.target.value)}
+                    <input type="text" name="addressLine2" id="modal-delivery-address-2" autoComplete="address-line2" placeholder="Near City Center / Building 4B" value={addressLine2} onChange={(e) => setAddressLine2(e.target.value)}
                       className={`w-full border rounded-lg px-3 py-2 placeholder-[#5C5456] focus:outline-none focus:border-[#FF000E] ${isDark ? 'bg-[#0A0808] border-[#261619] text-[#F1EEEE]' : 'bg-white border-[#E0DBD2] text-[#140E10]'}`} />
                   </div>
 
                   <div>
                     <label className={`block mb-1 ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>City / District *</label>
-                    <input type="text" required placeholder="e.g. Pune" value={city} onChange={(e) => setCity(e.target.value)}
+                    <input type="text" name="city" id="modal-delivery-city" autoComplete="address-level2" required placeholder="e.g. Pune" value={city} onChange={(e) => setCity(e.target.value)}
                       className={`w-full border rounded-lg px-3 py-2 placeholder-[#5C5456] focus:outline-none focus:border-[#FF000E] ${isDark ? 'bg-[#0A0808] border-[#261619] text-[#F1EEEE]' : 'bg-white border-[#E0DBD2] text-[#140E10]'}`} />
                   </div>
 

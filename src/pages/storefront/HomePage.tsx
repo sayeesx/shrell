@@ -202,7 +202,7 @@ export const HomePage: React.FC = () => {
         Clicking banner navigates directly to target page.
         ================================================================
       */}
-      <section className="pt-1 sm:pt-1 pb-0 sm:pb-2">
+      <section className="pt-1 sm:pt-1 pb-[0.3cm] sm:pb-2">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           {banners.length > 0 && (
             <div
@@ -493,7 +493,7 @@ export const HomePage: React.FC = () => {
                     </div>
 
                     {/* Card 2: Ultra Shampoo Editorial Product Poster */}
-                    <div className="rounded-2xl bg-[#0A0808] border border-[#221215] p-5 sm:p-6 flex flex-col justify-between flex-1 min-h-[260px] sm:min-h-[275px] group hover:border-[#4F242C] transition-all relative overflow-hidden">
+                    <div className="rounded-2xl bg-[#0A0808] border border-[#221215] p-5 pb-1 sm:p-6 flex flex-col justify-between flex-1 min-h-[260px] sm:min-h-[275px] group hover:border-[#4F242C] transition-all relative overflow-hidden">
                       {/* Subtle poster radial accent behind bottles */}
                       <div
                         className="absolute inset-0 pointer-events-none"

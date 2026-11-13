@@ -7,16 +7,18 @@ export interface LeaveCheckoutConfirmModalProps {
   isOpen: boolean;
   onContinueOrder: () => void;
   onConfirmLeave: () => void;
+  itemName?: string;
 }
 
 /**
  * Confirmation modal shown when user clicks Back on Cart, Delivery Address, or Payment Method.
- * Anchors sad-cat art flush to the bottom-right margin inside a desktop popup or mobile bottom sheet.
+ * Anchors sad-cat art resting against the content margin inside a desktop popup or mobile bottom sheet.
  */
 export const LeaveCheckoutConfirmModal: React.FC<LeaveCheckoutConfirmModalProps> = ({
   isOpen,
   onContinueOrder,
   onConfirmLeave,
+  itemName,
 }) => {
   const { isDark } = useTheme();
   useBodyScrollLock(isOpen);
@@ -56,17 +58,17 @@ export const LeaveCheckoutConfirmModal: React.FC<LeaveCheckoutConfirmModalProps>
         {/* Drag pill indicator for mobile bottom sheet */}
         <div className="md:hidden w-10 h-1 rounded-full bg-current opacity-20 mx-auto mb-3" aria-hidden="true" />
 
-        <div className="relative z-10 pr-24 sm:pr-32 space-y-2">
+        <div className="relative z-10 pr-28 sm:pr-36 space-y-2">
           <h2 id="leave-checkout-title" className="text-lg sm:text-xl font-bold tracking-tight">
             Wait... are you sure you want to leave?
           </h2>
           <p className={`text-xs sm:text-sm leading-relaxed ${isDark ? 'text-[#A8A0A2]' : 'text-[#5C5456]'}`}>
-            Your automotive gear is already queued for dispatch. Do you truly wish to head back and leave your order behind?
+            {itemName ? `${itemName} is` : 'Your items are'} already queued for dispatch. Do you truly wish to head back and leave your order behind?
           </p>
         </div>
 
         {/* Left action column sized clear of bottom-right cat image */}
-        <div className="relative z-10 mt-5 w-[calc(100%-7.25rem)] sm:w-[calc(100%-9.25rem)] flex flex-col gap-2">
+        <div className="relative z-10 mt-5 w-[calc(100%-8.5rem)] sm:w-[calc(100%-10.5rem)] flex flex-col gap-2">
           <button
             type="button"
             onClick={onContinueOrder}
@@ -87,11 +89,11 @@ export const LeaveCheckoutConfirmModal: React.FC<LeaveCheckoutConfirmModalProps>
           </button>
         </div>
 
-        {/* Sad cat attached strictly to bottom-right margin with zero background or shadow */}
+        {/* Sad cat image enlarged and touching the content margin rather than extreme corner */}
         <img
           src="/images/cat-sad.webp"
           alt="Sad cat hoping you complete your order"
-          className="pointer-events-none select-none absolute right-0 bottom-0 w-28 h-28 sm:w-36 sm:h-36 object-contain object-right-bottom bg-transparent border-0 shadow-none"
+          className="pointer-events-none select-none absolute right-4 bottom-4 sm:right-6 sm:bottom-6 w-32 h-32 sm:w-40 sm:h-40 object-contain object-right-bottom bg-transparent border-0 shadow-none"
           style={{ boxShadow: 'none', background: 'transparent' }}
         />
       </div>

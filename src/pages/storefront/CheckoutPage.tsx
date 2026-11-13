@@ -11,6 +11,7 @@ import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { StateSearchDropdown } from '../../components/checkout/StateSearchDropdown';
 import { CheckoutFlowTopBar } from '../../components/checkout/CheckoutFlowTopBar';
 import { CountryCodeDropdown } from '../../components/checkout/CountryCodeDropdown';
+import { getCountryPhoneRule } from '../../utils/phoneRules';
 import { LeaveCheckoutConfirmModal } from '../../components/checkout/LeaveCheckoutConfirmModal';
 import { usePostalPincode } from '../../hooks/usePostalPincode';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
@@ -53,30 +54,76 @@ export const CheckoutPage: React.FC = () => {
     );
   };
 
-  // Form Fields - Auto-fill from logged in user details ONLY if valid
-  const [fullName, setFullName] = useState(() => (user?.name && user.name !== 'Valued Customer' ? user.name : ''));
-  const [countryOption, setCountryOption] = useState('in:+91');
+  const SAVED_DELIVERY_KEY = 'shrell_saved_delivery_address_v1';
+
+  const getSavedDelivery = () => {
+    try {
+      const raw = localStorage.getItem(SAVED_DELIVERY_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const getStoredSessionPhone = (): string => {
+    try {
+      const raw = localStorage.getItem('shrell_user_session_v1');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.phone) {
+          const clean = String(parsed.phone).replace(/[^0-9]/g, '');
+          if (clean) return clean.slice(-10);
+        }
+      }
+    } catch {}
+    return '';
+  };
+
+  const initialSaved = getSavedDelivery();
+
+  // Form Fields - Auto-fill from logged in user details or saved session
+  const [fullName, setFullName] = useState(() => {
+    if (user?.name && user.name !== 'Valued Customer') return user.name;
+    if (initialSaved?.fullName) return initialSaved.fullName;
+    return '';
+  });
+  const [countryOption, setCountryOption] = useState(() => initialSaved?.countryOption || 'in:+91');
   const selectedCountryIso2 = countryOption.split(':')[0] || 'in';
   const countryDialCode = countryOption.split(':')[1] || '+91';
+
   const [phone, setPhone] = useState(() => {
     if (user?.phone) {
-      const clean = user.phone.replace(/[^0-9]/g, '');
-      return clean.slice(-10);
+      const clean = String(user.phone).replace(/[^0-9]/g, '');
+      if (clean) return clean.slice(-10);
+    }
+    const sessionPhone = getStoredSessionPhone();
+    if (sessionPhone) return sessionPhone;
+    if (initialSaved?.phone) {
+      const clean = String(initialSaved.phone).replace(/[^0-9]/g, '');
+      if (clean) return clean.slice(-10);
     }
     return '';
   });
+
   const isPhoneAutofilled = Boolean(
-    user?.phone &&
-      phone.length === 10 &&
-      phone === user.phone.replace(/[^0-9]/g, '').slice(-10)
+    phone.length === 10 && (
+      (user?.phone && phone === String(user.phone).replace(/[^0-9]/g, '').slice(-10)) ||
+      (getStoredSessionPhone() && phone === getStoredSessionPhone()) ||
+      (initialSaved?.phone && phone === String(initialSaved.phone).replace(/[^0-9]/g, '').slice(-10))
+    )
   );
-  const [email, setEmail] = useState(() => (isRealEmail(user?.email) ? user!.email : ''));
-  const [addressLine1, setAddressLine1] = useState('');
-  const [addressLine2, setAddressLine2] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('Maharashtra');
-  const [postalCode, setPostalCode] = useState('');
-  const [deliveryInstructions, setDeliveryInstructions] = useState('');
+
+  const [email, setEmail] = useState(() => {
+    if (isRealEmail(user?.email)) return user!.email;
+    if (isRealEmail(initialSaved?.email)) return initialSaved.email;
+    return '';
+  });
+  const [addressLine1, setAddressLine1] = useState(() => initialSaved?.addressLine1 || '');
+  const [addressLine2, setAddressLine2] = useState(() => initialSaved?.addressLine2 || '');
+  const [city, setCity] = useState(() => initialSaved?.city || '');
+  const [state, setState] = useState(() => initialSaved?.state || 'Maharashtra');
+  const [postalCode, setPostalCode] = useState(() => initialSaved?.postalCode || '');
+  const [deliveryInstructions, setDeliveryInstructions] = useState(() => initialSaved?.deliveryInstructions || '');
 
   // Track last autofilled city so changing PIN always updates District / City accurately
   const lastAutoCityRef = useRef<string>('');
@@ -96,17 +143,15 @@ export const CheckoutPage: React.FC = () => {
 
   // Auto-sync when user session updates asynchronously
   useEffect(() => {
-    if (user) {
-      if (user.phone && !phone) {
-        const clean = user.phone.replace(/[^0-9]/g, '');
-        setPhone(clean.slice(-10));
-      }
-      if (user.name && user.name !== 'Valued Customer' && !fullName) {
-        setFullName(user.name);
-      }
-      if (isRealEmail(user.email) && !email) {
-        setEmail(user.email);
-      }
+    const autoPhone = (user?.phone ? String(user.phone).replace(/[^0-9]/g, '').slice(-10) : '') || getStoredSessionPhone();
+    if (autoPhone && !phone) {
+      setPhone(autoPhone);
+    }
+    if (user?.name && user.name !== 'Valued Customer' && !fullName) {
+      setFullName(user.name);
+    }
+    if (isRealEmail(user?.email) && !email) {
+      setEmail(user!.email);
     }
   }, [user]);
 
@@ -163,13 +208,25 @@ export const CheckoutPage: React.FC = () => {
       return false;
     }
     const cleanPhone = phone.replace(/[^0-9]/g, '');
-    if (countryDialCode === '+91' ? cleanPhone.length !== 10 : cleanPhone.length < 6 || cleanPhone.length > 15) {
-      setErrorMessage(
-        countryDialCode === '+91'
-          ? 'Please provide a valid 10-digit Indian mobile number for courier dispatch.'
-          : 'Please provide a valid mobile number for courier dispatch.'
-      );
-      return false;
+    const currentRule = getCountryPhoneRule(selectedCountryIso2);
+
+    if (selectedCountryIso2 === 'in') {
+      if (cleanPhone.length !== 10) {
+        setErrorMessage('Please provide a valid 10-digit Indian mobile number for courier dispatch.');
+        return false;
+      }
+    } else {
+      if (currentRule.min === currentRule.max) {
+        if (cleanPhone.length !== currentRule.min) {
+          setErrorMessage(`Please provide a valid ${currentRule.min}-digit mobile number for ${countryDialCode}.`);
+          return false;
+        }
+      } else {
+        if (cleanPhone.length < currentRule.min || cleanPhone.length > currentRule.max) {
+          setErrorMessage(`Please provide a valid ${currentRule.min}-${currentRule.max} digit mobile number for ${countryDialCode}.`);
+          return false;
+        }
+      }
     }
     const cleanPin = postalCode.replace(/[^0-9]/g, '');
     if (cleanPin.length !== 6) {
@@ -188,6 +245,27 @@ export const CheckoutPage: React.FC = () => {
   const handleProceedToPayment = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!validateAddress()) return;
+
+    try {
+      localStorage.setItem(
+        SAVED_DELIVERY_KEY,
+        JSON.stringify({
+          fullName: fullName.trim(),
+          phone: phone.trim(),
+          countryOption,
+          email: email.trim(),
+          addressLine1: addressLine1.trim(),
+          addressLine2: addressLine2.trim(),
+          city: city.trim(),
+          state,
+          postalCode: postalCode.trim(),
+          deliveryInstructions: deliveryInstructions.trim(),
+        })
+      );
+    } catch {
+      // ignore storage error
+    }
+
     trackCheckoutStepCompleted('address', { city: city.trim(), state, postalCode: postalCode.trim() });
     setSearchParams({ step: 'payment' });
   };
@@ -365,6 +443,9 @@ export const CheckoutPage: React.FC = () => {
                   <label className="block text-[11px] font-semibold mb-1 opacity-80">Full Name *</label>
                   <input
                     type="text"
+                    name="name"
+                    id="delivery-name"
+                    autoComplete="name"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
@@ -383,21 +464,35 @@ export const CheckoutPage: React.FC = () => {
                     <div className="flex items-stretch gap-2">
                       <CountryCodeDropdown
                         selectedIso2={selectedCountryIso2}
-                        onChange={(country) => setCountryOption(`${country.iso2}:+${country.dialCode}`)}
+                        onChange={(country) => {
+                          setCountryOption(`${country.iso2}:+${country.dialCode}`);
+                          const rule = getCountryPhoneRule(country.iso2);
+                          if (phone.length > rule.max) {
+                            setPhone(phone.slice(0, rule.max));
+                          }
+                        }}
                       />
                       <div className="relative flex-1 min-w-0">
-                        <input
-                          type="tel"
-                          inputMode="numeric"
-                          required
-                          maxLength={countryDialCode === '+91' ? 10 : 15}
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
-                          placeholder=""
-                          className={`w-full rounded-lg pl-3.5 ${isPhoneAutofilled ? 'pr-10' : 'pr-3.5'} py-3 text-[13px] font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
-                            isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
-                          }`}
-                        />
+                        {(() => {
+                          const currentRule = getCountryPhoneRule(selectedCountryIso2);
+                          return (
+                            <input
+                              type="tel"
+                              name="phone"
+                              id="delivery-phone"
+                              autoComplete="tel"
+                              inputMode="numeric"
+                              required
+                              maxLength={currentRule.max}
+                              value={phone}
+                              onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, currentRule.max))}
+                              placeholder={currentRule.min === currentRule.max ? `${currentRule.min} digits` : `${currentRule.min}-${currentRule.max} digits`}
+                              className={`w-full rounded-lg pl-3.5 ${isPhoneAutofilled ? 'pr-10' : 'pr-3.5'} py-3 text-[13px] font-mono border focus:outline-none focus:ring-2 focus:ring-[#FF000E] ${
+                                isDark ? 'bg-[#181113] border-[#261619] text-white' : 'bg-[#F5F3EE] border-[#E0DBD2] text-black'
+                              }`}
+                            />
+                          );
+                        })()}
                         {isPhoneAutofilled && (
                           <span
                             title="Auto-filled from your account"
@@ -433,6 +528,9 @@ export const CheckoutPage: React.FC = () => {
                     </label>
                     <input
                       type="email"
+                      name="email"
+                      id="delivery-email"
+                      autoComplete="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder=""
@@ -451,6 +549,9 @@ export const CheckoutPage: React.FC = () => {
                     <div className="relative">
                       <input
                         type="text"
+                        name="postalCode"
+                        id="delivery-postal-code"
+                        autoComplete="postal-code"
                         inputMode="numeric"
                         required
                         maxLength={6}
@@ -504,6 +605,9 @@ export const CheckoutPage: React.FC = () => {
                     </div>
                     <input
                       type="text"
+                      name="city"
+                      id="delivery-city"
+                      autoComplete="address-level2"
                       required
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
@@ -519,6 +623,9 @@ export const CheckoutPage: React.FC = () => {
                   <label className="block text-[11px] font-semibold mb-1 opacity-80">Street Address / House / Flat *</label>
                   <input
                     type="text"
+                    name="addressLine1"
+                    id="delivery-address-1"
+                    autoComplete="address-line1"
                     required
                     value={addressLine1}
                     onChange={(e) => setAddressLine1(e.target.value)}
@@ -534,6 +641,9 @@ export const CheckoutPage: React.FC = () => {
                     <label className="block text-[11px] font-semibold mb-1 opacity-80">Apartment / Area / Landmark (Optional)</label>
                     <input
                       type="text"
+                      name="addressLine2"
+                      id="delivery-address-2"
+                      autoComplete="address-line2"
                       value={addressLine2}
                       onChange={(e) => setAddressLine2(e.target.value)}
                       placeholder=""
@@ -811,6 +921,7 @@ export const CheckoutPage: React.FC = () => {
       {/* Sad Cat Exit Confirmation Modal */}
       <LeaveCheckoutConfirmModal
         isOpen={isLeaveModalOpen}
+        itemName={cart.items.length === 1 ? cart.items[0].product.name : cart.items.length > 1 ? 'Your items' : undefined}
         onContinueOrder={() => setIsLeaveModalOpen(false)}
         onConfirmLeave={() => {
           setIsLeaveModalOpen(false);

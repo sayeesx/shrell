@@ -4,7 +4,7 @@ import { Category } from '../../domain/types';
 import { categoryRepository, productRepository } from '../../infrastructure/repositories';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 import { useTheme } from '../../application/ThemeContext';
-import { ShrellLoader } from '../../components/common/ShrellLoader';
+import { SquareGridLoader } from '../../components/common/SquareGridLoader';
 
 export const AdminCategories: React.FC = () => {
   const { isDark } = useTheme();
@@ -204,7 +204,7 @@ export const AdminCategories: React.FC = () => {
       <div className={`border rounded-xl overflow-x-auto shadow-xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
         {loading ? (
           <div className="py-20 flex items-center justify-center">
-            <ShrellLoader size={48} />
+            <SquareGridLoader size={48} color="#FF000E" />
           </div>
         ) : (
           <table className="w-full text-left text-xs font-mono min-w-[700px]">

@@ -36,6 +36,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const stored = localStorage.getItem(AUTH_STORAGE_KEY);
       const parsed = stored ? JSON.parse(stored) : null;
+      // Security: never trust 'admin' role directly from localStorage without active Supabase verification
+      if (parsed && parsed.role === 'admin') {
+        return null;
+      }
       if (parsed) {
         identifyUser(parsed.id, { name: parsed.name, email: parsed.email, phone: parsed.phone, role: parsed.role });
       }
@@ -201,18 +205,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const loginAsAdmin = async (password: string): Promise<boolean> => {
-    if (password === 'shrelladmin2026' || password === 'vahnadmin2026') {
-      const adminSession: UserSession = {
-        id: 'admin-master',
-        name: 'SHRELL Administrator',
+    if (!password) return false;
+    if (!isSupabaseConfigured) {
+      console.error('Supabase is not configured for authentication.');
+      return false;
+    }
+
+    try {
+      // Authenticate via Supabase Auth against server-side bcrypt hashed password
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: 'admin@shrell.com',
+        password: password.trim(),
+      });
+
+      if (error || !data.user) {
+        console.warn('Admin authentication failed:', error?.message);
+        return false;
+      }
+
+      // Verify that user profile possesses administrative authorization
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profile?.role !== 'admin' && data.user.user_metadata?.role !== 'admin') {
+        console.warn('Authenticated user does not have admin permissions.');
+        await supabase.auth.signOut();
+        return false;
+      }
+
+      const adminSession: UserSession = {
+        id: data.user.id,
+        name: data.user.user_metadata?.full_name || 'SHRELL Administrator',
+        email: data.user.email || 'admin@shrell.com',
         role: 'admin',
       };
       setUser(adminSession);
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(adminSession));
       return true;
+    } catch (err) {
+      console.error('Error during administrative authentication:', err);
+      return false;
     }
-    return false;
   };
 
   const signUp = async (
@@ -223,11 +259,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!isSupabaseConfigured) {
       throw new Error('Supabase is not configured.');
     }
+    // Security: sanitize metadata to ensure customer registration cannot self-grant admin role
+    const safeMetadata = {
+      ...metadata,
+      role: 'customer' as const,
+    };
     const { data, error } = await supabase.auth.signUp({
       email,
       password: pass,
       options: {
-        data: metadata,
+        data: safeMetadata,
       },
     });
     if (error) throw error;

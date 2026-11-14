@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ShrellLoader } from '../../components/common/ShrellLoader';
+import { SquareGridLoader } from '../../components/common/SquareGridLoader';
 import { settingsRepository } from '../../infrastructure/repositories';
 import { cloudinaryService } from '../../infrastructure/cloudinary/cloudinaryService';
 import { formatBytes, optimizeImageFile } from '../../utils/imageOptimizer';
@@ -142,7 +142,7 @@ export const AdminSettings: React.FC = () => {
   if (loading) {
     return (
       <div className="py-24 flex items-center justify-center">
-        <ShrellLoader size={56} />
+        <SquareGridLoader size={54} color="#FF000E" />
       </div>
     );
   }

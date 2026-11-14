@@ -4,12 +4,22 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useAuth } from '../../application/AuthContext';
 import { useTheme } from '../../application/ThemeContext';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
+import { SquareGridLoader } from '../../components/common/SquareGridLoader';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
 
 export const AdminLayout: React.FC = () => {
-  const { user, isAdmin, logout } = useAuth();
+  const { user, isAdmin, isLoading, logout } = useAuth();
   const { isDark } = useTheme();
   const location = useLocation();
+
+  // Auth Loading State
+  if (isLoading) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center ${isDark ? 'bg-[#000000]' : 'bg-slate-50'}`}>
+        <SquareGridLoader size={48} color="#FF000E" />
+      </div>
+    );
+  }
 
   // Route Guard: Redirect to /admin/login if not logged in as admin
   if (!isAdmin) {

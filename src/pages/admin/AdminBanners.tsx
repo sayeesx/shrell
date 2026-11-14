@@ -9,7 +9,7 @@ import {
 import { cloudinaryService } from '../../infrastructure/cloudinary/cloudinaryService';
 import { cropAndCompressImage, formatBytes, optimizeImageFile } from '../../utils/imageOptimizer';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
-import { ShrellLoader } from '../../components/common/ShrellLoader';
+import { SquareGridLoader } from '../../components/common/SquareGridLoader';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 import { useTheme } from '../../application/ThemeContext';
 
@@ -936,7 +936,7 @@ export const AdminBanners: React.FC = () => {
 
         {loading ? (
           <div className="py-12 flex items-center justify-center">
-            <ShrellLoader size={48} />
+            <SquareGridLoader size={48} color="#FF000E" />
           </div>
         ) : banners.length === 0 ? (
           <div className={`p-8 rounded-xl border text-center text-xs ${isDark ? 'bg-slate-900 border-slate-800 text-slate-400' : 'bg-white border-slate-200 text-slate-500'}`}>

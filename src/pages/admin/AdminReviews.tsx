@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Product, ProductReview } from '../../domain/types';
 import { productRepository, reviewRepository } from '../../infrastructure/repositories';
 import { useTheme } from '../../application/ThemeContext';
-import { ShrellLoader } from '../../components/common/ShrellLoader';
+import { SquareGridLoader } from '../../components/common/SquareGridLoader';
 
 export const AdminReviews: React.FC = () => {
   const { isDark } = useTheme();
@@ -170,7 +170,7 @@ export const AdminReviews: React.FC = () => {
       {/* Content */}
       {loading ? (
         <div className="py-16 flex flex-col items-center justify-center gap-3">
-          <ShrellLoader size={36} />
+          <SquareGridLoader size={44} color="#FF000E" />
           <p className={`text-xs font-mono ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
             Loading product reviews...
           </p>

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Order, Product } from '../../domain/types';
 import { formatINR } from '../../domain/services/CurrencyService';
 import { orderRepository, productRepository } from '../../infrastructure/repositories';
-import { ShrellLoader } from '../../components/common/ShrellLoader';
+import { SquareGridLoader } from '../../components/common/SquareGridLoader';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
 import { useTheme } from '../../application/ThemeContext';
 
@@ -46,7 +46,7 @@ export const AdminDashboardOverview: React.FC = () => {
   if (loading) {
     return (
       <div className="py-24 flex items-center justify-center">
-        <ShrellLoader size={64} />
+        <SquareGridLoader size={54} color="#FF000E" />
       </div>
     );
   }

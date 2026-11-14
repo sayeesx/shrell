@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../application/AuthContext';
 import { useTheme } from '../../application/ThemeContext';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
-import { ShrellLoader } from '../../components/common/ShrellLoader';
+import { SquareGridLoader } from '../../components/common/SquareGridLoader';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
 
 export const AdminLoginPage: React.FC = () => {
@@ -94,7 +94,7 @@ export const AdminLoginPage: React.FC = () => {
             className="w-full min-h-[44px] px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 disabled:opacity-50 font-bold text-xs font-mono uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
           >
             {isSubmitting ? (
-              <><ShrellLoader size={18} white /><span>Authenticating...</span></>
+              <><SquareGridLoader size={18} color="#ffffff" /><span>Authenticating...</span></>
             ) : (
               'Authorize Session'
             )}

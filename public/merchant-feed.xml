@@ -5,19 +5,6 @@
     <link>https://shrell.vercel.app/</link>
     <description>Premium car accessories, overland gear, and precision components for Indian vehicles</description>
     <item>
-      <g:id>prod-1794667515092</g:id>
-      <g:title>SHRELL Ultra Shampoo - pH Neutral Car Wash Shampoo | Lavender Breeze | Rich Foam, Spotless Finish</g:title>
-      <g:description>Deep Clean for a Brighter Ride. SHRELL Ultra Shampoo delivers rich, thick foam that lifts dirt and grime effortlessly, leaving a spotless, longer-lasting shine with less effort. Its plant-based, pH-neutral formula is tough on oil and grease but gentle on paint, wax, and coatings. Infused with a refreshing Lavender Breeze fragrance and anti-bacterial cleaning power.</g:description>
-      <g:link>https://shrell.vercel.app/product/shrell-ultra-shampoo-ph-neutral-car-wash-shampoo-lavender-breeze-rich-foam-spotless-finish</g:link>
-      <g:image_link>https://res.cloudinary.com/wvq5qp5z/image/upload/v1794667318/vouxfikqbmqcpa16jqow.webp</g:image_link>
-      <g:availability>out_of_stock</g:availability>
-      <g:price>299.00 INR</g:price>
-      <g:brand>SHRELL</g:brand>
-      <g:condition>new</g:condition>
-      <g:mpn>SHR-097345</g:mpn>
-      <g:identifier_exists>no</g:identifier_exists>
-    </item>
-    <item>
       <g:id>prod-1794668685927</g:id>
       <g:title>SHRELL Ultra Shampoo 500ml + Foam Sprayer Combo - pH Neutral Car Wash Shampoo | Lavender Breeze | Rich Foam, 30-50 Washes</g:title>
       <g:description>Deep Clean for a Brighter Ride - Now with Foam Sprayer.Get the complete wash kit. SHRELL Ultra Shampoo (500ml) + Heavy-Duty Foam Sprayer. A concentrated, pH-neutral shampoo that easily removes tough dirt without affecting existing wax, sealant, or coating. Creates rich, lubricating foam for a safe, scratch-free wash.</g:description>
@@ -55,6 +42,110 @@
       <g:condition>new</g:condition>
       <g:mpn>SHR-102578</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
+    </item>
+    <item>
+      <g:id>prod-1794667515092</g:id>
+      <g:title>SHRELL Ultra Shampoo - pH Neutral Car Wash Shampoo | Lavender Breeze | Rich Foam, Spotless Finish</g:title>
+      <g:description>Deep Clean for a Brighter Ride. SHRELL Ultra Shampoo delivers rich, thick foam that lifts dirt and grime effortlessly, leaving a spotless, longer-lasting shine with less effort. Its plant-based, pH-neutral formula is tough on oil and grease but gentle on paint, wax, and coatings. Infused with a refreshing Lavender Breeze fragrance and anti-bacterial cleaning power.</g:description>
+      <g:link>https://shrell.vercel.app/product/shrell-ultra-shampoo-ph-neutral-car-wash-shampoo-lavender-breeze-rich-foam-spotless-finish</g:link>
+      <g:image_link>https://res.cloudinary.com/wvq5qp5z/image/upload/v1794667318/vouxfikqbmqcpa16jqow.webp</g:image_link>
+      <g:availability>out_of_stock</g:availability>
+      <g:price>299.00 INR</g:price>
+      <g:brand>SHRELL</g:brand>
+      <g:condition>new</g:condition>
+      <g:mpn>SHR-097345</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
+    </item>
+    <item>
+      <g:id>prod-osram-light-02</g:id>
+      <g:title>FX500-CB High-Beam Driving LED Lightbar</g:title>
+      <g:description>500-metre reach combo-beam auxiliary driving lightbar with ECE approval and IP67 waterproof certification.</g:description>
+      <g:link>https://shrell.vercel.app/product/fx500-cb-high-beam-led-lightbar</g:link>
+      <g:image_link>https://shrell.vercel.app/logos/shrell-full_white-text_black-logo.png</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>22499.00 INR</g:price>
+      <g:brand>SHRELL</g:brand>
+      <g:condition>new</g:condition>
+      <g:mpn>LED-FX500CB</g:mpn>
+      <g:gtin>8901234567802</g:gtin>
+    </item>
+    <item>
+      <g:id>prod-vahn-mats-03</g:id>
+      <g:title>ArmorForm All-Weather 3D Laser-Fit TPE Mats</g:title>
+      <g:description>Moulded non-toxic TPE floor liners with raised perimeter dams to contain water, slush, and red mud.</g:description>
+      <g:link>https://shrell.vercel.app/product/armorform-all-weather-3d-mats</g:link>
+      <g:image_link>https://shrell.vercel.app/logos/shrell-full_white-text_black-logo.png</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>6499.00 INR</g:price>
+      <g:brand>SHRELL</g:brand>
+      <g:condition>new</g:condition>
+      <g:mpn>MAT-AF-SUV</g:mpn>
+      <g:gtin>8901234567803</g:gtin>
+    </item>
+    <item>
+      <g:id>prod-viair-pump-04</g:id>
+      <g:title>Portable 12V Heavy-Duty Air Compressor (150 PSI)</g:title>
+      <g:description>Direct-battery connected 150 PSI continuous-duty compressor capable of inflating 35-inch SUV tyres in under 5 minutes.</g:description>
+      <g:link>https://shrell.vercel.app/product/portable-12v-heavy-duty-air-compressor-150psi</g:link>
+      <g:image_link>https://shrell.vercel.app/logos/shrell-full_white-text_black-logo.png</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>12999.00 INR</g:price>
+      <g:brand>SHRELL</g:brand>
+      <g:condition>new</g:condition>
+      <g:mpn>PUMP-400-12V</g:mpn>
+      <g:gtin>8901234567804</g:gtin>
+    </item>
+    <item>
+      <g:id>prod-vahn-kinetic-05</g:id>
+      <g:title>Tactical Kinetic Recovery Snatch Rope (9m x 24mm)</g:title>
+      <g:description>12-strand double-braided nylon kinetic rope with 30% elongation for smooth kinetic off-road vehicle recovery.</g:description>
+      <g:link>https://shrell.vercel.app/product/tactical-kinetic-recovery-snatch-rope</g:link>
+      <g:image_link>https://shrell.vercel.app/logos/shrell-full_white-text_black-logo.png</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>5899.00 INR</g:price>
+      <g:brand>SHRELL</g:brand>
+      <g:condition>new</g:condition>
+      <g:mpn>REC-KIN-9M</g:mpn>
+      <g:gtin>8901234567805</g:gtin>
+    </item>
+    <item>
+      <g:id>prod-shrell-microfiber-06</g:id>
+      <g:title>Ultra-Plush 600 GSM Edgeless Microfiber Towels (Pack of 3)</g:title>
+      <g:description>Korean split 70/30 microfiber detailing towels with laser cut edgeless borders. Scratch-free for paint and glass.</g:description>
+      <g:link>https://shrell.vercel.app/product/ultra-plush-600-gsm-edgeless-microfiber-towels</g:link>
+      <g:image_link>https://shrell.vercel.app/icons/wash.svg</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>899.00 INR</g:price>
+      <g:brand>SHRELL</g:brand>
+      <g:condition>new</g:condition>
+      <g:mpn>MF-PLUSH-600</g:mpn>
+      <g:gtin>8901234567806</g:gtin>
+    </item>
+    <item>
+      <g:id>prod-shrell-perfume-07</g:id>
+      <g:title>Solar Kinetic Turbine Car Cabin Perfume Diffuser</g:title>
+      <g:description>Aerospace alloy solar rotating turbine diffuser with natural beechwood essential oil fragrance ring.</g:description>
+      <g:link>https://shrell.vercel.app/product/solar-kinetic-turbine-car-cabin-perfume-diffuser</g:link>
+      <g:image_link>https://shrell.vercel.app/icons/freshner.svg</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>1299.00 INR</g:price>
+      <g:brand>SHRELL</g:brand>
+      <g:condition>new</g:condition>
+      <g:mpn>PF-SOLAR-BLK</g:mpn>
+      <g:gtin>8901234567807</g:gtin>
+    </item>
+    <item>
+      <g:id>prod-vahn-roof-01</g:id>
+      <g:title>Stealth Wing Aerodynamic Crossbars</g:title>
+      <g:description>Extruded aircraft-grade T6 aluminium crossbars with anti-theft key lock and integrated T-track channel.</g:description>
+      <g:link>https://shrell.vercel.app/product/stealth-wing-aerodynamic-crossbars</g:link>
+      <g:image_link>https://shrell.vercel.app/logos/shrell-full_white-text_black-logo.png</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>14999.00 INR</g:price>
+      <g:brand>SHRELL</g:brand>
+      <g:condition>new</g:condition>
+      <g:mpn>RR-WING-BLK</g:mpn>
+      <g:gtin>8901234567801</g:gtin>
     </item>
   </channel>
 </rss>

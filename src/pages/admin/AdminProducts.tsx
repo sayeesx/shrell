@@ -358,7 +358,11 @@ export const AdminProducts: React.FC = () => {
       await loadData();
     } catch (err: any) {
       console.error('Failed to save product:', err);
-      setSaveError(err?.message || 'Failed to save product. Please check network connection and try again.');
+      const rawMsg = err?.message || '';
+      const friendlyMsg = rawMsg.includes('JSON object') || rawMsg.includes('PGRST116')
+        ? 'Database row sync issue. Please ensure you are logged in as admin and try again.'
+        : rawMsg || 'Failed to save product. Please check network connection and try again.';
+      setSaveError(friendlyMsg);
     } finally {
       setIsSaving(false);
     }

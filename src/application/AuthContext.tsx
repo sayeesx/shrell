@@ -77,12 +77,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         );
       };
 
-      supabase.auth.getSession().then(({ data: { session } }) => {
+      supabase.auth.getSession().then(async ({ data: { session } }) => {
         if (!isMounted) return;
         if (session?.user) {
           const sbUser = session.user;
-          const role = (sbUser.user_metadata?.role as 'customer' | 'admin') || 'customer';
-          const name = sbUser.user_metadata?.full_name || sbUser.user_metadata?.name || 'Valued Customer';
+          let role = (sbUser.user_metadata?.role as 'customer' | 'admin') || 'customer';
+          if (role !== 'admin') {
+            try {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', sbUser.id)
+                .maybeSingle();
+              if (profile?.role === 'admin') {
+                role = 'admin';
+              }
+            } catch {
+              // ignore
+            }
+          }
+          const name = sbUser.user_metadata?.full_name || sbUser.user_metadata?.name || (role === 'admin' ? 'SHRELL Administrator' : 'Valued Customer');
           const sessionData: UserSession = {
             id: sbUser.id,
             name,
@@ -98,12 +112,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (isMounted) setIsLoading(false);
       });
 
-      const { data: authSubscription } = supabase.auth.onAuthStateChange((event, session) => {
+      const { data: authSubscription } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (!isMounted) return;
         if (session?.user) {
           const sbUser = session.user;
-          const role = (sbUser.user_metadata?.role as 'customer' | 'admin') || 'customer';
-          const name = sbUser.user_metadata?.full_name || sbUser.user_metadata?.name || 'Valued Customer';
+          let role = (sbUser.user_metadata?.role as 'customer' | 'admin') || 'customer';
+          if (role !== 'admin') {
+            try {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', sbUser.id)
+                .maybeSingle();
+              if (profile?.role === 'admin') {
+                role = 'admin';
+              }
+            } catch {
+              // ignore
+            }
+          }
+          const name = sbUser.user_metadata?.full_name || sbUser.user_metadata?.name || (role === 'admin' ? 'SHRELL Administrator' : 'Valued Customer');
           const sessionData: UserSession = {
             id: sbUser.id,
             name,
@@ -228,7 +256,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .from('profiles')
         .select('role')
         .eq('id', data.user.id)
-        .single();
+        .maybeSingle();
 
       if (profile?.role !== 'admin' && data.user.user_metadata?.role !== 'admin') {
         console.warn('Authenticated user does not have admin permissions.');

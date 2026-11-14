@@ -273,21 +273,17 @@ export class SupabaseProductRepository implements IProductRepository {
         .from('products')
         .insert(payload)
         .select()
-        .single();
+        .maybeSingle();
 
-      if (error) {
-        console.error('Supabase product insert error:', error);
-        throw new Error(error.message || 'Failed to insert product into database');
-      }
-
-      if (!data) {
-        throw new Error('Database insert succeeded but returned empty product data');
+      if (error || !data) {
+        console.warn('Supabase product insert warning, using fallback:', error);
+        return this.fallback.create(product);
       }
 
       return this.mapRowToProduct(data);
     } catch (err: any) {
-      console.error('Failed to create product:', err);
-      throw err;
+      console.warn('Failed to create product in Supabase, falling back:', err);
+      return this.fallback.create(product);
     }
   }
 
@@ -328,26 +324,96 @@ export class SupabaseProductRepository implements IProductRepository {
           : baseSpecs;
       }
 
+      payload.updated_at = new Date().toISOString();
+
       const { data, error } = await supabase
         .from('products')
         .update(payload)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) {
-        console.error('Supabase product update error:', error);
-        throw new Error(error.message || 'Failed to update product in database');
+        console.warn('Supabase product update warning, falling back to local storage:', error);
+        return this.fallback.update(id, updates);
       }
 
       if (!data) {
-        throw new Error('Database update succeeded but returned empty product data');
+        // 0 rows updated: check whether product exists in Supabase
+        const { data: existing } = await supabase
+          .from('products')
+          .select('id')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (!existing) {
+          // Product not found in Supabase table; insert it with merged data
+          const baseProd = await this.fallback.getById(id);
+          const fullProd: Product = {
+            ...(baseProd || {}),
+            ...updates,
+            id,
+            createdAt: baseProd?.createdAt || new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          } as Product;
+
+          const baseSpecs = (fullProd.specifications || []).filter((s: any) => s.name !== 'badge');
+          const finalSpecs = fullProd.badge
+            ? [...baseSpecs, { group: 'System', name: 'badge', value: fullProd.badge }]
+            : baseSpecs;
+
+          const insertPayload = {
+            id: fullProd.id,
+            name: fullProd.name || 'Untitled Product',
+            slug: fullProd.slug || fullProd.id,
+            sku: fullProd.sku || `SHR-${Date.now().toString().slice(-6)}`,
+            barcode: fullProd.barcode || null,
+            short_description: fullProd.shortDescription || '',
+            description: fullProd.description || '',
+            category_id: fullProd.categoryId || 'cat-car-interior',
+            category_name: fullProd.categoryName || 'Car Interior',
+            brand_id: fullProd.brandId || 'brand-shrell',
+            brand_name: fullProd.brandName || 'SHRELL',
+            price_paisa: fullProd.pricePaisa || 0,
+            compare_at_price_paisa: fullProd.compareAtPricePaisa || 0,
+            cost_price_paisa: fullProd.costPricePaisa || 0,
+            is_universal_fit: fullProd.isUniversalFit ?? true,
+            is_active: fullProd.isActive ?? true,
+            is_featured: fullProd.isFeatured ?? false,
+            stock_quantity: fullProd.stockQuantity ?? 10,
+            weight_grams: fullProd.weightGrams ?? 0,
+            dimensions_cm: fullProd.dimensionsCm || '',
+            installation_difficulty: fullProd.installationDifficulty || 'Moderate',
+            warranty_months: fullProd.warrantyMonths ?? 12,
+            images: fullProd.images || [],
+            specifications: finalSpecs,
+            created_at: fullProd.createdAt,
+            updated_at: fullProd.updatedAt,
+          };
+
+          const { data: inserted, error: insertError } = await supabase
+            .from('products')
+            .insert(insertPayload)
+            .select()
+            .maybeSingle();
+
+          if (inserted && !insertError) {
+            try { await this.fallback.update(id, updates); } catch {}
+            return this.mapRowToProduct(inserted);
+          }
+        }
+
+        // Row exists or insert wasn't possible; save to fallback so image edits are never lost
+        return this.fallback.update(id, updates);
       }
+
+      // Sync to fallback memory/cache
+      try { await this.fallback.update(id, updates); } catch {}
 
       return this.mapRowToProduct(data);
     } catch (err: any) {
-      console.error('Failed to update product:', err);
-      throw err;
+      console.warn('Failed to update product in Supabase, using fallback:', err);
+      return this.fallback.update(id, updates);
     }
   }
 
@@ -493,7 +559,7 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
           display_order: category.displayOrder,
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error || !data) return this.fallback.create(category);
 
@@ -527,7 +593,7 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
         })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error || !data) return this.fallback.update(id, updates);
 
@@ -727,7 +793,7 @@ export class SupabaseInventoryRepository implements IInventoryRepository {
         .from('products')
         .select('stock_quantity')
         .eq('id', productId)
-        .single();
+        .maybeSingle();
 
       if (prod) {
         const newQty = Math.max(0, (prod.stock_quantity || 0) + quantityChange);
@@ -808,7 +874,7 @@ export class SupabaseOrderRepository implements IOrderRepository {
         .from('orders')
         .insert(orderPayload)
         .select()
-        .single();
+        .maybeSingle();
 
       if (orderError || !createdOrder) {
         console.warn('Supabase order insert error, fallback:', orderError);
@@ -968,7 +1034,7 @@ export class SupabaseOrderRepository implements IOrderRepository {
         .update({ status, ...(internalNotes ? { internal_notes: internalNotes } : {}) })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error || !data) return this.fallback.updateOrderStatus(id, status, internalNotes);
       const full = await this.getOrderById(id);
@@ -992,7 +1058,7 @@ export class SupabaseOrderRepository implements IOrderRepository {
         })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error || !data) return this.fallback.updatePaymentStatus(id, paymentStatus, reference);
       const full = await this.getOrderById(id);
@@ -1013,7 +1079,7 @@ export class SupabaseOrderRepository implements IOrderRepository {
         .update({ shipment, status: 'SHIPPED' })
         .eq('id', orderId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error || !data) return this.fallback.updateShipment(orderId, shipment);
       const full = await this.getOrderById(orderId);
@@ -1151,7 +1217,7 @@ export class SupabaseCouponRepository implements ICouponRepository {
           is_active: coupon.isActive,
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error || !data) return this.fallback.create(coupon);
       return {
@@ -1179,7 +1245,7 @@ export class SupabaseCouponRepository implements ICouponRepository {
         .from('coupons')
         .select('used_count')
         .ilike('code', code.trim())
-        .single();
+        .maybeSingle();
       if (coup) {
         await supabase
           .from('coupons')
@@ -1389,7 +1455,7 @@ export class SupabaseHomeSectionRepository implements IHomeSectionRepository {
         .from('home_sections')
         .insert(payload)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error || !data) return this.fallback.create(section);
       cachedHomeSections = null;
@@ -1420,7 +1486,7 @@ export class SupabaseHomeSectionRepository implements IHomeSectionRepository {
         .update(payload)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error || !data) return this.fallback.update(id, updates);
       cachedHomeSections = null;
@@ -1533,7 +1599,7 @@ export class SupabaseReviewRepository implements IReviewRepository {
           },
         ])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error || !data) {
         return this.fallback.addReview(review);

@@ -36,12 +36,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://shrell.vercel.app/product/shrell-ultra-shampoo-ph-neutral-car-wash-shampoo-lavender-breeze-rich-foam-spotless-finish</loc>
-    <lastmod>2026-11-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://shrell.vercel.app/product/shrell-ultra-shampoo-500ml-foam-sprayer-combo-ph-neutral-car-wash-shampoo-lavender-breeze-rich-foam-30-50-washes</loc>
     <lastmod>2026-11-14</lastmod>
     <changefreq>weekly</changefreq>
@@ -55,6 +49,54 @@
   </url>
   <url>
     <loc>https://shrell.vercel.app/product/shrell-ultra-shampoo-orange-zest-500ml-ph-neutral-car-wash-shampoo-thick-foam-wax-safe-scratch-free-for-30-50-washes-for-car-bike-suv</loc>
+    <lastmod>2026-11-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://shrell.vercel.app/product/shrell-ultra-shampoo-ph-neutral-car-wash-shampoo-lavender-breeze-rich-foam-spotless-finish</loc>
+    <lastmod>2026-11-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://shrell.vercel.app/product/fx500-cb-high-beam-led-lightbar</loc>
+    <lastmod>2026-03-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://shrell.vercel.app/product/armorform-all-weather-3d-mats</loc>
+    <lastmod>2026-03-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://shrell.vercel.app/product/portable-12v-heavy-duty-air-compressor-150psi</loc>
+    <lastmod>2026-03-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://shrell.vercel.app/product/tactical-kinetic-recovery-snatch-rope</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://shrell.vercel.app/product/ultra-plush-600-gsm-edgeless-microfiber-towels</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://shrell.vercel.app/product/solar-kinetic-turbine-car-cabin-perfume-diffuser</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://shrell.vercel.app/product/stealth-wing-aerodynamic-crossbars</loc>
     <lastmod>2026-11-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

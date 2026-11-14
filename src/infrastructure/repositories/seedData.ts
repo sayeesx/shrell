@@ -61,47 +61,47 @@ export const INITIAL_BRANDS: Brand[] = [
 
 export const INITIAL_CATEGORIES: Category[] = [
   {
-    id: 'cat-air-fresheners',
-    name: 'Air Fresheners',
-    slug: 'air-fresheners',
-    description: 'Organic cedar fiber blocks, solar kinetic turbine diffusers, and luxury car cabin fragrances.',
-    imageUrl: '/logos/shrell-full_white-text_black-logo.png',
+    id: 'cat-car-interior',
+    name: 'Car Interior',
+    slug: 'car-interior',
+    description: 'Precision-fit 7D floor liners, seat comfort systems, cabin organizers, and interior care accessories.',
+    imageUrl: '/icons/floormats.svg',
     isActive: true,
     displayOrder: 1,
   },
   {
-    id: 'cat-lighting',
-    name: 'Auxiliary & Fog Lighting',
-    slug: 'auxiliary-lighting',
-    description: 'IP68-rated amber and white driving beams, laser projectors, and modular LED lightbars.',
-    imageUrl: '/logos/shrell-full_white-text_black-logo.png',
+    id: 'cat-car-exterior',
+    name: 'Car Exterior',
+    slug: 'car-exterior',
+    description: 'Aerodynamic roof racks, Osram bi-LED auxiliary lighting, weather deflectors, and exterior equipment.',
+    imageUrl: '/icons/carcare.svg',
     isActive: true,
     displayOrder: 2,
   },
   {
-    id: 'cat-protection',
-    name: 'All-Weather Floor Protection',
-    slug: 'all-weather-floor-protection',
-    description: 'Laser-measured TPE thermoplastic 3D/7D mats engineered for heavy monsoon mud and dust.',
-    imageUrl: '/logos/shrell-full_white-text_black-logo.png',
+    id: 'cat-microfiber-cloths',
+    name: 'Microfiber Cloths',
+    slug: 'microfiber-cloths',
+    description: 'Heavy-GSM edgeless detailing microfibers, plush twist-loop drying towels, and scratch-free polishing cloths.',
+    imageUrl: '/icons/wash.svg',
     isActive: true,
     displayOrder: 3,
   },
   {
-    id: 'cat-tyre-care',
-    name: 'Tyre Care & Air Systems',
-    slug: 'tyre-care-air-systems',
-    description: 'Direct-drive 12V high-output compressors, digital deflators, and precision puncture kits.',
-    imageUrl: '/logos/shrell-full_white-text_black-logo.png',
+    id: 'cat-kits-combos',
+    name: 'Kits and Combos',
+    slug: 'kits-and-combos',
+    description: 'Curated multi-stage detailing bundles, DIY maintenance packs, and complete vehicle preparation combos.',
+    imageUrl: '/icons/tools.svg',
     isActive: true,
     displayOrder: 4,
   },
   {
-    id: 'cat-touring',
-    name: 'Touring & Recovery Gear',
-    slug: 'touring-recovery-gear',
-    description: 'Kinetic snatch straps, soft shackles, rapid tyre deflators, and off-grid power solutions.',
-    imageUrl: '/logos/shrell-full_white-text_black-logo.png',
+    id: 'cat-car-perfumes',
+    name: 'Car Perfumes',
+    slug: 'car-perfumes',
+    description: 'Artisan car perfumes, solar turbine diffusers, organic fiber scent blocks, and luxury fragrances.',
+    imageUrl: '/icons/freshner.svg',
     isActive: true,
     displayOrder: 5,
   },
@@ -154,8 +154,8 @@ Engineered specifically for Indian touring speeds and monsoons. The Stealth Wing
 - Heavy-duty cast zinc core locking mechanism with 2 coded master keys.
 - Universal standard 20mm T-slot channel compatible with cycle carriers, roof boxes, and kayak mounts.
 - Dynamic load capacity tested to 85 kg (Static capacity: 180 kg for rooftop tents).`,
-    categoryId: 'cat-air-fresheners',
-    categoryName: 'Air Fresheners',
+    categoryId: 'cat-car-exterior',
+    categoryName: 'Car Exterior',
     brandId: 'brand-vahn',
     brandName: '',
     pricePaisa: 1499900, // ₹14,999.00
@@ -206,8 +206,8 @@ Navigate unlit state highways and mountain passes with complete confidence. The 
 - Integrated thermal management system with rear heat-sink fins for extended longevity.
 - High-impact polycarbonate lens resistant to gravel strikes and thermal shocks.
 - Fully street-legal ECE R112 certified auxiliary high beam.`,
-    categoryId: 'cat-lighting',
-    categoryName: 'Auxiliary & Fog Lighting',
+    categoryId: 'cat-car-exterior',
+    categoryName: 'Car Exterior',
     brandId: 'brand-osram',
     brandName: '',
     pricePaisa: 2249900, // ₹22,499.00
@@ -258,8 +258,8 @@ Manufactured from automotive-grade Thermoplastic Elastomer (TPE), the ArmorForm 
 - Deep chevron drainage grooves direct moisture away from foot contact surfaces.
 - Integrated floorboard snap-lock anchors prevent mat slipping under clutch and brake pedals.
 - Easily cleaned in 2 minutes with a high-pressure hose.`,
-    categoryId: 'cat-protection',
-    categoryName: 'All-Weather Floor Protection',
+    categoryId: 'cat-car-interior',
+    categoryName: 'Car Interior',
     brandId: 'brand-vahn',
     brandName: '',
     pricePaisa: 649900, // ₹6,499.00
@@ -309,8 +309,8 @@ Designed for rugged off-highway touring and long road trips where gas station ai
 - Inflates a 265/65 R17 SUV tyre from 15 PSI to 35 PSI in under 2 minutes 30 seconds.
 - 5-in-1 quick-connect coiled air hose with integrated illuminated inline pressure gauge and tyre deflation valve.
 - Heavy-duty ballistic nylon padded transport bag included.`,
-    categoryId: 'cat-tyre-care',
-    categoryName: 'Tyre Care & Air Systems',
+    categoryId: 'cat-kits-combos',
+    categoryName: 'Kits and Combos',
     brandId: 'brand-viair',
     brandName: '',
     pricePaisa: 1299900, // ₹12,999.00
@@ -360,8 +360,8 @@ Eliminates the brutal jerk and chassis damage associated with rigid steel tow ca
 - Premium 100% Double Braided Nylon (Polyamide 6.6) construction.
 - Polymer dipped eyes with protective Cordura chafe sleeves for abrasion resistance against rocks and recovery shackles.
 - Water, chemical, and UV resistant coating.`,
-    categoryId: 'cat-touring',
-    categoryName: 'Touring & Recovery Gear',
+    categoryId: 'cat-car-exterior',
+    categoryName: 'Car Exterior',
     brandId: 'brand-vahn',
     brandName: '',
     pricePaisa: 589900, // ₹5,899.00
@@ -389,6 +389,102 @@ Eliminates the brutal jerk and chassis damage associated with rigid steel tow ca
         productId: 'prod-vahn-kinetic-05',
         url: '/logos/shrell-full_white-text_black-logo.png',
         altText: 'SHRELL Kinetic Snatch Rope',
+        sortOrder: 1,
+        isPrimary: true,
+      },
+    ],
+  },
+  {
+    id: 'prod-shrell-microfiber-06',
+    name: 'Ultra-Plush 600 GSM Edgeless Microfiber Towels (Pack of 3)',
+    slug: 'ultra-plush-600-gsm-edgeless-microfiber-towels',
+    sku: 'MF-PLUSH-600',
+    barcode: '8901234567806',
+    shortDescription: 'Korean split 70/30 microfiber detailing towels with laser cut edgeless borders. Scratch-free for paint and glass.',
+    description: `### Professional Grade Automotive Detailing Microfibers
+
+Engineered with 600 GSM dual-pile split microfibers. One side features long plush pile for safe waterless wash and quick detailing; reverse features dense short weave for buffing waxes and sealants.
+
+#### Key Specs
+- 70/30 polyester-to-polyamide split microfiber weave.
+- Ultrasonic cut edgeless perimeter eliminates stitching swirl marks.
+- Machine washable up to 500 wash cycles.`,
+    categoryId: 'cat-microfiber-cloths',
+    categoryName: 'Microfiber Cloths',
+    brandId: 'brand-vahn',
+    brandName: 'Automotive Equipment',
+    pricePaisa: 89900, // ₹899.00
+    compareAtPricePaisa: 129900,
+    costPricePaisa: 45000,
+    isUniversalFit: true,
+    isActive: true,
+    isFeatured: true,
+    weightGrams: 450,
+    dimensionsCm: '40x40x3',
+    installationDifficulty: 'Plug & Play',
+    warrantyMonths: 12,
+    stockQuantity: 85,
+    createdAt: '2026-03-01T10:00:00Z',
+    updatedAt: '2026-03-15T12:00:00Z',
+    specifications: [
+      { group: 'Material', name: 'Microfiber Blend', value: '70% Polyester / 30% Polyamide' },
+      { group: 'Density', name: 'GSM Rating', value: '600 GSM' },
+      { group: 'Border', name: 'Edge Treatment', value: 'Ultrasonic Laser Cut Edgeless' },
+    ],
+    images: [
+      {
+        id: 'img-mf-01',
+        productId: 'prod-shrell-microfiber-06',
+        url: '/icons/wash.svg',
+        altText: 'Ultra-Plush 600 GSM Edgeless Microfiber Towels',
+        sortOrder: 1,
+        isPrimary: true,
+      },
+    ],
+  },
+  {
+    id: 'prod-shrell-perfume-07',
+    name: 'Solar Kinetic Turbine Car Cabin Perfume Diffuser',
+    slug: 'solar-kinetic-turbine-car-cabin-perfume-diffuser',
+    sku: 'PF-SOLAR-BLK',
+    barcode: '8901234567807',
+    shortDescription: 'Aerospace alloy solar rotating turbine diffuser with natural beechwood essential oil fragrance ring.',
+    description: `### Solar-Powered Continuous Cabin Fragrance
+
+Silent magnetic levitation rotor activates automatically under direct sunlight. Solid beechwood aromatic core ensures zero liquid leakage and constant, subtle aroma diffusion for up to 90 days.
+
+#### Key Highlights
+- High-efficiency photovoltaic solar drive activates without battery.
+- Machined anodized aerospace aluminum housing.
+- Natural plant-based non-toxic essential oil ring.`,
+    categoryId: 'cat-car-perfumes',
+    categoryName: 'Car Perfumes',
+    brandId: 'brand-vahn',
+    brandName: 'Automotive Equipment',
+    pricePaisa: 129900, // ₹1,299.00
+    compareAtPricePaisa: 199900,
+    costPricePaisa: 60000,
+    isUniversalFit: true,
+    isActive: true,
+    isFeatured: true,
+    weightGrams: 320,
+    dimensionsCm: '8x8x6',
+    installationDifficulty: 'Plug & Play',
+    warrantyMonths: 12,
+    stockQuantity: 50,
+    createdAt: '2026-03-01T10:00:00Z',
+    updatedAt: '2026-03-15T12:00:00Z',
+    specifications: [
+      { group: 'Drive', name: 'Solar Motor', value: 'Photovoltaic Mag-Lev Turbine' },
+      { group: 'Fragrance', name: 'Aroma Core', value: 'Natural Beechwood Solid Ring' },
+      { group: 'Duration', name: 'Scent Longevity', value: 'Up to 90 Days' },
+    ],
+    images: [
+      {
+        id: 'img-perf-01',
+        productId: 'prod-shrell-perfume-07',
+        url: '/icons/freshner.svg',
+        altText: 'Solar Kinetic Turbine Car Cabin Perfume Diffuser',
         sortOrder: 1,
         isPrimary: true,
       },

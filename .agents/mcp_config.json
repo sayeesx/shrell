@@ -2,6 +2,9 @@
   "mcpServers": {
     "appwrite": {
       "serverUrl": "https://mcp.appwrite.io/"
+    },
+    "supabase": {
+      "serverUrl": "https://mcp.supabase.com/mcp?project_ref=mdfhavwmtwtoclpmwtfb&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching%2Cfeedback%2Cnotebooks"
     }
   }
 }

@@ -42,6 +42,21 @@ import {
 } from './MockPersistenceRepository';
 
 // ==============================================================================
+// FREE-TIER EGRESS & LATENCY OPTIMIZATION CACHE (TTL: 5 Minutes)
+// Eliminates repetitive Supabase requests for static/rarely changing tables
+// ==============================================================================
+interface CacheEntry<T> {
+  data: T;
+  expiry: number;
+}
+const TTL_FIVE_MINUTES_MS = 5 * 60 * 1000;
+
+let cachedCategories: CacheEntry<Category[]> | null = null;
+let cachedBrands: CacheEntry<Brand[]> | null = null;
+let cachedSettings: CacheEntry<StoreSettings> | null = null;
+let cachedHomeSections: CacheEntry<HomeSection[]> | null = null;
+
+// ==============================================================================
 // 1. PRODUCTS REPOSITORY
 // ==============================================================================
 export class SupabaseProductRepository implements IProductRepository {
@@ -59,25 +74,38 @@ export class SupabaseProductRepository implements IProductRepository {
         .eq('is_active', true);
 
       if (params?.categorySlug) {
-        // Query category ID from slug
-        const { data: cat } = await supabase
-          .from('categories')
-          .select('id')
-          .eq('slug', params.categorySlug)
-          .single();
-        if (cat) {
-          query = query.eq('category_id', cat.id);
+        // Resolve category ID from memory cache or query with 0 unnecessary egress
+        let catId: string | undefined = cachedCategories?.data.find(
+          (c) => c.slug === params.categorySlug
+        )?.id;
+        if (!catId) {
+          const { data: cat } = await supabase
+            .from('categories')
+            .select('id')
+            .eq('slug', params.categorySlug)
+            .maybeSingle();
+          if (cat) catId = cat.id;
+        }
+        if (catId) {
+          query = query.eq('category_id', catId);
         }
       }
 
       if (params?.brandSlug) {
-        const { data: brand } = await supabase
-          .from('brands')
-          .select('id')
-          .eq('slug', params.brandSlug)
-          .single();
-        if (brand) {
-          query = query.eq('brand_id', brand.id);
+        // Resolve brand ID from memory cache or query
+        let brandId: string | undefined = cachedBrands?.data.find(
+          (b) => b.slug === params.brandSlug
+        )?.id;
+        if (!brandId) {
+          const { data: brand } = await supabase
+            .from('brands')
+            .select('id')
+            .eq('slug', params.brandSlug)
+            .maybeSingle();
+          if (brand) brandId = brand.id;
+        }
+        if (brandId) {
+          query = query.eq('brand_id', brandId);
         }
       }
 
@@ -171,6 +199,33 @@ export class SupabaseProductRepository implements IProductRepository {
       return this.mapRowToProduct(data);
     } catch {
       return this.fallback.getById(id);
+    }
+  }
+
+  async getFeatured(): Promise<Product[]> {
+    if (!isSupabaseConfigured) {
+      const all = await this.fallback.getAll();
+      return all.products.filter((p) => p.isFeatured);
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('is_active', true)
+        .eq('is_featured', true)
+        .order('created_at', { ascending: false })
+        .limit(12);
+
+      if (error || !data || data.length === 0) {
+        const all = await this.fallback.getAll();
+        return all.products.filter((p) => p.isFeatured);
+      }
+
+      return data.map((row) => this.mapRowToProduct(row));
+    } catch {
+      const all = await this.fallback.getAll();
+      return all.products.filter((p) => p.isFeatured);
     }
   }
 
@@ -328,10 +383,14 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
       return this.fallback.getAll();
     }
 
+    if (cachedCategories && Date.now() < cachedCategories.expiry) {
+      return cachedCategories.data;
+    }
+
     try {
       const { data, error } = await supabase
         .from('categories')
-        .select('*')
+        .select('id, name, slug, description, image_url, is_active, display_order')
         .eq('is_active', true)
         .order('display_order', { ascending: true });
 
@@ -339,7 +398,7 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
         return this.fallback.getAll();
       }
 
-      return data.map((row) => ({
+      const mapped: Category[] = data.map((row) => ({
         id: row.id,
         name: row.name,
         slug: row.slug,
@@ -348,6 +407,9 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
         isActive: Boolean(row.is_active),
         displayOrder: row.display_order || 0,
       }));
+
+      cachedCategories = { data: mapped, expiry: Date.now() + TTL_FIVE_MINUTES_MS };
+      return mapped;
     } catch {
       return this.fallback.getAll();
     }
@@ -406,6 +468,7 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
 
       if (error || !data) return this.fallback.create(category);
 
+      cachedCategories = null;
       return {
         id: data.id,
         name: data.name,
@@ -439,6 +502,7 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
 
       if (error || !data) return this.fallback.update(id, updates);
 
+      cachedCategories = null;
       return {
         id: data.id,
         name: data.name,
@@ -460,6 +524,7 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
 
     try {
       const { error } = await supabase.from('categories').delete().eq('id', id);
+      if (!error) cachedCategories = null;
       return !error;
     } catch {
       return this.fallback.delete(id);
@@ -478,17 +543,21 @@ export class SupabaseBrandRepository implements IBrandRepository {
       return this.fallback.getAll();
     }
 
+    if (cachedBrands && Date.now() < cachedBrands.expiry) {
+      return cachedBrands.data;
+    }
+
     try {
       const { data, error } = await supabase
         .from('brands')
-        .select('*')
+        .select('id, name, slug, logo_url, is_active, country_of_origin')
         .eq('is_active', true);
 
       if (error || !data || data.length === 0) {
         return this.fallback.getAll();
       }
 
-      return data.map((b) => ({
+      const mapped = data.map((b) => ({
         id: b.id,
         name: b.name,
         slug: b.slug,
@@ -496,6 +565,9 @@ export class SupabaseBrandRepository implements IBrandRepository {
         isActive: Boolean(b.is_active),
         countryOfOrigin: b.country_of_origin,
       }));
+
+      cachedBrands = { data: mapped, expiry: Date.now() + TTL_FIVE_MINUTES_MS };
+      return mapped;
     } catch {
       return this.fallback.getAll();
     }
@@ -1115,6 +1187,11 @@ export class SupabaseSettingsRepository implements ISettingsRepository {
 
   async getSettings(): Promise<StoreSettings> {
     if (!isSupabaseConfigured) return this.fallback.getSettings();
+
+    if (cachedSettings && Date.now() < cachedSettings.expiry) {
+      return cachedSettings.data;
+    }
+
     try {
       const { data, error } = await supabase.from('store_settings').select('*');
       if (error || !data || data.length === 0) return this.fallback.getSettings();
@@ -1128,7 +1205,7 @@ export class SupabaseSettingsRepository implements ISettingsRepository {
       const shippingRules = settingsMap.shipping_rules || {};
       const seoOpengraph = settingsMap.seo_opengraph || {};
 
-      return {
+      const result: StoreSettings = {
         storeName: storeInfo.storeName || 'SHRELL Automotive',
         contactEmail: storeInfo.contactEmail || 'orders@shrell.com',
         contactPhone: storeInfo.contactPhone || '+91 98765 43210',
@@ -1148,6 +1225,9 @@ export class SupabaseSettingsRepository implements ISettingsRepository {
           seoOpengraph.ogImageAlt ||
           'SHRELL Automotive - Premium Car Accessories & Touring Equipment',
       };
+
+      cachedSettings = { data: result, expiry: Date.now() + TTL_FIVE_MINUTES_MS };
+      return result;
     } catch {
       return this.fallback.getSettings();
     }
@@ -1198,6 +1278,7 @@ export class SupabaseSettingsRepository implements ISettingsRepository {
         return this.fallback.updateSettings(settings);
       }
 
+      cachedSettings = null;
       await this.fallback.updateSettings(updated);
       return updated;
     } catch {
@@ -1233,6 +1314,11 @@ export class SupabaseHomeSectionRepository implements IHomeSectionRepository {
 
   async getAll(): Promise<HomeSection[]> {
     if (!isSupabaseConfigured) return this.fallback.getAll();
+
+    if (cachedHomeSections && Date.now() < cachedHomeSections.expiry) {
+      return cachedHomeSections.data;
+    }
+
     try {
       const { data, error } = await supabase
         .from('home_sections')
@@ -1243,7 +1329,9 @@ export class SupabaseHomeSectionRepository implements IHomeSectionRepository {
         return this.fallback.getAll();
       }
 
-      return data.map((r) => this.mapRowToSection(r));
+      const mapped = data.map((r) => this.mapRowToSection(r));
+      cachedHomeSections = { data: mapped, expiry: Date.now() + TTL_FIVE_MINUTES_MS };
+      return mapped;
     } catch {
       return this.fallback.getAll();
     }
@@ -1291,6 +1379,7 @@ export class SupabaseHomeSectionRepository implements IHomeSectionRepository {
         .single();
 
       if (error || !data) return this.fallback.create(section);
+      cachedHomeSections = null;
       return this.mapRowToSection(data);
     } catch {
       return this.fallback.create(section);
@@ -1321,6 +1410,7 @@ export class SupabaseHomeSectionRepository implements IHomeSectionRepository {
         .single();
 
       if (error || !data) return this.fallback.update(id, updates);
+      cachedHomeSections = null;
       return this.mapRowToSection(data);
     } catch {
       return this.fallback.update(id, updates);
@@ -1332,6 +1422,7 @@ export class SupabaseHomeSectionRepository implements IHomeSectionRepository {
     try {
       const { error } = await supabase.from('home_sections').delete().eq('id', id);
       if (error) return this.fallback.delete(id);
+      cachedHomeSections = null;
       return true;
     } catch {
       return this.fallback.delete(id);
@@ -1347,6 +1438,7 @@ export class SupabaseHomeSectionRepository implements IHomeSectionRepository {
           .update({ display_order: i + 1 })
           .eq('id', sectionIds[i]);
       }
+      cachedHomeSections = null;
     } catch {
       return this.fallback.reorder(sectionIds);
     }

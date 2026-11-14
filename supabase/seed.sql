@@ -8,14 +8,14 @@ INSERT INTO public.store_settings (key, value) VALUES
 ('shipping_rules', '{"freeShippingThresholdPaisa": 499900, "standardShippingPaisa": 25000, "gstRatePercent": 18}'::jsonb)
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
 
--- 2. Categories
+-- 2. Categories (Official Shrell Taxonomy)
 INSERT INTO public.categories (id, name, slug, description, image_url, is_active, display_order) VALUES
-('cat-air-fresheners', 'Air Fresheners', 'air-fresheners', 'Organic cedar fiber blocks, solar kinetic turbine diffusers, and luxury car cabin fragrances.', '/logos/shrell-brandicon_no-bg.png', true, 1),
-('cat-lighting', 'Auxiliary & Fog Lighting', 'auxiliary-lighting', 'IP68-rated amber and white driving beams, laser projectors, and modular LED lightbars.', '/logos/shrell-brandicon_no-bg.png', true, 2),
-('cat-protection', 'All-Weather Floor Protection', 'all-weather-floor-protection', 'Laser-measured TPE thermoplastic 3D/7D mats engineered for heavy monsoon mud and dust.', '/logos/shrell-brandicon_no-bg.png', true, 3),
-('cat-tyre-care', 'Tyre Care & Air Systems', 'tyre-care-air-systems', 'Direct-drive 12V high-output compressors, digital deflators, and precision puncture kits.', '/logos/shrell-brandicon_no-bg.png', true, 4),
-('cat-touring', 'Touring & Recovery Gear', 'touring-recovery-gear', 'Kinetic snatch straps, soft shackles, rapid tyre deflators, and off-grid power solutions.', '/logos/shrell-brandicon_no-bg.png', true, 5)
-ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description, is_active = EXCLUDED.is_active;
+('cat-car-interior', 'Car Interior', 'car-interior', 'Precision-fit 7D floor liners, seat comfort systems, cabin organizers, and interior care accessories.', '/icons/floormats.svg', true, 1),
+('cat-car-exterior', 'Car Exterior', 'car-exterior', 'Aerodynamic roof racks, Osram bi-LED auxiliary lighting, weather deflectors, and exterior equipment.', '/icons/carcare.svg', true, 2),
+('cat-microfiber-cloths', 'Microfiber Cloths', 'microfiber-cloths', 'Heavy-GSM edgeless detailing microfibers, plush twist-loop drying towels, and scratch-free polishing cloths.', '/icons/wash.svg', true, 3),
+('cat-kits-combos', 'Kits and Combos', 'kits-and-combos', 'Curated multi-stage detailing bundles, DIY maintenance packs, and complete vehicle preparation combos.', '/icons/tools.svg', true, 4),
+('cat-car-perfumes', 'Car Perfumes', 'car-perfumes', 'Artisan car perfumes, solar turbine diffusers, organic fiber scent blocks, and luxury fragrances.', '/icons/freshner.svg', true, 5)
+ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, slug = EXCLUDED.slug, description = EXCLUDED.description, image_url = EXCLUDED.image_url, is_active = EXCLUDED.is_active, display_order = EXCLUDED.display_order;
 
 -- 3. Brands
 INSERT INTO public.brands (id, name, slug, logo_url, country_of_origin, is_active) VALUES
@@ -72,7 +72,7 @@ INSERT INTO public.products (
   '8901234567801',
   'Extruded aircraft-grade T6 aluminium crossbars with anti-theft key lock and integrated T-track channel.',
   'High-tensile extruded 6063-T6 tempered aluminium construction with dual-sided rubber wind-diffuser strip reducing wind drag up to 70%. Cast zinc core locking mechanism with master keys.',
-  'cat-touring', 'Touring & Recovery Gear', 'brand-thule', 'Cargo Solutions',
+  'cat-car-exterior', 'Car Exterior', 'brand-thule', 'Cargo Solutions',
   1499900, 1849900, 850000,
   false, true, true, 18,
   4800, '120x12x8', 'Moderate', 36,
@@ -87,7 +87,7 @@ INSERT INTO public.products (
   '8901234567802',
   'Dual-spectrum 3000K Amber / 6000K Hyper-White auxiliary projector pods with laser diode high-beam assist.',
   'Engineered for dense Himalayan fog and Western Ghats monsoons. Dual-throw optical TIR lens projects razor-sharp low cutoff without blinding oncoming vehicles.',
-  'cat-lighting', 'Auxiliary & Fog Lighting', 'brand-osram', 'Illumination Systems',
+  'cat-car-exterior', 'Car Exterior', 'brand-osram', 'Illumination Systems',
   899900, 1199900, 480000,
   true, true, true, 34,
   1450, '9x9x7', 'Professional Recommended', 24,
@@ -102,7 +102,7 @@ INSERT INTO public.products (
   '8901234567803',
   'Laser 3D digitised deep-dish floor liners with detachable dual-layer monsoon curly coil grass mats.',
   'Custom moulded for Tata Safari, Harrier, Scorpio-N and XUV700 cabins. Raised 45mm containment lip traps up to 3 litres of mud, slush and spilled liquids.',
-  'cat-protection', 'All-Weather Floor Protection', 'brand-vahn', 'Automotive Equipment',
+  'cat-car-interior', 'Car Interior', 'brand-vahn', 'Automotive Equipment',
   649900, 799900, 320000,
   false, true, true, 22,
   5200, '75x55x18', 'Plug & Play', 12,
@@ -111,21 +111,53 @@ INSERT INTO public.products (
 ),
 (
   'prod-vahn-comp-04',
-  'Apex Dual-Cylinder Rapid Tyre Inflator',
+  'Apex Dual-Cylinder Rapid Tyre Inflator & Emergency Kit',
   'apex-dual-cylinder-rapid-tyre-inflator',
   'TC-APEX-12V',
   '8901234567804',
   'Heavy-duty direct-drive 12V 85L/min twin-piston air compressor with digital auto-cutoff gauge.',
-  'Inflates an SUV 265/65 R18 tyre from 15 PSI to 35 PSI in under 2 minutes. Features anodised aluminium heatsink and 5-metre braided braided air hose.',
-  'cat-tyre-care', 'Tyre Care & Air Systems', 'brand-viair', 'Air & Compressor Systems',
+  'Inflates an SUV 265/65 R18 tyre from 15 PSI to 35 PSI in under 2 minutes. Features anodised aluminium heatsink and 5-metre braided air hose.',
+  'cat-kits-combos', 'Kits and Combos', 'brand-viair', 'Air & Compressor Systems',
   589900, 749900, 310000,
   true, true, true, 41,
   3800, '28x14x20', 'Plug & Play', 24,
   '[{"id": "img-4", "url": "https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&q=80&w=1200", "altText": "Apex Rapid Air Compressor", "sortOrder": 1, "isPrimary": true}]'::jsonb,
   '[{"name": "Max Flow Rate", "value": "85 Litres / Minute"}, {"name": "Max Working Pressure", "value": "150 PSI"}, {"name": "Power Connector", "value": "Direct Battery Alligator Clamps"}]'::jsonb
+),
+(
+  'prod-shrell-microfiber-05',
+  'Ultra-Plush 600 GSM Edgeless Microfiber Towels (Pack of 3)',
+  'ultra-plush-600-gsm-edgeless-microfiber-towels',
+  'MF-PLUSH-600',
+  '8901234567805',
+  'Korean split 70/30 microfiber detailing towels with laser cut edgeless borders. Scratch-free for paint and glass.',
+  'Engineered with 600 GSM dual-pile split microfibers. One side features long plush pile for safe waterless wash and quick detailing; reverse features dense short weave for buffing waxes and sealants.',
+  'cat-microfiber-cloths', 'Microfiber Cloths', 'brand-vahn', 'Automotive Equipment',
+  89900, 129900, 45000,
+  true, true, true, 85,
+  450, '40x40x3', 'Plug & Play', 12,
+  '[{"id": "img-5", "url": "/icons/wash.svg", "altText": "Ultra-Plush Microfiber Towels", "sortOrder": 1, "isPrimary": true}]'::jsonb,
+  '[{"name": "Blend", "value": "70% Polyester / 30% Polyamide"}, {"name": "Weight", "value": "600 GSM"}, {"name": "Border", "value": "Laser Cut Ultrasonic Edgeless"}]'::jsonb
+),
+(
+  'prod-shrell-perfume-06',
+  'Solar Kinetic Turbine Car Cabin Perfume Diffuser',
+  'solar-kinetic-turbine-car-cabin-perfume-diffuser',
+  'PF-SOLAR-BLK',
+  '8901234567806',
+  'Aerospace alloy solar rotating turbine diffuser with natural beechwood essential oil fragrance ring.',
+  'Silent magnetic levitation rotor activates automatically under direct sunlight. Solid beechwood aromatic core ensures zero liquid leakage and constant, subtle aroma diffusion for up to 90 days.',
+  'cat-car-perfumes', 'Car Perfumes', 'brand-vahn', 'Automotive Equipment',
+  129900, 199900, 60000,
+  true, true, true, 50,
+  320, '8x8x6', 'Plug & Play', 12,
+  '[{"id": "img-6", "url": "/icons/freshner.svg", "altText": "Solar Kinetic Car Perfume", "sortOrder": 1, "isPrimary": true}]'::jsonb,
+  '[{"name": "Drive System", "value": "High-efficiency Photovoltaic Solar Rotor"}, {"name": "Scent Carrier", "value": "Natural Beechwood Ring"}, {"name": "Lifespan", "value": "90 Days Continuous Diffusion"}]'::jsonb
 )
 ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
+  category_id = EXCLUDED.category_id,
+  category_name = EXCLUDED.category_name,
   price_paisa = EXCLUDED.price_paisa,
   stock_quantity = EXCLUDED.stock_quantity,
   is_active = EXCLUDED.is_active,
@@ -141,4 +173,3 @@ INSERT INTO public.coupons (
 ON CONFLICT (id) DO UPDATE SET
   discount_value = EXCLUDED.discount_value,
   is_active = EXCLUDED.is_active;
-

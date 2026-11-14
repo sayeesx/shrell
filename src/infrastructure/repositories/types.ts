@@ -32,6 +32,7 @@ export interface IProductRepository {
   getAll(params?: ProductFilterParams): Promise<{ products: Product[]; total: number }>;
   getBySlug(slug: string): Promise<Product | null>;
   getById(id: string): Promise<Product | null>;
+  getFeatured?(): Promise<Product[]>;
   create(product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product>;
   update(id: string, updates: Partial<Product>): Promise<Product>;
   delete(id: string): Promise<boolean>;

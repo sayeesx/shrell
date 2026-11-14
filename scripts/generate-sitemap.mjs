@@ -102,11 +102,11 @@ async function fetchSitemapData() {
       { slug: 'apex-dual-cylinder-rapid-tyre-inflator', is_active: true, updated_at: '2026-03-01T10:00:00Z' },
     ],
     categories: [
-      { slug: 'air-fresheners', is_active: true },
-      { slug: 'auxiliary-lighting', is_active: true },
-      { slug: 'all-weather-floor-protection', is_active: true },
-      { slug: 'tyre-care-air-systems', is_active: true },
-      { slug: 'touring-recovery-gear', is_active: true },
+      { slug: 'car-interior', is_active: true },
+      { slug: 'car-exterior', is_active: true },
+      { slug: 'microfiber-cloths', is_active: true },
+      { slug: 'kits-and-combos', is_active: true },
+      { slug: 'car-perfumes', is_active: true },
     ],
   };
 }

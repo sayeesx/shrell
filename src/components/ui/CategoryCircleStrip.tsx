@@ -11,16 +11,11 @@ export interface CategoryItem {
 
 export const CATEGORY_ITEMS: CategoryItem[] = [
   { id: 'all', slug: '', label: 'All', iconSrc: '/icons/all.svg', to: '/catalogue' },
-  { id: 'freshner', slug: 'air-fresheners', label: 'Air Freshener', iconSrc: '/icons/freshner.svg', to: '/catalogue?category=air-fresheners' },
-  { id: 'lighting', slug: 'auxiliary-lighting', label: 'Lighting', iconSrc: '/icons/light.svg', to: '/catalogue?category=auxiliary-lighting' },
-  { id: 'mats', slug: 'all-weather-floor-protection', label: 'Floor Mats', iconSrc: '/icons/floormats.svg', to: '/catalogue?category=all-weather-floor-protection' },
-  { id: 'dashcam', slug: 'dash-cameras', label: 'Dash Cams', iconSrc: '/icons/dashcam.svg', to: '/catalogue?category=dash-cameras' },
-  { id: 'tyre', slug: 'tyre-care-air-systems', label: 'Tyre Care', iconSrc: '/icons/tyre-care.svg', to: '/catalogue?category=tyre-care-air-systems' },
-  { id: 'tools', slug: 'touring-recovery-gear', label: 'Recovery', iconSrc: '/icons/tools.svg', to: '/catalogue?category=touring-recovery-gear' },
-  { id: 'audio', slug: 'audio', label: 'Audio & Tech', iconSrc: '/icons/audio-screen.svg', to: '/catalogue?category=audio' },
-  { id: 'cleaning', slug: 'car-care', label: 'Car Care', iconSrc: '/icons/carcare.svg', to: '/catalogue?category=car-care' },
-  { id: 'coolant', slug: 'cooling-systems', label: 'Cooling', iconSrc: '/icons/coolant.svg', to: '/catalogue?category=cooling-systems' },
-  { id: 'others', slug: 'others', label: 'Others', iconSrc: '/icons/others.svg', to: '/catalogue?category=others' },
+  { id: 'interior', slug: 'car-interior', label: 'Car Interior', iconSrc: '/icons/floormats.svg', to: '/catalogue?category=car-interior' },
+  { id: 'exterior', slug: 'car-exterior', label: 'Car Exterior', iconSrc: '/icons/carcare.svg', to: '/catalogue?category=car-exterior' },
+  { id: 'microfiber', slug: 'microfiber-cloths', label: 'Microfiber Cloths', iconSrc: '/icons/wash.svg', to: '/catalogue?category=microfiber-cloths' },
+  { id: 'kits', slug: 'kits-and-combos', label: 'Kits and Combos', iconSrc: '/icons/tools.svg', to: '/catalogue?category=kits-and-combos' },
+  { id: 'perfumes', slug: 'car-perfumes', label: 'Car Perfumes', iconSrc: '/icons/freshner.svg', to: '/catalogue?category=car-perfumes' },
 ];
 
 interface CategoryCircleStripProps {

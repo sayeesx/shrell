@@ -54,7 +54,7 @@ export const AdminSanity: React.FC<{ embedded?: boolean }> = ({ embedded = false
   const [newProductSlug, setNewProductSlug] = useState('');
   const [newProductPrice, setNewProductPrice] = useState('4999');
   const [newProductSalePrice, setNewProductSalePrice] = useState('');
-  const [newProductCategory, setNewProductCategory] = useState('lighting');
+  const [newProductCategory, setNewProductCategory] = useState('car-interior');
   const [newProductDesc, setNewProductDesc] = useState('');
   const [isCreatingProduct, setIsCreatingProduct] = useState(false);
   const [copiedSchema, setCopiedSchema] = useState<string | null>(null);
@@ -953,16 +953,11 @@ export const banner = defineType({
                     : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-slate-500'
                 }`}
               >
-                <option value="air-fresheners">Air Fresheners</option>
-                <option value="auxiliary-lighting">Lighting</option>
-                <option value="all-weather-floor-protection">Floor Mats</option>
-                <option value="dash-cameras">Dash Cams</option>
-                <option value="tyre-care-air-systems">Tyre Care</option>
-                <option value="touring-recovery-gear">Recovery</option>
-                <option value="audio">Audio &amp; Tech</option>
-                <option value="car-care">Car Care</option>
-                <option value="cooling-systems">Cooling</option>
-                <option value="others">Others</option>
+                <option value="car-interior">Car Interior</option>
+                <option value="car-exterior">Car Exterior</option>
+                <option value="microfiber-cloths">Microfiber Cloths</option>
+                <option value="kits-and-combos">Kits and Combos</option>
+                <option value="car-perfumes">Car Perfumes</option>
               </select>
             </div>
 

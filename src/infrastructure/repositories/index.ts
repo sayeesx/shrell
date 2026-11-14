@@ -84,6 +84,9 @@ class UnifiedProductRepository implements IProductRepository {
   }
 
   async getAll(options?: any): Promise<any> {
+    if (isSupabaseConfigured) {
+      return supabaseProductRepo.getAll(options);
+    }
     if (isSanityConfigured()) {
       try {
         const sanityResult = await sanityProductRepository.getAll(options);
@@ -98,6 +101,9 @@ class UnifiedProductRepository implements IProductRepository {
   }
 
   async getById(id: string): Promise<any> {
+    if (isSupabaseConfigured) {
+      return supabaseProductRepo.getById(id);
+    }
     if (isSanityConfigured()) {
       try {
         const p = await sanityProductRepository.getById(id);
@@ -108,6 +114,9 @@ class UnifiedProductRepository implements IProductRepository {
   }
 
   async getBySlug(slug: string): Promise<any> {
+    if (isSupabaseConfigured) {
+      return supabaseProductRepo.getBySlug(slug);
+    }
     if (isSanityConfigured()) {
       try {
         const p = await sanityProductRepository.getBySlug(slug);
@@ -118,6 +127,9 @@ class UnifiedProductRepository implements IProductRepository {
   }
 
   async getFeatured(): Promise<any> {
+    if (isSupabaseConfigured) {
+      return supabaseProductRepo.getFeatured();
+    }
     if (isSanityConfigured()) {
       try {
         const featured = await sanityProductRepository.getFeatured();

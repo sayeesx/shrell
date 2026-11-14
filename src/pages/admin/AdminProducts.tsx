@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Brand, Category, Product } from '../../domain/types';
+import { Category, Product } from '../../domain/types';
 import { formatINR, paisaToRupees, rupeesToPaisa } from '../../domain/services/CurrencyService';
 import {
-  brandRepository,
   categoryRepository,
   productRepository,
 } from '../../infrastructure/repositories';
@@ -17,7 +16,6 @@ export const AdminProducts: React.FC = () => {
   const { isDark } = useTheme();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
   const [search, setSearch] = useState('');
 
   // Modal State
@@ -149,14 +147,12 @@ export const AdminProducts: React.FC = () => {
 
   const loadData = async () => {
     try {
-      const [prodRes, catList, brandList] = await Promise.all([
+      const [prodRes, catList] = await Promise.all([
         productRepository.getAll({ limit: 100 }),
         categoryRepository.getAll(),
-        brandRepository.getAll(),
       ]);
       setProducts(prodRes.products);
       setCategories(catList);
-      setBrands(brandList);
     } catch (err) {
       console.error('Failed to load products:', err);
     }
@@ -174,7 +170,7 @@ export const AdminProducts: React.FC = () => {
     setCostPriceRupees('5000');
     setStockQuantity('15');
     setCategoryId(categories[0]?.id || '');
-    setBrandId(brands[0]?.id || '');
+    setBrandId('brand-shrell');
     setShortDesc('');
     setDesc('');
     setImageUrls(['', '', '', '']);
@@ -206,7 +202,7 @@ export const AdminProducts: React.FC = () => {
     setCostPriceRupees(p.costPricePaisa ? paisaToRupees(p.costPricePaisa).toString() : '0');
     setStockQuantity(p.stockQuantity.toString());
     setCategoryId(p.categoryId);
-    setBrandId(p.brandId);
+    setBrandId('brand-shrell');
     setShortDesc(p.shortDescription);
     setDesc(p.description);
     setImageUrls([
@@ -254,7 +250,7 @@ export const AdminProducts: React.FC = () => {
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
     const selectedCat = categories.find((c) => c.id === categoryId);
-    const selectedBrand = brands.find((b) => b.id === brandId);
+    const selectedBrand = { id: 'brand-shrell', name: 'SHRELL' };
 
     const images = imageUrls
       .map((raw) => raw.trim())
@@ -592,25 +588,6 @@ export const AdminProducts: React.FC = () => {
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Brand</label>
-                  <select
-                    value={brandId}
-                    onChange={(e) => setBrandId(e.target.value)}
-                    className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
-                      isDark
-                        ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
-                        : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
-                    }`}
-                  >
-                    {brands.map((b) => (
-                      <option key={b.id} value={b.id}>
-                        {b.name}
                       </option>
                     ))}
                   </select>

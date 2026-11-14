@@ -204,7 +204,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (password === 'shrelladmin2026' || password === 'vahnadmin2026') {
       const adminSession: UserSession = {
         id: 'admin-master',
-        name: 'SHRELL Operations Director',
+        name: 'SHRELL Administrator',
         email: 'admin@shrell.com',
         role: 'admin',
       };

@@ -30,32 +30,11 @@ export const INITIAL_SETTINGS: StoreSettings = {
 
 export const INITIAL_BRANDS: Brand[] = [
   {
-    id: 'brand-vahn',
-    name: 'Automotive Equipment',
-    slug: 'automotive-equipment',
+    id: 'brand-shrell',
+    name: 'SHRELL',
+    slug: 'shrell',
     isActive: true,
     countryOfOrigin: 'India',
-  },
-  {
-    id: 'brand-thule',
-    name: 'Cargo Solutions',
-    slug: 'cargo-solutions',
-    isActive: true,
-    countryOfOrigin: 'Sweden',
-  },
-  {
-    id: 'brand-osram',
-    name: 'Illumination Systems',
-    slug: 'illumination-systems',
-    isActive: true,
-    countryOfOrigin: 'Germany',
-  },
-  {
-    id: 'brand-viair',
-    name: 'Air & Compressor Systems',
-    slug: 'air-compressor-systems',
-    isActive: true,
-    countryOfOrigin: 'United States',
   },
 ];
 
@@ -156,8 +135,8 @@ Engineered specifically for Indian touring speeds and monsoons. The Stealth Wing
 - Dynamic load capacity tested to 85 kg (Static capacity: 180 kg for rooftop tents).`,
     categoryId: 'cat-car-exterior',
     categoryName: 'Car Exterior',
-    brandId: 'brand-vahn',
-    brandName: '',
+    brandId: 'brand-shrell',
+    brandName: 'SHRELL',
     pricePaisa: 1499900, // ₹14,999.00
     compareAtPricePaisa: 1799900, // ₹17,999.00
     costPricePaisa: 850000,
@@ -208,8 +187,8 @@ Navigate unlit state highways and mountain passes with complete confidence. The 
 - Fully street-legal ECE R112 certified auxiliary high beam.`,
     categoryId: 'cat-car-exterior',
     categoryName: 'Car Exterior',
-    brandId: 'brand-osram',
-    brandName: '',
+    brandId: 'brand-shrell',
+    brandName: 'SHRELL',
     pricePaisa: 2249900, // ₹22,499.00
     compareAtPricePaisa: 2599900,
     costPricePaisa: 1500000,
@@ -260,8 +239,8 @@ Manufactured from automotive-grade Thermoplastic Elastomer (TPE), the ArmorForm 
 - Easily cleaned in 2 minutes with a high-pressure hose.`,
     categoryId: 'cat-car-interior',
     categoryName: 'Car Interior',
-    brandId: 'brand-vahn',
-    brandName: '',
+    brandId: 'brand-shrell',
+    brandName: 'SHRELL',
     pricePaisa: 649900, // ₹6,499.00
     compareAtPricePaisa: 799900,
     costPricePaisa: 320000,
@@ -311,8 +290,8 @@ Designed for rugged off-highway touring and long road trips where gas station ai
 - Heavy-duty ballistic nylon padded transport bag included.`,
     categoryId: 'cat-kits-combos',
     categoryName: 'Kits and Combos',
-    brandId: 'brand-viair',
-    brandName: '',
+    brandId: 'brand-shrell',
+    brandName: 'SHRELL',
     pricePaisa: 1299900, // ₹12,999.00
     compareAtPricePaisa: 1449900,
     costPricePaisa: 800000,
@@ -362,8 +341,8 @@ Eliminates the brutal jerk and chassis damage associated with rigid steel tow ca
 - Water, chemical, and UV resistant coating.`,
     categoryId: 'cat-car-exterior',
     categoryName: 'Car Exterior',
-    brandId: 'brand-vahn',
-    brandName: '',
+    brandId: 'brand-shrell',
+    brandName: 'SHRELL',
     pricePaisa: 589900, // ₹5,899.00
     compareAtPricePaisa: 699900,
     costPricePaisa: 290000,
@@ -411,8 +390,8 @@ Engineered with 600 GSM dual-pile split microfibers. One side features long plus
 - Machine washable up to 500 wash cycles.`,
     categoryId: 'cat-microfiber-cloths',
     categoryName: 'Microfiber Cloths',
-    brandId: 'brand-vahn',
-    brandName: 'Automotive Equipment',
+    brandId: 'brand-shrell',
+    brandName: 'SHRELL',
     pricePaisa: 89900, // ₹899.00
     compareAtPricePaisa: 129900,
     costPricePaisa: 45000,
@@ -459,8 +438,8 @@ Silent magnetic levitation rotor activates automatically under direct sunlight. 
 - Natural plant-based non-toxic essential oil ring.`,
     categoryId: 'cat-car-perfumes',
     categoryName: 'Car Perfumes',
-    brandId: 'brand-vahn',
-    brandName: 'Automotive Equipment',
+    brandId: 'brand-shrell',
+    brandName: 'SHRELL',
     pricePaisa: 129900, // ₹1,299.00
     compareAtPricePaisa: 199900,
     costPricePaisa: 60000,

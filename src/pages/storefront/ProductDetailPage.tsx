@@ -230,7 +230,12 @@ export const ProductDetailPage: React.FC = () => {
     setReviewStep(1);
     setReviewRating(5);
     setReviewHoverRating(0);
-    const profileName = user?.name && user.name !== 'Valued Customer' ? user.name.trim() : '';
+    const isInternalRole =
+      user?.role === 'admin' ||
+      !user?.name ||
+      user.name === 'Valued Customer' ||
+      /shrell|operator|operations|admin|director/i.test(user.name);
+    const profileName = isInternalRole ? '' : user.name.trim();
     setReviewAuthor(profileName);
     setReviewComment('');
     setReviewSuccessMsg('');
@@ -244,7 +249,10 @@ export const ProductDetailPage: React.FC = () => {
 
     setIsSubmittingReview(true);
     try {
-      const author = reviewAuthor.trim() || 'Anonymous';
+      let author = reviewAuthor.trim();
+      if (!author || /shrell\s*(operator|operations|admin|director)|operator/i.test(author)) {
+        author = 'Anonymous';
+      }
       await reviewRepository.addReview({
         productId: product.id,
         authorName: author,
@@ -854,82 +862,91 @@ export const ProductDetailPage: React.FC = () => {
 
           {/* Reviews List */}
           <div className="space-y-4">
-            {reviews.length === 0 ? (
-              <div className={`p-8 rounded-2xl border text-center space-y-3 ${
-                isDark ? 'bg-[#0E0A0B] border-[#261619]' : 'bg-white border-[#E0DBD2]'
-              }`}>
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto ${
-                  isDark ? 'bg-slate-900 text-slate-400' : 'bg-slate-100 text-slate-500'
-                }`}>
-                  <i className="bi bi-chat-heart text-xl" />
-                </div>
-                <h3 className={`text-sm font-bold ${isDark ? 'text-white' : 'text-[#140E10]'}`}>
-                  No Customer Reviews Yet
-                </h3>
-                <p className={`text-xs max-w-sm mx-auto ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
-                  Be the first to review this {product.name} and help fellow Indian overland enthusiasts.
-                </p>
-                <button
-                  type="button"
-                  onClick={openReviewModal}
-                  className="px-4 py-2 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-semibold cursor-pointer transition-colors"
-                >
-                  Rate &amp; Review First
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {reviews.map((rev) => (
-                  <div
-                    key={rev.id}
-                    className={`rounded-2xl border p-5 space-y-2.5 transition-colors ${
-                      isDark ? 'bg-[#0E0A0B] border-[#261619]' : 'bg-white border-[#E0DBD2]'
-                    }`}
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex items-center gap-2.5">
-                        <div className={`w-8 h-8 rounded-full border flex items-center justify-center font-bold text-xs ${
-                          isDark ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
-                        }`}>
-                          {rev.authorName.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className={`text-xs font-bold ${isDark ? 'text-white' : 'text-[#140E10]'}`}>
-                              {rev.authorName}
-                            </span>
-                            {rev.isVerifiedPurchase && (
-                              <span className="inline-flex items-center gap-1 text-[10px] text-emerald-500 font-medium">
-                                <i className="bi bi-patch-check-fill" /> Verified Owner
+            {(() => {
+              const customerReviews = reviews.filter(
+                (r) => !/shrell\s*(operator|operations|admin|director)|operator/i.test(r.authorName)
+              );
+              if (customerReviews.length === 0) {
+                return (
+                  <div className={`p-8 rounded-2xl border text-center space-y-3 ${
+                    isDark ? 'bg-[#0E0A0B] border-[#261619]' : 'bg-white border-[#E0DBD2]'
+                  }`}>
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto ${
+                      isDark ? 'bg-slate-900 text-slate-400' : 'bg-slate-100 text-slate-500'
+                    }`}>
+                      <i className="bi bi-chat-heart text-xl" />
+                    </div>
+                    <h3 className={`text-sm font-bold ${isDark ? 'text-white' : 'text-[#140E10]'}`}>
+                      No Customer Reviews Yet
+                    </h3>
+                    <p className={`text-xs max-w-sm mx-auto ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
+                      Be the first to review this {product.name} and help fellow Indian overland enthusiasts.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={openReviewModal}
+                      className="px-4 py-2 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white text-xs font-semibold cursor-pointer transition-colors"
+                    >
+                      Rate &amp; Review First
+                    </button>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="space-y-3">
+                  {customerReviews.map((rev) => (
+                    <div
+                      key={rev.id}
+                      className={`rounded-2xl border p-5 space-y-2.5 transition-colors ${
+                        isDark ? 'bg-[#0E0A0B] border-[#261619]' : 'bg-white border-[#E0DBD2]'
+                      }`}
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2.5">
+                          <div className={`w-8 h-8 rounded-full border flex items-center justify-center font-bold text-xs ${
+                            isDark ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
+                          }`}>
+                            {rev.authorName.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className={`text-xs font-bold ${isDark ? 'text-white' : 'text-[#140E10]'}`}>
+                                {rev.authorName}
                               </span>
-                            )}
-                          </div>
-                          <div className="text-[10px] text-slate-400 font-mono">
-                            {new Date(rev.createdAt).toLocaleDateString('en-IN', {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric',
-                            })}
+                              {rev.isVerifiedPurchase && (
+                                <span className="inline-flex items-center gap-1 text-[10px] text-emerald-500 font-medium">
+                                  <i className="bi bi-patch-check-fill" /> Verified Owner
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[10px] text-slate-400 font-mono">
+                              {new Date(rev.createdAt).toLocaleDateString('en-IN', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                              })}
+                            </div>
                           </div>
                         </div>
+
+                        <div>{renderStars(rev.rating, 'text-xs')}</div>
                       </div>
 
-                      <div>{renderStars(rev.rating, 'text-xs')}</div>
+                      {rev.title && (
+                        <h4 className={`text-xs font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                          {rev.title}
+                        </h4>
+                      )}
+
+                      <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-[#3A3030]'}`}>
+                        {rev.comment}
+                      </p>
                     </div>
-
-                    {rev.title && (
-                      <h4 className={`text-xs font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                        {rev.title}
-                      </h4>
-                    )}
-
-                    <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-[#3A3030]'}`}>
-                      {rev.comment}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         </section>
 

@@ -64,6 +64,9 @@ export const AdminReviews: React.FC = () => {
   };
 
   const filteredReviews = reviews.filter((r) => {
+    if (/shrell\s*(operator|operations|admin|director)|operator/i.test(r.authorName)) {
+      return false;
+    }
     if (ratingFilter !== 'ALL' && Math.round(r.rating) !== ratingFilter) {
       return false;
     }

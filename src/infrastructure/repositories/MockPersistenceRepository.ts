@@ -277,26 +277,12 @@ export class MockCategoryRepository implements ICategoryRepository {
 // ===================== BRAND REPOSITORY =====================
 
 export class MockBrandRepository implements IBrandRepository {
-  private brands: Brand[];
-
-  constructor() {
-    this.brands = loadFromStorage(STORAGE_KEYS.BRANDS, INITIAL_BRANDS);
-  }
-
   async getAll(): Promise<Brand[]> {
-    this.brands = loadFromStorage(STORAGE_KEYS.BRANDS, INITIAL_BRANDS);
-    return [...this.brands].filter((b) => b.isActive);
+    return [...INITIAL_BRANDS];
   }
 
-  async create(brand: Omit<Brand, 'id'>): Promise<Brand> {
-    this.brands = loadFromStorage(STORAGE_KEYS.BRANDS, INITIAL_BRANDS);
-    const newBrand: Brand = {
-      ...brand,
-      id: `brand-${Date.now()}`,
-    };
-    this.brands.push(newBrand);
-    saveToStorage(STORAGE_KEYS.BRANDS, this.brands);
-    return newBrand;
+  async create(_brand: Omit<Brand, 'id'>): Promise<Brand> {
+    return INITIAL_BRANDS[0];
   }
 }
 
@@ -781,15 +767,19 @@ export class MockReviewRepository implements IReviewRepository {
 
   async getAllReviews(): Promise<ProductReview[]> {
     this.reviews = loadFromStorage(STORAGE_KEYS.REVIEWS, INITIAL_REVIEWS);
-    return [...this.reviews].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    return [...this.reviews]
+      .filter((r) => !/shrell\s*(operator|operations|admin|director)|operator/i.test(r.authorName))
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
   async getByProductId(productId: string): Promise<ProductReview[]> {
     this.reviews = loadFromStorage(STORAGE_KEYS.REVIEWS, INITIAL_REVIEWS);
     return this.reviews
-      .filter((r) => r.productId === productId || r.productId.toLowerCase() === productId.toLowerCase())
+      .filter(
+        (r) =>
+          !/shrell\s*(operator|operations|admin|director)|operator/i.test(r.authorName) &&
+          (r.productId === productId || r.productId.toLowerCase() === productId.toLowerCase())
+      )
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 

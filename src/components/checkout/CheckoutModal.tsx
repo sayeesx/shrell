@@ -260,6 +260,10 @@ export const CheckoutModal: React.FC = () => {
 
       trackOrderCompleted(newOrder);
       clearCart();
+      try {
+        sessionStorage.setItem('shrell_last_order', JSON.stringify(newOrder));
+        localStorage.setItem('shrell_last_order', JSON.stringify(newOrder));
+      } catch (_) {}
       setCreatedOrder(newOrder);
     } catch (err: any) {
       console.error('Order placement failed:', err);

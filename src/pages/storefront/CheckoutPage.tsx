@@ -346,6 +346,7 @@ export const CheckoutPage: React.FC = () => {
       clearCart();
       try {
         sessionStorage.setItem('shrell_last_order', JSON.stringify(newOrder));
+        localStorage.setItem('shrell_last_order', JSON.stringify(newOrder));
       } catch (_) {}
       navigate(`/order-success?orderId=${encodeURIComponent(newOrder.id)}`, { state: { order: newOrder } });
     } catch (err: any) {

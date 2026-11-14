@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import { Order } from '../../domain/types';
@@ -10,22 +10,103 @@ import { SEOHead } from '../../infrastructure/seo/SEOHead';
 import { CheckoutFlowTopBar } from '../../components/checkout/CheckoutFlowTopBar';
 import { orderRepository } from '../../infrastructure/repositories';
 
-export const OrderSuccessPage: React.FC = () => {
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  isDark: boolean;
+  onNavigateHome: () => void;
+  onNavigateCatalogue: () => void;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error?: any;
+}
+
+class OrderSuccessErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: any): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: any, info: any) {
+    console.error('OrderSuccessPage caught render error:', error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      const { isDark, onNavigateHome, onNavigateCatalogue } = this.props;
+      return (
+        <div className={`min-h-screen py-12 px-4 transition-colors ${isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'}`}>
+          <div className={`max-w-md mx-auto p-6 sm:p-8 rounded-2xl border text-center space-y-5 shadow-sm ${
+            isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2]'
+          }`}>
+            <div className="w-20 h-20 rounded-full bg-[#FF000E] border-4 border-white/20 flex items-center justify-center mx-auto text-white shadow-xl shadow-[#FF000E]/30">
+              <i className="bi bi-check-lg text-4xl font-black" />
+            </div>
+            <div className="space-y-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span>Order Placed Successfully</span>
+              </span>
+              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">Thank You For Your Order!</h1>
+              <p className={`text-xs leading-relaxed max-w-sm mx-auto ${isDark ? 'text-[#A09899]' : 'text-[#605859]'}`}>
+                Your purchase has been received and registered in our automated dispatch pipeline. Our warehouse team is preparing your precision automotive equipment.
+              </p>
+            </div>
+            <div className="pt-2 space-y-2.5">
+              <button
+                type="button"
+                onClick={onNavigateCatalogue}
+                className="w-full py-3.5 rounded-xl bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer"
+              >
+                Continue Shopping Car Accessories
+              </button>
+              <button
+                type="button"
+                onClick={onNavigateHome}
+                className={`w-full py-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                  isDark
+                    ? 'bg-[#181113] hover:bg-[#201518] border-[#261619] text-[#F1EEEE]'
+                    : 'bg-[#F5F3EE] hover:bg-[#EDE9E1] border-[#E0DBD2] text-[#140E10]'
+                }`}
+              >
+                Back to Home
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const OrderSuccessContent: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isDark } = useTheme();
   const { selectedVehicle } = useVehicle();
   const confettiCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  // 1. Resolve Order from location.state, sessionStorage, or URL query param
+  // 1. Resolve Order from location.state, sessionStorage, localStorage, or query param
   const [order, setOrder] = useState<Order | null>(() => {
     try {
       const stateOrder = (location.state as { order?: Order })?.order;
       if (stateOrder && stateOrder.id) return stateOrder;
 
-      const cached = sessionStorage.getItem('shrell_last_order');
-      if (cached) {
-        const parsed = JSON.parse(cached);
+      const sessionCached = sessionStorage.getItem('shrell_last_order');
+      if (sessionCached) {
+        const parsed = JSON.parse(sessionCached);
+        if (parsed && parsed.id) return parsed;
+      }
+
+      const localCached = localStorage.getItem('shrell_last_order');
+      if (localCached) {
+        const parsed = JSON.parse(localCached);
         if (parsed && parsed.id) return parsed;
       }
     } catch (_) {}
@@ -51,6 +132,7 @@ export const OrderSuccessPage: React.FC = () => {
             setOrder(fetched);
             try {
               sessionStorage.setItem('shrell_last_order', JSON.stringify(fetched));
+              localStorage.setItem('shrell_last_order', JSON.stringify(fetched));
             } catch (_) {}
           }
         })
@@ -59,14 +141,18 @@ export const OrderSuccessPage: React.FC = () => {
     }
   }, [location.search, order]);
 
-  // 3. Celebratory Confetti Animation safely guarded
+  // 3. Celebratory Confetti Animation safely guarded against null/reduced-motion
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const canvas = confettiCanvasRef.current;
-    if (prefersReducedMotion || !canvas) return;
+    let cardConfetti: any = null;
+    let timer: any = null;
 
     try {
-      const cardConfetti = confetti.create(canvas, { resize: true, useWorker: false });
+      if (typeof window === 'undefined') return;
+      const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+      const canvas = confettiCanvasRef.current;
+      if (prefersReducedMotion || !canvas || typeof confetti !== 'function') return;
+
+      cardConfetti = confetti.create(canvas, { resize: true, useWorker: false });
       const confettiColors = isDark
         ? ['#FF000E', '#E0000C', '#FF000E', '#D4D0D0', '#E5E5E5']
         : ['#FF000E', '#CC000B', '#E0000C', '#140E10', '#000000'];
@@ -79,36 +165,40 @@ export const OrderSuccessPage: React.FC = () => {
         disableForReducedMotion: true,
       });
 
-      const timer = setTimeout(() => {
+      timer = setTimeout(() => {
         try {
-          cardConfetti({
-            particleCount: 40,
-            angle: 60,
-            spread: 50,
-            origin: { x: 0.15, y: 0.5 },
-            colors: confettiColors,
-            disableForReducedMotion: true,
-          });
-          cardConfetti({
-            particleCount: 40,
-            angle: 120,
-            spread: 50,
-            origin: { x: 0.85, y: 0.5 },
-            colors: confettiColors,
-            disableForReducedMotion: true,
-          });
+          if (cardConfetti) {
+            cardConfetti({
+              particleCount: 40,
+              angle: 60,
+              spread: 50,
+              origin: { x: 0.15, y: 0.5 },
+              colors: confettiColors,
+              disableForReducedMotion: true,
+            });
+            cardConfetti({
+              particleCount: 40,
+              angle: 120,
+              spread: 50,
+              origin: { x: 0.85, y: 0.5 },
+              colors: confettiColors,
+              disableForReducedMotion: true,
+            });
+          }
         } catch (_) {}
       }, 250);
-
-      return () => {
-        clearTimeout(timer);
-        try {
-          cardConfetti.reset();
-        } catch (_) {}
-      };
     } catch (err) {
       console.warn('Confetti suppressed:', err);
     }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      try {
+        if (cardConfetti && typeof cardConfetti.reset === 'function') {
+          cardConfetti.reset();
+        }
+      } catch (_) {}
+    };
   }, [isDark]);
 
   // Copy Order ID with visual feedback
@@ -134,6 +224,7 @@ export const OrderSuccessPage: React.FC = () => {
         setOrder(found);
         try {
           sessionStorage.setItem('shrell_last_order', JSON.stringify(found));
+          localStorage.setItem('shrell_last_order', JSON.stringify(found));
         } catch (_) {}
       } else {
         setSearchError(`No order found matching "${cleanId}". Please check the ID or contact support.`);
@@ -145,10 +236,28 @@ export const OrderSuccessPage: React.FC = () => {
     }
   };
 
-  // Safe variables with fallbacks
-  const orderId = order?.id || 'SH-2026-DEMO-ORD';
-  const customerName = order?.shippingAddress?.fullName || order?.customerName || 'Valued Enthusiast';
-  const customerPhone = order?.shippingAddress?.phone || order?.customerPhone || '';
+  // Safe variables with complete fallbacks
+  const orderId = order?.id || 'SH-2026-CONFIRMED';
+
+  // Safely extract address object
+  const rawAddress = order?.shippingAddress;
+  const shippingAddress = useMemo(() => {
+    if (!rawAddress) return null;
+    if (typeof rawAddress === 'string') {
+      try {
+        return JSON.parse(rawAddress);
+      } catch {
+        return { addressLine1: rawAddress };
+      }
+    }
+    return typeof rawAddress === 'object' ? rawAddress : null;
+  }, [rawAddress]);
+
+  const customerName =
+    shippingAddress?.fullName ||
+    order?.customerName ||
+    'Valued Enthusiast';
+  const customerPhone = shippingAddress?.phone || order?.customerPhone || '';
   const customerEmail = order?.customerEmail || '';
   const paymentMethodLabel =
     order?.paymentMethod === 'MANUAL_UPI'
@@ -157,16 +266,60 @@ export const OrderSuccessPage: React.FC = () => {
       ? 'Cash on Delivery (COD)'
       : 'Credit / Debit Card';
 
-  // Estimated Delivery (4 business days from today)
-  const orderDate = order?.createdAt
-    ? new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-    : new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  // Safely format placed date
+  const orderDate = useMemo(() => {
+    try {
+      if (order?.createdAt) {
+        const d = new Date(order.createdAt);
+        if (!isNaN(d.getTime())) {
+          return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+      }
+    } catch (_) {}
+    return new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  }, [order?.createdAt]);
 
-  const estimatedDelivery = new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-  });
+  const estimatedDelivery = useMemo(() => {
+    try {
+      return new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+      });
+    } catch (_) {
+      return '4-5 Business Days';
+    }
+  }, []);
+
+  // Safe vehicle compatibility name resolution (never crashes if make/model is string or undefined)
+  const vehicleFullName = useMemo(() => {
+    if (!selectedVehicle) return '';
+    const makeName =
+      selectedVehicle.make && typeof selectedVehicle.make === 'object'
+        ? selectedVehicle.make.name || ''
+        : typeof selectedVehicle.make === 'string'
+        ? selectedVehicle.make
+        : '';
+    const modelName =
+      selectedVehicle.model && typeof selectedVehicle.model === 'object'
+        ? selectedVehicle.model.name || ''
+        : typeof selectedVehicle.model === 'string'
+        ? selectedVehicle.model
+        : '';
+    return [makeName, modelName].filter(Boolean).join(' ').trim();
+  }, [selectedVehicle]);
+
+  // Safe WhatsApp support URL
+  const whatsappSupportUrl = useMemo(() => {
+    try {
+      if (order && order.id && whatsAppService && typeof whatsAppService.getOrderSupportLink === 'function') {
+        return whatsAppService.getOrderSupportLink(order);
+      }
+    } catch (_) {}
+    return `https://wa.me/919876543210?text=${encodeURIComponent(
+      `Hello SHRELL Support, I am checking on my order ID: ${orderId}`
+    )}`;
+  }, [order, orderId]);
 
   return (
     <div className={`min-h-screen transition-colors duration-300 pb-16 ${isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'}`}>
@@ -284,22 +437,22 @@ export const OrderSuccessPage: React.FC = () => {
           <div className="space-y-1">
             <h3 className="text-xs sm:text-sm font-bold flex items-center gap-2">
               <span>100% Automotive Fitment Guarantee</span>
-              {selectedVehicle && (
+              {vehicleFullName && (
                 <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#FF000E]/10 text-[#FF000E] border border-[#FF000E]/20">
-                  {selectedVehicle.make.name} {selectedVehicle.model.name}
+                  {vehicleFullName}
                 </span>
               )}
             </h3>
             <p className={`text-xs leading-relaxed ${isDark ? 'text-[#8E8587]' : 'text-[#706869]'}`}>
-              {selectedVehicle
-                ? `All items ordered are confirmed compatible with your ${selectedVehicle.make.name} ${selectedVehicle.model.name}. Backed by our direct 7-day replacement guarantee.`
+              {vehicleFullName
+                ? `All items ordered are confirmed compatible with your ${vehicleFullName}. Backed by our direct 7-day replacement guarantee.`
                 : 'All SHRELL equipment is precision-engineered and laser-measured. If an accessory does not fit your car perfectly, our concierge team will swap it free of charge.'}
             </p>
           </div>
         </div>
 
         {/* 3. Order Items Summary */}
-        {order && order.items && order.items.length > 0 && (
+        {order && Array.isArray(order.items) && order.items.length > 0 && (
           <div className={`p-5 sm:p-6 rounded-xl border space-y-4 ${
             isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-white border-[#E0DBD2]'
           }`}>
@@ -308,39 +461,48 @@ export const OrderSuccessPage: React.FC = () => {
             </h2>
 
             <div className="divide-y divide-gray-800/40">
-              {order.items.map((item, idx) => (
-                <div key={item.id || idx} className="py-3 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <img
-                      src={item.imageUrl || '/icons/carcare.svg'}
-                      alt={item.productName}
-                      className="w-12 h-12 object-cover rounded-lg border border-gray-700/40 bg-black/20 shrink-0"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/icons/carcare.svg';
-                      }}
-                    />
-                    <div className="min-w-0">
-                      <p className="text-xs sm:text-sm font-semibold truncate text-inherit">
-                        {item.productName}
+              {order.items.map((item, idx) => {
+                if (!item) return null;
+                const itemName = item.productName || (item as any).product?.name || 'Automotive Accessory';
+                const itemImg = item.imageUrl || (item as any).product?.images?.[0]?.url || '/icons/carcare.svg';
+                const itemQty = item.quantity || 1;
+                const itemPrice = item.unitPricePaisa || (item as any).product?.pricePaisa || 0;
+                const itemSubtotal = item.subtotalPaisa || (itemPrice * itemQty);
+
+                return (
+                  <div key={item.id || idx} className="py-3 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <img
+                        src={itemImg}
+                        alt={itemName}
+                        className="w-12 h-12 object-cover rounded-lg border border-gray-700/40 bg-black/20 shrink-0"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/icons/carcare.svg';
+                        }}
+                      />
+                      <div className="min-w-0">
+                        <p className="text-xs sm:text-sm font-semibold truncate text-inherit">
+                          {itemName}
+                        </p>
+                        <p className="text-[11px] text-gray-400 flex items-center gap-2">
+                          <span>SKU: {item.sku || 'SH-EQUIP'}</span>
+                          <span>•</span>
+                          <span>Qty: {itemQty}</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <p className="text-xs sm:text-sm font-bold font-mono">
+                        {formatINR(itemSubtotal)}
                       </p>
-                      <p className="text-[11px] text-gray-400 flex items-center gap-2">
-                        <span>SKU: {item.sku || 'SH-EQUIP'}</span>
-                        <span>•</span>
-                        <span>Qty: {item.quantity}</span>
+                      <p className="text-[10px] text-gray-400">
+                        {formatINR(itemPrice)} each
                       </p>
                     </div>
                   </div>
-
-                  <div className="text-right shrink-0">
-                    <p className="text-xs sm:text-sm font-bold font-mono">
-                      {formatINR(item.subtotalPaisa || item.unitPricePaisa * item.quantity)}
-                    </p>
-                    <p className="text-[10px] text-gray-400">
-                      {formatINR(item.unitPricePaisa)} each
-                    </p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -362,12 +524,20 @@ export const OrderSuccessPage: React.FC = () => {
               {customerPhone && <p className="text-gray-400 font-mono">{customerPhone}</p>}
               {customerEmail && <p className="text-gray-400 truncate">{customerEmail}</p>}
 
-              {order?.shippingAddress ? (
+              {shippingAddress ? (
                 <p className="text-gray-300 pt-1 leading-relaxed">
-                  {order.shippingAddress.addressLine1}
-                  {order.shippingAddress.addressLine2 ? `, ${order.shippingAddress.addressLine2}` : ''}
-                  <br />
-                  {order.shippingAddress.city}, {order.shippingAddress.state} - <span className="font-mono font-semibold">{order.shippingAddress.postalCode}</span>
+                  {shippingAddress.addressLine1 || ''}
+                  {shippingAddress.addressLine2 ? `, ${shippingAddress.addressLine2}` : ''}
+                  {(shippingAddress.city || shippingAddress.state) && (
+                    <>
+                      <br />
+                      {[shippingAddress.city, shippingAddress.state].filter(Boolean).join(', ')}
+                      {shippingAddress.postalCode ? ` - ` : ''}
+                      {shippingAddress.postalCode && (
+                        <span className="font-mono font-semibold">{shippingAddress.postalCode}</span>
+                      )}
+                    </>
+                  )}
                 </p>
               ) : (
                 <p className="text-gray-400 italic pt-1">Standard Express Delivery Address Registered</p>
@@ -414,7 +584,7 @@ export const OrderSuccessPage: React.FC = () => {
                 </span>
               </div>
 
-              {order && order.discountPaisa > 0 && (
+              {order && (order.discountPaisa || 0) > 0 && (
                 <div className="flex justify-between text-emerald-500">
                   <span className="font-sans">Discount Savings</span>
                   <span>-{formatINR(order.discountPaisa)}</span>
@@ -490,7 +660,7 @@ export const OrderSuccessPage: React.FC = () => {
           </div>
 
           <a
-            href={order ? whatsAppService.getOrderSupportLink(order) : 'https://wa.me/919876543210?text=Hello%20SHRELL%20Support,%20I%20need%20installation%20help%20with%20my%20order.'}
+            href={whatsappSupportUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors inline-flex items-center justify-center gap-1.5 shrink-0"
@@ -539,5 +709,20 @@ export const OrderSuccessPage: React.FC = () => {
 
       </div>
     </div>
+  );
+};
+
+export const OrderSuccessPage: React.FC = () => {
+  const { isDark } = useTheme();
+  const navigate = useNavigate();
+
+  return (
+    <OrderSuccessErrorBoundary
+      isDark={isDark}
+      onNavigateHome={() => navigate('/')}
+      onNavigateCatalogue={() => navigate('/catalogue')}
+    >
+      <OrderSuccessContent />
+    </OrderSuccessErrorBoundary>
   );
 };

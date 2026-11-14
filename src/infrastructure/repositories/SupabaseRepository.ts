@@ -29,7 +29,6 @@ import {
   ProductFilterParams,
 } from './types';
 import {
-  MockBrandRepository,
   MockCategoryRepository,
   MockCouponRepository,
   MockHomeSectionRepository,
@@ -533,79 +532,24 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
 }
 
 // ==============================================================================
-// 3. BRANDS REPOSITORY
+// 3. BRANDS REPOSITORY (Canonical Single Brand: SHRELL)
 // ==============================================================================
+export const SHRELL_BRAND: Brand = {
+  id: 'brand-shrell',
+  name: 'SHRELL',
+  slug: 'shrell',
+  isActive: true,
+  countryOfOrigin: 'India',
+  logoUrl: '/logos/shrell-brandicon_no-bg.png',
+};
+
 export class SupabaseBrandRepository implements IBrandRepository {
-  private fallback = new MockBrandRepository();
-
   async getAll(): Promise<Brand[]> {
-    if (!isSupabaseConfigured) {
-      return this.fallback.getAll();
-    }
-
-    if (cachedBrands && Date.now() < cachedBrands.expiry) {
-      return cachedBrands.data;
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('brands')
-        .select('id, name, slug, logo_url, is_active, country_of_origin')
-        .eq('is_active', true);
-
-      if (error || !data || data.length === 0) {
-        return this.fallback.getAll();
-      }
-
-      const mapped = data.map((b) => ({
-        id: b.id,
-        name: b.name,
-        slug: b.slug,
-        logoUrl: b.logo_url,
-        isActive: Boolean(b.is_active),
-        countryOfOrigin: b.country_of_origin,
-      }));
-
-      cachedBrands = { data: mapped, expiry: Date.now() + TTL_FIVE_MINUTES_MS };
-      return mapped;
-    } catch {
-      return this.fallback.getAll();
-    }
+    return [SHRELL_BRAND];
   }
 
-  async create(brand: Omit<Brand, 'id'>): Promise<Brand> {
-    if (!isSupabaseConfigured) {
-      return this.fallback.create(brand);
-    }
-
-    try {
-      const id = `brand-${Date.now()}`;
-      const { data, error } = await supabase
-        .from('brands')
-        .insert({
-          id,
-          name: brand.name,
-          slug: brand.slug,
-          logo_url: brand.logoUrl,
-          country_of_origin: brand.countryOfOrigin,
-          is_active: brand.isActive,
-        })
-        .select()
-        .single();
-
-      if (error || !data) return this.fallback.create(brand);
-
-      return {
-        id: data.id,
-        name: data.name,
-        slug: data.slug,
-        logoUrl: data.logo_url,
-        isActive: data.is_active,
-        countryOfOrigin: data.country_of_origin,
-      };
-    } catch {
-      return this.fallback.create(brand);
-    }
+  async create(_brand: Omit<Brand, 'id'>): Promise<Brand> {
+    return SHRELL_BRAND;
   }
 }
 

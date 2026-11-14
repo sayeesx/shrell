@@ -526,16 +526,16 @@ export const ProductDetailPage: React.FC = () => {
                       })}
                     </div>
 
-                    {/* Mobile Image Counter Badge (e.g. 1 / 4) */}
+                    {/* Image Counter Badge (e.g. 1 / 4) */}
                     {galleryImages.length > 1 && (
-                      <div className="sm:hidden absolute top-2.5 right-2.5 z-20 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide bg-black/60 text-white backdrop-blur-xs border border-white/10 pointer-events-none shadow-xs">
+                      <div className="absolute top-2.5 right-2.5 z-20 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide bg-black/60 text-white backdrop-blur-xs border border-white/10 pointer-events-none shadow-xs">
                         {selectedImageIndex + 1} / {galleryImages.length}
                       </div>
                     )}
 
-                    {/* Mobile Pagination Dots */}
+                    {/* Pagination Dots */}
                     {galleryImages.length > 1 && (
-                      <div className="sm:hidden absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/45 backdrop-blur-xs pointer-events-auto">
+                      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-xs pointer-events-auto">
                         {galleryImages.map((_, dotIdx) => (
                           <button
                             key={dotIdx}
@@ -560,11 +560,11 @@ export const ProductDetailPage: React.FC = () => {
                             scrollToImageIndex(prev);
                           }}
                           aria-label="Previous product image"
-                          className={`hidden sm:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full items-center justify-center transition-all opacity-0 group-hover:opacity-100 backdrop-blur-md border cursor-pointer active:scale-90 ${
-                            isDark ? 'bg-black/60 hover:bg-black/85 border-white/15 text-white' : 'bg-white/80 hover:bg-white border-black/10 text-neutral-800'
+                          className={`hidden sm:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full items-center justify-center transition-all opacity-80 hover:opacity-100 backdrop-blur-md border cursor-pointer active:scale-90 shadow-sm ${
+                            isDark ? 'bg-black/60 hover:bg-black/85 border-white/15 text-white' : 'bg-white/85 hover:bg-white border-black/10 text-neutral-800'
                           }`}
                         >
-                          <i className="bi bi-chevron-left text-xs" />
+                          <i className="bi bi-chevron-left text-sm" />
                         </button>
                         <button
                           type="button"
@@ -573,11 +573,11 @@ export const ProductDetailPage: React.FC = () => {
                             scrollToImageIndex(next);
                           }}
                           aria-label="Next product image"
-                          className={`hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full items-center justify-center transition-all opacity-0 group-hover:opacity-100 backdrop-blur-md border cursor-pointer active:scale-90 ${
-                            isDark ? 'bg-black/60 hover:bg-black/85 border-white/15 text-white' : 'bg-white/80 hover:bg-white border-black/10 text-neutral-800'
+                          className={`hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full items-center justify-center transition-all opacity-80 hover:opacity-100 backdrop-blur-md border cursor-pointer active:scale-90 shadow-sm ${
+                            isDark ? 'bg-black/60 hover:bg-black/85 border-white/15 text-white' : 'bg-white/85 hover:bg-white border-black/10 text-neutral-800'
                           }`}
                         >
-                          <i className="bi bi-chevron-right text-xs" />
+                          <i className="bi bi-chevron-right text-sm" />
                         </button>
                       </>
                     )}
@@ -606,59 +606,6 @@ export const ProductDetailPage: React.FC = () => {
                         {shareStatus === 'copied' ? 'Copied' : shareStatus === 'shared' ? 'Shared' : 'Share'}
                       </span>
                     </button>
-                  </div>
-
-                  {/* Selectable Image Thumbnails (Supports 5th, 6th & any number of images) */}
-                  <div className="flex items-center gap-2 sm:gap-2.5 pt-1 overflow-x-auto no-scrollbar py-1">
-                    {galleryImages.map((imgItem, idx) => {
-                      const isSelected = selectedImageIndex === idx;
-                      const thumbRaw = imgItem?.url || '';
-                      let thumbClean = thumbRaw?.trim() || '';
-                      if (thumbClean.startsWith('http://res.cloudinary.com/')) {
-                        thumbClean = thumbClean.replace('http://res.cloudinary.com/', 'https://res.cloudinary.com/');
-                      }
-                      const isThumbReal = Boolean(thumbClean && !thumbClean.includes('shrell-full_white-text_black-logo.png'));
-                      const imgLabel = imgItem?.altText || `Angle ${idx + 1}`;
-
-                      const imageContent = isThumbReal ? (
-                        <img
-                          src={thumbClean}
-                          alt={`${product.name} - ${imgLabel} Thumbnail`}
-                          referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className={`w-full h-full flex items-center justify-center p-1 ${isDark ? 'bg-[#120E0F]' : 'bg-[#F5F3EE]'}`}>
-                          <img
-                            src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
-                            alt={`${product.name} - ${imgLabel} Thumbnail`}
-                            className={`w-full h-full object-contain ${isDark ? 'opacity-60' : 'opacity-85'}`}
-                          />
-                        </div>
-                      );
-
-                      return (
-                        <button
-                          key={`thumb-${idx}`}
-                          type="button"
-                          onClick={() => scrollToImageIndex(idx)}
-                          onMouseEnter={() => scrollToImageIndex(idx)}
-                          className={`w-13 h-13 sm:w-15 sm:h-15 rounded-md transition-all flex items-center justify-center p-0.5 overflow-hidden cursor-pointer select-none shrink-0 focus-visible:outline-none ${
-                            isSelected
-                              ? 'border-2 border-[#FF000E] shadow-xs'
-                              : isDark
-                              ? 'border border-[#261619] opacity-60 hover:opacity-100 hover:border-neutral-500'
-                              : 'border border-[#E0DBD2] opacity-70 hover:opacity-100 hover:border-neutral-400'
-                          } ${isDark ? 'bg-[#100B0D]' : 'bg-[#F5F3EE]'}`}
-                          aria-label={`View ${product.name} - ${imgLabel} ${isSelected ? '(Active)' : ''}`}
-                          title={imgLabel}
-                        >
-                          <div className="w-full h-full rounded-[4px] overflow-hidden flex items-center justify-center">
-                            {imageContent}
-                          </div>
-                        </button>
-                      );
-                    })}
                   </div>
                 </>
               );

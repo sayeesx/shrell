@@ -101,16 +101,16 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         elements.push(
           <div
             key={`table-${elements.length}`}
-            className="my-3 overflow-x-auto rounded-lg border border-[#261619] dark:border-[#261619] bg-[#120E0F]/40 dark:bg-[#120E0F]/40"
+            className="my-3 overflow-x-auto rounded-lg border border-[#E0DBD2] dark:border-[#261619] bg-[#FFFEFA] dark:bg-[#0E0A0B] shadow-xs"
           >
             <table className="w-full text-left text-xs border-collapse">
               {headers.length > 0 && (
                 <thead>
-                  <tr className="border-b border-[#261619] bg-black/20 dark:bg-black/30">
+                  <tr className="border-b border-[#E0DBD2] dark:border-[#261619] bg-[#F5F3EE] dark:bg-[#181114]">
                     {headers.map((h, hIdx) => (
                       <th
                         key={hIdx}
-                        className="px-3.5 py-2 font-bold tracking-tight text-neutral-800 dark:text-neutral-100"
+                        className="px-3.5 py-2.5 font-bold tracking-tight text-[#140E10] dark:text-[#F1EEEE]"
                       >
                         {renderInline(h)}
                       </th>
@@ -118,18 +118,18 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
                   </tr>
                 </thead>
               )}
-              <tbody className="divide-y divide-[#261619]/60">
+              <tbody className="divide-y divide-[#E0DBD2] dark:divide-[#261619]">
                 {rowLines.map((r, rIdx) => {
                   const cells = splitTableRow(r);
                   return (
                     <tr
                       key={rIdx}
-                      className={rIdx % 2 === 0 ? 'bg-transparent' : 'bg-black/10 dark:bg-white/5'}
+                      className={rIdx % 2 === 0 ? 'bg-[#FFFEFA] dark:bg-[#0E0A0B]' : 'bg-[#F9F7F2] dark:bg-[#140E10]'}
                     >
                       {cells.map((cell, cIdx) => (
                         <td
                           key={cIdx}
-                          className="px-3.5 py-2 text-neutral-700 dark:text-neutral-300 font-medium"
+                          className="px-3.5 py-2 text-[#140E10] dark:text-[#F1EEEE] font-normal leading-relaxed"
                         >
                           {renderInline(cell)}
                         </td>

@@ -8,7 +8,6 @@ import { useCart } from '../../application/CartContext';
 import { useAuth } from '../../application/AuthContext';
 import { useTheme } from '../../application/ThemeContext';
 import { ProductCard } from '../../components/ui/ProductCard';
-import { AnimatedBorder } from '../../components/ui/animated-border';
 import { PaymentMethodIcons } from '../../components/common/PaymentMethodIcons';
 import { HalfArrowIcon } from '../../components/common/HalfArrowIcon';
 import { useSafeBack } from '../../components/common/useSafeBack';
@@ -531,45 +530,25 @@ export const ProductDetailPage: React.FC = () => {
                       </div>
                     );
 
-                    if (isSelected) {
-                      return (
-                        <button
-                          key={`thumb-${idx}`}
-                          type="button"
-                          onClick={() => { setSelectedImageIndex(idx); setImageError(false); }}
-                          className="w-13 h-13 sm:w-15 sm:h-15 rounded-md cursor-pointer select-none p-0 overflow-hidden focus:outline-none shrink-0"
-                          aria-label={`View ${product.name} - ${imgLabel} (Active)`}
-                          title={imgLabel}
-                        >
-                          <AnimatedBorder
-                            duration={3.5}
-                            width={2}
-                            color={isDark ? '#FFFFFF' : '#FF000E'}
-                            className={`w-full h-full rounded-md ${isDark ? 'bg-[#261619]' : 'bg-[#E0DBD2]'}`}
-                            contentClassName={`w-full h-full rounded-[inherit] overflow-hidden p-0 flex items-center justify-center ${
-                              isDark ? 'bg-[#100B0D]' : 'bg-[#F5F3EE]'
-                            }`}
-                          >
-                            {imageContent}
-                          </AnimatedBorder>
-                        </button>
-                      );
-                    }
-
                     return (
                       <button
                         key={`thumb-${idx}`}
                         type="button"
                         onClick={() => { setSelectedImageIndex(idx); setImageError(false); }}
-                        className={`w-13 h-13 sm:w-15 sm:h-15 rounded-md transition-all flex items-center justify-center p-0 overflow-hidden cursor-pointer select-none border opacity-60 hover:opacity-100 shrink-0 ${
-                          isDark
-                            ? 'border-[#261619] bg-[#100B0D]'
-                            : 'border-[#E0DBD2] bg-[#F5F3EE]'
-                        }`}
-                        aria-label={`View ${product.name} - ${imgLabel}`}
+                        onMouseEnter={() => { setSelectedImageIndex(idx); setImageError(false); }}
+                        className={`w-13 h-13 sm:w-15 sm:h-15 rounded-md transition-all flex items-center justify-center p-0.5 overflow-hidden cursor-pointer select-none shrink-0 focus-visible:outline-none ${
+                          isSelected
+                            ? 'border-2 border-[#FF000E] shadow-xs'
+                            : isDark
+                            ? 'border border-[#261619] opacity-60 hover:opacity-100 hover:border-neutral-500'
+                            : 'border border-[#E0DBD2] opacity-70 hover:opacity-100 hover:border-neutral-400'
+                        } ${isDark ? 'bg-[#100B0D]' : 'bg-[#F5F3EE]'}`}
+                        aria-label={`View ${product.name} - ${imgLabel} ${isSelected ? '(Active)' : ''}`}
                         title={imgLabel}
                       >
-                        {imageContent}
+                        <div className="w-full h-full rounded-[4px] overflow-hidden flex items-center justify-center">
+                          {imageContent}
+                        </div>
                       </button>
                     );
                   })}
@@ -1588,13 +1567,26 @@ export const ProductDetailPage: React.FC = () => {
 
         {/* Complementary Products */}
         {relatedProducts.length > 0 && (
-          <div className={`pt-10 border-t space-y-5 ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
-            <h2 className={`text-xl font-bold tracking-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
-              You May Also Like
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-              {relatedProducts.map((rel) => (
-                <ProductCard key={rel.id} product={rel} />
+          <div className={`pt-10 border-t space-y-4 ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
+            <div className="flex items-center justify-between gap-3">
+              <h2 className={`text-lg sm:text-xl font-bold tracking-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
+                You May Also Like
+              </h2>
+              <Link
+                to="/checkout"
+                className={`inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold transition-colors group ${
+                  isDark ? 'text-[#FF4A55] hover:text-[#FF707A]' : 'text-[#DC000C] hover:text-[#B30009]'
+                }`}
+              >
+                <span>See all</span>
+                <i className="bi bi-chevron-right text-xs transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </div>
+            <div className="flex items-stretch gap-3 sm:gap-4 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 py-1">
+              {relatedProducts.slice(0, 4).map((rel) => (
+                <div key={rel.id} className="w-[175px] sm:w-[210px] md:w-[230px] shrink-0 flex flex-col">
+                  <ProductCard product={rel} />
+                </div>
               ))}
             </div>
           </div>

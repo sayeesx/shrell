@@ -67,7 +67,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     setIsWishlisted(!isWishlisted);
   };
 
-  const offersCount = 5 + ((product.id.charCodeAt(0) * 3) % 15);
 
   const isActionActive = !isOutOfStock && (btnState === 'added' || btnState === 'checkout');
 
@@ -88,7 +87,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Top-left Product Label Badge */}
         {product.badge && (
-          <div className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 z-10 pointer-events-none">
+          <div className="absolute top-1 left-1.5 sm:top-1.5 sm:left-2 z-10 pointer-events-none">
             <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-semibold tracking-wide uppercase bg-[#FF000E] text-white shadow-xs">
               {product.badge}
             </span>
@@ -108,14 +107,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             aria-hidden="true"
           ></i>
         </motion.button>
-
-        {/* Bottom Image Overlay Offers Badge */}
-        <div className="absolute bottom-2 left-2 z-10 pointer-events-none">
-          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-medium border backdrop-blur-xs ${isDark ? 'bg-[#0A0808]/90 text-[#F1EEEE] border-[#261619]' : 'bg-white/90 text-[#3A3030] border-[#E0DBD2]'}`}>
-            <i className="bi bi-tag-fill text-[#FF000E] text-[10px]" aria-hidden="true"></i>
-            <span>{offersCount}+ offers</span>
-          </span>
-        </div>
       </Link>
 
       {/* Body Metadata */}

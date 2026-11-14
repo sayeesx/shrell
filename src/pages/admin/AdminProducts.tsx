@@ -537,7 +537,7 @@ export const AdminProducts: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSaveProduct} className="p-6 overflow-y-auto space-y-4 text-xs font-mono">
+            <form onSubmit={handleSaveProduct} className="p-6 overflow-y-auto flex-1 min-h-0 space-y-4 text-xs font-mono">
               <div>
                 <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Product Title *</label>
                 <input

@@ -527,20 +527,22 @@ html.light {
   pointer-events: auto;
 }
 
-/* Fluid 3/4 Viewport Admin Modal (auto-resizes smoothly across window dimensions) */
+/* Fluid Generous Viewport Admin Modal */
 .admin-modal-panel {
   width: min(94vw, 1280px);
-  max-height: 90vh;
+  height: 88vh;
+  min-height: 520px;
+  max-height: 92vh;
   display: flex;
   flex-direction: column;
 }
 
 @media (min-width: 768px) {
   .admin-modal-panel {
-    width: 75vw;
-    height: 75vh;
-    min-height: 480px;
-    max-height: 88vh;
+    width: min(85vw, 1280px);
+    height: 88vh;
+    min-height: 600px;
+    max-height: 92vh;
   }
 }
 

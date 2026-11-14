@@ -132,7 +132,7 @@ export function generateOrganizationSchema(): Record<string, any> {
     url: SITE_URL,
     logo: `${SITE_URL}/logos/shrell-logo-white.png`,
     description:
-      'Specialized car accessories, overland gear, and precision components engineered for Indian vehicles.',
+      'Specialized car accessories, touring gear, and precision components engineered for Indian vehicles.',
     telephone: '+91-98765-43210',
     email: 'orders@shrell.com',
     address: {

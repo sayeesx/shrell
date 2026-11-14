@@ -11,6 +11,7 @@ import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 import { useTheme } from '../../application/ThemeContext';
 import { ImageCropUploadModal } from '../../components/admin/ImageCropUploadModal';
 import { formatBytes, OptimizedImageResult } from '../../utils/imageOptimizer';
+import { SquareGridLoader } from '../../components/common/SquareGridLoader';
 
 export const AdminProducts: React.FC = () => {
   const { isDark } = useTheme();
@@ -488,7 +489,7 @@ export const AdminProducts: React.FC = () => {
                       aria-label={`Delete ${prod.name}`}
                     >
                       {deletingId === prod.id ? (
-                        <div className="w-3 h-3 border-2 border-rose-500 border-t-transparent rounded-full animate-spin" />
+                        <SquareGridLoader size={14} color="#FF000E" />
                       ) : (
                         <i className="bi bi-trash text-xs" aria-hidden="true" />
                       )}
@@ -736,7 +737,7 @@ export const AdminProducts: React.FC = () => {
                         >
                           {isUploading ? (
                             <div className="flex items-center gap-2 text-xs text-slate-400 font-mono">
-                              <div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                              <SquareGridLoader size={16} color="#FF000E" />
                               <span>Uploading...</span>
                             </div>
                           ) : url ? (
@@ -1090,7 +1091,7 @@ export const AdminProducts: React.FC = () => {
                 >
                   {isSaving ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0" />
+                      <SquareGridLoader size={16} white />
                       <span>Saving...</span>
                     </>
                   ) : (

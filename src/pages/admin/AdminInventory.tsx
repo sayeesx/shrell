@@ -4,6 +4,7 @@ import { InventoryMovement, Product } from '../../domain/types';
 import { inventoryRepository, productRepository } from '../../infrastructure/repositories';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 import { useTheme } from '../../application/ThemeContext';
+import { SquareGridLoader } from '../../components/common/SquareGridLoader';
 
 export const AdminInventory: React.FC = () => {
   const { isDark } = useTheme();
@@ -307,7 +308,7 @@ export const AdminInventory: React.FC = () => {
                 >
                   {isAdjusting ? (
                     <>
-                      <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin inline-block" />
+                      <SquareGridLoader size={14} color="#FF000E" />
                       <span>Adjusting...</span>
                     </>
                   ) : (

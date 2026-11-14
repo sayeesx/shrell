@@ -253,7 +253,7 @@ export const AdminSettings: React.FC = () => {
               >
                 {uploadingOgImage ? (
                   <div className="py-6 flex flex-col items-center justify-center gap-2">
-                    <div className="w-5 h-5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                    <SquareGridLoader size={20} color="#FF000E" />
                     <span className="text-[11px] text-slate-400">Uploading OpenGraph image to CDN...</span>
                   </div>
                 ) : (

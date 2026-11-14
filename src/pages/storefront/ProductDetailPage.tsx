@@ -257,17 +257,41 @@ export const ProductDetailPage: React.FC = () => {
     }, 400);
   };
 
+  const getProductShareMessage = (prod: Product) => {
+    const badgeLower = (prod.badge || '').toLowerCase().trim();
+    let prefix = '';
+
+    if (badgeLower.includes('selling fast') || badgeLower.includes('fast selling')) {
+      prefix = 'Hurry Up, this product will be out of stock soon!';
+    } else if (badgeLower.includes('new launch') || badgeLower.includes('new')) {
+      prefix = 'New Launch!';
+    } else if (badgeLower.includes('limited') || badgeLower.includes('edition')) {
+      prefix = 'Limited Edition – grab yours now!';
+    } else if (badgeLower.includes('best seller') || badgeLower.includes('bestseller') || badgeLower.includes('trending')) {
+      prefix = 'Trending Best Seller!';
+    } else if (prod.badge) {
+      prefix = `${prod.badge}!`;
+    }
+
+    let msg = prefix ? `${prefix} ${prod.name} - Buy Now` : `${prod.name} - Buy Now`;
+
+    if (typeof prod.stockQuantity === 'number' && prod.stockQuantity > 0 && prod.stockQuantity < 5) {
+      msg += ` (Hurry up, only ${prod.stockQuantity} remaining!)`;
+    }
+
+    return msg;
+  };
+
   const handleShareProduct = async () => {
     if (!product) return;
-    const shareUrl = `${window.location.origin}/product/${product.slug}`;
-    const shareTitle = `${product.name} | SHRELL Automotive`;
-    const shareText = product.shortDescription || `Check out ${product.name} at SHRELL Automotive`;
+    const shareUrl = `${window.location.origin}/product/${product.slug || product.id}`;
+    const customMessage = getProductShareMessage(product);
 
     if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
       try {
         await navigator.share({
-          title: shareTitle,
-          text: shareText,
+          title: customMessage,
+          text: customMessage,
           url: shareUrl,
         });
         setShareStatus('shared');
@@ -278,13 +302,14 @@ export const ProductDetailPage: React.FC = () => {
       }
     }
 
+    const sharePayload = `${customMessage}\n${shareUrl}`;
     try {
-      await navigator.clipboard.writeText(shareUrl);
+      await navigator.clipboard.writeText(sharePayload);
       setShareStatus('copied');
       setTimeout(() => setShareStatus('idle'), 2500);
     } catch {
-      const input = document.createElement('input');
-      input.value = shareUrl;
+      const input = document.createElement('textarea');
+      input.value = sharePayload;
       document.body.appendChild(input);
       input.select();
       document.execCommand('copy');
@@ -458,7 +483,7 @@ export const ProductDetailPage: React.FC = () => {
         <HalfArrowIcon className="w-4 h-4 sm:w-5 sm:h-5 text-current -ml-0.5" strokeWidth={2.4} />
       </button>
 
-      <div className="max-w-2xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-36 sm:pb-16 space-y-6 sm:space-y-8">
+      <div className="max-w-2xl lg:max-w-5xl mx-auto px-2.5 sm:px-6 py-2.5 sm:py-8 pb-16 sm:pb-12 space-y-5 sm:space-y-8">
         {/* Main Product Showcase */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           
@@ -493,7 +518,7 @@ export const ProductDetailPage: React.FC = () => {
                         return (
                           <div
                             key={`carousel-slide-${idx}`}
-                            className="w-full shrink-0 snap-center snap-always aspect-square sm:aspect-[4/3] flex items-center justify-center p-1 sm:p-3 relative select-none"
+                            className="w-full shrink-0 snap-center snap-always aspect-square sm:aspect-[4/3] flex items-center justify-center p-0 sm:p-2 relative select-none"
                           >
                             {isReal ? (
                               <img
@@ -504,7 +529,7 @@ export const ProductDetailPage: React.FC = () => {
                                 loading={idx === 0 ? 'eager' : 'lazy'}
                                 width="700"
                                 height="550"
-                                className="w-full h-full min-h-[280px] sm:min-h-[380px] max-h-[420px] sm:max-h-[520px] object-contain rounded-lg sm:rounded-xl transition-all duration-300 pointer-events-none"
+                                className="w-full h-full min-h-[320px] sm:min-h-[380px] max-h-[500px] sm:max-h-[520px] object-contain rounded-lg sm:rounded-xl transition-all duration-300 pointer-events-none"
                                 onError={() => {
                                   if (idx === selectedImageIndex) setImageError(true);
                                 }}
@@ -624,8 +649,8 @@ export const ProductDetailPage: React.FC = () => {
                 </div>
               )}
 
-              {/* Title gets clean full line width */}
-              <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight leading-snug sm:leading-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
+              {/* Title gets clean full line width (smaller font size on mobile browser) */}
+              <h1 className={`text-base sm:text-2xl lg:text-3xl font-bold tracking-tight leading-snug sm:leading-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
                 {product.name}
               </h1>
 
@@ -646,7 +671,7 @@ export const ProductDetailPage: React.FC = () => {
                 )}
               </div>
 
-              {/* Rating & Verified Fitment Badges (Modern anti-slop alignment on mobile & desktop) */}
+              {/* Rating Review Link (Clean alignment on mobile & desktop) */}
               <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap text-xs pt-0.5">
                 <a
                   href="#reviews-section"
@@ -665,15 +690,6 @@ export const ProductDetailPage: React.FC = () => {
                     {ratingSummary.totalReviews} {ratingSummary.totalReviews === 1 ? 'review' : 'reviews'}
                   </span>
                 </a>
-
-                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium border ${
-                  isDark
-                    ? 'bg-emerald-950/40 border-emerald-800/50 text-emerald-400'
-                    : 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                }`}>
-                  <i className="bi bi-patch-check-fill text-xs" aria-hidden="true" />
-                  <span>Verified Overland Fitment</span>
-                </span>
               </div>
             </div>
 
@@ -704,16 +720,32 @@ export const ProductDetailPage: React.FC = () => {
                 Quantity
               </label>
               <div className="flex flex-row items-center gap-4 sm:flex-col sm:items-start sm:gap-2">
-                <div className={`w-32 border rounded-lg flex items-center justify-between px-3 py-1.5 flex-shrink-0 ${isDark ? 'border-[#261619] bg-[#130E10]' : 'border-[#E0DBD2] bg-[#F5F3EE]'}`}>
-                  <button type="button" onClick={() => setQuantity((q) => Math.max(1, q - 1))} disabled={quantity <= 1 || isOutOfStock}
-                    className={`text-lg leading-none p-1 cursor-pointer disabled:opacity-30 ${isDark ? 'text-slate-400 hover:text-white' : 'text-[#5C5456] hover:text-[#140E10]'}`} aria-label="Decrease quantity">−</button>
-                  <input id="pdp-quantity" type="number" min="1" max={product.stockQuantity} value={quantity}
-                    onChange={(e) => setQuantity(Math.max(1, Math.min(product.stockQuantity, Number(e.target.value))))}
-                    disabled={isOutOfStock}
-                    className={`w-10 text-center bg-transparent text-sm font-semibold focus:outline-none ${isDark ? 'text-white' : 'text-[#140E10]'}`}
-                  />
-                  <button type="button" onClick={() => setQuantity((q) => Math.min(product.stockQuantity, q + 1))} disabled={quantity >= product.stockQuantity || isOutOfStock}
-                    className={`text-lg leading-none p-1 cursor-pointer disabled:opacity-30 ${isDark ? 'text-slate-400 hover:text-white' : 'text-[#5C5456] hover:text-[#140E10]'}`} aria-label="Increase quantity">+</button>
+                <div className={`h-10 w-32 border rounded-xl flex items-center justify-between px-1.5 select-none transition-all flex-shrink-0 ${
+                  isDark
+                    ? 'border-[#FF000E]/50 bg-[#130E10] text-white shadow-xs'
+                    : 'border-[#FF000E]/40 bg-white text-[#140E10] shadow-xs'
+                }`}>
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    disabled={quantity <= 1 || isOutOfStock}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-[#FF000E] hover:bg-[#FF000E]/10 active:scale-90 font-black text-base cursor-pointer disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+                    aria-label="Decrease quantity"
+                  >
+                    −
+                  </button>
+                  <span className="flex-1 text-center font-bold text-sm text-[#FF000E] tabular-nums select-none font-mono">
+                    {quantity}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((q) => Math.min(product.stockQuantity, q + 1))}
+                    disabled={quantity >= product.stockQuantity || isOutOfStock}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-[#FF000E] hover:bg-[#FF000E]/10 active:scale-90 font-black text-base cursor-pointer disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+                    aria-label="Increase quantity"
+                  >
+                    +
+                  </button>
                 </div>
                 <div>
                   {isOutOfStock ? (
@@ -1106,7 +1138,7 @@ export const ProductDetailPage: React.FC = () => {
                       No Customer Reviews Yet
                     </h3>
                     <p className={`text-xs max-w-sm mx-auto ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
-                      Be the first to review this {product.name} and help fellow Indian overland enthusiasts.
+                      Be the first to review this {product.name} and help fellow automotive enthusiasts.
                     </p>
                     <button
                       type="button"
@@ -1628,7 +1660,7 @@ export const ProductDetailPage: React.FC = () => {
                 You May Also Like
               </h2>
               <Link
-                to="/checkout"
+                to={product?.categoryId ? `/catalogue?category=${product.categoryId}` : '/catalogue'}
                 className={`inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold transition-colors group ${
                   isDark ? 'text-[#FF4A55] hover:text-[#FF707A]' : 'text-[#DC000C] hover:text-[#B30009]'
                 }`}

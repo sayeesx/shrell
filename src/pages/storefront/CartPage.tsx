@@ -428,11 +428,11 @@ export const CartPage: React.FC = () => {
     </div>
   );
 
-  // Suggestions excluding items already at maximum quantity
+  // Suggestions excluding items already at maximum quantity (limited strictly to 4 items)
   const displayedSuggestions = suggestions.filter((p) => {
     const inCart = cart.items.find((it) => it.productId === p.id);
     return !inCart || inCart.quantity < p.stockQuantity;
-  }).slice(0, 6);
+  }).slice(0, 4);
 
   // If cart is empty
   if (cart.items.length === 0) {
@@ -530,11 +530,11 @@ export const CartPage: React.FC = () => {
                   isDark ? 'bg-[#130E10] border-[#2D161A]' : 'bg-white border-[#D0C9BE] shadow-xs'
                 }`}
               >
-                {/* Product image (clean compact square frame) */}
+                {/* Product image (stretches to match full card height) */}
                 <Link
                   to={productHref}
                   aria-label={`View ${item.product.name}`}
-                  className={`w-16 h-16 shrink-0 aspect-square rounded-lg flex items-center justify-center p-1.5 overflow-hidden border transition-opacity hover:opacity-85 ${
+                  className={`self-stretch w-20 shrink-0 rounded-lg flex items-center justify-center p-0 overflow-hidden border transition-opacity hover:opacity-85 min-h-[78px] ${
                     isDark ? 'bg-[#181113] border-[#2D161A]' : 'bg-[#F5F3EE] border-[#D0C9BE]'
                   }`}
                 >
@@ -543,7 +543,7 @@ export const CartPage: React.FC = () => {
                       src={cleanImg}
                       alt={item.product.name}
                       referrerPolicy="no-referrer"
-                      className="w-full h-full object-contain aspect-square"
+                      className="w-full h-full object-cover"
                       onError={() => handleImageError(item.productId)}
                     />
                   ) : (
@@ -649,7 +649,7 @@ export const CartPage: React.FC = () => {
         {/* ========================================================================= */}
         {displayedSuggestions.length > 0 && (
           <div className="pt-1">
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none snap-x snap-mandatory w-full">
+            <div className="-mx-3.5 px-3.5 flex gap-2 overflow-x-auto pb-1 scrollbar-none snap-x snap-mandatory w-[calc(100%+1.75rem)]">
               {displayedSuggestions.map((prod) => {
                 const inCartItem = cart.items.find((it) => it.productId === prod.id);
                 const currentQty = inCartItem?.quantity || 0;
@@ -697,21 +697,25 @@ export const CartPage: React.FC = () => {
 
                     <div className={`mt-1.5 pt-1 border-t ${isDark ? 'border-[#2D161A]' : 'border-[#D0C9BE]'}`}>
                       {currentQty > 0 ? (
-                        <div className="w-full h-7 rounded-lg bg-[#FF000E] text-white px-2 font-bold text-xs flex items-center justify-between shadow-xs">
+                        <div className={`w-full h-7 rounded-lg border flex items-center justify-between px-1.5 transition-all ${
+                          isDark
+                            ? 'bg-[#181113] border-[#FF000E] text-white'
+                            : 'bg-white border-[#FF000E] text-[#140E10]'
+                        }`}>
                           <button
                             type="button"
                             onClick={() => updateQuantity(prod.id, currentQty - 1)}
-                            className="w-5 h-full flex items-center justify-center hover:scale-110 active:scale-95 transition-transform text-sm leading-none"
+                            className="w-5 h-full flex items-center justify-center text-[#FF000E] font-black text-sm active:scale-90 transition-transform bg-transparent border-0 cursor-pointer"
                             aria-label="Decrease quantity"
                           >
                             −
                           </button>
-                          <span className="font-mono text-xs select-none">{currentQty}</span>
+                          <span className="font-mono font-bold text-xs text-[#FF000E] select-none">{currentQty}</span>
                           <button
                             type="button"
                             onClick={() => updateQuantity(prod.id, currentQty + 1)}
                             disabled={currentQty >= prod.stockQuantity}
-                            className="w-5 h-full flex items-center justify-center hover:scale-110 active:scale-95 transition-transform disabled:opacity-40 text-sm leading-none"
+                            className="w-5 h-full flex items-center justify-center text-[#FF000E] font-black text-sm active:scale-90 transition-transform disabled:opacity-30 bg-transparent border-0 cursor-pointer"
                             aria-label="Increase quantity"
                           >
                             +
@@ -731,8 +735,6 @@ export const CartPage: React.FC = () => {
                   </div>
                 );
               })}
-              {/* Trailing spacer so last item scrolls comfortably clear of margin */}
-              <div className="w-1.5 shrink-0" aria-hidden="true" />
             </div>
           </div>
         )}
@@ -953,7 +955,7 @@ export const CartPage: React.FC = () => {
                   <Link
                     to={productHref}
                     aria-label={`View ${item.product.name}`}
-                    className={`w-20 h-20 shrink-0 rounded-lg flex items-center justify-center p-2 overflow-hidden border transition-opacity hover:opacity-85 ${
+                    className={`self-stretch w-24 shrink-0 rounded-lg flex items-center justify-center p-0 overflow-hidden border transition-opacity hover:opacity-85 min-h-[92px] ${
                       isDark ? 'bg-[#181113] border-[#261619]' : 'bg-[#F5F3EE] border-[#E0DBD2]'
                     }`}
                   >
@@ -962,7 +964,7 @@ export const CartPage: React.FC = () => {
                         src={cleanImg}
                         alt={item.product.name}
                         referrerPolicy="no-referrer"
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-cover"
                         onError={() => handleImageError(`desk-${item.productId}`)}
                       />
                     ) : (
@@ -1093,20 +1095,24 @@ export const CartPage: React.FC = () => {
 
                         <div className={`mt-2 pt-1.5 border-t ${isDark ? 'border-[#261619]' : 'border-[#E0DBD2]'}`}>
                           {currentQty > 0 ? (
-                            <div className="w-full flex items-center justify-between rounded-md bg-[#FF000E] text-white py-1 px-2 font-bold text-xs">
+                            <div className={`w-full h-8 flex items-center justify-between rounded-lg border px-2 font-bold text-xs ${
+                              isDark ? 'bg-[#181113] border-[#FF000E] text-white' : 'bg-white border-[#FF000E] text-[#140E10]'
+                            }`}>
                               <button
                                 type="button"
                                 onClick={() => updateQuantity(prod.id, currentQty - 1)}
-                                className="hover:scale-110 active:scale-95 transition-transform"
+                                className="w-6 h-full flex items-center justify-center text-[#FF000E] font-black text-sm active:scale-90 transition-transform bg-transparent border-0 cursor-pointer"
+                                aria-label="Decrease quantity"
                               >
                                 −
                               </button>
-                              <span className="font-mono text-xs">{currentQty}</span>
+                              <span className="font-mono text-xs text-[#FF000E]">{currentQty}</span>
                               <button
                                 type="button"
                                 onClick={() => updateQuantity(prod.id, currentQty + 1)}
                                 disabled={currentQty >= prod.stockQuantity}
-                                className="hover:scale-110 active:scale-95 transition-transform disabled:opacity-40"
+                                className="w-6 h-full flex items-center justify-center text-[#FF000E] font-black text-sm active:scale-90 transition-transform disabled:opacity-40 bg-transparent border-0 cursor-pointer"
+                                aria-label="Increase quantity"
                               >
                                 +
                               </button>

@@ -48,9 +48,9 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['"InterDigits"', '"DM Sans"', 'system-ui', 'sans-serif'],
-        mono: ['"InterDigits"', '"DM Sans"', 'monospace'],
-        tight: ['"InterDigits"', '"Inter Tight"', 'system-ui', 'sans-serif'],
+        sans: ['"Aspekta"', 'system-ui', 'sans-serif'],
+        mono: ['"Aspekta"', 'monospace'],
+        tight: ['"Aspekta"', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
         none: 'none',

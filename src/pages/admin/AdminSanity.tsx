@@ -18,6 +18,7 @@ import {
 } from '../../infrastructure/sanity/sanityClient';
 import { INITIAL_PRODUCTS } from '../../infrastructure/repositories/seedData';
 import { useTheme } from '../../application/ThemeContext';
+import { SquareGridLoader } from '../../components/common/SquareGridLoader';
 
 export const AdminSanity: React.FC<{ embedded?: boolean }> = ({ embedded = false }) => {
   const { isDark } = useTheme();
@@ -785,8 +786,8 @@ export const banner = defineType({
           </div>
 
           {loadingProducts ? (
-            <div className={`p-12 text-center text-xs font-mono border rounded-xl ${isDark ? 'bg-slate-900 border-slate-800 text-slate-400' : 'bg-white border-slate-200 text-slate-500'}`}>
-              <i className="bi bi-arrow-clockwise text-xl animate-spin mx-auto block mb-2 text-slate-400" aria-hidden="true" />
+            <div className={`p-12 text-center text-xs font-mono border rounded-xl flex flex-col items-center justify-center gap-3 ${isDark ? 'bg-slate-900 border-slate-800 text-slate-400' : 'bg-white border-slate-200 text-slate-500'}`}>
+              <SquareGridLoader size={36} color="#FF000E" />
               <span>Querying Sanity GROQ endpoints...</span>
             </div>
           ) : sanityProducts.length > 0 ? (
@@ -1224,8 +1225,8 @@ export const banner = defineType({
             </div>
 
             {loadingBanners ? (
-              <div className={`py-12 flex items-center justify-center gap-3 text-xs font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                <i className="bi bi-arrow-clockwise text-sm animate-spin text-slate-400" aria-hidden="true" />
+              <div className={`py-12 flex flex-col items-center justify-center gap-3 text-xs font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                <SquareGridLoader size={36} color="#FF000E" />
                 <span>Loading Sanity banners...</span>
               </div>
             ) : sanityBanners.length === 0 ? (

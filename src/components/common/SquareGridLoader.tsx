@@ -1,121 +1,64 @@
-import React from 'react';
-import styled from 'styled-components';
+import React, { useMemo } from 'react';
+import { SHRELL_LOADER_POINTS } from './shrellLoaderData';
 
 export interface SquareGridLoaderProps {
   color?: string;
   size?: number;
   className?: string;
+  /** When true, forces white squares (e.g. inside brand red buttons) */
+  white?: boolean;
 }
-
-interface StyledWrapperProps {
-  $size?: number;
-  $color?: string;
-}
-
-const StyledWrapper = styled.div<StyledWrapperProps>`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  width: ${({ $size }) => ($size ? `${$size}px` : '50px')};
-  height: ${({ $size }) => ($size ? `${$size}px` : '50px')};
-
-  .loader {
-    position: relative;
-    width: 50px;
-    height: 50px;
-    ${({ $size }) => ($size ? `transform: scale(${$size / 50}); transform-origin: center center;` : '')}
-  }
-
-  @keyframes loader_5191 {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
-  }
-
-  .square {
-    background: ${({ $color }) => $color || '#ddd'};
-    width: 10px;
-    height: 10px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-top: -5px;
-    margin-left: -5px;
-  }
-
-  #sq1 {
-    margin-top: -25px;
-    margin-left: -25px;
-    animation: loader_5191 675ms ease-in-out 0s infinite alternate;
-  }
-
-  #sq2 {
-    margin-top: -25px;
-    animation: loader_5191 675ms ease-in-out 75ms infinite alternate;
-  }
-
-  #sq3 {
-    margin-top: -25px;
-    margin-left: 15px;
-    animation: loader_5191 675ms ease-in-out 150ms infinite;
-  }
-
-  #sq4 {
-    margin-left: -25px;
-    animation: loader_5191 675ms ease-in-out 225ms infinite;
-  }
-
-  #sq5 {
-    animation: loader_5191 675ms ease-in-out 300ms infinite;
-  }
-
-  #sq6 {
-    margin-left: 15px;
-    animation: loader_5191 675ms ease-in-out 375ms infinite;
-  }
-
-  #sq7 {
-    margin-top: 15px;
-    margin-left: -25px;
-    animation: loader_5191 675ms ease-in-out 450ms infinite;
-  }
-
-  #sq8 {
-    margin-top: 15px;
-    animation: loader_5191 675ms ease-in-out 525ms infinite;
-  }
-
-  #sq9 {
-    margin-top: 15px;
-    margin-left: 15px;
-    animation: loader_5191 675ms ease-in-out 600ms infinite;
-  }
-`;
 
 export const SquareGridLoader: React.FC<SquareGridLoaderProps> = ({
   color,
-  size,
-  className,
+  size = 48,
+  className = '',
+  white = false,
 }) => {
+  // If white is explicitly requested or color is white, use crisp white.
+  // Otherwise use the passed color or default to signature crimson red (#FF000E).
+  const fillColor = white || color === '#ffffff' || color === 'white' ? '#FFFFFF' : (color || '#FF000E');
+
+  // Pre-calculate deterministic staggered delays for each of the 1,184 raster blocks
+  const blocks = useMemo(() => {
+    return SHRELL_LOADER_POINTS.map(([r, c]) => {
+      // Deterministic hash to give natural pseudo-random distribution between 0 and 1100ms
+      const delay = Math.abs(((r * 48 + c) * 73) % 1100);
+      return { r, c, delay };
+    });
+  }, []);
+
   return (
-    <StyledWrapper $color={color} $size={size} className={className}>
-      <div className="loader">
-        <div className="square" id="sq1" />
-        <div className="square" id="sq2" />
-        <div className="square" id="sq3" />
-        <div className="square" id="sq4" />
-        <div className="square" id="sq5" />
-        <div className="square" id="sq6" />
-        <div className="square" id="sq7" />
-        <div className="square" id="sq8" />
-        <div className="square" id="sq9" />
-      </div>
-    </StyledWrapper>
+    <svg
+      viewBox="0 0 48 48"
+      width={size}
+      height={size}
+      className={`inline-block shrink-0 select-none ${className}`}
+      role="img"
+      aria-label="Loading"
+      style={{
+        width: size,
+        height: size,
+        display: 'inline-block',
+      }}
+    >
+      <style>
+        {`@keyframes loader_5191 { from { opacity: .3; } to { opacity: 1; } }`}
+      </style>
+      {blocks.map(({ r, c, delay }) => (
+        <rect
+          key={`${r}-${c}`}
+          x={c + 0.07}
+          y={r + 0.07}
+          width={0.86}
+          height={0.86}
+          fill={fillColor}
+          style={{
+            animation: `loader_5191 550ms ease-in-out -${delay}ms infinite alternate`,
+          }}
+        />
+      ))}
+    </svg>
   );
 };
 

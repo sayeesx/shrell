@@ -16,7 +16,7 @@ const DEFAULT_BANNERS: HeroBanner[] = [
     desktopImageUrl: 'https://res.cloudinary.com/dy1i55fut/image/upload/v1793512009/uykqili5ey5zhdkdondv.png',
     mobileImageUrl: 'https://res.cloudinary.com/dy1i55fut/image/upload/v1793512009/uykqili5ey5zhdkdondv.png',
     targetUrl: '/catalogue',
-    altText: 'SHRELL Premium Automotive Overland Equipment',
+    altText: 'SHRELL Premium Automotive Equipment',
     isActive: true,
     order: 1,
     createdAt: new Date().toISOString(),

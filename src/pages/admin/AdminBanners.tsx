@@ -912,7 +912,7 @@ export const AdminBanners: React.FC = () => {
             >
               {uploading ? (
                 <>
-                  <span className="animate-spin inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full" />
+                  <SquareGridLoader size={14} white />
                   <span>Uploading to Cloudinary...</span>
                 </>
               ) : (

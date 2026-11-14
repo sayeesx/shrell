@@ -20,7 +20,7 @@ export const Footer: React.FC = () => {
               />
             </Link>
             <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
-              Specialized car accessories, overland gear, and precision components designed for Indian road conditions.
+              Specialized car accessories, touring gear, and precision components designed for Indian road conditions.
             </p>
             <div className={`text-xs pt-1 ${isDark ? 'text-slate-400' : 'text-[#5C5456]'}`}>
               <span>Support Hours: Mon - Sat (9:30 AM - 6:30 PM IST)</span>

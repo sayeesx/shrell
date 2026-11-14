@@ -344,7 +344,10 @@ export const CheckoutPage: React.FC = () => {
 
       trackOrderCompleted(newOrder);
       clearCart();
-      navigate('/order-success', { state: { order: newOrder } });
+      try {
+        sessionStorage.setItem('shrell_last_order', JSON.stringify(newOrder));
+      } catch (_) {}
+      navigate(`/order-success?orderId=${encodeURIComponent(newOrder.id)}`, { state: { order: newOrder } });
     } catch (err: any) {
       console.error('Order creation failed:', err);
       navigate('/order-failure', { state: { error: err.message || 'Payment transaction failed' } });

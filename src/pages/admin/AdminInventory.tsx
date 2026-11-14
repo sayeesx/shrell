@@ -122,7 +122,7 @@ export const AdminInventory: React.FC = () => {
                     <div className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{p.sku}</div>
                   </td>
                   <td className={`px-4 py-3 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{p.categoryName || 'Automotive'}</td>
-                  <td className={`px-4 py-3 font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{p.stockQuantity} units</td>
+                  <td className={`px-4 py-3 whitespace-nowrap font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{p.stockQuantity} units</td>
                   <td className="px-4 py-3">
                     {p.stockQuantity <= 5 ? (
                       <span className="px-2 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-bold">

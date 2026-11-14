@@ -426,12 +426,12 @@ export const AdminProducts: React.FC = () => {
         <table className="w-full text-left text-xs font-mono min-w-[700px]">
           <thead className={`border-b ${isDark ? 'bg-slate-950/70 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
             <tr>
-              <th className="px-4 py-3 font-semibold">Product Name & SKU</th>
-              <th className="px-4 py-3 font-semibold">Category</th>
-              <th className="px-4 py-3 font-semibold">Selling Price</th>
-              <th className="px-4 py-3 font-semibold">Stock Units</th>
-              <th className="px-4 py-3 font-semibold">Fitment</th>
-              <th className="px-4 py-3 font-semibold text-right">Actions</th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">Product Name & SKU</th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">Category</th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">Selling Price</th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">Stock Units</th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">Fitment</th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap text-right">Actions</th>
             </tr>
           </thead>
           <tbody className={`divide-y ${isDark ? 'divide-slate-800' : 'divide-slate-200'}`}>
@@ -448,15 +448,15 @@ export const AdminProducts: React.FC = () => {
                   </div>
                   <div className={`text-[11px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{prod.sku}</div>
                 </td>
-                <td className={`px-4 py-3 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                <td className={`px-4 py-3 whitespace-nowrap ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                   {prod.categoryName || 'Automotive'}
                 </td>
-                <td className={`px-4 py-3 font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                <td className={`px-4 py-3 whitespace-nowrap font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   {formatINR(prod.pricePaisa)}
                 </td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 whitespace-nowrap">
                   <span
-                    className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                    className={`inline-flex items-center whitespace-nowrap px-2 py-0.5 rounded text-[10px] font-bold ${
                       prod.stockQuantity <= 5
                         ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30'
                         : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
@@ -465,7 +465,7 @@ export const AdminProducts: React.FC = () => {
                     {prod.stockQuantity} in stock
                   </span>
                 </td>
-                <td className={`px-4 py-3 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                <td className={`px-4 py-3 whitespace-nowrap ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                   {prod.isUniversalFit ? 'Universal' : 'Vehicle Specific'}
                 </td>
                 <td className="px-4 py-3 text-right">

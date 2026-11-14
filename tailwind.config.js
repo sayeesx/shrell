@@ -48,9 +48,9 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
-        mono: ['"DM Sans"', 'monospace'],
-        tight: ['"Inter Tight"', 'system-ui', 'sans-serif'],
+        sans: ['"InterDigits"', '"DM Sans"', 'system-ui', 'sans-serif'],
+        mono: ['"InterDigits"', '"DM Sans"', 'monospace'],
+        tight: ['"InterDigits"', '"Inter Tight"', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
         none: 'none',

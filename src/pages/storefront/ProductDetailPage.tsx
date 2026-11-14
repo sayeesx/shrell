@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Product, ProductReview, ProductRatingSummary } from '../../domain/types';
@@ -33,6 +33,8 @@ export const ProductDetailPage: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const isProgrammaticScroll = useRef<boolean>(false);
   const [quantity, setQuantity] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
   const [addedMessage, setAddedMessage] = useState<string>('');
@@ -82,9 +84,9 @@ export const ProductDetailPage: React.FC = () => {
   }, [isReviewModalOpen, isNotifyModalOpen]);
 
 
-  // Accordion open states - Technical Specifications & Shipping & Warranty start collapsed
+  // Accordion open states - All sections start closed per user request
   const [openAccordions, setOpenAccordions] = useState<{ [key: string]: boolean }>({
-    description: true,
+    description: false,
     specs: false,
     shipping: false,
   });
@@ -375,6 +377,35 @@ export const ProductDetailPage: React.FC = () => {
   const categoryTitle = product.categoryName || 'Equipment Catalogue';
   const categoryPath = product.categoryId ? `/catalogue?category=${product.categoryId}` : '/catalogue';
 
+  const scrollToImageIndex = (idx: number) => {
+    setSelectedImageIndex(idx);
+    setImageError(false);
+    const container = carouselRef.current;
+    if (container) {
+      isProgrammaticScroll.current = true;
+      container.scrollTo({
+        left: idx * container.clientWidth,
+        behavior: 'smooth',
+      });
+      window.setTimeout(() => {
+        isProgrammaticScroll.current = false;
+      }, 450);
+    }
+  };
+
+  const handleCarouselScroll = () => {
+    if (isProgrammaticScroll.current) return;
+    const container = carouselRef.current;
+    if (!container) return;
+    const width = container.clientWidth;
+    if (width <= 0) return;
+    const newIndex = Math.round(container.scrollLeft / width);
+    const galleryCount = product?.images?.length || 1;
+    if (newIndex >= 0 && newIndex < galleryCount && newIndex !== selectedImageIndex) {
+      setSelectedImageIndex(newIndex);
+    }
+  };
+
   const productSchema = generateProductSchema(
     product,
     ratingSummary.totalReviews > 0 ? ratingSummary : undefined
@@ -435,124 +466,201 @@ export const ProductDetailPage: React.FC = () => {
           {/* LEFT: Product Image Showcase (Curved Image + Thumbnails)  */}
           {/* ========================================================= */}
           <div className="space-y-3 sm:space-y-4">
-            {/* Main Product Image with subtle curved radius & Share button */}
-            <div className="relative aspect-square sm:aspect-[4/3] flex items-center justify-center p-1 sm:p-3 select-none rounded-lg sm:rounded-xl overflow-hidden">
-              {(() => {
-                const rawUrl = product.images?.[selectedImageIndex]?.url || product.images?.[0]?.url;
-                let cleanUrl = rawUrl?.trim() || '';
-                if (cleanUrl.startsWith('http://res.cloudinary.com/')) {
-                  cleanUrl = cleanUrl.replace('http://res.cloudinary.com/', 'https://res.cloudinary.com/');
-                }
-                const isReal = Boolean(cleanUrl && !imageError && !cleanUrl.includes('shrell-full_white-text_black-logo.png'));
-                return isReal ? (
-                  <img
-                    src={cleanUrl}
-                    alt={`${product.name} - ${product.images?.[selectedImageIndex]?.altText || `View ${selectedImageIndex + 1}`}`}
-                    referrerPolicy="no-referrer"
-                    fetchPriority="high"
-                    width="700"
-                    height="550"
-                    className="w-full h-full min-h-[280px] sm:min-h-[380px] max-h-[420px] sm:max-h-[520px] object-contain rounded-lg sm:rounded-xl transition-all duration-300"
-                    onError={() => setImageError(true)}
-                  />
-                ) : (
-                  <div className={`w-full max-w-xs sm:max-w-md h-64 sm:h-80 flex items-center justify-center ${isDark ? 'opacity-60' : 'opacity-85'}`}>
-                    <img
-                      src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
-                      alt={`${product.name} - ${product.images?.[selectedImageIndex]?.altText || 'Primary View'}`}
-                      fetchPriority="high"
-                      width="320"
-                      height="120"
-                      className="w-full h-full object-contain rounded-lg sm:rounded-xl transition-all duration-300"
-                    />
-                  </div>
-                );
-              })()}
-
-              {/* Share Button on bottom-right corner of the product image */}
-              <button
-                type="button"
-                onClick={handleShareProduct}
-                aria-label={`Share ${product.name}`}
-                title="Share product link"
-                className={`absolute bottom-2.5 right-2.5 sm:bottom-3.5 sm:right-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md border text-xs font-semibold transition-all cursor-pointer shadow-md select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF000E] ${
-                  shareStatus !== 'idle'
-                    ? isDark
-                      ? 'border-emerald-500/60 bg-emerald-950/85 text-emerald-300'
-                      : 'border-emerald-600/60 bg-emerald-50/95 text-emerald-800'
-                    : isDark
-                      ? 'border-white/15 bg-black/60 hover:bg-black/85 text-white'
-                      : 'border-black/10 bg-white/85 hover:bg-white text-neutral-800'
-                }`}
-              >
-                <i
-                  className={`bi ${shareStatus !== 'idle' ? 'bi-check2 text-emerald-400' : 'bi-share'} text-xs`}
-                  aria-hidden="true"
-                />
-                <span>
-                  {shareStatus === 'copied' ? 'Copied' : shareStatus === 'shared' ? 'Shared' : 'Share'}
-                </span>
-              </button>
-            </div>
-
-            {/* Selectable Image Thumbnails (Supports 5th, 6th & any number of images) */}
             {(() => {
               const galleryImages = (product.images && product.images.length > 0)
                 ? product.images
                 : [{ url: '', altText: 'Primary View' }];
 
               return (
-                <div className="flex items-center gap-2 sm:gap-2.5 pt-1 overflow-x-auto no-scrollbar py-1">
-                  {galleryImages.map((imgItem, idx) => {
-                    const isSelected = selectedImageIndex === idx;
-                    const thumbRaw = imgItem?.url || '';
-                    let thumbClean = thumbRaw?.trim() || '';
-                    if (thumbClean.startsWith('http://res.cloudinary.com/')) {
-                      thumbClean = thumbClean.replace('http://res.cloudinary.com/', 'https://res.cloudinary.com/');
-                    }
-                    const isThumbReal = Boolean(thumbClean && !thumbClean.includes('shrell-full_white-text_black-logo.png'));
-                    const imgLabel = imgItem?.altText || `Angle ${idx + 1}`;
+                <>
+                  {/* Main Showcase: Horizontal Swipeable Carousel for Mobile & Interactive Viewer for Desktop */}
+                  <div className="relative group select-none rounded-lg sm:rounded-xl overflow-hidden bg-transparent">
+                    {/* Horizontal Scroll Track (Scroll Snap on touch / swipe) */}
+                    <div
+                      ref={carouselRef}
+                      onScroll={handleCarouselScroll}
+                      className="w-full flex overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar touch-pan-x"
+                    >
+                      {galleryImages.map((imgItem, idx) => {
+                        const rawUrl = imgItem?.url || '';
+                        let cleanUrl = rawUrl?.trim() || '';
+                        if (cleanUrl.startsWith('http://res.cloudinary.com/')) {
+                          cleanUrl = cleanUrl.replace('http://res.cloudinary.com/', 'https://res.cloudinary.com/');
+                        }
+                        const isReal = Boolean(cleanUrl && !(imageError && selectedImageIndex === idx) && !cleanUrl.includes('shrell-full_white-text_black-logo.png'));
+                        const imgLabel = imgItem?.altText || `View ${idx + 1}`;
 
-                    const imageContent = isThumbReal ? (
-                      <img
-                        src={thumbClean}
-                        alt={`${product.name} - ${imgLabel} Thumbnail`}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className={`w-full h-full flex items-center justify-center p-1 ${isDark ? 'bg-[#120E0F]' : 'bg-[#F5F3EE]'}`}>
-                        <img
-                          src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
-                          alt={`${product.name} - ${imgLabel} Thumbnail`}
-                          className={`w-full h-full object-contain ${isDark ? 'opacity-60' : 'opacity-85'}`}
-                        />
+                        return (
+                          <div
+                            key={`carousel-slide-${idx}`}
+                            className="w-full shrink-0 snap-center snap-always aspect-square sm:aspect-[4/3] flex items-center justify-center p-1 sm:p-3 relative select-none"
+                          >
+                            {isReal ? (
+                              <img
+                                src={cleanUrl}
+                                alt={`${product.name} - ${imgLabel}`}
+                                referrerPolicy="no-referrer"
+                                fetchPriority={idx === 0 ? 'high' : 'auto'}
+                                loading={idx === 0 ? 'eager' : 'lazy'}
+                                width="700"
+                                height="550"
+                                className="w-full h-full min-h-[280px] sm:min-h-[380px] max-h-[420px] sm:max-h-[520px] object-contain rounded-lg sm:rounded-xl transition-all duration-300 pointer-events-none"
+                                onError={() => {
+                                  if (idx === selectedImageIndex) setImageError(true);
+                                }}
+                              />
+                            ) : (
+                              <div className={`w-full max-w-xs sm:max-w-md h-64 sm:h-80 flex items-center justify-center ${isDark ? 'opacity-60' : 'opacity-85'}`}>
+                                <img
+                                  src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
+                                  alt={`${product.name} - ${imgLabel}`}
+                                  fetchPriority={idx === 0 ? 'high' : 'auto'}
+                                  width="320"
+                                  height="120"
+                                  className="w-full h-full object-contain rounded-lg sm:rounded-xl transition-all duration-300 pointer-events-none"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Mobile Image Counter Badge (e.g. 1 / 4) */}
+                    {galleryImages.length > 1 && (
+                      <div className="sm:hidden absolute top-2.5 right-2.5 z-20 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide bg-black/60 text-white backdrop-blur-xs border border-white/10 pointer-events-none shadow-xs">
+                        {selectedImageIndex + 1} / {galleryImages.length}
                       </div>
-                    );
+                    )}
 
-                    return (
-                      <button
-                        key={`thumb-${idx}`}
-                        type="button"
-                        onClick={() => { setSelectedImageIndex(idx); setImageError(false); }}
-                        onMouseEnter={() => { setSelectedImageIndex(idx); setImageError(false); }}
-                        className={`w-13 h-13 sm:w-15 sm:h-15 rounded-md transition-all flex items-center justify-center p-0.5 overflow-hidden cursor-pointer select-none shrink-0 focus-visible:outline-none ${
-                          isSelected
-                            ? 'border-2 border-[#FF000E] shadow-xs'
-                            : isDark
-                            ? 'border border-[#261619] opacity-60 hover:opacity-100 hover:border-neutral-500'
-                            : 'border border-[#E0DBD2] opacity-70 hover:opacity-100 hover:border-neutral-400'
-                        } ${isDark ? 'bg-[#100B0D]' : 'bg-[#F5F3EE]'}`}
-                        aria-label={`View ${product.name} - ${imgLabel} ${isSelected ? '(Active)' : ''}`}
-                        title={imgLabel}
-                      >
-                        <div className="w-full h-full rounded-[4px] overflow-hidden flex items-center justify-center">
-                          {imageContent}
+                    {/* Mobile Pagination Dots */}
+                    {galleryImages.length > 1 && (
+                      <div className="sm:hidden absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/45 backdrop-blur-xs pointer-events-auto">
+                        {galleryImages.map((_, dotIdx) => (
+                          <button
+                            key={dotIdx}
+                            type="button"
+                            onClick={() => scrollToImageIndex(dotIdx)}
+                            aria-label={`Go to slide ${dotIdx + 1}`}
+                            className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                              selectedImageIndex === dotIdx ? 'w-4 bg-[#FF000E]' : 'w-1.5 bg-white/60 hover:bg-white'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Desktop Arrow Nav Buttons */}
+                    {galleryImages.length > 1 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const prev = selectedImageIndex > 0 ? selectedImageIndex - 1 : galleryImages.length - 1;
+                            scrollToImageIndex(prev);
+                          }}
+                          aria-label="Previous product image"
+                          className={`hidden sm:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full items-center justify-center transition-all opacity-0 group-hover:opacity-100 backdrop-blur-md border cursor-pointer active:scale-90 ${
+                            isDark ? 'bg-black/60 hover:bg-black/85 border-white/15 text-white' : 'bg-white/80 hover:bg-white border-black/10 text-neutral-800'
+                          }`}
+                        >
+                          <i className="bi bi-chevron-left text-xs" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const next = selectedImageIndex < galleryImages.length - 1 ? selectedImageIndex + 1 : 0;
+                            scrollToImageIndex(next);
+                          }}
+                          aria-label="Next product image"
+                          className={`hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full items-center justify-center transition-all opacity-0 group-hover:opacity-100 backdrop-blur-md border cursor-pointer active:scale-90 ${
+                            isDark ? 'bg-black/60 hover:bg-black/85 border-white/15 text-white' : 'bg-white/80 hover:bg-white border-black/10 text-neutral-800'
+                          }`}
+                        >
+                          <i className="bi bi-chevron-right text-xs" />
+                        </button>
+                      </>
+                    )}
+
+                    {/* Share Button on bottom-right corner of the product image */}
+                    <button
+                      type="button"
+                      onClick={handleShareProduct}
+                      aria-label={`Share ${product.name}`}
+                      title="Share product link"
+                      className={`absolute bottom-2.5 right-2.5 sm:bottom-3.5 sm:right-3.5 z-20 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md border text-xs font-semibold transition-all cursor-pointer shadow-md select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF000E] ${
+                        shareStatus !== 'idle'
+                          ? isDark
+                            ? 'border-emerald-500/60 bg-emerald-950/85 text-emerald-300'
+                            : 'border-emerald-600/60 bg-emerald-50/95 text-emerald-800'
+                          : isDark
+                            ? 'border-white/15 bg-black/60 hover:bg-black/85 text-white'
+                            : 'border-black/10 bg-white/85 hover:bg-white text-neutral-800'
+                      }`}
+                    >
+                      <i
+                        className={`bi ${shareStatus !== 'idle' ? 'bi-check2 text-emerald-400' : 'bi-share'} text-xs`}
+                        aria-hidden="true"
+                      />
+                      <span>
+                        {shareStatus === 'copied' ? 'Copied' : shareStatus === 'shared' ? 'Shared' : 'Share'}
+                      </span>
+                    </button>
+                  </div>
+
+                  {/* Selectable Image Thumbnails (Supports 5th, 6th & any number of images) */}
+                  <div className="flex items-center gap-2 sm:gap-2.5 pt-1 overflow-x-auto no-scrollbar py-1">
+                    {galleryImages.map((imgItem, idx) => {
+                      const isSelected = selectedImageIndex === idx;
+                      const thumbRaw = imgItem?.url || '';
+                      let thumbClean = thumbRaw?.trim() || '';
+                      if (thumbClean.startsWith('http://res.cloudinary.com/')) {
+                        thumbClean = thumbClean.replace('http://res.cloudinary.com/', 'https://res.cloudinary.com/');
+                      }
+                      const isThumbReal = Boolean(thumbClean && !thumbClean.includes('shrell-full_white-text_black-logo.png'));
+                      const imgLabel = imgItem?.altText || `Angle ${idx + 1}`;
+
+                      const imageContent = isThumbReal ? (
+                        <img
+                          src={thumbClean}
+                          alt={`${product.name} - ${imgLabel} Thumbnail`}
+                          referrerPolicy="no-referrer"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className={`w-full h-full flex items-center justify-center p-1 ${isDark ? 'bg-[#120E0F]' : 'bg-[#F5F3EE]'}`}>
+                          <img
+                            src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
+                            alt={`${product.name} - ${imgLabel} Thumbnail`}
+                            className={`w-full h-full object-contain ${isDark ? 'opacity-60' : 'opacity-85'}`}
+                          />
                         </div>
-                      </button>
-                    );
-                  })}
-                </div>
+                      );
+
+                      return (
+                        <button
+                          key={`thumb-${idx}`}
+                          type="button"
+                          onClick={() => scrollToImageIndex(idx)}
+                          onMouseEnter={() => scrollToImageIndex(idx)}
+                          className={`w-13 h-13 sm:w-15 sm:h-15 rounded-md transition-all flex items-center justify-center p-0.5 overflow-hidden cursor-pointer select-none shrink-0 focus-visible:outline-none ${
+                            isSelected
+                              ? 'border-2 border-[#FF000E] shadow-xs'
+                              : isDark
+                              ? 'border border-[#261619] opacity-60 hover:opacity-100 hover:border-neutral-500'
+                              : 'border border-[#E0DBD2] opacity-70 hover:opacity-100 hover:border-neutral-400'
+                          } ${isDark ? 'bg-[#100B0D]' : 'bg-[#F5F3EE]'}`}
+                          aria-label={`View ${product.name} - ${imgLabel} ${isSelected ? '(Active)' : ''}`}
+                          title={imgLabel}
+                        >
+                          <div className="w-full h-full rounded-[4px] overflow-hidden flex items-center justify-center">
+                            {imageContent}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
               );
             })()}
           </div>

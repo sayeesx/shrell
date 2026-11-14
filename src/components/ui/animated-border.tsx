@@ -40,9 +40,9 @@ interface AnimatedBorderProps extends Omit<ComponentProps<"div">, "ref"> {
  * 1.7 times taller than it is wide.
  */
 function AnimatedBorder({
-  duration = 6,
+  duration = 4,
   color = "var(--primary)",
-  width = 1,
+  width = 1.5,
   className,
   contentClassName,
   style,
@@ -58,19 +58,19 @@ function AnimatedBorder({
       ref={mergedRef}
       data-slot="animated-border"
       className={cn(
-        "bg-border relative isolate overflow-hidden rounded-xl",
+        "relative isolate overflow-hidden rounded-md",
         className,
       )}
       style={{ padding: width, ...style }}
       {...props}
     >
-      {/* Centered with margins rather than a transform, which the spin would overwrite. */}
+      {/* Light traveling around the border */}
       <span
         aria-hidden="true"
         data-slot="animated-border-light"
-        className="pointer-events-none absolute top-1/2 left-1/2 -mt-[100%] -ml-[100%] aspect-square w-[200%] animate-spin motion-reduce:animate-none"
+        className="pointer-events-none absolute -top-[50%] -left-[50%] w-[200%] h-[200%] animate-spin motion-reduce:animate-none"
         style={{
-          background: `conic-gradient(from 0deg, transparent 0 62%, ${color} 82%, transparent 96%)`,
+          background: `conic-gradient(from 0deg, transparent 0 55%, ${color} 78%, transparent 95%)`,
           animationDuration: `${duration}s`,
           animationPlayState: inView ? "running" : "paused",
         }}
@@ -78,7 +78,7 @@ function AnimatedBorder({
       <div
         data-slot="animated-border-content"
         className={cn(
-          "bg-card text-card-foreground relative h-full rounded-[inherit]",
+          "relative h-full rounded-[inherit]",
           contentClassName,
         )}
       >

@@ -78,12 +78,6 @@ export const ProductDetailPage: React.FC = () => {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [isReviewModalOpen, isNotifyModalOpen]);
 
-  const productViews = [
-    { id: 1, label: 'Primary Angle' },
-    { id: 2, label: 'Side Detail' },
-    { id: 3, label: 'Mounting & Hardware' },
-    { id: 4, label: 'Vehicle Fitment' },
-  ];
 
   // Accordion open states - Technical Specifications & Shipping & Warranty start collapsed
   const [openAccordions, setOpenAccordions] = useState<{ [key: string]: boolean }>({
@@ -420,11 +414,11 @@ export const ProductDetailPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           
           {/* ========================================================= */}
-          {/* LEFT: Product Image Showcase (No box/border + 4 Cubes)   */}
+          {/* LEFT: Product Image Showcase (Curved Image + Thumbnails)  */}
           {/* ========================================================= */}
-          <div className="space-y-4">
-            {/* Main Product Image - Free-floating without box or border */}
-            <div className="relative aspect-square sm:aspect-[4/3] flex items-center justify-center p-1 sm:p-4 select-none">
+          <div className="space-y-3 sm:space-y-4">
+            {/* Main Product Image with subtle curved radius & Share button */}
+            <div className="relative aspect-square sm:aspect-[4/3] flex items-center justify-center p-1 sm:p-3 select-none rounded-lg sm:rounded-xl overflow-hidden">
               {(() => {
                 const rawUrl = product.images?.[selectedImageIndex]?.url || product.images?.[0]?.url;
                 let cleanUrl = rawUrl?.trim() || '';
@@ -435,177 +429,199 @@ export const ProductDetailPage: React.FC = () => {
                 return isReal ? (
                   <img
                     src={cleanUrl}
-                    alt={`${product.name} - ${productViews[selectedImageIndex]?.label || 'Primary View'}`}
+                    alt={`${product.name} - ${product.images?.[selectedImageIndex]?.altText || `View ${selectedImageIndex + 1}`}`}
                     referrerPolicy="no-referrer"
                     fetchPriority="high"
                     width="700"
                     height="550"
-                    className="w-full h-full min-h-[280px] sm:min-h-[380px] max-h-[420px] sm:max-h-[520px] object-contain transition-all duration-300"
+                    className="w-full h-full min-h-[280px] sm:min-h-[380px] max-h-[420px] sm:max-h-[520px] object-contain rounded-lg sm:rounded-xl transition-all duration-300"
                     onError={() => setImageError(true)}
                   />
                 ) : (
                   <div className={`w-full max-w-xs sm:max-w-md h-64 sm:h-80 flex items-center justify-center ${isDark ? 'opacity-60' : 'opacity-85'}`}>
                     <img
                       src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
-                      alt={`${product.name} - ${productViews[selectedImageIndex]?.label || 'Primary View'}`}
+                      alt={`${product.name} - ${product.images?.[selectedImageIndex]?.altText || 'Primary View'}`}
                       fetchPriority="high"
                       width="320"
                       height="120"
-                      className="w-full h-full object-contain transition-all duration-300"
+                      className="w-full h-full object-contain rounded-lg sm:rounded-xl transition-all duration-300"
                     />
                   </div>
                 );
               })()}
+
+              {/* Share Button on bottom-right corner of the product image */}
+              <button
+                type="button"
+                onClick={handleShareProduct}
+                aria-label={`Share ${product.name}`}
+                title="Share product link"
+                className={`absolute bottom-2.5 right-2.5 sm:bottom-3.5 sm:right-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md border text-xs font-semibold transition-all cursor-pointer shadow-md select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF000E] ${
+                  shareStatus !== 'idle'
+                    ? isDark
+                      ? 'border-emerald-500/60 bg-emerald-950/85 text-emerald-300'
+                      : 'border-emerald-600/60 bg-emerald-50/95 text-emerald-800'
+                    : isDark
+                      ? 'border-white/15 bg-black/60 hover:bg-black/85 text-white'
+                      : 'border-black/10 bg-white/85 hover:bg-white text-neutral-800'
+                }`}
+              >
+                <i
+                  className={`bi ${shareStatus !== 'idle' ? 'bi-check2 text-emerald-400' : 'bi-share'} text-xs`}
+                  aria-hidden="true"
+                />
+                <span>
+                  {shareStatus === 'copied' ? 'Copied' : shareStatus === 'shared' ? 'Shared' : 'Share'}
+                </span>
+              </button>
             </div>
 
-            {/* 4 Small Selectable Image Cubes */}
-            <div className="flex items-center gap-2.5 sm:gap-3 pt-1">
-              {productViews.map((view, idx) => {
-                const isSelected = selectedImageIndex === idx;
-                const thumbRaw = product.images?.[idx]?.url || product.images?.[0]?.url;
-                let thumbClean = thumbRaw?.trim() || '';
-                if (thumbClean.startsWith('http://res.cloudinary.com/')) {
-                  thumbClean = thumbClean.replace('http://res.cloudinary.com/', 'https://res.cloudinary.com/');
-                }
-                const isThumbReal = Boolean(thumbClean && !thumbClean.includes('shrell-full_white-text_black-logo.png'));
+            {/* Selectable Image Thumbnails (Supports 5th, 6th & any number of images) */}
+            {(() => {
+              const galleryImages = (product.images && product.images.length > 0)
+                ? product.images
+                : [{ url: '', altText: 'Primary View' }];
 
-                const imageContent = isThumbReal ? (
-                  <img
-                    src={thumbClean}
-                    alt={`${product.name} - ${view.label} Thumbnail`}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className={`w-full h-full flex items-center justify-center p-1 ${isDark ? 'bg-[#120E0F]' : 'bg-[#F5F3EE]'}`}>
-                    <img
-                      src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
-                      alt={`${product.name} - ${view.label} Thumbnail`}
-                      className={`w-full h-full object-contain ${isDark ? 'opacity-60' : 'opacity-85'}`}
-                    />
-                  </div>
-                );
+              return (
+                <div className="flex items-center gap-2 sm:gap-2.5 pt-1 overflow-x-auto no-scrollbar py-1">
+                  {galleryImages.map((imgItem, idx) => {
+                    const isSelected = selectedImageIndex === idx;
+                    const thumbRaw = imgItem?.url || '';
+                    let thumbClean = thumbRaw?.trim() || '';
+                    if (thumbClean.startsWith('http://res.cloudinary.com/')) {
+                      thumbClean = thumbClean.replace('http://res.cloudinary.com/', 'https://res.cloudinary.com/');
+                    }
+                    const isThumbReal = Boolean(thumbClean && !thumbClean.includes('shrell-full_white-text_black-logo.png'));
+                    const imgLabel = imgItem?.altText || `Angle ${idx + 1}`;
 
-                if (isSelected) {
-                  return (
-                    <button
-                      key={view.id}
-                      type="button"
-                      onClick={() => { setSelectedImageIndex(idx); setImageError(false); }}
-                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl cursor-pointer select-none p-0 overflow-hidden focus:outline-none"
-                      aria-label={`View ${product.name} - ${view.label} (Active)`}
-                      title={view.label}
-                    >
-                      <AnimatedBorder
-                        duration={4}
-                        width={2}
-                        color={isDark ? '#FFFFFF' : '#140E10'}
-                        className="w-full h-full rounded-xl"
-                        contentClassName="w-full h-full rounded-[inherit] overflow-hidden p-0 bg-transparent flex items-center justify-center"
+                    const imageContent = isThumbReal ? (
+                      <img
+                        src={thumbClean}
+                        alt={`${product.name} - ${imgLabel} Thumbnail`}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className={`w-full h-full flex items-center justify-center p-1 ${isDark ? 'bg-[#120E0F]' : 'bg-[#F5F3EE]'}`}>
+                        <img
+                          src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
+                          alt={`${product.name} - ${imgLabel} Thumbnail`}
+                          className={`w-full h-full object-contain ${isDark ? 'opacity-60' : 'opacity-85'}`}
+                        />
+                      </div>
+                    );
+
+                    if (isSelected) {
+                      return (
+                        <button
+                          key={`thumb-${idx}`}
+                          type="button"
+                          onClick={() => { setSelectedImageIndex(idx); setImageError(false); }}
+                          className="w-13 h-13 sm:w-15 sm:h-15 rounded-md cursor-pointer select-none p-0 overflow-hidden focus:outline-none shrink-0"
+                          aria-label={`View ${product.name} - ${imgLabel} (Active)`}
+                          title={imgLabel}
+                        >
+                          <AnimatedBorder
+                            duration={3.5}
+                            width={2}
+                            color={isDark ? '#FFFFFF' : '#FF000E'}
+                            className={`w-full h-full rounded-md ${isDark ? 'bg-[#261619]' : 'bg-[#E0DBD2]'}`}
+                            contentClassName={`w-full h-full rounded-[inherit] overflow-hidden p-0 flex items-center justify-center ${
+                              isDark ? 'bg-[#100B0D]' : 'bg-[#F5F3EE]'
+                            }`}
+                          >
+                            {imageContent}
+                          </AnimatedBorder>
+                        </button>
+                      );
+                    }
+
+                    return (
+                      <button
+                        key={`thumb-${idx}`}
+                        type="button"
+                        onClick={() => { setSelectedImageIndex(idx); setImageError(false); }}
+                        className={`w-13 h-13 sm:w-15 sm:h-15 rounded-md transition-all flex items-center justify-center p-0 overflow-hidden cursor-pointer select-none border opacity-60 hover:opacity-100 shrink-0 ${
+                          isDark
+                            ? 'border-[#261619] bg-[#100B0D]'
+                            : 'border-[#E0DBD2] bg-[#F5F3EE]'
+                        }`}
+                        aria-label={`View ${product.name} - ${imgLabel}`}
+                        title={imgLabel}
                       >
                         {imageContent}
-                      </AnimatedBorder>
-                    </button>
-                  );
-                }
-
-                return (
-                  <button
-                    key={view.id}
-                    type="button"
-                    onClick={() => { setSelectedImageIndex(idx); setImageError(false); }}
-                    className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl transition-all flex items-center justify-center p-0 overflow-hidden cursor-pointer select-none border opacity-60 hover:opacity-100 ${
-                      isDark
-                        ? 'border-[#261619] bg-[#100B0D]'
-                        : 'border-[#E0DBD2] bg-[#F5F3EE]'
-                    }`}
-                    aria-label={`View ${product.name} - ${view.label}`}
-                    title={view.label}
-                  >
-                    {imageContent}
-                  </button>
-                );
-              })}
-            </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </div>
 
           {/* RIGHT: Buy Box */}
           <div className="space-y-4 sm:space-y-5">
-            {/* Title, Share Button & Rating */}
-            <div className="space-y-1.5 sm:space-y-2">
+            {/* Header: Badge, Product Title, Price & Verified Rating */}
+            <div className="space-y-2.5 sm:space-y-3">
               {product.badge && (
                 <div>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded text-[11px] font-bold tracking-wide uppercase bg-[#FF000E] text-white shadow-xs">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-semibold tracking-wider uppercase bg-[#FF000E] text-white shadow-xs">
                     {product.badge}
                   </span>
                 </div>
               )}
-              <div className="flex items-start justify-between gap-2.5 sm:gap-4">
-                <h1 className={`text-lg sm:text-2xl lg:text-3xl font-bold tracking-tight leading-snug sm:leading-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
-                  {product.name}
-                </h1>
-                <button
-                  type="button"
-                  onClick={handleShareProduct}
-                  aria-label={`Share ${product.name}`}
-                  title="Share product link"
-                  className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg border text-[11px] sm:text-xs font-semibold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF000E] ${
-                    shareStatus !== 'idle'
-                      ? isDark
-                        ? 'border-emerald-500/50 bg-emerald-950/50 text-emerald-300'
-                        : 'border-emerald-600/50 bg-emerald-50 text-emerald-700'
-                      : isDark
-                        ? 'border-[#261619] bg-[#130E10] hover:bg-[#1E1417] text-[#F1EEEE]'
-                        : 'border-[#E0DBD2] bg-[#F5F3EE] hover:bg-[#EDE9E1] text-[#140E10]'
-                  }`}
-                >
-                  <i
-                    className={`bi ${shareStatus !== 'idle' ? 'bi-check2' : 'bi-share'} text-xs`}
-                    aria-hidden="true"
-                  />
-                  <span>
-                    {shareStatus === 'copied' ? 'Link Copied' : shareStatus === 'shared' ? 'Shared' : 'Share'}
+
+              {/* Title gets clean full line width */}
+              <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight leading-snug sm:leading-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
+                {product.name}
+              </h1>
+
+              {/* Price Row */}
+              <div className="flex items-baseline gap-2.5 pt-0.5 flex-wrap">
+                <span className={`text-2xl sm:text-3xl font-bold font-tight tracking-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
+                  {formatINR(product.pricePaisa)}
+                </span>
+                {product.compareAtPricePaisa && (
+                  <span className="text-base sm:text-lg text-[#7A7575] line-through font-normal font-tight">
+                    {formatINR(product.compareAtPricePaisa)}
                   </span>
-                </button>
+                )}
+                {product.compareAtPricePaisa && product.compareAtPricePaisa > product.pricePaisa && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-[#FF000E] text-white">
+                    Save {Math.round(((product.compareAtPricePaisa - product.pricePaisa) / product.compareAtPricePaisa) * 100)}%
+                  </span>
+                )}
               </div>
 
-              {/* Dynamic Rating Link */}
-              <div className="flex items-center gap-2 text-xs pt-0.5">
-                {renderStars(ratingSummary.averageRating, 'text-sm')}
-                <span className={`font-bold font-tight ${isDark ? 'text-white' : 'text-[#140E10]'}`}>
-                  {ratingSummary.averageRating.toFixed(1)}
-                </span>
+              {/* Rating & Verified Fitment Badges (Modern anti-slop alignment on mobile & desktop) */}
+              <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap text-xs pt-0.5">
                 <a
                   href="#reviews-section"
-                  className={`underline hover:text-[#FF000E] transition-colors ${
-                    isDark ? 'text-slate-400' : 'text-[#5C5456]'
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border transition-colors cursor-pointer ${
+                    isDark
+                      ? 'border-[#261619] bg-[#120E0F] hover:border-neutral-700 text-neutral-300'
+                      : 'border-[#E0DBD2] bg-[#F5F3EE] hover:border-neutral-400 text-neutral-700'
                   }`}
                 >
-                  ({ratingSummary.totalReviews} {ratingSummary.totalReviews === 1 ? 'review' : 'reviews'})
+                  <span className="text-amber-400 font-bold text-xs flex items-center gap-0.5">
+                    <i className="bi bi-star-fill text-[11px]" aria-hidden="true" />
+                    <span>{ratingSummary.averageRating.toFixed(1)}</span>
+                  </span>
+                  <span className="text-neutral-400 dark:text-neutral-600">/</span>
+                  <span className="underline decoration-neutral-400/40 hover:text-[#FF000E] transition-colors">
+                    {ratingSummary.totalReviews} {ratingSummary.totalReviews === 1 ? 'review' : 'reviews'}
+                  </span>
                 </a>
-                <span className="text-slate-400">•</span>
-                <span className={`text-[11px] font-medium inline-flex items-center gap-1 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>
-                  <i className="bi bi-patch-check-fill" />
-                  Verified Overland Fitment
+
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium border ${
+                  isDark
+                    ? 'bg-emerald-950/40 border-emerald-800/50 text-emerald-400'
+                    : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                }`}>
+                  <i className="bi bi-patch-check-fill text-xs" aria-hidden="true" />
+                  <span>Verified Overland Fitment</span>
                 </span>
               </div>
-            </div>
-
-            {/* Price Row */}
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <span className={`text-2xl sm:text-3xl font-bold font-tight tracking-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
-                {formatINR(product.pricePaisa)}
-              </span>
-              {product.compareAtPricePaisa && (
-                <span className="text-base sm:text-lg text-[#7A7575] line-through font-normal font-tight">
-                  {formatINR(product.compareAtPricePaisa)}
-                </span>
-              )}
-              {product.compareAtPricePaisa && product.compareAtPricePaisa > product.pricePaisa && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#B0000A] text-white tracking-wide">
-                  Sale
-                </span>
-              )}
             </div>
 
             {/* Success message banner */}
@@ -964,7 +980,7 @@ export const ProductDetailPage: React.FC = () => {
           </div>
 
           {/* Rating Summary Breakdown Box */}
-          <div className={`p-5 sm:p-6 rounded-lg sm:rounded-xl border ${
+          <div className={`p-5 sm:p-6 rounded-md sm:rounded-lg border ${
             isDark ? 'bg-[#0E0A0B] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
           }`}>
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
@@ -1020,10 +1036,10 @@ export const ProductDetailPage: React.FC = () => {
               );
               if (customerReviews.length === 0) {
                 return (
-                  <div className={`p-8 rounded-lg sm:rounded-xl border text-center space-y-3 ${
+                  <div className={`p-8 rounded-md sm:rounded-lg border text-center space-y-3 ${
                     isDark ? 'bg-[#0E0A0B] border-[#261619]' : 'bg-white border-[#E0DBD2]'
                   }`}>
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto flex items-center justify-center">
+                    <div className="w-36 h-36 sm:w-44 sm:h-44 mx-auto flex items-center justify-center">
                       <img
                         src="/images/Chill Guy PNG.png"
                         alt="Chill Guy - No Reviews Yet"
@@ -1052,7 +1068,7 @@ export const ProductDetailPage: React.FC = () => {
                   {customerReviews.map((rev) => (
                     <div
                       key={rev.id}
-                      className={`rounded-lg sm:rounded-xl border p-5 space-y-2.5 transition-colors ${
+                      className={`rounded-md sm:rounded-lg border p-5 space-y-2.5 transition-colors ${
                         isDark ? 'bg-[#0E0A0B] border-[#261619]' : 'bg-white border-[#E0DBD2]'
                       }`}
                     >
@@ -1209,15 +1225,23 @@ export const ProductDetailPage: React.FC = () => {
                       </label>
                       <div className="flex items-center justify-center gap-2.5">
                         {[1, 2, 3, 4, 5].map((star) => {
-                          const active = (reviewHoverRating || reviewRating) >= star;
+                          const active = (reviewHoverRating > 0 ? reviewHoverRating : reviewRating) >= star;
                           return (
                             <button
                               key={star}
                               type="button"
-                              onMouseEnter={() => setReviewHoverRating(star)}
-                              onMouseLeave={() => setReviewHoverRating(0)}
-                              onClick={() => setReviewRating(star)}
-                              className="text-3xl transition-transform hover:scale-110 cursor-pointer p-1"
+                              onPointerEnter={(e) => {
+                                if (e.pointerType === 'mouse') setReviewHoverRating(star);
+                              }}
+                              onPointerLeave={(e) => {
+                                if (e.pointerType === 'mouse') setReviewHoverRating(0);
+                              }}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setReviewRating(star);
+                                setReviewHoverRating(0);
+                              }}
+                              className="text-3xl transition-transform hover:scale-110 active:scale-95 cursor-pointer p-1 focus:outline-none"
                               aria-label={`${star} star rating`}
                             >
                               <i

@@ -30,5 +30,18 @@
       <g:mpn>SHR-451610</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
     </item>
+    <item>
+      <g:id>prod-1794671568741</g:id>
+      <g:title>SHRELL Microfiber Cloth - 400 GSM, 40x40cm | Ultra-Absorbent, Scratch-Free Car Cleaning Towel | Plush, Lint-Free, Quick-Dry | For Car, Bike, Home &amp; Glass</g:title>
+      <g:description>SHRELL Microfiber Cloth is a premium 400 GSM, 40x40cm towel designed for a safe, scratch-free clean. Its ultra-plush fibers absorb water, dust, and dirt 7x its weight without leaving lint, streaks, or swirls. Perfect for drying, polishing, interior cleaning, and glass.</g:description>
+      <g:link>https://shrell.vercel.app/product/shrell-microfiber-cloth-400-gsm-40x40cm-ultra-absorbent-scratch-free-car-cleaning-towel-plush-lint-free-quick-dry-for-car-bike-home-glass</g:link>
+      <g:image_link>https://res.cloudinary.com/wvq5qp5z/image/upload/v1794671395/q2xb9gmlyg7adbhzafpe.webp</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>99.00 INR</g:price>
+      <g:brand>SHRELL</g:brand>
+      <g:condition>new</g:condition>
+      <g:mpn>SHR-144231</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
+    </item>
   </channel>
 </rss>

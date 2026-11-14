@@ -41,7 +41,7 @@ export const CategoryRowSkeleton: React.FC = () => {
   const { isDark } = useTheme();
 
   return (
-    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+    <div className="-mx-4 px-4 sm:mx-0 sm:px-0 flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
       {Array.from({ length: 7 }).map((_, idx) => (
         <div
           key={idx}

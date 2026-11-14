@@ -89,7 +89,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* Top-left Product Label Badge */}
         {product.badge && (
           <div className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 z-10 pointer-events-none">
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-bold tracking-wide uppercase bg-[#FF000E] text-white shadow-xs">
+            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-semibold tracking-wide uppercase bg-[#FF000E] text-white shadow-xs">
               {product.badge}
             </span>
           </div>

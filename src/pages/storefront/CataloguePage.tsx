@@ -71,11 +71,21 @@ export const CataloguePage: React.FC = () => {
 
     // 1. Category Filter
     if (selectedCategory) {
-      pool = pool.filter(
-        (p) =>
-          p.categoryId === selectedCategory ||
-          p.categoryName?.toLowerCase() === selectedCategory.toLowerCase()
+      const targetSlug = selectedCategory.toLowerCase().trim();
+      const matchedCat = categories.find(
+        (c) =>
+          c.slug.toLowerCase() === targetSlug ||
+          c.id.toLowerCase() === targetSlug ||
+          c.name.toLowerCase() === targetSlug
       );
+
+      pool = pool.filter((p) => {
+        if (matchedCat && p.categoryId === matchedCat.id) return true;
+        if (p.categoryId && p.categoryId.toLowerCase() === targetSlug) return true;
+        if (matchedCat && p.categoryName && p.categoryName.toLowerCase() === matchedCat.name.toLowerCase()) return true;
+        if (p.categoryName && p.categoryName.toLowerCase() === targetSlug) return true;
+        return false;
+      });
     }
 
     // 2. Fuse.js typo-tolerant search
@@ -170,11 +180,11 @@ export const CataloguePage: React.FC = () => {
         {loading && categories.length === 0 ? (
           <CategoryRowSkeleton />
         ) : (
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+          <div className="-mx-4 px-4 sm:mx-0 sm:px-0 flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
             <button
               type="button"
               onClick={() => handleCategorySelect('')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold whitespace-nowrap border transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold whitespace-nowrap border transition-all cursor-pointer shrink-0 ${
                 !selectedCategory
                   ? 'bg-[#FF000E] text-white border-[#FF000E] shadow-sm'
                   : isDark
@@ -184,22 +194,27 @@ export const CataloguePage: React.FC = () => {
             >
               All Products
             </button>
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => handleCategorySelect(cat.slug)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold whitespace-nowrap border transition-all cursor-pointer ${
-                  selectedCategory === cat.slug
-                    ? 'bg-[#FF000E] text-white border-[#FF000E] shadow-sm'
-                    : isDark
-                    ? 'bg-[#130E10] text-gray-300 border-[#261619] hover:border-gray-600'
-                    : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
-                }`}
-              >
-                {cat.name}
-              </button>
-            ))}
+            {categories.map((cat) => {
+              const isSelected =
+                selectedCategory.toLowerCase() === cat.slug.toLowerCase() ||
+                selectedCategory.toLowerCase() === cat.id.toLowerCase();
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => handleCategorySelect(cat.slug)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold whitespace-nowrap border transition-all cursor-pointer shrink-0 ${
+                    isSelected
+                      ? 'bg-[#FF000E] text-white border-[#FF000E] shadow-sm'
+                      : isDark
+                      ? 'bg-[#130E10] text-gray-300 border-[#261619] hover:border-gray-600'
+                      : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              );
+            })}
           </div>
         )}
 

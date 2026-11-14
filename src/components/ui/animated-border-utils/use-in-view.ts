@@ -11,7 +11,7 @@ export function useInView<T extends HTMLElement = HTMLElement>(
 ): [(node: T | null) => void, boolean] {
   const { root = null, rootMargin = "0px", threshold = 0, once = false } = options;
   const [node, setNode] = useState<T | null>(null);
-  const [inView, setInView] = useState(false);
+  const [inView, setInView] = useState(true);
 
   const observe = useCallback((el: T | null) => {
     setNode(el);

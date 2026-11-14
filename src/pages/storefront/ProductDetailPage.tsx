@@ -10,7 +10,7 @@ import { useTheme } from '../../application/ThemeContext';
 import { ProductCard } from '../../components/ui/ProductCard';
 import { AnimatedBorder } from '../../components/ui/animated-border';
 import { PaymentMethodIcons } from '../../components/common/PaymentMethodIcons';
-import { ShrellLoader } from '../../components/common/ShrellLoader';
+import { SquareGridLoader } from '../../components/common/SquareGridLoader';
 import { ProductDetailSkeleton } from '../../components/common/ShimmerSkeleton';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 import { useNavigationLoading } from '../../application/NavigationLoadingContext';
@@ -703,7 +703,7 @@ export const ProductDetailPage: React.FC = () => {
                 </span>
                 {isAddingToCart && (
                   <div className="absolute">
-                    <ShrellLoader size={18} />
+                    <SquareGridLoader size={20} color={isDark ? '#F1EEEE' : '#140E10'} />
                   </div>
                 )}
               </button>
@@ -731,7 +731,7 @@ export const ProductDetailPage: React.FC = () => {
                   </span>
                   {isBuyingNow && (
                     <div className="absolute">
-                      <ShrellLoader size={18} white />
+                      <SquareGridLoader size={20} color="#FFFFFF" />
                     </div>
                   )}
                 </button>

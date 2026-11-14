@@ -10,6 +10,9 @@ import { useTheme } from '../../application/ThemeContext';
 import { ProductCard } from '../../components/ui/ProductCard';
 import { AnimatedBorder } from '../../components/ui/animated-border';
 import { PaymentMethodIcons } from '../../components/common/PaymentMethodIcons';
+import { HalfArrowIcon } from '../../components/common/HalfArrowIcon';
+import { useSafeBack } from '../../components/common/useSafeBack';
+import { MarkdownRenderer } from '../../components/common/MarkdownRenderer';
 import { SquareGridLoader } from '../../components/common/SquareGridLoader';
 import { ProductDetailSkeleton } from '../../components/common/ShimmerSkeleton';
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
@@ -22,6 +25,7 @@ import { whatsAppService } from '../../features/whatsapp/WhatsAppService';
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const goBack = useSafeBack('/catalogue');
   const { addItem, settings } = useCart();
   const { user } = useAuth();
   const { finishPageLoad } = useNavigationLoading();
@@ -409,6 +413,21 @@ export const ProductDetailPage: React.FC = () => {
         </ol>
       </nav>
 
+      {/* Floating Go Back Half Arrow Pointer on Top Left */}
+      <button
+        type="button"
+        onClick={goBack}
+        aria-label="Go back"
+        title="Go back"
+        className={`fixed top-3.5 left-3.5 sm:top-5 sm:left-6 z-40 w-9 h-9 sm:w-10 sm:h-10 rounded-full border shadow-lg backdrop-blur-md flex items-center justify-center transition-all cursor-pointer active:scale-90 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF000E] ${
+          isDark
+            ? 'bg-black/75 hover:bg-black/95 border-[#261619] text-[#F1EEEE]'
+            : 'bg-white/90 hover:bg-white border-[#E0DBD2] text-[#140E10]'
+        }`}
+      >
+        <HalfArrowIcon className="w-4 h-4 sm:w-5 sm:h-5 text-current -ml-0.5" strokeWidth={2.4} />
+      </button>
+
       <div className="max-w-2xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-36 sm:pb-16 space-y-6 sm:space-y-8">
         {/* Main Product Showcase */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
@@ -794,8 +813,8 @@ export const ProductDetailPage: React.FC = () => {
               <i className={`bi ${openAccordions.description ? 'bi-chevron-up' : 'bi-chevron-down'} text-xs ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}></i>
             </button>
             {openAccordions.description && (
-              <div className={`pb-6 text-xs sm:text-sm leading-relaxed whitespace-pre-line text-left max-w-none ${isDark ? 'text-[#D8D1D1]' : 'text-[#3A3030]'}`}>
-                {product.description || product.shortDescription}
+              <div className={`pb-6 text-xs sm:text-sm leading-relaxed text-left max-w-none ${isDark ? 'text-[#D8D1D1]' : 'text-[#3A3030]'}`}>
+                <MarkdownRenderer content={product.description || product.shortDescription} />
               </div>
             )}
           </div>
@@ -803,7 +822,10 @@ export const ProductDetailPage: React.FC = () => {
           {/* Accordion 2: Technical Specifications */}
           {(() => {
             const techSpecs = (product.specifications || []).filter(
-              (s) => s.group !== 'Shipping & Warranty'
+              (s) =>
+                s.group !== 'Shipping & Warranty' &&
+                s.name.toLowerCase() !== 'badge' &&
+                !s.name.toLowerCase().includes('badge')
             );
             const hasTechSpecs =
               product.showTechnicalSpecs !== false &&
@@ -855,14 +877,14 @@ export const ProductDetailPage: React.FC = () => {
                                 isDark ? 'text-[#8E8587] border-[#261619]' : 'text-[#5C5456] border-[#E0DBD2]'
                               }`}
                             >
-                              {spec.name}
+                              <MarkdownRenderer content={spec.name} inlineOnly />
                             </td>
                             <td
                               className={`px-4 py-2.5 font-medium border-b ${
                                 isDark ? 'text-[#F1EEEE] border-[#261619]' : 'text-[#140E10] border-[#E0DBD2]'
                               }`}
                             >
-                              {spec.value}
+                              <MarkdownRenderer content={spec.value} />
                             </td>
                           </tr>
                         ))}

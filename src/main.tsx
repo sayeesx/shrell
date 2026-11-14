@@ -33,6 +33,20 @@ const queryClient = new QueryClient({
   },
 });
 
+// Prevent mouse wheel from inadvertently changing number input digits
+if (typeof window !== 'undefined') {
+  window.addEventListener(
+    'wheel',
+    () => {
+      const active = document.activeElement;
+      if (active && active.tagName === 'INPUT' && (active as HTMLInputElement).type === 'number') {
+        (active as HTMLInputElement).blur();
+      }
+    },
+    { passive: true }
+  );
+}
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <HelmetProvider>

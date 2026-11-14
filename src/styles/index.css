@@ -260,6 +260,17 @@ html.light {
   .theme-text-muted     { color: var(--text-muted); }
   .theme-text-faint     { color: var(--text-faint); }
 
+  /* Remove mouse scroller digit counter & spin buttons from number inputs */
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
   /* Desktop Infinite Horizontal Marquee Scroll */
   @keyframes marqueeScroll {
     0% {

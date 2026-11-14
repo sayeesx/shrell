@@ -31,6 +31,7 @@ export const AdminProducts: React.FC = () => {
   // Form Fields
   const [name, setName] = useState('');
   const [sku, setSku] = useState('');
+  const [badge, setBadge] = useState('');
   const [priceRupees, setPriceRupees] = useState('');
   const [costPriceRupees, setCostPriceRupees] = useState('');
   const [stockQuantity, setStockQuantity] = useState('10');
@@ -171,6 +172,7 @@ export const AdminProducts: React.FC = () => {
     setShowTechSpecsSection(false);
     setName('');
     setSku(`SHR-${Date.now().toString().slice(-6)}`);
+    setBadge('');
     setPriceRupees('9999');
     setCostPriceRupees('5000');
     setStockQuantity('15');
@@ -199,6 +201,7 @@ export const AdminProducts: React.FC = () => {
     setIsSaving(false);
     setName(p.name);
     setSku(p.sku);
+    setBadge(p.badge || '');
     setPriceRupees(paisaToRupees(p.pricePaisa).toString());
     setCostPriceRupees(p.costPricePaisa ? paisaToRupees(p.costPricePaisa).toString() : '0');
     setStockQuantity(p.stockQuantity.toString());
@@ -310,6 +313,7 @@ export const AdminProducts: React.FC = () => {
           categoryName: selectedCat?.name || 'Automotive',
           brandId: 'brand-shrell',
           brandName: selectedBrand.name,
+          badge: badge.trim() || undefined,
           shortDescription: shortDesc,
           description: desc,
           images,
@@ -326,6 +330,7 @@ export const AdminProducts: React.FC = () => {
           name,
           slug,
           sku,
+          badge: badge.trim() || undefined,
           pricePaisa,
           costPricePaisa: costPaisa,
           stockQuantity: stock,
@@ -433,7 +438,14 @@ export const AdminProducts: React.FC = () => {
             {filtered.map((prod) => (
               <tr key={prod.id} className={isDark ? 'hover:bg-slate-850/50' : 'hover:bg-slate-50'}>
                 <td className="px-4 py-3">
-                  <div className={`font-semibold line-clamp-1 ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{prod.name}</div>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className={`font-semibold line-clamp-1 ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{prod.name}</span>
+                    {prod.badge && (
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#FF000E] text-white uppercase tracking-wider shrink-0">
+                        {prod.badge}
+                      </span>
+                    )}
+                  </div>
                   <div className={`text-[11px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{prod.sku}</div>
                 </td>
                 <td className={`px-4 py-3 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
@@ -540,6 +552,53 @@ export const AdminProducts: React.FC = () => {
                       : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
                   }`}
                 />
+              </div>
+
+              <div>
+                <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  Product Label / Overlay Badge (Optional)
+                </label>
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {['New Launches', 'Selling Fast', 'Best Seller', 'Hot Deal', 'Trending', 'Limited Edition'].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setBadge(badge === preset ? '' : preset)}
+                      className={`px-2.5 py-1 rounded text-[11px] font-medium border transition-colors cursor-pointer ${
+                        badge === preset
+                          ? 'bg-[#FF000E] border-[#FF000E] text-white'
+                          : isDark
+                            ? 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-500'
+                            : 'bg-slate-100 border-slate-300 text-slate-700 hover:border-slate-400'
+                      }`}
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                  {badge && (
+                    <button
+                      type="button"
+                      onClick={() => setBadge('')}
+                      className="px-2 py-1 rounded text-[11px] font-medium text-rose-500 hover:underline cursor-pointer"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <input
+                  type="text"
+                  value={badge}
+                  onChange={(e) => setBadge(e.target.value)}
+                  placeholder="e.g. New Launches, Selling Fast, or type custom label"
+                  className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                    isDark
+                      ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                      : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                  }`}
+                />
+                <p className={`text-[10px] mt-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                  Displays as an overlay badge in front of the product image on cards and catalogue.
+                </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">

@@ -65,6 +65,16 @@ html.lenis body {
   --scrollbar-track:#0A0808;
   --scrollbar-thumb:#261619;
   --scrollbar-hover:#650008;
+
+  /* shadcn UI compatibility tokens */
+  --background:        #000000;
+  --foreground:        #F1EEEE;
+  --muted-foreground:  #8E8587;
+  --border:            #221215;
+  --card:              #0A0808;
+  --card-foreground:   #F1EEEE;
+  --primary:           #FF000E;
+  --primary-foreground:#FFFFFF;
 }
 
 /* Light theme overrides applied via html.light */
@@ -88,6 +98,16 @@ html.light {
   --scrollbar-track:#FFFEFA;
   --scrollbar-thumb:#D6D0C7;
   --scrollbar-hover:#FF000E;
+
+  /* shadcn UI compatibility tokens */
+  --background:        #FFFEFA;
+  --foreground:        #140E10;
+  --muted-foreground:  #5C5456;
+  --border:            #E0DBD2;
+  --card:              #F5F3EE;
+  --card-foreground:   #140E10;
+  --primary:           #FF000E;
+  --primary-foreground:#FFFFFF;
 }
 
 /* Brand crimson-to-black overrides — signature #FF000E */

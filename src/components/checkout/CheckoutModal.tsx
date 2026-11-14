@@ -14,6 +14,7 @@ import { trackPaymentAttempted, trackOrderCompleted } from '../../infrastructure
 import { ThemeSuccessAnimation } from '../common/ThemeFeedbackAnimation';
 import { useTheme } from '../../application/ThemeContext';
 import { ShrellLoader } from '../common/ShrellLoader';
+import Basket from '../ui/hairline-basket';
 
 const INDIAN_STATES = [
   'Andhra Pradesh',
@@ -377,9 +378,9 @@ export const CheckoutModal: React.FC = () => {
             </div>
           ) : cart.items.length === 0 ? (
             /* EMPTY CART */
-            <div className="text-center py-12 space-y-4">
-              <div className={`w-16 h-16 rounded-full border flex items-center justify-center mx-auto ${isDark ? 'bg-[#130E10] border-[#261619] text-[#8E8587]' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#8E8587]'}`}>
-                <i className="bi bi-bag-x text-3xl" />
+            <div className="text-center py-10 space-y-4">
+              <div className="flex items-center justify-center mx-auto">
+                <Basket style={{ width: 140, height: 140 }} label="An empty wire shopping basket" />
               </div>
               <h2 className={`text-xl font-semibold ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>Your Shopping Cart is Empty</h2>
               <p className={`text-xs max-w-xs mx-auto ${isDark ? 'text-[#8E8587]' : 'text-[#5C5456]'}`}>

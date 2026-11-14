@@ -12,6 +12,7 @@
     "test": "node --test tests/**/*.test.js"
   },
   "dependencies": {
+    "@lucasmarkes/hairline": "^0.5.1",
     "@posthog/react": "^1.11.3",
     "@sanity/client": "^8.14.1",
     "@sanity/image-url": "^2.1.1",

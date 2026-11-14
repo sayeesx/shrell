@@ -96,6 +96,7 @@ export interface Product {
   installationDifficulty: 'Plug & Play' | 'Moderate' | 'Professional Recommended';
   warrantyMonths: number;
   showTechnicalSpecs?: boolean;
+  badge?: string;
   specifications: ProductSpecification[];
   images: ProductImage[];
   stockQuantity: number;

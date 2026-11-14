@@ -237,6 +237,11 @@ export class SupabaseProductRepository implements IProductRepository {
 
     try {
       const id = `prod-${Date.now()}`;
+      const baseSpecs = (product.specifications || []).filter((s: any) => s.name !== 'badge');
+      const finalSpecs = product.badge
+        ? [...baseSpecs, { group: 'System', name: 'badge', value: product.badge }]
+        : baseSpecs;
+
       const payload = {
         id,
         name: product.name,
@@ -261,7 +266,7 @@ export class SupabaseProductRepository implements IProductRepository {
         installation_difficulty: product.installationDifficulty,
         warranty_months: product.warrantyMonths,
         images: product.images,
-        specifications: product.specifications,
+        specifications: finalSpecs,
       };
 
       const { data, error } = await supabase
@@ -315,7 +320,13 @@ export class SupabaseProductRepository implements IProductRepository {
       if (updates.installationDifficulty !== undefined) payload.installation_difficulty = updates.installationDifficulty;
       if (updates.warrantyMonths !== undefined) payload.warranty_months = updates.warrantyMonths;
       if (updates.images !== undefined) payload.images = updates.images;
-      if (updates.specifications !== undefined) payload.specifications = updates.specifications;
+      if (updates.specifications !== undefined || updates.badge !== undefined) {
+        const specsSource = updates.specifications !== undefined ? updates.specifications : [];
+        const baseSpecs = specsSource.filter((s: any) => s.name !== 'badge');
+        payload.specifications = updates.badge
+          ? [...baseSpecs, { group: 'System', name: 'badge', value: updates.badge }]
+          : baseSpecs;
+      }
 
       const { data, error } = await supabase
         .from('products')
@@ -354,6 +365,10 @@ export class SupabaseProductRepository implements IProductRepository {
   }
 
   private mapRowToProduct(row: Record<string, any>): Product {
+    const badgeFromSpecs = Array.isArray(row.specifications)
+      ? row.specifications.find((s: any) => s.name === 'badge')?.value
+      : undefined;
+
     return {
       id: row.id,
       name: row.name,
@@ -372,6 +387,7 @@ export class SupabaseProductRepository implements IProductRepository {
       isUniversalFit: Boolean(row.is_universal_fit),
       isActive: Boolean(row.is_active),
       isFeatured: Boolean(row.is_featured),
+      badge: row.badge || badgeFromSpecs || undefined,
       weightGrams: row.weight_grams || 1000,
       dimensionsCm: row.dimensions_cm || '',
       installationDifficulty: row.installation_difficulty || 'Moderate',

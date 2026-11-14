@@ -533,6 +533,13 @@ export const ProductDetailPage: React.FC = () => {
           <div className="space-y-4 sm:space-y-5">
             {/* Title, Share Button & Rating */}
             <div className="space-y-1.5 sm:space-y-2">
+              {product.badge && (
+                <div>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded text-[11px] font-bold tracking-wide uppercase bg-[#FF000E] text-white shadow-xs">
+                    {product.badge}
+                  </span>
+                </div>
+              )}
               <div className="flex items-start justify-between gap-2.5 sm:gap-4">
                 <h1 className={`text-lg sm:text-2xl lg:text-3xl font-bold tracking-tight leading-snug sm:leading-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
                   {product.name}

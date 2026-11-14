@@ -15,6 +15,7 @@ import { getCountryPhoneRule } from '../../utils/phoneRules';
 import { LeaveCheckoutConfirmModal } from '../../components/checkout/LeaveCheckoutConfirmModal';
 import { usePostalPincode } from '../../hooks/usePostalPincode';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
+import Basket from '../../components/ui/hairline-basket';
 import {
   trackCheckoutStarted,
   trackCheckoutStepCompleted,
@@ -179,10 +180,8 @@ export const CheckoutPage: React.FC = () => {
       <div className={`min-h-[80vh] flex flex-col items-center justify-center p-6 text-center space-y-6 pb-20 ${
         isDark ? 'bg-[#0A0808] text-[#F1EEEE]' : 'bg-[#FFFEFA] text-[#140E10]'
       }`}>
-        <div className={`w-20 h-20 rounded-full border flex items-center justify-center mx-auto ${
-          isDark ? 'bg-[#130E10] border-[#261619] text-[#8E8587]' : 'bg-[#F5F3EE] border-[#E0DBD2] text-[#8E8587]'
-        }`}>
-          <i className="bi bi-bag-x text-3xl" />
+        <div className="flex items-center justify-center mx-auto">
+          <Basket style={{ width: 160, height: 160 }} label="An empty wire shopping basket" />
         </div>
         <h2 className="text-xl font-bold">Your Cart is Empty</h2>
         <p className="text-xs text-gray-500 max-w-xs">

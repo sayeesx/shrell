@@ -15,6 +15,7 @@ import { LeaveCheckoutConfirmModal } from '../../components/checkout/LeaveChecko
 import { useBodyScrollLock } from '../../components/common/useBodyScrollLock';
 import { trackCartViewed } from '../../infrastructure/analytics/posthog';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
+import Basket from '../../components/ui/hairline-basket';
 
 export const CartPage: React.FC = () => {
   const { cart, settings, updateQuantity, removeItem, clearCart, applyCoupon, removeCoupon, addItem } = useCart();
@@ -454,10 +455,8 @@ export const CartPage: React.FC = () => {
 
         {/* Empty Cart Body - Centered in remaining viewport space */}
         <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 text-center space-y-5 pb-20">
-          <div className={`w-20 h-20 rounded-full border flex items-center justify-center mx-auto shadow-inner ${
-            isDark ? 'bg-[#130E10] border-[#2D161A] text-[#8E8587]' : 'bg-[#F5F3EE] border-[#D0C9BE] text-[#8E8587]'
-          }`}>
-            <i className="bi bi-bag-x text-3xl" aria-hidden="true" />
+          <div className="flex items-center justify-center mx-auto">
+            <Basket style={{ width: 180, height: 180 }} label="An empty wire shopping basket" />
           </div>
           <div className="space-y-1.5 max-w-sm">
             <h2 className="text-xl font-bold tracking-tight">Your Cart is Empty</h2>

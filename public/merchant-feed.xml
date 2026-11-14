@@ -5,43 +5,30 @@
     <link>https://shrell.vercel.app/</link>
     <description>Premium car accessories, overland gear, and precision components for Indian vehicles</description>
     <item>
-      <g:id>prod-vahn-roof-01</g:id>
-      <g:title>Stealth Wing Aerodynamic Crossbars</g:title>
-      <g:description>Extruded aircraft-grade T6 aluminium crossbars with anti-theft key lock and integrated T-track channel.</g:description>
-      <g:link>https://shrell.vercel.app/product/stealth-wing-aerodynamic-crossbars</g:link>
-      <g:image_link>https://images.unsplash.com/photo-1541443131876-44b03de101c5?auto=format&amp;fit=crop&amp;q=80&amp;w=1200</g:image_link>
-      <g:availability>in_stock</g:availability>
-      <g:price>14999.00 INR</g:price>
+      <g:id>prod-1794667515092</g:id>
+      <g:title>SHRELL Ultra Shampoo - pH Neutral Car Wash Shampoo | Lavender Breeze | Rich Foam, Spotless Finish</g:title>
+      <g:description>Deep Clean for a Brighter Ride. SHRELL Ultra Shampoo delivers rich, thick foam that lifts dirt and grime effortlessly, leaving a spotless, longer-lasting shine with less effort. Its plant-based, pH-neutral formula is tough on oil and grease but gentle on paint, wax, and coatings. Infused with a refreshing Lavender Breeze fragrance and anti-bacterial cleaning power.</g:description>
+      <g:link>https://shrell.vercel.app/product/shrell-ultra-shampoo-ph-neutral-car-wash-shampoo-lavender-breeze-rich-foam-spotless-finish</g:link>
+      <g:image_link>https://res.cloudinary.com/wvq5qp5z/image/upload/v1794667318/vouxfikqbmqcpa16jqow.webp</g:image_link>
+      <g:availability>out_of_stock</g:availability>
+      <g:price>299.00 INR</g:price>
       <g:brand>SHRELL</g:brand>
       <g:condition>new</g:condition>
-      <g:mpn>RR-WING-BLK</g:mpn>
-      <g:gtin>8901234567801</g:gtin>
+      <g:mpn>SHR-097345</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
     </item>
     <item>
-      <g:id>prod-vahn-comp-04</g:id>
-      <g:title>Apex Dual-Cylinder Rapid Tyre Inflator</g:title>
-      <g:description>Heavy-duty direct-drive 12V 85L/min twin-piston air compressor with digital auto-cutoff gauge.</g:description>
-      <g:link>https://shrell.vercel.app/product/apex-dual-cylinder-rapid-tyre-inflator</g:link>
-      <g:image_link>https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&amp;fit=crop&amp;q=80&amp;w=1200</g:image_link>
+      <g:id>prod-1794668685927</g:id>
+      <g:title>SHRELL Ultra Shampoo 500ml + Foam Sprayer Combo - pH Neutral Car Wash Shampoo | Lavender Breeze | Rich Foam, 30-50 Washes</g:title>
+      <g:description>Deep Clean for a Brighter Ride - Now with Foam Sprayer.Get the complete wash kit. SHRELL Ultra Shampoo (500ml) + Heavy-Duty Foam Sprayer. A concentrated, pH-neutral shampoo that easily removes tough dirt without affecting existing wax, sealant, or coating. Creates rich, lubricating foam for a safe, scratch-free wash.</g:description>
+      <g:link>https://shrell.vercel.app/product/shrell-ultra-shampoo-500ml-foam-sprayer-combo-ph-neutral-car-wash-shampoo-lavender-breeze-rich-foam-30-50-washes</g:link>
+      <g:image_link>https://res.cloudinary.com/wvq5qp5z/image/upload/v1794668495/mgbjsyklskyz2ywah81o.webp</g:image_link>
       <g:availability>in_stock</g:availability>
-      <g:price>5899.00 INR</g:price>
+      <g:price>699.00 INR</g:price>
       <g:brand>SHRELL</g:brand>
       <g:condition>new</g:condition>
-      <g:mpn>TC-APEX-12V</g:mpn>
-      <g:gtin>8901234567804</g:gtin>
-    </item>
-    <item>
-      <g:id>prod-vahn-fog-02</g:id>
-      <g:title>Night Sabre Bi-LED Projector Pods</g:title>
-      <g:description>Dual-spectrum 3000K Amber / 6000K Hyper-White auxiliary projector pods with laser diode high-beam assist.</g:description>
-      <g:link>https://shrell.vercel.app/product/night-sabre-bi-led-projector-pods</g:link>
-      <g:image_link>https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&amp;fit=crop&amp;q=80&amp;w=1200</g:image_link>
-      <g:availability>in_stock</g:availability>
-      <g:price>8999.00 INR</g:price>
-      <g:brand>SHRELL</g:brand>
-      <g:condition>new</g:condition>
-      <g:mpn>LT-SABRE-PAIR</g:mpn>
-      <g:gtin>8901234567802</g:gtin>
+      <g:mpn>SHR-451610</g:mpn>
+      <g:identifier_exists>no</g:identifier_exists>
     </item>
   </channel>
 </rss>

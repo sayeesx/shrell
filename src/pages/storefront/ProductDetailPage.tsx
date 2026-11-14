@@ -8,6 +8,7 @@ import { useCart } from '../../application/CartContext';
 import { useAuth } from '../../application/AuthContext';
 import { useTheme } from '../../application/ThemeContext';
 import { ProductCard } from '../../components/ui/ProductCard';
+import { AnimatedBorder } from '../../components/ui/animated-border';
 import { PaymentMethodIcons } from '../../components/common/PaymentMethodIcons';
 import { ShrellLoader } from '../../components/common/ShrellLoader';
 import { ProductDetailSkeleton } from '../../components/common/ShimmerSkeleton';
@@ -58,7 +59,6 @@ export const ProductDetailPage: React.FC = () => {
   // Restock Notification States (for Out-of-Stock items)
   const [isNotifyModalOpen, setIsNotifyModalOpen] = useState(false);
   const [notifyContact, setNotifyContact] = useState('');
-  const [isNotifying, setIsNotifying] = useState(false);
   const [isSubmittingNotify, setIsSubmittingNotify] = useState(false);
   const [notifySuccessMsg, setNotifySuccessMsg] = useState<string | null>(null);
   const [notifyError, setNotifyError] = useState<string | null>(null);
@@ -208,39 +208,14 @@ export const ProductDetailPage: React.FC = () => {
   const handleNotifyWhenAvailable = () => {
     if (!product) return;
 
-    if (user && (user.email || user.phone)) {
-      setIsNotifying(true);
-      const contactVal = (user.email || user.phone || user.name || '').trim();
-      const newLead = {
-        id: `lead-${Date.now()}`,
-        productId: product.id,
-        productName: product.name,
-        sku: product.sku,
-        contact: contactVal,
-        userName: user.name || 'Valued Customer',
-        userId: user.id,
-        createdAt: new Date().toISOString(),
-      };
+    // Never default to or auto-assign admin@shrell.com
+    const isAdminUser = user?.role === 'admin' || user?.email?.toLowerCase() === 'admin@shrell.com';
+    const customerContact = !isAdminUser && user ? (user.phone || user.email || '').trim() : '';
 
-      try {
-        const stored = JSON.parse(localStorage.getItem('shrell_restock_requests') || '[]');
-        localStorage.setItem('shrell_restock_requests', JSON.stringify([newLead, ...stored]));
-      } catch (_) {}
-
-      const waMsg = `Hello SHRELL Operations, please notify me when *${product.name}* (SKU: ${product.sku}) is back in stock. My registered contact is: ${contactVal}`;
-      const waUrl = whatsAppService.generateLink(waMsg);
-      setNotifyWhatsAppLink(waUrl);
-
-      setTimeout(() => {
-        setIsNotifying(false);
-        setNotifySuccessMsg(`Request registered! We will notify you at ${contactVal} when on order.`);
-      }, 400);
-    } else {
-      setNotifyError(null);
-      setNotifySuccessMsg(null);
-      setNotifyContact('');
-      setIsNotifyModalOpen(true);
-    }
+    setNotifyError(null);
+    setNotifySuccessMsg(null);
+    setNotifyContact(customerContact);
+    setIsNotifyModalOpen(true);
   };
 
   const handleSubmitGuestNotification = (e: React.FormEvent) => {
@@ -256,13 +231,15 @@ export const ProductDetailPage: React.FC = () => {
     setIsSubmittingNotify(true);
     setNotifyError(null);
 
+    const isAdminUser = user?.role === 'admin' || user?.email?.toLowerCase() === 'admin@shrell.com';
     const newLead = {
       id: `lead-${Date.now()}`,
       productId: product.id,
       productName: product.name,
       sku: product.sku,
       contact: trimmed,
-      userName: 'Guest Customer',
+      userName: !isAdminUser && user?.name ? user.name : 'Valued Customer',
+      userId: !isAdminUser && user?.id ? user.id : undefined,
       createdAt: new Date().toISOString(),
     };
 
@@ -447,7 +424,7 @@ export const ProductDetailPage: React.FC = () => {
           {/* ========================================================= */}
           <div className="space-y-4">
             {/* Main Product Image - Free-floating without box or border */}
-            <div className="relative aspect-square sm:aspect-[4/3] flex items-center justify-center p-4 sm:p-8 select-none">
+            <div className="relative aspect-square sm:aspect-[4/3] flex items-center justify-center p-1 sm:p-4 select-none">
               {(() => {
                 const rawUrl = product.images?.[selectedImageIndex]?.url || product.images?.[0]?.url;
                 let cleanUrl = rawUrl?.trim() || '';
@@ -461,13 +438,13 @@ export const ProductDetailPage: React.FC = () => {
                     alt={`${product.name} - ${productViews[selectedImageIndex]?.label || 'Primary View'}`}
                     referrerPolicy="no-referrer"
                     fetchPriority="high"
-                    width="600"
-                    height="450"
-                    className="w-full h-full max-h-72 object-contain transition-all duration-300"
+                    width="700"
+                    height="550"
+                    className="w-full h-full min-h-[280px] sm:min-h-[380px] max-h-[420px] sm:max-h-[520px] object-contain transition-all duration-300"
                     onError={() => setImageError(true)}
                   />
                 ) : (
-                  <div className={`w-56 sm:w-72 max-h-60 flex items-center justify-center ${isDark ? 'opacity-60' : 'opacity-85'}`}>
+                  <div className={`w-full max-w-xs sm:max-w-md h-64 sm:h-80 flex items-center justify-center ${isDark ? 'opacity-60' : 'opacity-85'}`}>
                     <img
                       src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
                       alt={`${product.name} - ${productViews[selectedImageIndex]?.label || 'Primary View'}`}
@@ -482,7 +459,7 @@ export const ProductDetailPage: React.FC = () => {
             </div>
 
             {/* 4 Small Selectable Image Cubes */}
-            <div className="flex items-center gap-3 pt-1">
+            <div className="flex items-center gap-2.5 sm:gap-3 pt-1">
               {productViews.map((view, idx) => {
                 const isSelected = selectedImageIndex === idx;
                 const thumbRaw = product.images?.[idx]?.url || product.images?.[0]?.url;
@@ -492,26 +469,60 @@ export const ProductDetailPage: React.FC = () => {
                 }
                 const isThumbReal = Boolean(thumbClean && !thumbClean.includes('shrell-full_white-text_black-logo.png'));
 
+                const imageContent = isThumbReal ? (
+                  <img
+                    src={thumbClean}
+                    alt={`${product.name} - ${view.label} Thumbnail`}
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className={`w-full h-full flex items-center justify-center p-1 ${isDark ? 'bg-[#120E0F]' : 'bg-[#F5F3EE]'}`}>
+                    <img
+                      src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'}
+                      alt={`${product.name} - ${view.label} Thumbnail`}
+                      className={`w-full h-full object-contain ${isDark ? 'opacity-60' : 'opacity-85'}`}
+                    />
+                  </div>
+                );
+
+                if (isSelected) {
+                  return (
+                    <button
+                      key={view.id}
+                      type="button"
+                      onClick={() => { setSelectedImageIndex(idx); setImageError(false); }}
+                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl cursor-pointer select-none p-0 overflow-hidden focus:outline-none"
+                      aria-label={`View ${product.name} - ${view.label} (Active)`}
+                      title={view.label}
+                    >
+                      <AnimatedBorder
+                        duration={4}
+                        width={2}
+                        color={isDark ? '#FFFFFF' : '#140E10'}
+                        className="w-full h-full rounded-xl"
+                        contentClassName="w-full h-full rounded-[inherit] overflow-hidden p-0 bg-transparent flex items-center justify-center"
+                      >
+                        {imageContent}
+                      </AnimatedBorder>
+                    </button>
+                  );
+                }
+
                 return (
                   <button
                     key={view.id}
                     type="button"
                     onClick={() => { setSelectedImageIndex(idx); setImageError(false); }}
-                    className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg transition-all flex items-center justify-center p-1.5 cursor-pointer select-none ${
-                      isSelected
-                        ? 'ring-2 ring-[#FF000E] ' + (isDark ? 'bg-[#160D0F]' : 'bg-[#FFE0E2]')
-                        : isDark
-                          ? 'bg-[#100B0D] hover:bg-[#180E11] opacity-60 hover:opacity-100 border border-[#221215]'
-                          : 'bg-[#F5F3EE] hover:bg-[#EDE9E1] opacity-70 hover:opacity-100 border border-[#E0DBD2]'
+                    className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl transition-all flex items-center justify-center p-0 overflow-hidden cursor-pointer select-none border opacity-60 hover:opacity-100 ${
+                      isDark
+                        ? 'border-[#261619] bg-[#100B0D]'
+                        : 'border-[#E0DBD2] bg-[#F5F3EE]'
                     }`}
                     aria-label={`View ${product.name} - ${view.label}`}
                     title={view.label}
                   >
-                    {isThumbReal ? (
-                      <img src={thumbClean} alt={`${product.name} - ${view.label} Thumbnail`} referrerPolicy="no-referrer" className="w-full h-full object-contain" />
-                    ) : (
-                      <img src={isDark ? '/logos/shrell-logo-white.png' : '/logos/shrell-blacktext-redlogo.png'} alt={`${product.name} - ${view.label} Thumbnail`} className={`w-full h-full object-contain ${isDark ? 'opacity-60' : 'opacity-85'}`} />
-                    )}
+                    {imageContent}
                   </button>
                 );
               })}
@@ -521,9 +532,9 @@ export const ProductDetailPage: React.FC = () => {
           {/* RIGHT: Buy Box */}
           <div className="space-y-4 sm:space-y-5">
             {/* Title, Share Button & Rating */}
-            <div className="space-y-1.5">
-              <div className="flex items-start justify-between gap-3">
-                <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight leading-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
+            <div className="space-y-1.5 sm:space-y-2">
+              <div className="flex items-start justify-between gap-2.5 sm:gap-4">
+                <h1 className={`text-lg sm:text-2xl lg:text-3xl font-bold tracking-tight leading-snug sm:leading-tight ${isDark ? 'text-[#F1EEEE]' : 'text-[#140E10]'}`}>
                   {product.name}
                 </h1>
                 <button
@@ -531,7 +542,7 @@ export const ProductDetailPage: React.FC = () => {
                   onClick={handleShareProduct}
                   aria-label={`Share ${product.name}`}
                   title="Share product link"
-                  className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF000E] ${
+                  className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg border text-[11px] sm:text-xs font-semibold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF000E] ${
                     shareStatus !== 'idle'
                       ? isDark
                         ? 'border-emerald-500/50 bg-emerald-950/50 text-emerald-300'
@@ -592,9 +603,22 @@ export const ProductDetailPage: React.FC = () => {
 
             {/* Success message banner */}
             {addedMessage && (
-              <div className="p-3 rounded-lg bg-emerald-950/70 border border-emerald-800 text-xs text-emerald-300 font-semibold flex items-center justify-between">
+              <div
+                className={`p-3 rounded-lg border text-xs font-semibold flex items-center justify-between gap-3 ${
+                  isDark
+                    ? 'bg-emerald-950/70 border-emerald-800 text-emerald-300'
+                    : 'bg-emerald-50 border-emerald-300 text-emerald-900 shadow-xs'
+                }`}
+              >
                 <span>{addedMessage}</span>
-                <Link to="/cart" className="underline font-bold text-white">View Cart</Link>
+                <Link
+                  to="/cart"
+                  className={`underline font-bold shrink-0 ${
+                    isDark ? 'text-white hover:text-emerald-200' : 'text-emerald-950 hover:text-emerald-700'
+                  }`}
+                >
+                  View Cart
+                </Link>
               </div>
             )}
 
@@ -631,23 +655,24 @@ export const ProductDetailPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Out of Stock Restock Notification Banner (no background or shadow on image) */}
+            {/* Out of Stock Restock Notification Banner (image fills height) */}
             {isOutOfStock && (
               <div
                 role="status"
-                className={`p-3.5 sm:p-4 rounded-xl border flex items-center gap-3.5 ${
+                className={`rounded-xl border flex items-stretch overflow-hidden ${
                   isDark
                     ? 'bg-[#0A0A0A] border-[#261619] text-[#F1EEEE]'
                     : 'bg-[#FAF8F4] border-[#E0DBD2] text-[#140E10]'
                 }`}
               >
-                <img
-                  src="/images/Tired Worker in a Busy Warehouse_converted.avif"
-                  alt="Warehouse team preparing restock"
-                  className="w-20 h-20 sm:w-24 sm:h-24 object-contain shrink-0 bg-transparent border-0 shadow-none"
-                  style={{ boxShadow: 'none', background: 'transparent' }}
-                />
-                <div className="space-y-1 min-w-0">
+                <div className="w-24 sm:w-28 shrink-0 relative self-stretch overflow-hidden bg-neutral-900/10">
+                  <img
+                    src="/images/Tired Worker in a Busy Warehouse_converted.avif"
+                    alt="Warehouse team preparing restock"
+                    className="w-full h-full object-cover absolute inset-0"
+                  />
+                </div>
+                <div className="p-3.5 sm:p-4 space-y-1 min-w-0 flex-1 flex flex-col justify-center">
                   <p className="text-sm font-bold tracking-tight text-[#FF000E]">
                     We&apos;re extremely sorry!
                   </p>
@@ -680,20 +705,12 @@ export const ProductDetailPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleNotifyWhenAvailable}
-                  disabled={isNotifying}
-                  className="relative w-full py-3.5 sm:py-4 rounded-lg font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center overflow-hidden cursor-pointer shadow-md active:scale-98 bg-amber-500 hover:bg-amber-400 text-slate-950 disabled:opacity-50"
+                  className="relative w-full py-3.5 sm:py-4 rounded-lg font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center overflow-hidden cursor-pointer shadow-md active:scale-98 bg-amber-500 hover:bg-amber-400 text-slate-950"
                 >
-                  {isNotifying ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-                      <span>Registering Alert...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <i className="bi bi-bell-fill text-sm" />
-                      <span>Notify When on Order</span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <i className="bi bi-bell-fill text-sm" />
+                    <span>Notify When on Order</span>
+                  </div>
                 </button>
               ) : (
                 <button
@@ -940,7 +957,7 @@ export const ProductDetailPage: React.FC = () => {
           </div>
 
           {/* Rating Summary Breakdown Box */}
-          <div className={`p-5 sm:p-6 rounded-2xl border ${
+          <div className={`p-5 sm:p-6 rounded-lg sm:rounded-xl border ${
             isDark ? 'bg-[#0E0A0B] border-[#261619]' : 'bg-white border-[#E0DBD2] shadow-xs'
           }`}>
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
@@ -996,13 +1013,15 @@ export const ProductDetailPage: React.FC = () => {
               );
               if (customerReviews.length === 0) {
                 return (
-                  <div className={`p-8 rounded-2xl border text-center space-y-3 ${
+                  <div className={`p-8 rounded-lg sm:rounded-xl border text-center space-y-3 ${
                     isDark ? 'bg-[#0E0A0B] border-[#261619]' : 'bg-white border-[#E0DBD2]'
                   }`}>
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto ${
-                      isDark ? 'bg-slate-900 text-slate-400' : 'bg-slate-100 text-slate-500'
-                    }`}>
-                      <i className="bi bi-chat-heart text-xl" />
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto flex items-center justify-center">
+                      <img
+                        src="/images/Chill Guy PNG.png"
+                        alt="Chill Guy - No Reviews Yet"
+                        className="w-full h-full object-contain"
+                      />
                     </div>
                     <h3 className={`text-sm font-bold ${isDark ? 'text-white' : 'text-[#140E10]'}`}>
                       No Customer Reviews Yet
@@ -1026,7 +1045,7 @@ export const ProductDetailPage: React.FC = () => {
                   {customerReviews.map((rev) => (
                     <div
                       key={rev.id}
-                      className={`rounded-2xl border p-5 space-y-2.5 transition-colors ${
+                      className={`rounded-lg sm:rounded-xl border p-5 space-y-2.5 transition-colors ${
                         isDark ? 'bg-[#0E0A0B] border-[#261619]' : 'bg-white border-[#E0DBD2]'
                       }`}
                     >

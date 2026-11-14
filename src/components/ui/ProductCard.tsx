@@ -18,18 +18,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const isInCart = cart.items.some((it) => it.productId === product.id);
 
+  const isOutOfStock = product.stockQuantity <= 0;
+
   // Button state machine: 'idle' | 'adding' | 'added' | 'checkout'
   const [btnState, setBtnState] = useState<'idle' | 'adding' | 'added' | 'checkout'>(() =>
-    isInCart ? 'checkout' : 'idle'
+    !isOutOfStock && isInCart ? 'checkout' : 'idle'
   );
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  // Sync state if cart changes externally
+  // Sync state if cart changes externally or item is out of stock
   useEffect(() => {
-    if (!isInCart && btnState === 'checkout') {
+    if ((!isInCart || isOutOfStock) && btnState === 'checkout') {
       setBtnState('idle');
     }
-  }, [isInCart, btnState]);
+  }, [isInCart, isOutOfStock, btnState]);
 
   const handleButtonClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -65,10 +67,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     setIsWishlisted(!isWishlisted);
   };
 
-  const isOutOfStock = product.stockQuantity <= 0;
   const offersCount = 5 + ((product.id.charCodeAt(0) * 3) % 15);
 
-  const isActionActive = btnState === 'added' || btnState === 'checkout';
+  const isActionActive = !isOutOfStock && (btnState === 'added' || btnState === 'checkout');
 
   return (
     <motion.article
@@ -136,28 +137,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </div>
           </div>
 
-          {/* Quick Add Button with Skew-Sweep "Added to cart" -> Rotate to "Checkout" Animation */}
+          {/* Quick Add Button or No Stock Indicator */}
           <motion.button
             type="button"
-            whileTap={{ scale: 0.94 }}
+            whileTap={isOutOfStock ? undefined : { scale: 0.94 }}
             onClick={handleButtonClick}
             disabled={isOutOfStock || btnState === 'adding'}
-            className={`shrell-cart-btn ${btnState === 'added' ? 'is-added' : ''} ${btnState === 'checkout' ? 'is-checkout' : ''} relative min-h-[32px] sm:min-h-[34px] px-3 py-1 rounded-lg text-xs font-semibold flex items-center justify-center transition-all flex-shrink-0 select-none outline-none focus:outline-none focus:ring-0 disabled:opacity-100 ${
-              btnState === 'checkout'
-                ? 'bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white w-full shadow-sm cursor-pointer'
-                : btnState === 'added'
-                  ? 'bg-[#FF000E] text-white w-full'
-                  : btnState === 'adding'
-                    ? 'bg-[#FF000E] text-white cursor-wait min-w-[70px] sm:min-w-[80px]'
-                    : isOutOfStock
-                      ? isDark
-                        ? 'bg-[#1A1214] text-[#7A7575] cursor-not-allowed border border-[#261619] min-w-[70px] sm:min-w-[80px]'
-                        : 'bg-[#F0EDE6] text-[#9E9898] cursor-not-allowed border border-[#E0DBD2] min-w-[70px] sm:min-w-[80px]'
+            className={`shrell-cart-btn ${!isOutOfStock && btnState === 'added' ? 'is-added' : ''} ${!isOutOfStock && btnState === 'checkout' ? 'is-checkout' : ''} relative min-h-[32px] sm:min-h-[34px] px-3 py-1 rounded-lg text-xs font-semibold flex items-center justify-center transition-all flex-shrink-0 select-none outline-none focus:outline-none focus:ring-0 disabled:opacity-100 ${
+              isOutOfStock
+                ? isDark
+                  ? 'bg-[#1A1214] text-[#8E8587] cursor-not-allowed border border-[#261619] min-w-[75px] sm:min-w-[85px]'
+                  : 'bg-[#F0EDE6] text-[#7A7575] cursor-not-allowed border border-[#E0DBD2] min-w-[75px] sm:min-w-[85px]'
+                : btnState === 'checkout'
+                  ? 'bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white w-full shadow-sm cursor-pointer'
+                  : btnState === 'added'
+                    ? 'bg-[#FF000E] text-white w-full'
+                    : btnState === 'adding'
+                      ? 'bg-[#FF000E] text-white cursor-wait min-w-[70px] sm:min-w-[80px]'
                       : 'bg-[#FF000E] hover:bg-[#E0000C] active:bg-[#CC000B] text-white min-w-[70px] sm:min-w-[80px]'
             }`}
             aria-label={
               isOutOfStock
-                ? `${product.name} is sold out`
+                ? `${product.name} is out of stock`
                 : btnState === 'checkout'
                   ? `Proceed to cart for ${product.name}`
                   : btnState === 'added'
@@ -165,7 +166,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     : `Add ${product.name} to cart`
             }
           >
-            {/* Default state (Add + Shrell icon or loading spinner) */}
+            {/* Default state (Add + Shrell icon, loading spinner, or no stock) */}
             <span className="btn-default-content flex items-center justify-center gap-1.5">
               {btnState === 'adding' ? (
                 <svg
@@ -190,7 +191,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                   />
                 </svg>
               ) : isOutOfStock ? (
-                <span>Out</span>
+                <span className="font-semibold text-[11px] sm:text-xs tracking-tight">no stock</span>
               ) : (
                 <>
                   <svg

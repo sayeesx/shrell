@@ -21,6 +21,10 @@ export const AdminProducts: React.FC = () => {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showTechSpecsSection, setShowTechSpecsSection] = useState(false);
 
   useBodyScrollLock(isModalOpen);
 
@@ -31,17 +35,15 @@ export const AdminProducts: React.FC = () => {
   const [costPriceRupees, setCostPriceRupees] = useState('');
   const [stockQuantity, setStockQuantity] = useState('10');
   const [categoryId, setCategoryId] = useState('');
-  const [brandId, setBrandId] = useState('');
   const [shortDesc, setShortDesc] = useState('');
   const [desc, setDesc] = useState('');
-  const [imageUrls, setImageUrls] = useState<string[]>(['', '', '', '']);
+  const [imageUrls, setImageUrls] = useState<string[]>(['', '', '', '', '', '']);
   const [uploadingSlots, setUploadingSlots] = useState<Record<number, boolean>>({});
   const [uploadErrors, setUploadErrors] = useState<Record<number, string>>({});
   const [slotMeta, setSlotMeta] = useState<
     Record<number, { format: string; sizeBytes: number; width: number; height: number }>
   >({});
   const [pendingCrop, setPendingCrop] = useState<{ slotIndex: number; file: File } | null>(null);
-  const [isUniversal, setIsUniversal] = useState(false);
   const [weightGrams, setWeightGrams] = useState('2000');
   const [dimensions, setDimensions] = useState('50x30x10');
   const [installationDifficulty, setInstallationDifficulty] = useState<Product['installationDifficulty']>('Moderate');
@@ -164,30 +166,27 @@ export const AdminProducts: React.FC = () => {
 
   const openCreateModal = () => {
     setEditingProduct(null);
+    setSaveError(null);
+    setIsSaving(false);
+    setShowTechSpecsSection(false);
     setName('');
     setSku(`SHR-${Date.now().toString().slice(-6)}`);
     setPriceRupees('9999');
     setCostPriceRupees('5000');
     setStockQuantity('15');
-    setCategoryId(categories[0]?.id || '');
-    setBrandId('brand-shrell');
+    setCategoryId(categories[0]?.id || 'cat-car-interior');
     setShortDesc('');
     setDesc('');
-    setImageUrls(['', '', '', '']);
+    setImageUrls(['', '', '', '', '', '']);
     setUploadingSlots({});
     setUploadErrors({});
     setSlotMeta({});
     setPendingCrop(null);
-    setSlotMeta({});
-    setPendingCrop(null);
-    setIsUniversal(true);
-    setWeightGrams('3000');
-    setDimensions('80x25x15');
+    setWeightGrams('0');
+    setDimensions('');
     setInstallationDifficulty('Moderate');
     setWarrantyMonths('24');
-    setSpecRows([
-      { group: 'General', name: 'Mounting Style', value: 'Universal' },
-    ]);
+    setSpecRows([]);
     setShippingCourier('Across India on all orders over ₹300 via BlueDart & Delhivery Express.');
     setShippingDispatch('Dispatched within 24 hours from Pune logistics facility.');
     setShippingReturns('Rapid replacement guarantee for transit or manufacturing issues within 7 days.');
@@ -196,34 +195,41 @@ export const AdminProducts: React.FC = () => {
 
   const openEditModal = (p: Product) => {
     setEditingProduct(p);
+    setSaveError(null);
+    setIsSaving(false);
     setName(p.name);
     setSku(p.sku);
     setPriceRupees(paisaToRupees(p.pricePaisa).toString());
     setCostPriceRupees(p.costPricePaisa ? paisaToRupees(p.costPricePaisa).toString() : '0');
     setStockQuantity(p.stockQuantity.toString());
-    setCategoryId(p.categoryId);
-    setBrandId('brand-shrell');
-    setShortDesc(p.shortDescription);
-    setDesc(p.description);
+    setCategoryId(p.categoryId || categories[0]?.id || 'cat-car-interior');
+    setShortDesc(p.shortDescription || '');
+    setDesc(p.description || '');
     setImageUrls([
       p.images[0]?.url || '',
       p.images[1]?.url || '',
       p.images[2]?.url || '',
       p.images[3]?.url || '',
+      p.images[4]?.url || '',
+      p.images[5]?.url || '',
     ]);
     setUploadingSlots({});
     setUploadErrors({});
     setSlotMeta({});
     setPendingCrop(null);
-    setIsUniversal(p.isUniversalFit);
-    setWeightGrams(p.weightGrams.toString());
-    setDimensions(p.dimensionsCm);
+    setWeightGrams(p.weightGrams ? p.weightGrams.toString() : '0');
+    setDimensions(p.dimensionsCm || '');
     setInstallationDifficulty(p.installationDifficulty || 'Moderate');
     setWarrantyMonths((p.warrantyMonths ?? 12).toString());
 
     const allSpecs = Array.isArray(p.specifications) ? p.specifications : [];
     const techSpecs = allSpecs.filter((s) => s.group !== 'Shipping & Warranty');
     const shipSpecs = allSpecs.filter((s) => s.group === 'Shipping & Warranty');
+
+    setShowTechSpecsSection(
+      p.showTechnicalSpecs !== false &&
+        (techSpecs.length > 0 || Boolean(p.dimensionsCm) || Boolean(p.weightGrams))
+    );
 
     setSpecRows(techSpecs.map((s) => ({ group: s.group || 'General', name: s.name, value: s.value })));
     setShippingCourier(
@@ -243,13 +249,17 @@ export const AdminProducts: React.FC = () => {
 
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSaving(true);
+    setSaveError(null);
+
     const pricePaisa = rupeesToPaisa(Number(priceRupees));
     const costPaisa = rupeesToPaisa(Number(costPriceRupees));
     const stock = Number(stockQuantity);
     const parsedWarranty = Math.max(0, Number(warrantyMonths) || 0);
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
-    const selectedCat = categories.find((c) => c.id === categoryId);
+    const finalCategoryId = categoryId || categories[0]?.id || 'cat-car-interior';
+    const selectedCat = categories.find((c) => c.id === finalCategoryId);
     const selectedBrand = { id: 'brand-shrell', name: 'SHRELL' };
 
     const images = imageUrls
@@ -269,13 +279,15 @@ export const AdminProducts: React.FC = () => {
         };
       });
 
-    const cleanedTechSpecs = specRows
-      .filter((r) => r.name.trim() && r.value.trim())
-      .map((r) => ({
-        group: r.group.trim() || 'General',
-        name: r.name.trim(),
-        value: r.value.trim(),
-      }));
+    const cleanedTechSpecs = showTechSpecsSection
+      ? specRows
+          .filter((r) => r.name.trim() && r.value.trim())
+          .map((r) => ({
+            group: r.group.trim() || 'General',
+            name: r.name.trim(),
+            value: r.value.trim(),
+          }))
+      : [];
 
     const shippingSpecs = [
       { group: 'Shipping & Warranty', name: 'Free Express Courier', value: shippingCourier.trim() },
@@ -294,17 +306,18 @@ export const AdminProducts: React.FC = () => {
           pricePaisa,
           costPricePaisa: costPaisa,
           stockQuantity: stock,
-          categoryId,
-          categoryName: selectedCat?.name,
-          brandId,
-          brandName: selectedBrand?.name,
+          categoryId: finalCategoryId,
+          categoryName: selectedCat?.name || 'Automotive',
+          brandId: 'brand-shrell',
+          brandName: selectedBrand.name,
           shortDescription: shortDesc,
           description: desc,
           images,
-          isUniversalFit: isUniversal,
-          weightGrams: Number(weightGrams) || 1000,
-          dimensionsCm: dimensions,
-          installationDifficulty,
+          isUniversalFit: true,
+          showTechnicalSpecs: showTechSpecsSection,
+          weightGrams: showTechSpecsSection ? Number(weightGrams) || 0 : 0,
+          dimensionsCm: showTechSpecsSection ? dimensions : '',
+          installationDifficulty: showTechSpecsSection ? installationDifficulty : 'Moderate',
           warrantyMonths: parsedWarranty,
           specifications,
         });
@@ -316,35 +329,46 @@ export const AdminProducts: React.FC = () => {
           pricePaisa,
           costPricePaisa: costPaisa,
           stockQuantity: stock,
-          categoryId,
-          categoryName: selectedCat?.name,
-          brandId,
-          brandName: selectedBrand?.name,
+          categoryId: finalCategoryId,
+          categoryName: selectedCat?.name || 'Automotive',
+          brandId: 'brand-shrell',
+          brandName: selectedBrand.name,
           shortDescription: shortDesc,
           description: desc,
           images,
-          isUniversalFit: isUniversal,
+          isUniversalFit: true,
+          showTechnicalSpecs: showTechSpecsSection,
           isActive: true,
           isFeatured: false,
-          weightGrams: Number(weightGrams) || 1000,
-          dimensionsCm: dimensions,
-          installationDifficulty,
+          weightGrams: showTechSpecsSection ? Number(weightGrams) || 0 : 0,
+          dimensionsCm: showTechSpecsSection ? dimensions : '',
+          installationDifficulty: showTechSpecsSection ? installationDifficulty : 'Moderate',
           warrantyMonths: parsedWarranty,
           specifications,
         });
       }
 
       setIsModalOpen(false);
-      loadData();
-    } catch (err) {
+      await loadData();
+    } catch (err: any) {
       console.error('Failed to save product:', err);
+      setSaveError(err?.message || 'Failed to save product. Please check network connection and try again.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handleDeleteProduct = async (id: string, prodName: string) => {
     if (window.confirm(`Are you sure you want to remove "${prodName}" from catalogue?`)) {
-      await productRepository.delete(id);
-      loadData();
+      try {
+        setDeletingId(id);
+        await productRepository.delete(id);
+        await loadData();
+      } catch (err: any) {
+        alert(`Failed to delete product: ${err?.message || 'Database error'}`);
+      } finally {
+        setDeletingId(null);
+      }
     }
   };
 
@@ -446,11 +470,16 @@ export const AdminProducts: React.FC = () => {
                     </button>
                     <button
                       type="button"
+                      disabled={deletingId === prod.id}
                       onClick={() => handleDeleteProduct(prod.id, prod.name)}
-                      className="p-1.5 rounded-lg hover:bg-rose-500/10 text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg hover:bg-rose-500/10 text-slate-400 hover:text-rose-500 disabled:opacity-40 transition-colors cursor-pointer"
                       aria-label={`Delete ${prod.name}`}
                     >
-                      <i className="bi bi-trash text-xs" aria-hidden="true" />
+                      {deletingId === prod.id ? (
+                        <div className="w-3 h-3 border-2 border-rose-500 border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <i className="bi bi-trash text-xs" aria-hidden="true" />
+                      )}
                     </button>
                   </div>
                 </td>
@@ -594,23 +623,29 @@ export const AdminProducts: React.FC = () => {
                 </div>
               </div>
 
-              {/* Product Images: 4 Optional Upload Boxes (Crop + Compress to WebP/JPEG before CDN) */}
+              {/* Product Images: Up to 6 Slots (Crop + Compress to WebP/JPEG before CDN, Slots 5 & 6 Optional) */}
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <label className={`block uppercase font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    Product Images (Crop + WebP Compress, Up to 4 Slots)
+                    Product Images (Crop + WebP Compress, Up to 6 Slots)
                   </label>
                   <span className="text-[10px] text-slate-400 font-mono">
-                    {imageUrls.filter((u) => u.trim()).length} / 4 added
+                    {imageUrls.filter((u) => u.trim()).length} / 6 added
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {[0, 1, 2, 3].map((slotIdx) => {
+                  {[0, 1, 2, 3, 4, 5].map((slotIdx) => {
                     const url = imageUrls[slotIdx] || '';
                     const isUploading = Boolean(uploadingSlots[slotIdx]);
                     const slotError = uploadErrors[slotIdx];
                     const optimizedInfo = slotMeta[slotIdx];
+                    const slotTitle =
+                      slotIdx === 0
+                        ? 'Image 1 (Primary)'
+                        : slotIdx >= 4
+                        ? `Image ${slotIdx + 1} (Optional)`
+                        : `Image ${slotIdx + 1}`;
 
                     return (
                       <div
@@ -621,7 +656,7 @@ export const AdminProducts: React.FC = () => {
                       >
                         <div className="flex items-center justify-between text-[11px]">
                           <span className={`font-semibold uppercase ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                            {slotIdx === 0 ? 'Image 1 (Primary)' : `Image ${slotIdx + 1}`}
+                            {slotTitle}
                           </span>
                           {url && (
                             <button
@@ -649,7 +684,7 @@ export const AdminProducts: React.FC = () => {
                             <div className="flex items-center gap-3 w-full">
                               <div
                                 className={`w-12 h-12 shrink-0 rounded-md border overflow-hidden flex items-center justify-center p-1 ${
-                                  isDark ? 'bg-slate-950 border-slate-700' : 'bg-slate-50 border-slate-200'
+                                   isDark ? 'bg-slate-950 border-slate-700' : 'bg-slate-50 border-slate-200'
                                 }`}
                               >
                                 <img
@@ -703,7 +738,7 @@ export const AdminProducts: React.FC = () => {
                           type="text"
                           value={url}
                           onChange={(e) => handleImageUrlChange(slotIdx, e.target.value)}
-                          placeholder="Or paste image URL (optional)"
+                          placeholder={slotIdx >= 4 ? "Paste image URL (optional)" : "Or paste image URL (optional)"}
                           aria-label={`Image ${slotIdx + 1} URL`}
                           className={`w-full border rounded-md px-2.5 py-1.5 text-[11px] transition-colors focus:outline-none ${
                             isDark
@@ -718,9 +753,12 @@ export const AdminProducts: React.FC = () => {
               </div>
 
               <div>
-                <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Short Description</label>
+                <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  Short Description * <span className="text-[10px] text-rose-500 lowercase font-normal">(compulsory)</span>
+                </label>
                 <input
                   type="text"
+                  required
                   value={shortDesc}
                   onChange={(e) => setShortDesc(e.target.value)}
                   placeholder="Brief 1-sentence product summary"
@@ -733,12 +771,16 @@ export const AdminProducts: React.FC = () => {
               </div>
 
               <div>
-                <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Detailed Technical Markdown</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className={`block uppercase font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                    Detailed Technical Markdown <span className="text-[10px] text-slate-400 lowercase font-normal">(optional)</span>
+                  </label>
+                </div>
                 <textarea
                   rows={4}
                   value={desc}
                   onChange={(e) => setDesc(e.target.value)}
-                  placeholder="Detailed engineering specifications and features..."
+                  placeholder="Detailed engineering specifications and features (optional)..."
                   className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
                     isDark
                       ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
@@ -747,120 +789,144 @@ export const AdminProducts: React.FC = () => {
                 />
               </div>
 
-              {/* Technical Specifications Section */}
+              {/* Technical Specifications Section (Optional - Show / Hide toggle) */}
               <div className={`pt-3 border-t space-y-3 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
                 <div className="flex items-center justify-between">
-                  <h3 className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                    Technical Specifications
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                      Technical Specifications
+                    </h3>
+                    <span className="text-[10px] text-slate-400 font-normal lowercase">(optional)</span>
+                  </div>
                   <button
                     type="button"
-                    onClick={() => setSpecRows((prev) => [...prev, { group: 'General', name: '', value: '' }])}
-                    className="px-2.5 py-1 rounded-md border border-slate-500/40 text-[11px] font-semibold hover:bg-slate-500/10 transition-colors cursor-pointer"
+                    onClick={() => setShowTechSpecsSection((prev) => !prev)}
+                    className={`px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 border ${
+                      showTechSpecsSection
+                        ? 'bg-amber-500/10 border-amber-500/30 text-amber-500 hover:bg-amber-500/20'
+                        : isDark
+                        ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'
+                        : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
+                    }`}
                   >
-                    + Add Spec
+                    <i className={`bi ${showTechSpecsSection ? 'bi-eye-slash' : 'bi-plus-lg'} text-xs`} />
+                    <span>{showTechSpecsSection ? 'Hide Specifications' : 'Show & Add Specifications'}</span>
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                      Net Weight (g)
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={weightGrams}
-                      onChange={(e) => setWeightGrams(e.target.value)}
-                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
-                        isDark
-                          ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
-                          : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                      Dimensions (cm)
-                    </label>
-                    <input
-                      type="text"
-                      value={dimensions}
-                      onChange={(e) => setDimensions(e.target.value)}
-                      placeholder="e.g. 80x25x15"
-                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
-                        isDark
-                          ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
-                          : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                      Installation
-                    </label>
-                    <select
-                      value={installationDifficulty}
-                      onChange={(e) => setInstallationDifficulty(e.target.value as Product['installationDifficulty'])}
-                      className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
-                        isDark
-                          ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
-                          : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
-                      }`}
-                    >
-                      <option value="Plug & Play">Plug &amp; Play</option>
-                      <option value="Moderate">Moderate</option>
-                      <option value="Professional Recommended">Professional Recommended</option>
-                    </select>
-                  </div>
-                </div>
+                {showTechSpecsSection && (
+                  <div className="space-y-3 pt-2">
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => setSpecRows((prev) => [...prev, { group: 'General', name: '', value: '' }])}
+                        className="px-2.5 py-1 rounded-md border border-slate-500/40 text-[11px] font-semibold hover:bg-slate-500/10 transition-colors cursor-pointer"
+                      >
+                        + Add Spec Row
+                      </button>
+                    </div>
 
-                {specRows.length > 0 && (
-                  <div className="space-y-2">
-                    {specRows.map((row, idx) => (
-                      <div key={idx} className="grid grid-cols-12 gap-2 items-center">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                          Net Weight (g)
+                        </label>
                         <input
-                          type="text"
-                          value={row.name}
-                          onChange={(e) =>
-                            setSpecRows((prev) =>
-                              prev.map((item, i) => (i === idx ? { ...item, name: e.target.value } : item))
-                            )
-                          }
-                          placeholder="Spec name (e.g. Material)"
-                          aria-label={`Specification ${idx + 1} name`}
-                          className={`col-span-5 border rounded-lg px-2.5 py-1.5 text-xs focus:outline-none ${
+                          type="number"
+                          min="0"
+                          value={weightGrams}
+                          onChange={(e) => setWeightGrams(e.target.value)}
+                          className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
                             isDark
                               ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
                               : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
                           }`}
                         />
-                        <input
-                          type="text"
-                          value={row.value}
-                          onChange={(e) =>
-                            setSpecRows((prev) =>
-                              prev.map((item, i) => (i === idx ? { ...item, value: e.target.value } : item))
-                            )
-                          }
-                          placeholder="Value (e.g. T6 Aluminium)"
-                          aria-label={`Specification ${idx + 1} value`}
-                          className={`col-span-6 border rounded-lg px-2.5 py-1.5 text-xs focus:outline-none ${
-                            isDark
-                              ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
-                              : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
-                          }`}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setSpecRows((prev) => prev.filter((_, i) => i !== idx))}
-                          aria-label={`Remove specification ${idx + 1}`}
-                          className="col-span-1 p-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10 flex items-center justify-center cursor-pointer"
-                        >
-                          <i className="bi bi-trash text-xs" aria-hidden="true" />
-                        </button>
                       </div>
-                    ))}
+                      <div>
+                        <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                          Dimensions (cm)
+                        </label>
+                        <input
+                          type="text"
+                          value={dimensions}
+                          onChange={(e) => setDimensions(e.target.value)}
+                          placeholder="e.g. 80x25x15"
+                          className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                            isDark
+                              ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                              : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <label className={`block uppercase font-medium mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                          Installation
+                        </label>
+                        <select
+                          value={installationDifficulty}
+                          onChange={(e) => setInstallationDifficulty(e.target.value as Product['installationDifficulty'])}
+                          className={`w-full border rounded-lg px-3 py-2 transition-colors focus:outline-none ${
+                            isDark
+                              ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                              : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                          }`}
+                        >
+                          <option value="Plug & Play">Plug &amp; Play</option>
+                          <option value="Moderate">Moderate</option>
+                          <option value="Professional Recommended">Professional Recommended</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {specRows.length > 0 && (
+                      <div className="space-y-2">
+                        {specRows.map((row, idx) => (
+                          <div key={idx} className="grid grid-cols-12 gap-2 items-center">
+                            <input
+                              type="text"
+                              value={row.name}
+                              onChange={(e) =>
+                                setSpecRows((prev) =>
+                                  prev.map((item, i) => (i === idx ? { ...item, name: e.target.value } : item))
+                                )
+                              }
+                              placeholder="Spec name (e.g. Material)"
+                              aria-label={`Specification ${idx + 1} name`}
+                              className={`col-span-5 border rounded-lg px-2.5 py-1.5 text-xs focus:outline-none ${
+                                isDark
+                                  ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                                  : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                              }`}
+                            />
+                            <input
+                              type="text"
+                              value={row.value}
+                              onChange={(e) =>
+                                setSpecRows((prev) =>
+                                  prev.map((item, i) => (i === idx ? { ...item, value: e.target.value } : item))
+                                )
+                              }
+                              placeholder="Value (e.g. T6 Aluminium)"
+                              aria-label={`Specification ${idx + 1} value`}
+                              className={`col-span-6 border rounded-lg px-2.5 py-1.5 text-xs focus:outline-none ${
+                                isDark
+                                  ? 'bg-slate-950 border-slate-700 text-white focus:border-slate-400'
+                                  : 'bg-white border-slate-300 text-slate-900 focus:border-slate-800'
+                              }`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setSpecRows((prev) => prev.filter((_, i) => i !== idx))}
+                              aria-label={`Remove specification ${idx + 1}`}
+                              className="col-span-1 p-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10 flex items-center justify-center cursor-pointer"
+                            >
+                              <i className="bi bi-trash text-xs" aria-hidden="true" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -936,24 +1002,23 @@ export const AdminProducts: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 pt-2">
-                <input
-                  id="modal-univ-fit"
-                  type="checkbox"
-                  checked={isUniversal}
-                  onChange={(e) => setIsUniversal(e.target.checked)}
-                  className="w-4 h-4 rounded border-slate-700 text-slate-900"
-                />
-                <label htmlFor="modal-univ-fit" className={isDark ? 'text-slate-300' : 'text-slate-700'}>
-                  Universal Fit (Fits all standard vehicles)
-                </label>
-              </div>
+              {/* Error Alert Display */}
+              {saveError && (
+                <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-500 text-xs flex items-start gap-2.5">
+                  <i className="bi bi-exclamation-octagon-fill text-sm shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <div className="font-bold uppercase tracking-wider text-[11px]">Save Failed</div>
+                    <div className="mt-0.5 leading-relaxed">{saveError}</div>
+                  </div>
+                </div>
+              )}
 
               <div className={`pt-4 border-t flex justify-end gap-3 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer ${
+                  disabled={isSaving}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer disabled:opacity-40 ${
                     isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -961,10 +1026,20 @@ export const AdminProducts: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] text-white font-bold uppercase tracking-wider transition-all active:scale-95 cursor-pointer shadow-md flex items-center gap-1.5"
+                  disabled={isSaving}
+                  className="px-6 py-2.5 rounded-lg bg-[#FF000E] hover:bg-[#E0000C] disabled:opacity-50 text-white font-bold uppercase tracking-wider transition-all active:scale-95 cursor-pointer shadow-md flex items-center gap-2 min-w-[140px] justify-center"
                 >
-                  <i className="bi bi-check2 text-base" aria-hidden="true" />
-                  <span>Save Product</span>
+                  {isSaving ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <i className="bi bi-check2 text-base" aria-hidden="true" />
+                      <span>{editingProduct ? 'Update Product' : 'Save Product'}</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>

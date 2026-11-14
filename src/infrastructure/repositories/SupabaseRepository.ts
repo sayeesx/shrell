@@ -167,10 +167,12 @@ export class SupabaseProductRepository implements IProductRepository {
         .eq('slug', slug)
         .maybeSingle();
 
-      if (error) {
+      if (error || !data) {
+        // Fallback: check if the slug passed was actually an id
+        const byId = await this.getById(slug);
+        if (byId) return byId;
         return this.fallback.getBySlug(slug);
       }
-      if (!data) return null;
 
       return this.mapRowToProduct(data);
     } catch {
@@ -268,13 +270,19 @@ export class SupabaseProductRepository implements IProductRepository {
         .select()
         .single();
 
-      if (error || !data) {
-        return this.fallback.create(product);
+      if (error) {
+        console.error('Supabase product insert error:', error);
+        throw new Error(error.message || 'Failed to insert product into database');
+      }
+
+      if (!data) {
+        throw new Error('Database insert succeeded but returned empty product data');
       }
 
       return this.mapRowToProduct(data);
-    } catch {
-      return this.fallback.create(product);
+    } catch (err: any) {
+      console.error('Failed to create product:', err);
+      throw err;
     }
   }
 
@@ -316,13 +324,19 @@ export class SupabaseProductRepository implements IProductRepository {
         .select()
         .single();
 
-      if (error || !data) {
-        return this.fallback.update(id, updates);
+      if (error) {
+        console.error('Supabase product update error:', error);
+        throw new Error(error.message || 'Failed to update product in database');
+      }
+
+      if (!data) {
+        throw new Error('Database update succeeded but returned empty product data');
       }
 
       return this.mapRowToProduct(data);
-    } catch {
-      return this.fallback.update(id, updates);
+    } catch (err: any) {
+      console.error('Failed to update product:', err);
+      throw err;
     }
   }
 

@@ -16,6 +16,7 @@ import { useNavigationLoading } from '../../application/NavigationLoadingContext
 import { trackProductViewed } from '../../infrastructure/analytics/posthog';
 import { SEOHead } from '../../infrastructure/seo/SEOHead';
 import { generateProductSchema, generateBreadcrumbSchema } from '../../infrastructure/seo/schemaGenerators';
+import { whatsAppService } from '../../features/whatsapp/WhatsAppService';
 
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -54,16 +55,28 @@ export const ProductDetailPage: React.FC = () => {
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [reviewSuccessMsg, setReviewSuccessMsg] = useState('');
 
-  useBodyScrollLock(isReviewModalOpen);
+  // Restock Notification States (for Out-of-Stock items)
+  const [isNotifyModalOpen, setIsNotifyModalOpen] = useState(false);
+  const [notifyContact, setNotifyContact] = useState('');
+  const [isNotifying, setIsNotifying] = useState(false);
+  const [isSubmittingNotify, setIsSubmittingNotify] = useState(false);
+  const [notifySuccessMsg, setNotifySuccessMsg] = useState<string | null>(null);
+  const [notifyError, setNotifyError] = useState<string | null>(null);
+  const [notifyWhatsAppLink, setNotifyWhatsAppLink] = useState<string | null>(null);
+
+  useBodyScrollLock(isReviewModalOpen || isNotifyModalOpen);
 
   useEffect(() => {
-    if (!isReviewModalOpen) return;
+    if (!isReviewModalOpen && !isNotifyModalOpen) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsReviewModalOpen(false);
+      if (e.key === 'Escape') {
+        setIsReviewModalOpen(false);
+        setIsNotifyModalOpen(false);
+      }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isReviewModalOpen]);
+  }, [isReviewModalOpen, isNotifyModalOpen]);
 
   const productViews = [
     { id: 1, label: 'Primary Angle' },
@@ -95,7 +108,10 @@ export const ProductDetailPage: React.FC = () => {
       if (!slug) return;
       setLoading(true);
       try {
-        const p = await productRepository.getBySlug(slug);
+        let p = await productRepository.getBySlug(slug);
+        if (!p) {
+          p = await productRepository.getById(slug);
+        }
         if (p) {
           setProduct(p);
           setQuantity(1);
@@ -186,6 +202,82 @@ export const ProductDetailPage: React.FC = () => {
       const res = addItem(product, quantity);
       setIsBuyingNow(false);
       if (res.success) navigate('/cart');
+    }, 400);
+  };
+
+  const handleNotifyWhenAvailable = () => {
+    if (!product) return;
+
+    if (user && (user.email || user.phone)) {
+      setIsNotifying(true);
+      const contactVal = (user.email || user.phone || user.name || '').trim();
+      const newLead = {
+        id: `lead-${Date.now()}`,
+        productId: product.id,
+        productName: product.name,
+        sku: product.sku,
+        contact: contactVal,
+        userName: user.name || 'Valued Customer',
+        userId: user.id,
+        createdAt: new Date().toISOString(),
+      };
+
+      try {
+        const stored = JSON.parse(localStorage.getItem('shrell_restock_requests') || '[]');
+        localStorage.setItem('shrell_restock_requests', JSON.stringify([newLead, ...stored]));
+      } catch (_) {}
+
+      const waMsg = `Hello SHRELL Operations, please notify me when *${product.name}* (SKU: ${product.sku}) is back in stock. My registered contact is: ${contactVal}`;
+      const waUrl = whatsAppService.generateLink(waMsg);
+      setNotifyWhatsAppLink(waUrl);
+
+      setTimeout(() => {
+        setIsNotifying(false);
+        setNotifySuccessMsg(`Request registered! We will notify you at ${contactVal} when on order.`);
+      }, 400);
+    } else {
+      setNotifyError(null);
+      setNotifySuccessMsg(null);
+      setNotifyContact('');
+      setIsNotifyModalOpen(true);
+    }
+  };
+
+  const handleSubmitGuestNotification = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!product) return;
+
+    const trimmed = notifyContact.trim();
+    if (!trimmed || trimmed.length < 5) {
+      setNotifyError('Please enter a valid phone number or email address.');
+      return;
+    }
+
+    setIsSubmittingNotify(true);
+    setNotifyError(null);
+
+    const newLead = {
+      id: `lead-${Date.now()}`,
+      productId: product.id,
+      productName: product.name,
+      sku: product.sku,
+      contact: trimmed,
+      userName: 'Guest Customer',
+      createdAt: new Date().toISOString(),
+    };
+
+    try {
+      const stored = JSON.parse(localStorage.getItem('shrell_restock_requests') || '[]');
+      localStorage.setItem('shrell_restock_requests', JSON.stringify([newLead, ...stored]));
+    } catch (_) {}
+
+    const waMsg = `Hello SHRELL Operations, please notify me when *${product.name}* (SKU: ${product.sku}) is back in stock. My contact is: ${trimmed}`;
+    const waUrl = whatsAppService.generateLink(waMsg);
+    setNotifyWhatsAppLink(waUrl);
+
+    setTimeout(() => {
+      setIsSubmittingNotify(false);
+      setNotifySuccessMsg(`Request registered! We will notify you at ${trimmed} when on order.`);
     }, 400);
   };
 
@@ -584,27 +676,62 @@ export const ProductDetailPage: React.FC = () => {
                 )}
               </button>
 
-              <button
-                type="button"
-                onClick={handleBuyNow}
-                disabled={isOutOfStock || isBuyingNow}
-                className={`relative w-full py-3.5 sm:py-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center overflow-hidden ${
-                  isOutOfStock
-                    ? isDark
-                      ? 'bg-neutral-800 text-neutral-500 border border-neutral-700 cursor-not-allowed'
-                      : 'bg-neutral-200 text-neutral-500 border border-neutral-300 cursor-not-allowed'
-                    : 'bg-[#FF000E] hover:bg-[#E0000C] disabled:opacity-40 text-white cursor-pointer'
-                }`}
-              >
-                <span className={`transition-all duration-300 ${isBuyingNow ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}>
-                  Buy it now
-                </span>
-                {isBuyingNow && (
-                  <div className="absolute">
-                    <ShrellLoader size={18} white />
+              {isOutOfStock ? (
+                <button
+                  type="button"
+                  onClick={handleNotifyWhenAvailable}
+                  disabled={isNotifying}
+                  className="relative w-full py-3.5 sm:py-4 rounded-lg font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center overflow-hidden cursor-pointer shadow-md active:scale-98 bg-amber-500 hover:bg-amber-400 text-slate-950 disabled:opacity-50"
+                >
+                  {isNotifying ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                      <span>Registering Alert...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <i className="bi bi-bell-fill text-sm" />
+                      <span>Notify When on Order</span>
+                    </div>
+                  )}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleBuyNow}
+                  disabled={isBuyingNow}
+                  className="relative w-full py-3.5 sm:py-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center overflow-hidden bg-[#FF000E] hover:bg-[#E0000C] disabled:opacity-40 text-white cursor-pointer"
+                >
+                  <span className={`transition-all duration-300 ${isBuyingNow ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}>
+                    Buy it now
+                  </span>
+                  {isBuyingNow && (
+                    <div className="absolute">
+                      <ShrellLoader size={18} white />
+                    </div>
+                  )}
+                </button>
+              )}
+
+              {notifySuccessMsg && (
+                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs flex flex-col gap-2">
+                  <div className="flex items-start gap-2">
+                    <i className="bi bi-check-circle-fill text-sm shrink-0 mt-0.5" />
+                    <span className="font-medium leading-relaxed">{notifySuccessMsg}</span>
                   </div>
-                )}
-              </button>
+                  {notifyWhatsAppLink && (
+                    <a
+                      href={notifyWhatsAppLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] transition-colors"
+                    >
+                      <i className="bi bi-whatsapp text-xs" />
+                      <span>Ping Admin on WhatsApp</span>
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Secure Checkout badges */}
@@ -639,7 +766,8 @@ export const ProductDetailPage: React.FC = () => {
               (s) => s.group !== 'Shipping & Warranty'
             );
             const hasTechSpecs =
-              techSpecs.length > 0 || Boolean(product.dimensionsCm) || Boolean(product.weightGrams);
+              product.showTechnicalSpecs !== false &&
+              (techSpecs.length > 0 || Boolean(product.dimensionsCm) || Boolean(product.weightGrams));
 
             if (!hasTechSpecs) return null;
 
@@ -1229,6 +1357,156 @@ export const ProductDetailPage: React.FC = () => {
                       </div>
                     </div>
                   )}
+                </form>
+              )}
+            </div>
+          </div>,
+          document.body
+        )}
+
+        {/* Restock Notification Modal for Guests */}
+        {isNotifyModalOpen && createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-y-auto"
+            style={{ position: 'fixed', inset: 0, zIndex: 99999 }}
+          >
+            <div
+              className="fixed inset-0 modal-backdrop-solid"
+              onClick={() => setIsNotifyModalOpen(false)}
+              aria-hidden="true"
+            />
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className={`relative z-10 w-full max-w-md border rounded-2xl shadow-2xl overflow-hidden my-auto p-6 space-y-4 ${
+                isDark ? 'bg-[#0A0A0A] border-[#261619] text-[#F1EEEE]' : 'bg-white border-[#E0DBD2] text-[#140E10]'
+              }`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-1">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20 uppercase tracking-wider font-mono">
+                    <i className="bi bi-bell-fill text-[9px]" /> Back in Stock Alert
+                  </span>
+                  <h3 className="text-base font-bold tracking-tight">Notify When on Order</h3>
+                  <p className={`text-xs ${isDark ? 'text-neutral-400' : 'text-[#605859]'}`}>
+                    Enter your phone number or email to receive an instant alert when this equipment is available.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsNotifyModalOpen(false)}
+                  className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                    isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-black'
+                  }`}
+                  aria-label="Close modal"
+                >
+                  <i className="bi bi-x-lg" />
+                </button>
+              </div>
+
+              {/* Product preview card */}
+              <div className={`p-3 rounded-xl border flex items-center gap-3 ${
+                isDark ? 'bg-[#120E0F] border-[#261619]' : 'bg-[#FAF8F4] border-[#E0DBD2]'
+              }`}>
+                <div className="w-12 h-12 rounded-lg bg-neutral-900/10 overflow-hidden flex items-center justify-center p-1 shrink-0">
+                  <img
+                    src={product?.images?.[0]?.url || '/logos/shrell-brandicon_no-bg.png'}
+                    alt={product?.name}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-xs font-bold truncate">{product?.name}</h4>
+                  <p className="text-[11px] font-mono opacity-60">SKU: {product?.sku}</p>
+                </div>
+              </div>
+
+              {notifySuccessMsg ? (
+                <div className="space-y-3 pt-2 text-center">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 flex items-center justify-center mx-auto text-xl">
+                    <i className="bi bi-check-lg font-bold" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-bold text-emerald-500">Alert Confirmed!</h4>
+                    <p className={`text-xs ${isDark ? 'text-neutral-300' : 'text-[#5C5456]'}`}>
+                      {notifySuccessMsg}
+                    </p>
+                  </div>
+                  {notifyWhatsAppLink && (
+                    <a
+                      href={notifyWhatsAppLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                    >
+                      <i className="bi bi-whatsapp text-sm" />
+                      <span>Send Notice to Admin via WhatsApp</span>
+                    </a>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setIsNotifyModalOpen(false)}
+                    className={`w-full py-2 rounded-xl text-xs font-semibold border transition-colors cursor-pointer ${
+                      isDark ? 'border-[#261619] hover:bg-neutral-900' : 'border-[#E0DBD2] hover:bg-neutral-100'
+                    }`}
+                  >
+                    Done
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmitGuestNotification} className="space-y-3 pt-1">
+                  <div>
+                    <label className={`block text-xs font-semibold uppercase tracking-wider mb-1 ${
+                      isDark ? 'text-neutral-300' : 'text-neutral-700'
+                    }`}>
+                      Phone Number or Email *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={notifyContact}
+                      onChange={(e) => setNotifyContact(e.target.value)}
+                      placeholder="e.g. +91 98765 43210 or yourname@gmail.com"
+                      className={`w-full px-3 py-2.5 rounded-xl border text-xs transition-colors focus:outline-none ${
+                        isDark
+                          ? 'bg-[#120E0F] border-[#261619] text-white focus:border-amber-500'
+                          : 'bg-white border-[#E0DBD2] text-black focus:border-amber-500'
+                      }`}
+                    />
+                    {notifyError && (
+                      <p className="text-[11px] text-rose-500 mt-1">{notifyError}</p>
+                    )}
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsNotifyModalOpen(false)}
+                      className={`flex-1 py-2.5 rounded-xl border text-xs font-semibold transition-colors cursor-pointer ${
+                        isDark ? 'border-[#261619] text-neutral-300 hover:bg-neutral-900' : 'border-[#E0DBD2] text-neutral-700 hover:bg-neutral-100'
+                      }`}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmittingNotify}
+                      className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-slate-950 font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+                    >
+                      {isSubmittingNotify ? (
+                        <>
+                          <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                          <span>Saving...</span>
+                        </>
+                      ) : (
+                        <>
+                          <i className="bi bi-bell-fill text-xs" />
+                          <span>Register Alert</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </form>
               )}
             </div>

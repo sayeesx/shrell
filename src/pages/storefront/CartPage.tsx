@@ -522,6 +522,7 @@ export const CartPage: React.FC = () => {
               !cleanImg.includes('shrell-brandicon')
             );
             const isImageAvailable = hasRealImg && !failedImages[item.productId];
+            const productHref = `/product/${item.product.slug || item.product.id || item.productId}`;
 
             return (
               <div
@@ -531,9 +532,13 @@ export const CartPage: React.FC = () => {
                 }`}
               >
                 {/* Product image (clean compact square frame) */}
-                <div className={`w-16 h-16 shrink-0 aspect-square rounded-lg flex items-center justify-center p-1.5 overflow-hidden border ${
-                  isDark ? 'bg-[#181113] border-[#2D161A]' : 'bg-[#F5F3EE] border-[#D0C9BE]'
-                }`}>
+                <Link
+                  to={productHref}
+                  aria-label={`View ${item.product.name}`}
+                  className={`w-16 h-16 shrink-0 aspect-square rounded-lg flex items-center justify-center p-1.5 overflow-hidden border transition-opacity hover:opacity-85 ${
+                    isDark ? 'bg-[#181113] border-[#2D161A]' : 'bg-[#F5F3EE] border-[#D0C9BE]'
+                  }`}
+                >
                   {isImageAvailable ? (
                     <img
                       src={cleanImg}
@@ -551,14 +556,14 @@ export const CartPage: React.FC = () => {
                       />
                     </div>
                   )}
-                </div>
+                </Link>
 
                 {/* Details */}
                 <div className="flex-1 min-w-0 pr-0.5">
                   {/* Title & Top-Right Delete Button */}
                   <div className="flex items-start justify-between gap-1">
                     <Link
-                      to={`/product/${item.product.slug}`}
+                      to={productHref}
                       className="font-bold text-xs leading-snug line-clamp-1 block hover:text-[#FF000E] transition-colors flex-1 min-w-0"
                     >
                       {item.product.name}
@@ -936,6 +941,7 @@ export const CartPage: React.FC = () => {
                 !cleanImg.includes('shrell-brandicon')
               );
               const isImageAvailable = hasRealImg && !failedImages[`desk-${item.productId}`];
+              const productHref = `/product/${item.product.slug || item.product.id || item.productId}`;
 
               return (
                 <div
@@ -945,9 +951,13 @@ export const CartPage: React.FC = () => {
                   }`}
                 >
                   {/* Product Image Frame */}
-                  <div className={`w-20 h-20 shrink-0 rounded-lg flex items-center justify-center p-2 overflow-hidden border ${
-                    isDark ? 'bg-[#181113] border-[#261619]' : 'bg-[#F5F3EE] border-[#E0DBD2]'
-                  }`}>
+                  <Link
+                    to={productHref}
+                    aria-label={`View ${item.product.name}`}
+                    className={`w-20 h-20 shrink-0 rounded-lg flex items-center justify-center p-2 overflow-hidden border transition-opacity hover:opacity-85 ${
+                      isDark ? 'bg-[#181113] border-[#261619]' : 'bg-[#F5F3EE] border-[#E0DBD2]'
+                    }`}
+                  >
                     {isImageAvailable ? (
                       <img
                         src={cleanImg}
@@ -965,14 +975,14 @@ export const CartPage: React.FC = () => {
                         />
                       </div>
                     )}
-                  </div>
+                  </Link>
 
                   {/* Details */}
                   <div className="flex-1 min-w-0 space-y-1.5">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <Link
-                          to={`/product/${item.product.slug}`}
+                          to={productHref}
                           className="font-bold text-sm leading-snug line-clamp-1 hover:text-[#FF000E] transition-colors"
                         >
                           {item.product.name}

@@ -5,19 +5,6 @@
     <link>https://shrell.vercel.app/</link>
     <description>Premium car accessories, overland gear, and precision components for Indian vehicles</description>
     <item>
-      <g:id>prod-vahn-mats-03</g:id>
-      <g:title>TerraShield 7D All-Weather Floor Liner System</g:title>
-      <g:description>Laser 3D digitised deep-dish floor liners with detachable dual-layer monsoon curly coil grass mats.</g:description>
-      <g:link>https://shrell.vercel.app/product/terrashield-7d-all-weather-floor-liners</g:link>
-      <g:image_link>https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&amp;fit=crop&amp;q=80&amp;w=1200</g:image_link>
-      <g:availability>in_stock</g:availability>
-      <g:price>6499.00 INR</g:price>
-      <g:brand>Automotive Equipment</g:brand>
-      <g:condition>new</g:condition>
-      <g:mpn>FL-TERRA-7D</g:mpn>
-      <g:gtin>8901234567803</g:gtin>
-    </item>
-    <item>
       <g:id>prod-vahn-roof-01</g:id>
       <g:title>Stealth Wing Aerodynamic Crossbars</g:title>
       <g:description>Extruded aircraft-grade T6 aluminium crossbars with anti-theft key lock and integrated T-track channel.</g:description>
@@ -25,7 +12,7 @@
       <g:image_link>https://images.unsplash.com/photo-1541443131876-44b03de101c5?auto=format&amp;fit=crop&amp;q=80&amp;w=1200</g:image_link>
       <g:availability>in_stock</g:availability>
       <g:price>14999.00 INR</g:price>
-      <g:brand>Cargo Solutions</g:brand>
+      <g:brand>SHRELL</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>RR-WING-BLK</g:mpn>
       <g:gtin>8901234567801</g:gtin>
@@ -38,7 +25,7 @@
       <g:image_link>https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&amp;fit=crop&amp;q=80&amp;w=1200</g:image_link>
       <g:availability>in_stock</g:availability>
       <g:price>5899.00 INR</g:price>
-      <g:brand>Air &amp; Compressor Systems</g:brand>
+      <g:brand>SHRELL</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>TC-APEX-12V</g:mpn>
       <g:gtin>8901234567804</g:gtin>
@@ -51,7 +38,7 @@
       <g:image_link>https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&amp;fit=crop&amp;q=80&amp;w=1200</g:image_link>
       <g:availability>in_stock</g:availability>
       <g:price>8999.00 INR</g:price>
-      <g:brand>Illumination Systems</g:brand>
+      <g:brand>SHRELL</g:brand>
       <g:condition>new</g:condition>
       <g:mpn>LT-SABRE-PAIR</g:mpn>
       <g:gtin>8901234567802</g:gtin>

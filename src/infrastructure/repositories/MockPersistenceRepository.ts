@@ -177,7 +177,7 @@ export class MockProductRepository implements IProductRepository {
 
   async getBySlug(slug: string): Promise<Product | null> {
     this.products = loadFromStorage(STORAGE_KEYS.PRODUCTS, INITIAL_PRODUCTS);
-    const p = this.products.find((prod) => prod.slug === slug);
+    const p = this.products.find((prod) => prod.slug === slug || prod.id === slug);
     return p ? { ...p } : null;
   }
 

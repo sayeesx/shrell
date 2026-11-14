@@ -95,6 +95,7 @@ export interface Product {
   dimensionsCm: string; // e.g. "120x45x15"
   installationDifficulty: 'Plug & Play' | 'Moderate' | 'Professional Recommended';
   warrantyMonths: number;
+  showTechnicalSpecs?: boolean;
   specifications: ProductSpecification[];
   images: ProductImage[];
   stockQuantity: number;

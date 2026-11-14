@@ -13,6 +13,8 @@ export const AdminInventory: React.FC = () => {
 
   // Adjustment Modal
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isAdjusting, setIsAdjusting] = useState(false);
+  const [adjustError, setAdjustError] = useState<string | null>(null);
 
   useBodyScrollLock(!!selectedProduct);
   const [adjustmentQuantity, setAdjustmentQuantity] = useState('5');
@@ -41,9 +43,16 @@ export const AdminInventory: React.FC = () => {
     if (!selectedProduct) return;
 
     const qty = Number(adjustmentQuantity);
+    if (isNaN(qty) || qty <= 0) {
+      setAdjustError('Please specify a valid quantity greater than zero');
+      return;
+    }
+
     const multiplier = adjustmentType === 'RESTOCK' ? 1 : -1;
     const finalChange = qty * multiplier;
 
+    setIsAdjusting(true);
+    setAdjustError(null);
     try {
       await inventoryRepository.adjustStock(
         selectedProduct.id,
@@ -53,9 +62,12 @@ export const AdminInventory: React.FC = () => {
         `ADJ-${Date.now()}`
       );
       setSelectedProduct(null);
-      loadData();
-    } catch (err) {
+      await loadData();
+    } catch (err: any) {
       console.error('Failed to adjust stock:', err);
+      setAdjustError(err?.message || 'Failed to adjust stock. Please try again.');
+    } finally {
+      setIsAdjusting(false);
     }
   };
 
@@ -270,19 +282,37 @@ export const AdminInventory: React.FC = () => {
                 />
               </div>
 
+              {adjustError && (
+                <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs">
+                  {adjustError}
+                </div>
+              )}
+
               <div className={`pt-2 flex justify-end gap-3 border-t ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
                 <button
                   type="button"
-                  onClick={() => setSelectedProduct(null)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'}`}
+                  disabled={isAdjusting}
+                  onClick={() => {
+                    setSelectedProduct(null);
+                    setAdjustError(null);
+                  }}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer disabled:opacity-50 ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'}`}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-sm"
+                  disabled={isAdjusting}
+                  className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-sm disabled:opacity-50 flex items-center gap-2"
                 >
-                  Confirm Adjustment
+                  {isAdjusting ? (
+                    <>
+                      <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin inline-block" />
+                      <span>Adjusting...</span>
+                    </>
+                  ) : (
+                    <span>Confirm Adjustment</span>
+                  )}
                 </button>
               </div>
             </form>

@@ -1,0 +1,49 @@
+# SHRELL Automotive
+
+> Precision-engineered automotive gear, recovery apparatus, and expedition accessories built for extreme terrain and overland performance across the Indian subcontinent.
+
+## Overview
+SHRELL is an Indian direct-to-consumer automotive engineering and premium aftermarket equipment manufacturer. We design, test, and ship high-grade vehicle hardware including kinetic snatch ropes, dual-cylinder 12V air compressors, aerodynamic roof bars, auxiliary lighting systems, and specialized detailing care products.
+
+- **Website**: https://shrell.vercel.app
+- **Store Catalogue**: https://shrell.vercel.app/catalogue
+- **Sitemap**: https://shrell.vercel.app/sitemap.xml
+- **Product Merchant Feed**: https://shrell.vercel.app/merchant-feed.xml
+- **Headquarters & Dispatch**: Pune & Bengaluru, India
+- **Shipping**: Pan-India door-to-door courier dispatch with real-time AWB shipment tracking (Delhivery, BlueDart, DTDC).
+- **Warranty**: 1-Year comprehensive replacement warranty on all mechanical, electrical, and electronic products.
+
+## Primary Product Categories
+
+### 1. Recovery & Overlanding Gear
+- **Tactical Kinetic Recovery Snatch Ropes**: 9-meter, 30% dynamic stretch braided double-layer nylon ropes engineered for smooth, shock-free kinetic extractions from mud, sand, and slush without chassis jolting.
+- **Heavy-Duty Soft Shackles**: High-molecular-weight polyethylene (UHMWPE) synthetic winch shackles rated up to 14,000 kg breaking strength, eliminating metal missile hazards.
+
+### 2. High-Output Air Systems
+- **Apex Dual-Cylinder Rapid Tyre Inflator**: Dual 30mm cylinder all-metal motor delivering 85 L/min airflow at up to 150 PSI. Direct battery clamp powered with integrated pressure gauge and automatic thermal overload protection. Ideal for rapid deflation/re-inflation cycles on 4x4 SUVs and off-road vehicles.
+
+### 3. Exterior & Cargo Management
+- **Stealth Wing Aerodynamic Crossbars**: Extruded aircraft-grade T6 aluminum roof crossbars designed with aerodynamic tear-drop profiles to eliminate wind buffeting and cabin noise. Built-in anti-theft key lock barrels.
+
+### 4. Auxiliary & Trail Lighting
+- **Night Sabre Bi-LED Projector Pods**: High-lux IP68 sealed spot/flood combination driving pods featuring Osram automotive chips, cast aluminum heatsinks, and impact-resistant polycarbonate lenses for night trail visibility.
+
+### 5. Professional Detailing & Vehicle Care
+- **Ultra-Plush Korean-Weave Microfiber Towels**: 600+ GSM edgeless microfiber cloths engineered for ceramic coating buffing, waterless wash drying, and scratch-free paint restoration.
+
+## Vehicle Fitment & Compatibility
+Products on SHRELL indicate exact vehicle compatibility:
+- **Universal Fitment**: Air compressors, recovery ropes, soft shackles, microfiber care, and 12V plug accessories fit all passenger cars, 4x4s, and commercial vehicles.
+- **Vehicle-Specific Fitment**: Roof crossbars, mounting brackets, and custom lighting harnesses are tailored for specific chassis:
+  - Mahindra: Thar (2020+), Scorpio-N, Scorpio Classic, XUV700, Bolero
+  - Tata: Safari, Harrier, Nexon, Punch
+  - Toyota: Fortuner, Hilux, Innova Crysta, Hycross
+  - Suzuki: Jimny 5-Door, Grand Vitara, Brezza
+  - Force: Gurkha (2021+)
+  - Ford: Endeavour
+
+## Customer Policies & Support
+- **Shipping Policy**: Orders placed before 2:00 PM IST dispatch within 24 hours. Transit time is 2-4 business days for metros and 4-6 business days for tier 2/3 locations.
+- **Warranty Policy**: 12-month manufacturer defect replacement warranty.
+- **Return Policy**: 7-day return policy for unused, original-packaged products.
+- **Support Contact**: support@shrell.com

@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
+Allow: /llms.txt
+Allow: /sitemap.xml
+Allow: /merchant-feed.xml
 
 # Disallow administrative, checkout and customer account routes
 Disallow: /admin

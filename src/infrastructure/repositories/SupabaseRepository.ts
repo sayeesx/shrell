@@ -904,7 +904,11 @@ export class SupabaseOrderRepository implements IOrderRepository {
     }
 
     try {
-      let q = supabase.from('orders').select('*').order('created_at', { ascending: false });
+      let q = supabase
+        .from('orders')
+        .select('*, order_items(*)')
+        .order('created_at', { ascending: false });
+
       if (filters?.status) q = q.eq('status', filters.status);
       if (filters?.paymentStatus) q = q.eq('payment_status', filters.paymentStatus);
       if (filters?.search) {
@@ -916,7 +920,22 @@ export class SupabaseOrderRepository implements IOrderRepository {
         return this.fallback.getAllOrders(filters);
       }
 
-      return data.map((r) => this.mapRowToOrder(r, []));
+      return data.map((r: any) => {
+        const items = Array.isArray(r.order_items)
+          ? r.order_items.map((it: any) => ({
+              id: it.id,
+              orderId: it.order_id,
+              productId: it.product_id,
+              productName: it.product_name,
+              sku: it.sku,
+              unitPricePaisa: Number(it.unit_price_paisa),
+              quantity: it.quantity,
+              subtotalPaisa: Number(it.subtotal_paisa),
+              imageUrl: it.image_url,
+            }))
+          : [];
+        return this.mapRowToOrder(r, items);
+      });
     } catch {
       return this.fallback.getAllOrders(filters);
     }
@@ -936,7 +955,8 @@ export class SupabaseOrderRepository implements IOrderRepository {
         .single();
 
       if (error || !data) return this.fallback.updateOrderStatus(id, status, internalNotes);
-      return this.mapRowToOrder(data, []);
+      const full = await this.getOrderById(id);
+      return full || this.mapRowToOrder(data, []);
     } catch {
       return this.fallback.updateOrderStatus(id, status, internalNotes);
     }
@@ -959,7 +979,8 @@ export class SupabaseOrderRepository implements IOrderRepository {
         .single();
 
       if (error || !data) return this.fallback.updatePaymentStatus(id, paymentStatus, reference);
-      return this.mapRowToOrder(data, []);
+      const full = await this.getOrderById(id);
+      return full || this.mapRowToOrder(data, []);
     } catch {
       return this.fallback.updatePaymentStatus(id, paymentStatus, reference);
     }
@@ -973,35 +994,53 @@ export class SupabaseOrderRepository implements IOrderRepository {
     try {
       const { data, error } = await supabase
         .from('orders')
-        .update({ shipment })
+        .update({ shipment, status: 'SHIPPED' })
         .eq('id', orderId)
         .select()
         .single();
 
       if (error || !data) return this.fallback.updateShipment(orderId, shipment);
-      return this.mapRowToOrder(data, []);
+      const full = await this.getOrderById(orderId);
+      return full || this.mapRowToOrder(data, []);
     } catch {
       return this.fallback.updateShipment(orderId, shipment);
     }
   }
 
   private mapRowToOrder(row: Record<string, any>, items: Order['items']): Order {
+    let parsedAddress = row.shipping_address;
+    if (typeof parsedAddress === 'string') {
+      try {
+        parsedAddress = JSON.parse(parsedAddress);
+      } catch {
+        parsedAddress = { addressLine1: parsedAddress };
+      }
+    }
+    if (!parsedAddress || typeof parsedAddress !== 'object') {
+      parsedAddress = {
+        addressLine1: 'Address not available',
+        city: '',
+        state: '',
+        postalCode: '',
+      };
+    }
+
     return {
       id: row.id,
       customerId: row.customer_id,
-      customerName: row.customer_name,
-      customerEmail: row.customer_email,
-      customerPhone: row.customer_phone,
+      customerName: row.customer_name || 'Valued Customer',
+      customerEmail: row.customer_email || '',
+      customerPhone: row.customer_phone || '',
       status: row.status,
       paymentStatus: row.payment_status,
       paymentMethod: row.payment_method,
       paymentReference: row.payment_reference,
-      subtotalPaisa: Number(row.subtotal_paisa),
-      taxPaisa: Number(row.tax_paisa),
-      shippingPaisa: Number(row.shipping_paisa),
-      discountPaisa: Number(row.discount_paisa),
-      totalPaisa: Number(row.total_paisa),
-      shippingAddress: typeof row.shipping_address === 'string' ? JSON.parse(row.shipping_address) : row.shipping_address,
+      subtotalPaisa: Number(row.subtotal_paisa || 0),
+      taxPaisa: Number(row.tax_paisa || 0),
+      shippingPaisa: Number(row.shipping_paisa || 0),
+      discountPaisa: Number(row.discount_paisa || 0),
+      totalPaisa: Number(row.total_paisa || 0),
+      shippingAddress: parsedAddress,
       deliveryInstructions: row.delivery_instructions,
       shipment: row.shipment,
       items: items || [],
